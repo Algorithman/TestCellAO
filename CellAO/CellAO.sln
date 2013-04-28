@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AO.Core", "Libraries\Source
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmokeLounge.AOtomation.Messaging", "..\..\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\SmokeLounge.AOtomation.Messaging.csproj", "{3CEAC898-BFCA-45EA-BF34-C4BBB85D2DA4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZoneEngine", "AO.Servers\ZoneEngine\ZoneEngine.csproj", "{9FAB94E5-58EE-475B-B866-E8F2EDE31FDD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,6 +122,16 @@ Global
 		{3CEAC898-BFCA-45EA-BF34-C4BBB85D2DA4}.Release|Itanium.ActiveCfg = Release|Any CPU
 		{3CEAC898-BFCA-45EA-BF34-C4BBB85D2DA4}.Release|x64.ActiveCfg = Release|Any CPU
 		{3CEAC898-BFCA-45EA-BF34-C4BBB85D2DA4}.Release|x86.ActiveCfg = Release|Any CPU
+		{9FAB94E5-58EE-475B-B866-E8F2EDE31FDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FAB94E5-58EE-475B-B866-E8F2EDE31FDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FAB94E5-58EE-475B-B866-E8F2EDE31FDD}.Debug|Itanium.ActiveCfg = Debug|Any CPU
+		{9FAB94E5-58EE-475B-B866-E8F2EDE31FDD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9FAB94E5-58EE-475B-B866-E8F2EDE31FDD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9FAB94E5-58EE-475B-B866-E8F2EDE31FDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FAB94E5-58EE-475B-B866-E8F2EDE31FDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FAB94E5-58EE-475B-B866-E8F2EDE31FDD}.Release|Itanium.ActiveCfg = Release|Any CPU
+		{9FAB94E5-58EE-475B-B866-E8F2EDE31FDD}.Release|x64.ActiveCfg = Release|Any CPU
+		{9FAB94E5-58EE-475B-B866-E8F2EDE31FDD}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -132,5 +144,6 @@ Global
 		{3CEAC898-BFCA-45EA-BF34-C4BBB85D2DA4} = {DC864B6D-2877-4FE5-95F2-F1E2D9CF73D1}
 		{A4AC6B9E-4E0E-4143-ACCF-FBCA2FC1BAD2} = {D8F47413-AD0E-4A6B-AE10-4732E9BA85FE}
 		{18839C38-02CB-49DA-9650-F014C74BB750} = {0B8DB2AA-3670-43CF-8F08-99FA7469EA4D}
+		{9FAB94E5-58EE-475B-B866-E8F2EDE31FDD} = {0B8DB2AA-3670-43CF-8F08-99FA7469EA4D}
 	EndGlobalSection
 EndGlobal
