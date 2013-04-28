@@ -185,7 +185,16 @@ namespace RevisionGetter
         /// </param>
         private static void ApplyRevisionToAssemblyInfos(string tag, string filename)
         {
-            string newTag = tag.Split('-')[0] + "." + tag.Split('-')[1];
+            string newTag = "1.4.1.2";
+            try
+            {
+                newTag = tag.Split('-')[0] + "." + tag.Split('-')[1];
+            }
+            catch
+            {
+                
+            }
+            
 
             TextReader tr = new StreamReader(filename + ".template");
             List<string> content = new List<string>();
@@ -259,6 +268,21 @@ namespace RevisionGetter
             tw.Close();
         }
 
+
+        private static bool isRepo(string folderName, string startFolder)
+        {
+            string checkFolder = startFolder;
+            while (Directory.Exists(checkFolder))
+            {
+                if (Directory.Exists(Path.Combine(checkFolder, folderName)))
+                {
+                    return true;
+                }
+                checkFolder = Path.Combine(checkFolder, "..");
+            }
+            return false;
+        }
+
         /// <summary>
         /// The main.
         /// </summary>
@@ -274,7 +298,7 @@ namespace RevisionGetter
                 Console.WriteLine("Changing File: " + args[0]);
 
                 string PathToGit = FindGit();
-                if ((PathToGit != string.Empty) && (Directory.Exists("..\\..\\..\\.git")))
+                if ((PathToGit != string.Empty) && (isRepo(".git", Path.GetDirectoryName(args[0]))))
                 {
                     ProcessStartInfo startInfo = new ProcessStartInfo(PathToGit);
                     startInfo.UseShellExecute = false;
@@ -301,7 +325,7 @@ namespace RevisionGetter
                 }
 
                 string PathToSvn = Findsvn();
-                if ((PathToSvn != string.Empty) && (Directory.Exists("..\\..\\..\\.svn")))
+                if ((PathToSvn != string.Empty) && (isRepo(".svn", Path.GetDirectoryName(args[0]))))
                 {
                     ProcessStartInfo startInfo = new ProcessStartInfo(PathToSvn);
                     startInfo.UseShellExecute = false;
