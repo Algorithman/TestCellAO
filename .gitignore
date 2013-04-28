@@ -114,3 +114,4 @@ UpgradeLog*.XML
 /CellAO/AO.Servers/LoginEngine/Properties/AssemblyInfo.cs
 /CellAO/AO.Servers/ZoneEngine/Properties/AssemblyInfo.cs
 /CellAO/AO.Servers/ChatEngine/Properties/AssemblyInfo.cs
+/CellAO/Built
