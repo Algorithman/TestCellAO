@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\Built\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -28,7 +28,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\Built\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -102,6 +102,10 @@
     <ProjectReference Include="..\..\Libraries\Source\Cell.Core\Cell.Core.csproj">
       <Project>{71ab07ad-4d94-4693-8560-47862e5b6e61}</Project>
       <Name>Cell.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NiceHexOutput\NiceHexOutput.csproj">
+      <Project>{6079cb15-9d05-4142-ab50-00db492dd871}</Project>
+      <Name>NiceHexOutput</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

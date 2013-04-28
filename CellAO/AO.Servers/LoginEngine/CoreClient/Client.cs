@@ -8,7 +8,7 @@ namespace LoginEngine.CoreClient
     using AO.Core.Events;
 
     using Cell.Core;
-    using NLog;
+    using NiceHexOutput;
 
     using SmokeLounge.AOtomation.Messaging.Messages;
 
@@ -101,12 +101,15 @@ namespace LoginEngine.CoreClient
 
         protected override bool OnReceive(BufferSegment buffer)
         {
-            Console.WriteLine("Offset: "+buffer.Offset.ToString()+" -- RemainingLength: "+_remainingLength);
             Message message = null;
 
             var packet = new byte[_remainingLength];
             Array.Copy(buffer.SegmentData, packet, _remainingLength);
-            Console.WriteLine(BitConverter.ToString(packet));
+            /* Uncomment for Incoming Messages
+             */
+            Console.WriteLine("Offset: " + buffer.Offset.ToString() + " -- RemainingLength: " + _remainingLength);
+            Console.WriteLine(NiceHexOutput.Output(packet));
+             
             _remainingLength = 0;
             try
             {
@@ -155,14 +158,19 @@ namespace LoginEngine.CoreClient
             buffer[1] = BitConverter.GetBytes(packetNumber)[0];
             packetNumber++;
 
+
+            /* Uncomment for Debug outgoing Messages
+             */
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(BitConverter.ToString(buffer));
+            Console.WriteLine(NiceHexOutput.Output(buffer));
             Console.ResetColor();
+             
+
             if (buffer.Length % 4 > 0)
             {
                 Array.Resize(ref buffer, buffer.Length + (4 - (buffer.Length % 4)));
             }
-            
+
             this.Send(buffer);
         }
     }

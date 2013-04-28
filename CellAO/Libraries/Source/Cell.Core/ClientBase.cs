@@ -33,7 +33,7 @@ namespace Cell.Core
         //public const int MinBufferSize = 1024;
         public const int BufferSize = CellDef.MAX_PBUF_SEGMENT_SIZE;
 
-        private static readonly BufferManager Buffers = BufferManager.Small;
+        private static readonly BufferManager Buffers = BufferManager.Default;
 
 
         /// <summary>
