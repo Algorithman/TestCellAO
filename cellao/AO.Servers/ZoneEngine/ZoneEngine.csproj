@@ -51,9 +51,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyInfoclass.cs" />
     <Compile Include="Collision\BorderlineCheck.cs" />
+    <Compile Include="CoreClient\Client.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Script\AOChatCommand.cs" />
+    <Compile Include="Script\IAOScript.cs" />
+    <Compile Include="Script\ScriptCompiler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config.xml">
@@ -2114,9 +2119,21 @@
     <Folder Include="Static Handlers\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\SmokeLounge.AOtomation.Messaging.csproj">
+      <Project>{3ceac898-bfca-45ea-bf34-c4bbb85d2da4}</Project>
+      <Name>SmokeLounge.AOtomation.Messaging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Libraries\Source\AO.Core\AO.Core.csproj">
       <Project>{1ec261bb-153d-487d-8a0a-dd85e850775f}</Project>
       <Name>AO.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\Cell.Core\Cell.Core.csproj">
+      <Project>{71ab07ad-4d94-4693-8560-47862e5b6e61}</Project>
+      <Name>Cell.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NiceHexOutput\NiceHexOutput.csproj">
+      <Project>{6079cb15-9d05-4142-ab50-00db492dd871}</Project>
+      <Name>NiceHexOutput</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
