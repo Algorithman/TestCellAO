@@ -568,7 +568,7 @@ namespace ZoneEngine.Collision
 
         public static LineSegment WallCollisionCheck(float x, float z, int playfield)
         {
-            return Program.zoneServer.ZoneBorderHandler.Test(x, z, playfield);
+            return Program.ZoneBorderHandler.Test(x, z, playfield);
         }
 
         public static CoordHeading GetCoord(LineSegment lineSegment, float x, float z, AOCoord coordinates)
