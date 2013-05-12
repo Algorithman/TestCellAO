@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ZoneEngine.GameObject
 {
-    public class VendorShop : GameObject, INamedEntity, IInventory
+    public class VendorShop : GameObject, INamedEntity, IInventory, IAOEvents
     {
     }
 }

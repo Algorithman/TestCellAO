@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ZoneEngine.GameObject
 {
-    public class Statel : GameObject
+    public class Statel : GameObject, IAOEvents, IAOActions
     {
     }
 }

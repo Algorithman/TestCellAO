@@ -6,7 +6,7 @@ using ZoneEngine.GameObject.Stats;
 
 namespace ZoneEngine.GameObject
 {
-    public class InstancedItem : Dynel
+    public class InstancedItem : Dynel, IAOEvents, IAOActions
     {
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ZoneEngine.GameObject
 {
-    public class NonPlayerCharacter : Dynel, INamedEntity, ISummoner
+    public class NonPlayerCharacter : Dynel, INamedEntity, ISummoner, IAOEvents, IAOActions
     {
     }
 }

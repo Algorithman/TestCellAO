@@ -5,7 +5,12 @@ using System.Text;
 
 namespace ZoneEngine.GameObject
 {
-    public interface INamedEntity : IInstancedEntity
+    public interface INamedEntity : IInstancedEntity, IStats
     {
+        string Name
+        {
+            get;
+            set;
+        }
     }
 }

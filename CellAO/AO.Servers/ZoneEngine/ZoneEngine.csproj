@@ -88,6 +88,8 @@
     <Compile Include="GameObject\InstancedItem.cs" />
     <Compile Include="GameObject\IStats.cs" />
     <Compile Include="GameObject\ILootInventory.cs" />
+    <Compile Include="GameObject\IAOEvents.cs" />
+    <Compile Include="IAOActions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Script\AOChatCommand.cs" />

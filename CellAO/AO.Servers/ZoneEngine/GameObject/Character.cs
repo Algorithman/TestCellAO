@@ -6,7 +6,7 @@ using ZoneEngine.GameObject.Stats;
 
 namespace ZoneEngine.GameObject
 {
-    public class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner
+    public class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner, IAOEvents, IAOActions
     {
 
     }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ZoneEngine.GameObject
+namespace ZoneEngine
 {
-    public class Corpse : GameObject, IInstancedEntity, IAOEvents
+    public interface IAOActions
     {
     }
 }
