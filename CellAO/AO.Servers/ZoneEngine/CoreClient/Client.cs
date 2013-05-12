@@ -22,9 +22,7 @@ namespace ZoneEngine.CoreClient
 
         private ushort packetNumber = 1;
 
-        private string serverSalt = string.Empty;
-
-        private Character character = new Character();
+        private readonly Character character = new Character();
 
         #region Public Properties
 
@@ -54,24 +52,11 @@ namespace ZoneEngine.CoreClient
             }
         }
 
-        public string ServerSalt
-        {
-            get
-            {
-                return this.serverSalt;
-            }
-
-            set
-            {
-                this.serverSalt = value;
-            }
-        }
-
         public Character Character
         {
             get
             {
-                return character;
+                return this.character;
             }
         }
 
@@ -151,18 +136,15 @@ namespace ZoneEngine.CoreClient
                 Header =
                     new Header
                     {
-                        MessageId = BitConverter.ToInt16(new byte[] { 0xDF, 0xDF }, 0),
+                        MessageId = (short)packetNumber,
                         PacketType = messageBody.PacketType,
                         Unknown = 0x0001,
                         Sender = 0x00000001,
                         Receiver = receiver
                     }
             };
+            packetNumber++;
             var buffer = this.messageSerializer.Serialize(message);
-
-            buffer[0] = BitConverter.GetBytes(this.packetNumber)[1];
-            buffer[1] = BitConverter.GetBytes(this.packetNumber)[0];
-            this.packetNumber++;
 
             /* Uncomment for Debug outgoing Messages
             */
@@ -178,12 +160,15 @@ namespace ZoneEngine.CoreClient
             this.Send(buffer);
         }
 
-        public void SendChatText(string Text)
+        public void SendChatText(string text)
         {
-            /* ChatTextMessage chatTextMessage = new ChatTextMessage();
-            chatTextMessage.Text = Text;
-            byte[] packet = 
-            */
+            var message = new Message();
+
+            ChatTextMessage chatTextMessage = new ChatTextMessage();
+            chatTextMessage.Text = text;
+            Send(character.Identity.Instance, chatTextMessage);
+
+            
             throw new NotImplementedException("SendChatText not implemented yet");
         }
     }
