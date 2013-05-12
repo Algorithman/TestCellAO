@@ -81,6 +81,7 @@
     <Compile Include="GameObject\Stats\SpecialStats\StatSkill.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\StatTitleLevel.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\StatWeaponsStyle.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\XPTable.cs" />
     <Compile Include="InstancedItem.cs" />
     <Compile Include="GameObject\IStats.cs" />
     <Compile Include="Program.cs" />

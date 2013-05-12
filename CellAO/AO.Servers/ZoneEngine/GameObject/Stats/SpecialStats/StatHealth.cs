@@ -25,7 +25,7 @@
 #region Usings...
 #endregion
 
-namespace ZoneEngine.GameObject.Misc
+namespace ZoneEngine.GameObject.Stats
 {
     public class StatHealth : ClassStat
     {
