@@ -7,5 +7,9 @@ namespace ZoneEngine.GameObject
 {
     public interface ISummoner
     {
+        IList<Pet> Pets
+        {
+            get;
+        }
     }
 }

@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameObject\Items\AOItem.cs" />
     <Compile Include="AssemblyInfoclass.cs" />
     <Compile Include="GameObject\Corpse.cs" />
     <Compile Include="GameObject\Character.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="GameObject\INamedEntity.cs" />
     <Compile Include="GameObject\IPacketReceivingEntity.cs" />
     <Compile Include="GameObject\ISummoner.cs" />
+    <Compile Include="GameObject\Items\LootTable.cs" />
     <Compile Include="GameObject\NonPlayerCharacter.cs" />
     <Compile Include="GameObject\Pet.cs" />
     <Compile Include="GameObject\Stats\ClassStat.cs" />
@@ -85,11 +87,11 @@
     <Compile Include="GameObject\Stats\SpecialStats\StatWeaponsStyle.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\XPTable.cs" />
     <Compile Include="GameObject\IInventory.cs" />
-    <Compile Include="GameObject\InstancedItem.cs" />
+    <Compile Include="GameObject\Items\InstancedItem.cs" />
     <Compile Include="GameObject\IStats.cs" />
     <Compile Include="GameObject\ILootInventory.cs" />
     <Compile Include="GameObject\IAOEvents.cs" />
-    <Compile Include="IAOActions.cs" />
+    <Compile Include="GameObject\IAOActions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Script\AOChatCommand.cs" />

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ZoneEngine
+namespace ZoneEngine.GameObject.Items
 {
-    public interface IAOActions
+    public class AOItem
     {
+
     }
 }

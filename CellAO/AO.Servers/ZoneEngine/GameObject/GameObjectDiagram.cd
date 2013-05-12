@@ -3,7 +3,7 @@
   <Class Name="ZoneEngine.GameObject.GameObject">
     <Position X="6.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAA=</HashCode>
       <FileName>GameObject\GameObject.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -11,7 +11,7 @@
   <Class Name="ZoneEngine.GameObject.Character">
     <Position X="3" Y="4.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAACAAAAAgEAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\Character.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -47,11 +47,11 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="ZoneEngine.GameObject.InstancedItem">
+  <Class Name="ZoneEngine.GameObject.Items.InstancedItem">
     <Position X="5.25" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>GameObject\InstancedItem.cs</FileName>
+      <FileName>GameObject\Items\InstancedItem.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
@@ -71,6 +71,13 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
+  <Class Name="ZoneEngine.GameObject.Items.AOItem">
+    <Position X="6.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>GameObject\Items\AOItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Interface Name="ZoneEngine.GameObject.IEntity">
     <Position X="3.25" Y="6.5" Width="1.5" />
     <TypeIdentifier>
@@ -81,7 +88,7 @@
   <Interface Name="ZoneEngine.GameObject.IInstancedEntity">
     <Position X="3.25" Y="8.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\IInstancedEntity.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -102,7 +109,7 @@
   <Interface Name="ZoneEngine.GameObject.ISummoner" Collapsed="true">
     <Position X="18" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\ISummoner.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -123,7 +130,7 @@
   <Interface Name="ZoneEngine.GameObject.ILootInventory" Collapsed="true">
     <Position X="14.5" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAA=</HashCode>
       <FileName>GameObject\ILootInventory.cs</FileName>
     </TypeIdentifier>
   </Interface>
@@ -134,11 +141,11 @@
       <FileName>GameObject\IAOEvents.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="ZoneEngine.IAOActions" Collapsed="true">
+  <Interface Name="ZoneEngine.GameObject.IAOActions" Collapsed="true">
     <Position X="14.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>IAOActions.cs</FileName>
+      <FileName>GameObject\IAOActions.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Font Name="Segoe UI" Size="9" />

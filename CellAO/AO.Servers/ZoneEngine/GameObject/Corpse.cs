@@ -7,5 +7,6 @@ namespace ZoneEngine.GameObject
 {
     public class Corpse : GameObject, IInstancedEntity, IAOEvents
     {
+
     }
 }
