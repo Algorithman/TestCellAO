@@ -1,5 +1,4 @@
 ﻿using System;
-
 using System.Threading.Tasks;
 
 namespace LoginEngine
@@ -7,87 +6,76 @@ namespace LoginEngine
     using System.Diagnostics;
     using System.Net;
     using System.Text.RegularExpressions;
-
     using AO.Core;
     using AO.Core.Components;
-    using MySql.Data.MySqlClient;
-
     using LoginEngine.CoreServer;
-
+    using MySql.Data.MySqlClient;
     using NBug;
     using NBug.Properties;
-
     using NLog;
     using NLog.Config;
     using NLog.Targets;
     using Config = AO.Core.Config.ConfigReadWrite;
+
     class Program
     {
-
-
         #region Static Fields
-
+        
         private static readonly
-            IContainer Container = new MefContainer();
-
+        IContainer Container = new MefContainer();
+        
         private static
         LoginServer loginServer;
-
+        
         #endregion
-
+        
         #region Public Methods and Operators
-
+        
         public static
-        bool Ismixed
-        ()
+        bool Ismixed()
         {
             var info = AssemblyInfoclass.Trademark.Split(';');
             return info[0] == "1";
         }
-
+        
         public static
-            bool Ismodified
-            ()
+        bool Ismodified()
         {
             var info = AssemblyInfoclass.Trademark.Split(';');
             return info[1] == "1";
         }
-
+        
         public static
-            bool TestEmailRegex
-            (string
-            emailAddress)
+        bool TestEmailRegex(string emailAddress)
         {
             const string PatternStrict =
-                @"^(([^<>()[\]\\.,;:\s@\""]+" + @"(\.[^<>()[\]\\.,;:\s@\""]+)*)|(\"".+\""))@"
-                + @"((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}" + @"\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+"
-                + @"[a-zA-Z]{2,}))$";
-
+                                        @"^(([^<>()[\]\\.,;:\s@\""]+" + @"(\.[^<>()[\]\\.,;:\s@\""]+)*)|(\"".+\""))@" +
+                                        @"((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}" + @"\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+" +
+                                        @"[a-zA-Z]{2,}))$";
+            
             var reStrict = new Regex(PatternStrict);
             return reStrict.IsMatch(emailAddress);
         }
-
+        
         #endregion
-
+        
         #region Methods
-
+        
         private static
-            void Main
-            (string[]
-            args)
+        void Main(string[] args)
         {
-            Console.Title = "CellAO " + AssemblyInfoclass.Title + " Console. Version: "
-                            + AssemblyInfoclass.Description + " " + AssemblyInfoclass.AssemblyVersion + " "
-                            + AssemblyInfoclass.Trademark;
-
+            Console.Title = "CellAO " + AssemblyInfoclass.Title + " Console. Version: " +
+                            AssemblyInfoclass.Description + " " + AssemblyInfoclass.AssemblyVersion + " " +
+                            AssemblyInfoclass.Trademark;
+            
             var ct = new ConsoleText();
             ct.TextRead("main.txt");
             Console.WriteLine("Loading " + AssemblyInfoclass.Title + "...");
-
+            
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("[OK]");
             Console.ResetColor();
-
+            
             // Sying helped figure all this code out, about 5 yearts ago! :P
             var processedargs = false;
             loginServer = Container.GetInstance<LoginServer>();
@@ -111,9 +99,7 @@ namespace LoginEngine
                 Console.ReadKey();
                 return;
             }
-
-
-
+            
             var config = new LoggingConfiguration();
             var consoleTarget = new ColoredConsoleTarget();
             consoleTarget.Layout = "${date:format=HH\\:MM\\:ss} ${logger} ${message}";
@@ -126,17 +112,17 @@ namespace LoginEngine
             var rule2 = new LoggingRule("*", LogLevel.Trace, fileTarget);
             config.LoggingRules.Add(rule2);
             LogManager.Configuration = config;
-
+            
             SettingsOverride.LoadCustomSettings("NBug.LoginEngine.Config");
             NBug.Settings.WriteLogToDisk = true;
             AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
             TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
-
+            
             // TODO: ADD More Handlers.
             loginServer.MaximumPendingConnections = 100;
-
+            
             #region Console Commands
-
+            
             // Andyzweb: Added checks for start and stop
             // also added a running command to return status of the server
             // and added Console.Write("\nServer Command >>"); to login server
@@ -154,12 +140,12 @@ namespace LoginEngine
                             loginServer.Start(TCPEnable, UDPEnable);
                         }
                     }
-
+                    
                     processedargs = true;
                 }
-
+                
                 Console.Write("\nServer Command >>");
-
+                
                 consoleCommand = Console.ReadLine();
                 var temp = string.Empty;
                 while (temp != consoleCommand)
@@ -167,7 +153,7 @@ namespace LoginEngine
                     temp = consoleCommand;
                     consoleCommand = consoleCommand.Replace("  ", " ");
                 }
-
+                
                 consoleCommand = consoleCommand.Trim();
                 switch (consoleCommand.ToLower())
                 {
@@ -179,7 +165,7 @@ namespace LoginEngine
                             Console.ResetColor();
                             break;
                         }
-
+                        
                         loginServer.Start(TCPEnable, UDPEnable);
                         break;
                     case "stop":
@@ -190,7 +176,7 @@ namespace LoginEngine
                             Console.ResetColor();
                             break;
                         }
-
+                        
                         loginServer.Stop();
                         break;
                     case "exit":
@@ -203,13 +189,13 @@ namespace LoginEngine
                             ct.TextRead("loginisrunning.txt");
                             break;
                         }
-
+                        
                         // Console.WriteLine("Login Server not running");
                         ct.TextRead("loginisnotrunning.txt");
                         break;
 
-                    #region Help Commands....
-
+                        #region Help Commands....
+                        
                     case "help":
                         ct.TextRead("logincmdhelp.txt");
                         break;
@@ -228,13 +214,13 @@ namespace LoginEngine
                     case "help setpass":
                         ct.TextRead("logincmdhelpsetpass.txt");
                         break;
-
-                    #endregion
-
+                    
+                        #endregion
+                        
                     default:
-
+                        
                         #region Adduser
-
+                        
                         // This section handles the command for adding a user to the database
                         if (consoleCommand.ToLower().StartsWith("adduser"))
                         {
@@ -245,7 +231,7 @@ namespace LoginEngine
                                     "Invalid command syntax.\nPlease use:\nAdduser <username> <password> <number of characters> <expansion> <gm level> <email> <FirstName> <LastName>");
                                 break;
                             }
-
+                            
                             var username = parts[1];
                             var password = parts[2];
                             var numChars = 0;
@@ -258,7 +244,7 @@ namespace LoginEngine
                                 Console.WriteLine("Error: <number of characters> must be a number (duh!)");
                                 break;
                             }
-
+                            
                             var expansions = 0;
                             try
                             {
@@ -269,13 +255,13 @@ namespace LoginEngine
                                 Console.WriteLine("Error: <expansions> must be a number between 0 and 2047!");
                                 break;
                             }
-
+                                
                             if (expansions < 0 || expansions > 2047)
                             {
                                 Console.WriteLine("Error: <expansions> must be a number between 0 and 2047!");
                                 break;
                             }
-
+                            
                             var gm = 0;
                             try
                             {
@@ -286,20 +272,20 @@ namespace LoginEngine
                                 Console.WriteLine("Error: <GM Level> must be number (duh!)");
                                 break;
                             }
-
+                            
                             var email = parts[6];
                             if (email == null)
                             {
                                 email = string.Empty;
                             }
-
+                                
                             if (!TestEmailRegex(email))
                             {
                                 Console.WriteLine(
                                     "Error: <Email> You must supply an email address for this account");
                                 break;
                             }
-
+                            
                             var firstname = parts[7];
                             try
                             {
@@ -313,7 +299,7 @@ namespace LoginEngine
                                 Console.WriteLine("Error: <FirstName> You must supply a first name for this accout");
                                 break;
                             }
-
+                            
                             var lastname = parts[8];
                             try
                             {
@@ -327,15 +313,15 @@ namespace LoginEngine
                                 Console.WriteLine("Error: <LastName> You must supply a last name for this account");
                                 break;
                             }
-
+                                                       
                             const string FormatString =
-                                "INSERT INTO `login` (`CreationDate`, `Flags`,`AccountFlags`,`Username`,`Password`,`Allowed_Characters`,`Expansions`, `GM`, `Email`, `FirstName`, `LastName`) VALUES "
-                                + "(NOW(), '0', '0', '{0}', '{1}', {2}, {3}, {4}, '{5}', '{6}', '{7}');";
-
+                                                       "INSERT INTO `login` (`CreationDate`, `Flags`,`AccountFlags`,`Username`,`Password`,`Allowed_Characters`,`Expansions`, `GM`, `Email`, `FirstName`, `LastName`) VALUES " +
+                                                       "(NOW(), '0', '0', '{0}', '{1}', {2}, {3}, {4}, '{5}', '{6}', '{7}');";
+                            
                             var le = new LoginEncryption();
-
+                            
                             var hashedPassword = le.GeneratePasswordHash(password);
-
+                                
                             var sql = string.Format(
                                 FormatString,
                                 username,
@@ -367,15 +353,15 @@ namespace LoginEngine
 
                                 break;
                             }
-
+                        
                             Console.WriteLine("User added successfully.");
                             break;
                         }
-
+                        
                         #endregion
-
+                        
                         #region Hashpass
-
+                        
                         // This function just hashes the string you enter using the loginencryption method
                         if (consoleCommand.ToLower().StartsWith("hash"))
                         {
@@ -387,18 +373,18 @@ namespace LoginEngine
                                 Console.WriteLine(Syntax);
                                 break;
                             }
-
+                            
                             var pass = parts[1];
                             var le = new LoginEncryption();
                             var hashed = le.GeneratePasswordHash(pass);
                             Console.WriteLine(hashed);
                             break;
                         }
-
+                        
                         #endregion
-
+                        
                         #region setpass
-
+                        
                         // sets the password for the given username
                         // Added by Andyzweb
                         // Still TODO add exception and error handling
@@ -412,42 +398,37 @@ namespace LoginEngine
                                 Console.WriteLine(Syntax);
                                 break;
                             }
-
+                            
                             var username = parts[1];
                             var newpass = parts[2];
                             var le = new LoginEncryption();
                             var hashed = le.GeneratePasswordHash(newpass);
                             string formatString;
                             formatString = "UPDATE `login` SET Password = '{0}' WHERE login.Username = '{1}'";
-
+                            
                             var sql = string.Format(formatString, hashed, username);
-
+                            
                             var updt = new SqlWrapper();
                             try
                             {
                                 updt.SqlUpdate(sql);
                             }
-
-
-
-                                // yeah this part here, some kind of exception handling for mysql errors
+                            // yeah this part here, some kind of exception handling for mysql errors
                             catch
                             {
                             }
                         }
-
+                        
                         #endregion
-
+                
                         ct.TextRead("login_consolecmdsdefault.txt");
                         break;
                 }
             }
-
+    
             #endregion
         }
 
         #endregion
-
     }
 }
-

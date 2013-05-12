@@ -27,19 +27,33 @@ using NBug.Properties;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using System.Threading.Tasks;
+using AO.Core.Components;
 
 namespace ZoneEngine
 {
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Threading.Tasks;
     using AO.Core;
     using ZoneEngine.Collision;
     using ZoneEngine.CoreClient;
+    using ZoneEngine.CoreServer;
     using ZoneEngine.Script;
 
     class Program
     {
+        #region Static Fields
+
+        private static readonly
+        IContainer Container = new MefContainer();
+
+        private static
+        ZoneServer zoneServer;
+
+        #endregion
+
         public static WallCollision ZoneBorderHandler = new WallCollision();
 
         public static ScriptCompiler csc;
@@ -72,11 +86,33 @@ namespace ZoneEngine
             //TODO: ADD More Handlers.
             
             #endregion
-            
+
+            ZoneServer = Container.GetInstance<ZoneServer>();
+            bool TCPEnable = true;
+            bool UDPEnable = false;
+            int Port = Convert.ToInt32(Config.Instance.CurrentConfig.ZonePort);
+            try
+            {
+                if (Config.Instance.CurrentConfig.ListenIP == "0.0.0.0")
+                {
+                    ZoneServer.TcpEndPoint = new IPEndPoint(IPAddress.Any, Port);
+                }
+                else
+                {
+                    ZoneServer.TcpIP = IPAddress.Parse(Config.Instance.CurrentConfig.ListenIP);
+                }
+            }
+            catch
+            {
+                ct.TextRead("ip_config_parse_error.txt");
+                Console.ReadKey();
+                return;
+            }
+           
             #region Console Text...
             
             Console.Title = "CellAO " + AssemblyInfoclass.Title + " Console. Version: " + AssemblyInfoclass.Description +
-                            " " + AssemblyInfoclass.AssemblyVersion + " " + AssemblyInfoclass.Trademark;
+                    " " + AssemblyInfoclass.AssemblyVersion + " " + AssemblyInfoclass.Trademark;
             
             ConsoleText ct = new ConsoleText();
             ct.TextRead("main.txt");
@@ -222,7 +258,63 @@ namespace ZoneEngine
                 }
             }
         }
-    
+        
         #endregion
+        
+        public static void StartTheServer()
+        {
+            try
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                zoneServer.Monsters = new List<NonPlayerCharacterClass>();
+                zoneServer.Vendors = new List<VendingMachine>();
+                zoneServer.Doors = new List<Doors>();
+                
+                using (SqlWrapper sqltester = new SqlWrapper())
+                {
+                    if (sqltester.SQLCheck() != SqlWrapper.DBCheckCodes.DBC_ok)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Database setup not correct");
+                        Console.WriteLine("Error: #" + sqltester.lasterrorcode + " - " + sqltester.lasterrormessage);
+                        Console.WriteLine("Please press Enter to exit.");
+                        Console.ReadLine();
+                        Process.GetCurrentProcess().Kill();
+                    }
+                    sqltester.CheckDBs();
+                }
+                
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Loaded {0} items", ItemHandler.CacheAllItems());
+                Console.WriteLine("Loaded {0} nanos", NanoHandler.CacheAllNanos());
+                Console.WriteLine("Loaded {0} spawns", NonPlayerCharacterHandler.CacheAllFromDB());
+                Console.WriteLine("Loaded {0} vendors", VendorHandler.CacheAllFromDB());
+                Console.WriteLine("Loaded {0} teleports", DoorHandler.CacheAllFromDB());
+                Console.WriteLine("Loaded {0} statels", Statels.CacheAllStatels());
+                
+                LootHandler.CacheAllFromDB();
+                Tradeskill.CacheItemNames();
+                
+                csc.AddScriptMembers();
+                csc.CallMethod("Init", null);
+                
+                ThreadMgr.Start();
+                zoneServer.Start();
+                Console.ResetColor();
+            }
+            catch (MySqlException e)
+            {
+                Console.WriteLine("MySql Error. Server Cannot Start");
+                Console.WriteLine("Exception: " + e.Message);
+                string current = DateTime.Now.ToString("HH:mm:ss");
+                StreamWriter logfile = File.AppendText("ZoneEngineLog.txt");
+                logfile.WriteLine(current + " " + e.Source + " MySql Error. Server Cannot Start");
+                logfile.WriteLine(current + " " + e.Source + " Exception: " + e.Message);
+                logfile.Close();
+                zoneServer.Stop();
+                ThreadMgr.Stop();
+                Process.GetCurrentProcess().Kill();
+            }
+        }
     }
 }
