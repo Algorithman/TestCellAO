@@ -1,6 +1,4 @@
-﻿
-#region License
-
+﻿#region License
 // Copyright (c) 2005-2012, CellAO Team
 // 
 // All rights reserved.
@@ -22,40 +20,41 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 #endregion
 
-#region Usings...
-
-#endregion
-
-#region NameSpace
-    
-namespace ZoneEngine.Script
+namespace ZoneEngine.GameObject.Stats
 {
-    #region Class AoScript
-    
-    /// <summary>
-    /// The Class in charge of printing information to our consoles
-    /// </summary>
-    public interface IAOScript
+    using System;
+
+    public class StatHealDelta : ClassStat
     {
-        #region Fields
-        
-        #endregion
-    
-        #region Properties
+        public StatHealDelta(
+            int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
+        {
+            this.StatNumber = number;
+            this.StatDefaultValue = (uint)defaultValue;
 
-        #endregion
+            this.StatBaseValue = this.StatDefaultValue;
+            this.SendBaseValue = true;
+            this.DoNotDontWriteToSql = false;
+            this.AnnounceToPlayfield = false;
+        }
 
-        #region Script Entry
+        public override void CalcTrickle()
+        {
+            if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter)) // This condition could be obsolete
+            {
+                Character ch = (Character)this.Parent;
+                uint[] healDelta = { 3, 3, 2, 4, 12, 15, 20 };
 
-        void Main(string[] args);
+                this.StatBaseValue = healDelta[ch.Stats.Breed.Value - 1]
+                                     + (uint)Math.Floor((double)(ch.Stats.BodyDevelopment.Value / 100));
 
-        #endregion
+                if (!this.Parent.Starting)
+                {
+                    this.AffectStats();
+                }
+            }
+        }
     }
-
-    #endregion Class AoScript
 }
-
-#endregion NameSpace

@@ -1,4 +1,6 @@
-﻿#region License
+﻿
+#region License
+
 // Copyright (c) 2005-2012, CellAO Team
 // 
 // All rights reserved.
@@ -20,12 +22,15 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 #endregion
 
 #region Usings...
+
 #endregion
 
 #region NameSpace
+    
 namespace ZoneEngine.Script
 {
     using System;
@@ -37,15 +42,15 @@ namespace ZoneEngine.Script
     using System.Reflection;
     using System.Text;
 
-    using AO.Core;
-
-    using LoginEngine.CoreClient;
+    using ZoneEngine.GameObject;
+    using ZoneEngine.CoreClient;
 
     using Microsoft.CSharp;
-
+    
     using SmokeLounge.AOtomation.Messaging.GameData;
-
+    
     #region Class ScriptCompiler
+    
     /// <summary>
     /// Controls Compilation and loading
     /// of *.cs files contained in the
@@ -55,6 +60,7 @@ namespace ZoneEngine.Script
     public class ScriptCompiler : IDisposable
     {
         #region Fields
+
         /// <summary>
         /// Our CSharp compiler object
         /// </summary>
@@ -63,45 +69,48 @@ namespace ZoneEngine.Script
 
         // Holder for usermade scripts
         private readonly Dictionary<string, Type> scriptList = new Dictionary<string, Type>();
-
+        
         // Holder for Chat commands
         private readonly Dictionary<string, Type> chatCommands = new Dictionary<string, Type>();
-
+        
         /// <summary>
         /// Our compiler parameter command line to pass 
         /// when we compile the scripts.
         /// </summary>
         private readonly CompilerParameters p = new CompilerParameters
-            {
-                GenerateInMemory = false,
-                GenerateExecutable = false,
-                IncludeDebugInformation = true,
-                OutputAssembly = "Scripts.dll",
-                // TODO: Figure out how to parse the file and return the usings, then load those.
-                ReferencedAssemblies =
-                    {
-                        "System.dll",
-                        "System.Core.dll",
-                        "AO.Core.dll",
-                        "Cell.Core.dll",
-                        "MySql.Data.dll",
-                        "ZoneEngine.exe",
-                        "ChatEngine.exe",
-                        "LoginEngine.exe"
-                    },
-                TreatWarningsAsErrors = false,
-                WarningLevel = 3,
-                CompilerOptions = "/optimize"
-            };
+        {
+            GenerateInMemory = false,
+            GenerateExecutable = false,
+            IncludeDebugInformation = true,
+            OutputAssembly = "Scripts.dll",
+            // TODO: Figure out how to parse the file and return the usings, then load those.
+            ReferencedAssemblies = {
+                "System.dll",
+                "System.Core.dll",
+                "AO.Core.dll",
+                "Cell.Core.dll",
+                "MySql.Data.dll",
+                "ZoneEngine.exe",
+                "ChatEngine.exe",
+                "LoginEngine.exe"
+            },
+            TreatWarningsAsErrors = false,
+            WarningLevel = 3,
+            CompilerOptions = "/optimize"
+        };
+        
         #endregion
-
+        
         #region Properties
+        
         private string[] ScriptsList { get; set; }
+        
         #endregion
-
+        
         private readonly List<Assembly> multipleDllList = new List<Assembly>();
-
+        
         #region Compiler
+            
         /// <summary>
         /// 
         /// </summary>
@@ -188,12 +197,14 @@ namespace ZoneEngine.Script
                 }
                 this.AddScriptMembers();
             }
-
+        
             return true;
         }
+        
         #endregion Compiler
-
+        
         #region AppDomain Script Loading using interface IAOScript
+        
         /// <summary>
         /// Loads all classes contained in our
         /// Assembly file that publically inherit
@@ -218,7 +229,6 @@ namespace ZoneEngine.Script
                         if (constructor != null && constructor.IsPublic)
                         {
                             // lets be friendly and only do things legitimitely by only using valid constructors
-
                             // we specified that we wanted a constructor that doesn't take parameters, so don't pass parameters
                             IAOScript scriptObject = constructor.Invoke(null) as IAOScript;
                             if (scriptObject != null)
@@ -250,9 +260,11 @@ namespace ZoneEngine.Script
                 }
             }
         }
+        
         #endregion AppDomain Script Loading using interface IAOScript
-
+            
         #region ErrorReporting Logging and Misc Tools
+            
         /// <summary>
         /// Our Error reporting method.
         /// </summary>
@@ -264,20 +276,19 @@ namespace ZoneEngine.Script
             if (results.Errors.HasErrors)
             {
                 //Count the errors and return them
-
                 var count = results.Errors.Count;
                 for (var i = 0; i < count; i++)
                 {
                     report.Append(results.Errors[i].FileName);
                     report.AppendLine(
-                        " In Line: " + results.Errors[i].Line + " Error: " + results.Errors[i].ErrorNumber + " "
-                        + results.Errors[i].ErrorText);
+                                      " In Line: " + results.Errors[i].Line + " Error: " + results.Errors[i].ErrorNumber + " " +
+                                      results.Errors[i].ErrorText);
                 }
             }
-
+        
             return report.ToString();
         }
-
+        
         /// <summary>
         /// Remove all text in a string before
         /// the first chars it finds.
@@ -301,7 +312,7 @@ namespace ZoneEngine.Script
             //Hmm if we got here then it has no .'s in it so just return input
             return input;
         }
-
+            
         /// <summary>
         /// Removes all text from a string
         /// after char chars
@@ -319,7 +330,7 @@ namespace ZoneEngine.Script
             }
             return input;
         }
-
+            
         /// <summary>
         /// Turn our script names into dll names.
         /// </summary>
@@ -330,10 +341,10 @@ namespace ZoneEngine.Script
             scriptName = RemoveCharactersAfterChar(scriptName, '.');
             scriptName = RemoveCharactersBeforeChar(scriptName, '\\');
             scriptName = RemoveCharactersBeforeChar(scriptName, '/');
-
+        
             return scriptName + ".dll";
         }
-
+            
         /// <summary>
         /// If the Scripts directory is empty
         /// or the Scripts directory is missing
@@ -377,7 +388,7 @@ namespace ZoneEngine.Script
                     ConsoleColor.Red);
                 return false;
             }
-
+        
             if (this.ScriptsList.Length == 0)
             {
                 LogScriptAction(
@@ -386,7 +397,7 @@ namespace ZoneEngine.Script
             }
             return true;
         }
-
+        
         /// <summary>
         /// Logs messages to the console.
         /// </summary>
@@ -403,9 +414,11 @@ namespace ZoneEngine.Script
             Console.Write(message + "\n");
             Console.ResetColor();
         }
+                
         #endregion ErrorReporting Logging and Misc Tools
-
+                    
         #region Read all Classes and their Members into a Dictionary
+                        
         public void AddScriptMembers()
         {
             this.scriptList.Clear();
@@ -419,8 +432,8 @@ namespace ZoneEngine.Script
                         {
                             foreach (MemberInfo mi in t.GetMembers())
                             {
-                                if ((mi.Name == "GetType") || (mi.Name == ".ctor") || (mi.Name == "GetHashCode")
-                                    || (mi.Name == "ToString") || (mi.Name == "Equals"))
+                                if ((mi.Name == "GetType") || (mi.Name == ".ctor") || (mi.Name == "GetHashCode") ||
+                                    (mi.Name == "ToString") || (mi.Name == "Equals"))
                                 {
                                     continue;
                                 }
@@ -457,9 +470,11 @@ namespace ZoneEngine.Script
                 }
             }
         }
+                    
         #endregion
-
+                            
         #region Function Calling
+                        
         public void CallMethod(string functionName, Character character)
         {
             foreach (Assembly assembly in this.multipleDllList)
@@ -485,9 +500,11 @@ namespace ZoneEngine.Script
                 }
             }
         }
+                        
         #endregion
-
+                        
         #region ChatCommand Calling
+                            
         public void CallChatCommand(string commandName, Client client, Identity target, string[] commandArguments)
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
@@ -495,8 +512,8 @@ namespace ZoneEngine.Script
             {
                 foreach (KeyValuePair<string, Type> kv in this.chatCommands)
                 {
-                    if (kv.Key.Substring(kv.Key.IndexOf(":", StringComparison.Ordinal) + 1).ToUpperInvariant()
-                        == commandName.ToUpperInvariant())
+                    if (kv.Key.Substring(kv.Key.IndexOf(":", StringComparison.Ordinal) + 1).ToUpperInvariant() ==
+                        commandName.ToUpperInvariant())
                     {
                         AOChatCommand aoc =
                             (AOChatCommand)
@@ -504,8 +521,8 @@ namespace ZoneEngine.Script
                         if (aoc != null)
                         {
                             // Check GM Level bitwise
-                            if ((client.Character.Stats.GMLevel.Value < aoc.GMLevelNeeded())
-                                && (aoc.GMLevelNeeded() > 0))
+                            if ((client.Character.Stats.GMLevel.Value < aoc.GMLevelNeeded()) &&
+                                (aoc.GMLevelNeeded() > 0))
                             {
                                 client.SendChatText(
                                     "You are not authorized to use this command!. This incident will be recorded.");
@@ -540,13 +557,12 @@ namespace ZoneEngine.Script
                 string[] scriptNames = this.chatCommands.Keys.ToArray();
                 for (int i = 0; i < scriptNames.Length; i++)
                 {
-                    scriptNames[i] = scriptNames[i].Substring(scriptNames[i].IndexOf(":", StringComparison.Ordinal) + 1)
-                                     + ":"
-                                     +
+                    scriptNames[i] = scriptNames[i].Substring(scriptNames[i].IndexOf(":", StringComparison.Ordinal) + 1) +
+                                     ":" +
                                      scriptNames[i].Substring(0, scriptNames[i].IndexOf(":", StringComparison.Ordinal));
                 }
                 Array.Sort(scriptNames);
-
+                
                 foreach (string scriptName in scriptNames)
                 {
                     string typename = scriptName.Substring(scriptName.IndexOf(":", StringComparison.Ordinal) + 1);
@@ -562,8 +578,9 @@ namespace ZoneEngine.Script
                 }
             }
         }
+                
         #endregion ChatCommand Calling
-
+        
         public void Dispose()
         {
             this.Dispose(true);
@@ -578,6 +595,7 @@ namespace ZoneEngine.Script
             }
         }
     }
+
     #endregion Class ScriptCompiler
 }
 

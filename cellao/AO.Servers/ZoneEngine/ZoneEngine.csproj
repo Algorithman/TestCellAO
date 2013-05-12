@@ -52,13 +52,43 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfoclass.cs" />
+    <Compile Include="GameObject\Character.cs" />
     <Compile Include="Collision\BorderlineCheck.cs" />
     <Compile Include="CoreClient\Client.cs" />
+    <Compile Include="GameObject\Dynel.cs" />
+    <Compile Include="GameObject.cs" />
+    <Compile Include="GameObject\IEntity.cs" />
+    <Compile Include="GameObject\IInstancedEntity.cs" />
+    <Compile Include="GameObject\INamedEntity.cs" />
+    <Compile Include="GameObject\IPacketReceivingEntity.cs" />
+    <Compile Include="GameObject\ISummoner.cs" />
+    <Compile Include="GameObject\NonPlayerCharacter.cs" />
+    <Compile Include="GameObject\Pet.cs" />
+    <Compile Include="GameObject\Stats\ClassStat.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatAlienNextXP.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatHealDelta.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatHealInterval.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatHealth.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatHitPoints.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatIP.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatLevel.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatNano.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatNanoDelta.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatNanoInterval.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatNanoPoints.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatNextSK.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatNextXP.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatSkill.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatTitleLevel.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatWeaponsStyle.cs" />
+    <Compile Include="InstancedItem.cs" />
+    <Compile Include="GameObject\IStats.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Script\AOChatCommand.cs" />
     <Compile Include="Script\IAOScript.cs" />
     <Compile Include="Script\ScriptCompiler.cs" />
+    <Compile Include="GameObject\Statel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config.xml">
@@ -2112,6 +2142,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="GameObject\GameObjectDiagram.cd" />
     <None Include="NBug.ZoneEngine.config" />
     <None Include="packages.config" />
   </ItemGroup>

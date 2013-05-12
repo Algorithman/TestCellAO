@@ -1,6 +1,4 @@
-﻿
-#region License
-
+﻿#region License
 // Copyright (c) 2005-2012, CellAO Team
 // 
 // All rights reserved.
@@ -22,40 +20,34 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 #endregion
 
-#region Usings...
-
-#endregion
-
-#region NameSpace
-    
-namespace ZoneEngine.Script
+namespace ZoneEngine.GameObject.Stats
 {
-    #region Class AoScript
-    
-    /// <summary>
-    /// The Class in charge of printing information to our consoles
-    /// </summary>
-    public interface IAOScript
+    using System;
+
+    public class StatHitPoints : ClassStat
     {
-        #region Fields
-        
-        #endregion
-    
-        #region Properties
+        public StatHitPoints(
+            int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
+        {
+            this.StatNumber = number;
+            this.StatDefaultValue = (uint)defaultValue;
 
-        #endregion
+            this.StatBaseValue = this.StatDefaultValue;
+            this.SendBaseValue = true;
+            this.DoNotDontWriteToSql = false;
+            this.AnnounceToPlayfield = true;
+        }
 
-        #region Script Entry
-
-        void Main(string[] args);
-
-        #endregion
+        public override uint GetMaxValue(uint val)
+        {
+            if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter))
+            {
+                Character character = (Character)this.Parent;
+                return (uint)(Math.Min(val, character.Stats.Life.Value));
+            }
+            return base.GetMaxValue(val);
+        }
     }
-
-    #endregion Class AoScript
 }
-
-#endregion NameSpace

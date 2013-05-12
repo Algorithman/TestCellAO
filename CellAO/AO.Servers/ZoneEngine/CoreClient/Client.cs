@@ -1,12 +1,11 @@
 ﻿using System;
 
-namespace LoginEngine.CoreClient
+namespace ZoneEngine.CoreClient
 {
     using System.Globalization;
 
     using AO.Core.Components;
     using AO.Core.Events;
-
 
     using Cell.Core;
     using NiceHexOutput;
@@ -69,9 +68,7 @@ namespace LoginEngine.CoreClient
 
         #endregion
 
-
-        public Client(ServerBase server, IMessageSerializer messageSerializer, IBus bus)
-            : base(server)
+        public Client(ServerBase server, IMessageSerializer messageSerializer, IBus bus) : base(server)
         {
             this.messageSerializer = messageSerializer;
             this.bus = bus;
@@ -99,22 +96,20 @@ namespace LoginEngine.CoreClient
             return reply;
         }
 
-
         protected override bool OnReceive(BufferSegment buffer)
         {
             Message message = null;
 
-            var packet = new byte[_remainingLength];
-            Array.Copy(buffer.SegmentData, packet, _remainingLength);
+            var packet = new byte[this._remainingLength];
+            Array.Copy(buffer.SegmentData, packet, this._remainingLength);
             /* Uncomment for Incoming Messages
-             */
-            Console.WriteLine("Offset: " + buffer.Offset.ToString() + " -- RemainingLength: " + _remainingLength);
+            */
+            Console.WriteLine("Offset: " + buffer.Offset.ToString() + " -- RemainingLength: " + this._remainingLength);
             Console.WriteLine(NiceHexOutput.Output(packet));
              
-            _remainingLength = 0;
+            this._remainingLength = 0;
             try
             {
-
                 message = this.messageSerializer.Deserialize(packet);
             }
             catch (Exception)
@@ -137,6 +132,7 @@ namespace LoginEngine.CoreClient
 
             return true;
         }
+
         public void Send(int receiver, MessageBody messageBody)
         {
             // TODO: Investigate if reciever is a timestamp
@@ -155,18 +151,16 @@ namespace LoginEngine.CoreClient
             };
             var buffer = this.messageSerializer.Serialize(message);
 
-            buffer[0] = BitConverter.GetBytes(packetNumber)[1];
-            buffer[1] = BitConverter.GetBytes(packetNumber)[0];
-            packetNumber++;
-
+            buffer[0] = BitConverter.GetBytes(this.packetNumber)[1];
+            buffer[1] = BitConverter.GetBytes(this.packetNumber)[0];
+            this.packetNumber++;
 
             /* Uncomment for Debug outgoing Messages
-             */
+            */
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(NiceHexOutput.Output(buffer));
             Console.ResetColor();
              
-
             if (buffer.Length % 4 > 0)
             {
                 Array.Resize(ref buffer, buffer.Length + (4 - (buffer.Length % 4)));

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using NBug;
 using NBug.Properties;
-
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -18,22 +17,20 @@ namespace ZoneEngine
 
     using AO.Core;
 
-    using LoginEngine.CoreClient;
-
     using ZoneEngine.Collision;
     using ZoneEngine.Script;
+    using ZoneEngine.CoreClient;
 
     class Program
     {
-
         public static WallCollision ZoneBorderHandler = new WallCollision();
 
         public static ScriptCompiler csc;
 
         static void Main(string[] args)
         {
-
             #region NLog
+            
             LoggingConfiguration config = new LoggingConfiguration();
             ColoredConsoleTarget consoleTarget = new ColoredConsoleTarget();
             consoleTarget.Layout = "${date:format=HH\\:MM\\:ss} ${logger} ${message}";
@@ -46,36 +43,41 @@ namespace ZoneEngine
             LoggingRule rule2 = new LoggingRule("*", LogLevel.Trace, fileTarget);
             config.LoggingRules.Add(rule2);
             LogManager.Configuration = config;
-            #endregion
 
+            #endregion
+            
             #region NBug
+            
             SettingsOverride.LoadCustomSettings("NBug.ZoneEngine.Config");
             NBug.Settings.WriteLogToDisk = true;
             AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
             TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
             //TODO: ADD More Handlers.
+            
             #endregion
 
             #region Console Text...
-            Console.Title = "CellAO " + AssemblyInfoclass.Title + " Console. Version: " + AssemblyInfoclass.Description
-                + " " + AssemblyInfoclass.AssemblyVersion + " " + AssemblyInfoclass.Trademark;
-
+            
+            Console.Title = "CellAO " + AssemblyInfoclass.Title + " Console. Version: " + AssemblyInfoclass.Description +
+                            " " + AssemblyInfoclass.AssemblyVersion + " " + AssemblyInfoclass.Trademark;
+            
             ConsoleText ct = new ConsoleText();
             ct.TextRead("main.txt");
             Console.WriteLine("Loading " + AssemblyInfoclass.Title + "...");
-
+            
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Using ISComm v1.0");
             Console.WriteLine("[OK]");
             Console.ResetColor();
+            
             #endregion
-
-
+            
             #region Console Commands...
+                
             string consoleCommand;
             ct.TextRead("zone_consolecommands.txt");
             // removed CheckDBs here, added commands check and updatedb (updatedb will change to a versioning 
-
+                        
             while (true)
             {
                 if (!processedargs)
@@ -103,7 +105,7 @@ namespace ZoneEngine
                             Console.ResetColor();
                             break;
                         }
-
+                        
                         //TODO: Add Sql Check.
                         csc.Compile(false);
                         StartTheServer();
@@ -116,7 +118,7 @@ namespace ZoneEngine
                             Console.ResetColor();
                             break;
                         }
-
+                        
                         //TODO: Add Sql Check.
                         csc.Compile(true);
                         StartTheServer();
@@ -166,7 +168,7 @@ namespace ZoneEngine
                             /* Old Lua way
                             if (s.EndsWith(".lua"))
                             {
-                                Console.WriteLine(s.Split('\\')[1].Split('.')[0]);
+                            Console.WriteLine(s.Split('\\')[1].Split('.')[0]);
                             }*/
                         }
                         Console.ResetColor();
@@ -203,10 +205,7 @@ namespace ZoneEngine
                 }
             }
         }
-            #endregion
 
-
-
-
+        #endregion
     }
 }

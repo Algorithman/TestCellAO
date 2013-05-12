@@ -1,4 +1,6 @@
-﻿#region License
+﻿
+#region License
+
 // Copyright (c) 2005-2012, CellAO Team
 // 
 // All rights reserved.
@@ -20,20 +22,22 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 #endregion
 
 #region Usings...
-#endregion
 
+#endregion
+    
 namespace ZoneEngine.Collision
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Xml.Serialization;
-
+    
     using AO.Core;
-
+    
     /// <summary>
     /// Class contains a list of line segments and functions to test a client against them
     /// </summary>
@@ -52,7 +56,7 @@ namespace ZoneEngine.Collision
                 this.X = 0.0f;
                 this.Z = 0.0f;
             }
-
+            
             /// <summary>
             /// 
             /// </summary>
@@ -61,7 +65,7 @@ namespace ZoneEngine.Collision
                 this.X = x;
                 this.Z = z;
             }
-
+            
             /// <summary>
             /// 
             /// </summary>
@@ -70,17 +74,17 @@ namespace ZoneEngine.Collision
                 this.X = vector.X;
                 this.Z = vector.Z;
             }
-
+            
             /// <summary>
             /// 
             /// </summary>
             public Single X;
-
+            
             /// <summary>
             /// 
             /// </summary>
             public Single Z;
-
+            
             /// <summary>
             /// 
             /// </summary>
@@ -90,7 +94,7 @@ namespace ZoneEngine.Collision
                 return vectorC;
             }
         }
-
+        
         /// <summary>
         /// This holds two 2d vectors made from 2 points that represent a line segment
         /// </summary>
@@ -116,7 +120,7 @@ namespace ZoneEngine.Collision
                 this.ZoneToIndex = destinationIndex;
                 this.Flags = destinationFlags;
             }
-
+            
             /// <summary>
             /// 
             /// </summary>
@@ -136,7 +140,7 @@ namespace ZoneEngine.Collision
                 this.ZoneToIndex = destinationIndex;
                 this.Flags = pointA.Flags;
             }
-
+            
             /// <summary>
             /// 
             /// </summary>
@@ -156,7 +160,7 @@ namespace ZoneEngine.Collision
                 this.ZoneToIndex = pointA.DestIdx;
                 this.Flags = pointA.Flags;
             }
-
+            
             /// <summary>
             /// 
             /// </summary>
@@ -169,7 +173,7 @@ namespace ZoneEngine.Collision
                 this.ZoneToIndex = 0;
                 this.Flags = 0;
             }
-
+            
             /// <summary>
             /// 
             /// </summary>
@@ -182,38 +186,38 @@ namespace ZoneEngine.Collision
                 this.ZoneToIndex = 0;
                 this.Flags = 0;
             }
-
+            
             /// <summary>
             /// 
             /// </summary>
             public Vector2 VectorA { get; set; }
-
+            
             /// <summary>
             /// 
             /// </summary>
             public Vector2 VectorB { get; set; }
-
+            
             /// <summary>
             /// 
             /// </summary>
             public int Flags { get; set; }
-
+            
             /// <summary>
             /// 
             /// </summary>
             public int ZoneToPlayfield { get; set; }
-
+            
             /// <summary>
             /// 
             /// </summary>
             public int ZoneToIndex { get; set; }
-
+            
             /// <summary>
             /// 
             /// </summary>
             public float Y { get; set; }
         }
-
+        
         /// <summary>
         /// This holds a destination zone and border coordinate
         /// </summary>
@@ -224,38 +228,38 @@ namespace ZoneEngine.Collision
             /// </summary>
             [XmlAttribute("DestPF")]
             public Int32 DestinationPlayfield { get; set; }
-
+            
             /// <summary>
             ///
             /// </summary>
             [XmlAttribute("DestIdx")]
             public Int32 DestIdx { get; set; }
-
+            
             /// <summary>
             ///
             /// </summary>
             [XmlAttribute("Flags")]
             public Int32 Flags { get; set; }
-
+            
             /// <summary>
             ///
             /// </summary>
             [XmlAttribute("X")]
             public Single X { get; set; }
-
+            
             /// <summary>
             ///
             /// </summary>
             [XmlAttribute("Y")]
             public Single Y { get; set; }
-
+            
             /// <summary>
             ///
             /// </summary>
             [XmlAttribute("Z")]
             public Single Z { get; set; }
         };
-
+        
         /// <summary>
         /// This holds a list of points
         /// </summary>
@@ -266,14 +270,14 @@ namespace ZoneEngine.Collision
             /// </summary>
             [XmlElement("Point")]
             public List<Point> Points;
-
+            
             /// <summary>
             ///
             /// </summary>
             [XmlAttribute("NumPoints")]
             public int NumPoints { get; set; }
         };
-
+        
         /// <summary>
         /// This holds a list of walls
         /// </summary>
@@ -285,14 +289,14 @@ namespace ZoneEngine.Collision
             /// </summary>
             [XmlElement("Wall")]
             public List<Wall> walls;
-
+            
             /// <summary>
             ///
             /// </summary>
             [XmlAttribute("NumWalls")]
             public int NumWalls { get; set; }
         };
-
+            
         public class LineStart
         {
             /// <summary>
@@ -300,20 +304,20 @@ namespace ZoneEngine.Collision
             /// </summary>
             [XmlAttribute("X")]
             public Single X { get; set; }
-
+            
             /// <summary>
             ///
             /// </summary>
             [XmlAttribute("Y")]
             public Single Y { get; set; }
-
+            
             /// <summary>
             ///
             /// </summary>
             [XmlAttribute("Z")]
             public Single Z { get; set; }
         };
-
+            
         public class LineEnd
         {
             /// <summary>
@@ -321,20 +325,20 @@ namespace ZoneEngine.Collision
             /// </summary>
             [XmlAttribute("X")]
             public Single X { get; set; }
-
+            
             /// <summary>
             ///
             /// </summary>
             [XmlAttribute("Y")]
             public Single Y { get; set; }
-
+            
             /// <summary>
             ///
             /// </summary>
             [XmlAttribute("Z")]
             public Single Z { get; set; }
         };
-
+            
         public class Line
         {
             /// <summary>
@@ -342,17 +346,17 @@ namespace ZoneEngine.Collision
             /// </summary>
             [XmlElement("Start")]
             public LineStart LineStartPoint;
-
+            
             [XmlElement("End")]
             public LineEnd LineEndPoint;
-
+            
             /// <summary>
             ///
             /// </summary>
             [XmlAttribute("ID")]
             public int ID { get; set; }
         };
-
+            
         public class PlayField
         {
             /// <summary>
@@ -360,14 +364,14 @@ namespace ZoneEngine.Collision
             /// </summary>
             [XmlElement("Line")]
             public List<Line> Lines;
-
+            
             /// <summary>
             ///
             /// </summary>
             [XmlAttribute("NumLines")]
             public int NumLines { get; set; }
         };
-
+            
         [XmlRoot("Root")]
         public class Root
         {
@@ -377,12 +381,12 @@ namespace ZoneEngine.Collision
             [XmlElement("PlayField")]
             public PlayField Playfield;
         };
-
+        
         /// <summary>
         /// Default value of threshold
         /// </summary>
         private const Int32 WallCollisionThreshold = 2;
-
+        
         /// <summary>
         /// Number of units we use as fuzzy detection
         /// (within 0-n to 0+n units of the client position along the axis of the client heading vector)
@@ -390,7 +394,7 @@ namespace ZoneEngine.Collision
         /// intersecting the wall, this is a rudimentary kind of sweep test.
         /// </summary>
         internal Int32 Threshold = WallCollisionThreshold;
-
+        
         /// <summary>
         /// Collection of walls
         /// </summary>
@@ -401,7 +405,7 @@ namespace ZoneEngine.Collision
                 return wallList;
             }
         }
-
+            
         public static Dictionary<int, Root> Destinations
         {
             get
@@ -409,16 +413,16 @@ namespace ZoneEngine.Collision
                 return destinations;
             }
         }
-
+        
         /// <summary>
         /// Collection of line segments built from the walls collection
         /// </summary>
         public static Dictionary<Int32, List<LineSegment>> Segments;
 
         private static Dictionary<int, Walls> wallList;
-
+        
         private static Dictionary<int, Root> destinations;
-
+        
         /// <summary>
         /// Constructor
         /// </summary>
@@ -427,12 +431,12 @@ namespace ZoneEngine.Collision
             wallList = new Dictionary<Int32, Walls>();
             Segments = new Dictionary<Int32, List<LineSegment>>();
             destinations = new Dictionary<Int32, Root>();
-
+        
             this.LoadWalls();
             this.LoadDestinations();
             this.BuildLineSegments();
         }
-
+        
         /// <summary>
         /// Iterate over all wall XML files and load them
         /// </summary>
@@ -447,7 +451,7 @@ namespace ZoneEngine.Collision
                 Segments.Add(id, new List<LineSegment>(WallList[id].NumWalls));
             }
         }
-
+            
         public void LoadDestinations()
         {
             DirectoryInfo di = new DirectoryInfo(Path.Combine("XML Data", "Destinations"));
@@ -458,7 +462,7 @@ namespace ZoneEngine.Collision
                 Destinations.Add(id, this.PlayFieldsLoadXml(fileInfo.FullName));
             }
         }
-
+        
         /// <summary>
         /// Load a specific PF wall set
         /// </summary>
@@ -470,7 +474,7 @@ namespace ZoneEngine.Collision
             reader.Close();
             return data;
         }
-
+            
         public Root PlayFieldsLoadXml(String fileName)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(Root));
@@ -479,7 +483,7 @@ namespace ZoneEngine.Collision
             reader.Close();
             return data;
         }
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -502,7 +506,7 @@ namespace ZoneEngine.Collision
                 }
             }
         }
-
+        
         /// <summary>
         /// Test of two line segments intersect
         /// </summary>
@@ -513,7 +517,7 @@ namespace ZoneEngine.Collision
         {
             Vector2 A = new Vector2(x - this.Threshold, z - this.Threshold);
             Vector2 B = new Vector2(x + this.Threshold, z + this.Threshold);
-
+                
             LineSegment clientLineSegment = new LineSegment(A, B);
             try
             {
@@ -531,7 +535,7 @@ namespace ZoneEngine.Collision
             LineSegment empty = new LineSegment();
             return empty;
         }
-
+        
         /// <summary>
         /// Test of two line segments intersect
         /// </summary>
@@ -549,15 +553,15 @@ namespace ZoneEngine.Collision
                 Vector2.Subtract(vectorB1, vectorA2), Vector2.Subtract(vectorB2, vectorA2));
             Int32 intersectionB2 = this.Cross2D(
                 Vector2.Subtract(vectorA2, vectorB2), Vector2.Subtract(vectorA1, vectorB2));
-            if (((intersectionA1 <= 0 && intersectionA2 <= 0 && intersectionB1 <= 0 && intersectionB2 <= 0)
-                 || (intersectionA1 >= 0 && intersectionA2 >= 0 && intersectionB1 >= 0 && intersectionB2 >= 0))
-                && !(intersectionA1 == 0 && intersectionA2 == 0 && intersectionB1 == 0 && intersectionB2 == 0))
+            if (((intersectionA1 <= 0 && intersectionA2 <= 0 && intersectionB1 <= 0 && intersectionB2 <= 0) ||
+                 (intersectionA1 >= 0 && intersectionA2 >= 0 && intersectionB1 >= 0 && intersectionB2 >= 0)) &&
+                !(intersectionA1 == 0 && intersectionA2 == 0 && intersectionB1 == 0 && intersectionB2 == 0))
             {
                 return true;
             }
             return false;
         }
-
+        
         /// <summary>
         /// Get the cross product in 2D of two 2D vectors
         /// </summary>
@@ -565,12 +569,12 @@ namespace ZoneEngine.Collision
         {
             return (Int32)(vectorA.X * vectorB.Z - vectorA.Z * vectorB.X);
         }
-
+        
         public static LineSegment WallCollisionCheck(float x, float z, int playfield)
         {
             return Program.ZoneBorderHandler.Test(x, z, playfield);
         }
-
+            
         public static CoordHeading GetCoord(LineSegment lineSegment, float x, float z, AOCoord coordinates)
         {
             CoordHeading coordHeading = new CoordHeading();
@@ -580,14 +584,14 @@ namespace ZoneEngine.Collision
                 {
                     int incX = 0;
                     int incZ = 0;
-
+                    
                     Vector3 temp = new Vector3(
                         line.LineEndPoint.X - line.LineStartPoint.X, 0, line.LineEndPoint.Z - line.LineStartPoint.Z);
 
                     double factor = 1.0 / Math.Sqrt(Math.Pow(temp.x, 2) + Math.Pow(temp.z, 2));
                     temp.x = temp.x * factor;
                     temp.z = temp.z * factor;
-
+                        
                     if (line.LineStartPoint.X >= line.LineEndPoint.X)
                     {
                         coordHeading.Coordinates.x = line.LineEndPoint.X;
@@ -595,18 +599,16 @@ namespace ZoneEngine.Collision
                         {
                             if (lineSegment.VectorA.X > lineSegment.VectorB.X)
                             {
-                                coordHeading.Coordinates.x += Math.Abs(line.LineEndPoint.X - line.LineStartPoint.X)
-                                                              *
-                                                              (Math.Abs(x - lineSegment.VectorB.X)
-                                                               / Math.Abs(lineSegment.VectorA.X - lineSegment.VectorB.X));
+                                coordHeading.Coordinates.x += Math.Abs(line.LineEndPoint.X - line.LineStartPoint.X) *
+                                                              (Math.Abs(x - lineSegment.VectorB.X) /
+                                                               Math.Abs(lineSegment.VectorA.X - lineSegment.VectorB.X));
                                 incZ = 1;
                             }
                             else
                             {
-                                coordHeading.Coordinates.x += Math.Abs(line.LineEndPoint.X - line.LineStartPoint.X)
-                                                              *
-                                                              (Math.Abs(x - lineSegment.VectorA.X)
-                                                               / Math.Abs(lineSegment.VectorA.X - lineSegment.VectorB.X));
+                                coordHeading.Coordinates.x += Math.Abs(line.LineEndPoint.X - line.LineStartPoint.X) *
+                                                              (Math.Abs(x - lineSegment.VectorA.X) /
+                                                               Math.Abs(lineSegment.VectorA.X - lineSegment.VectorB.X));
                                 incZ = -1;
                             }
                         }
@@ -618,18 +620,16 @@ namespace ZoneEngine.Collision
                         {
                             if (lineSegment.VectorA.X > lineSegment.VectorB.X)
                             {
-                                coordHeading.Coordinates.x += Math.Abs(line.LineEndPoint.X - line.LineStartPoint.X)
-                                                              *
-                                                              (Math.Abs(x - lineSegment.VectorB.X)
-                                                               / Math.Abs(lineSegment.VectorA.X - lineSegment.VectorB.X));
+                                coordHeading.Coordinates.x += Math.Abs(line.LineEndPoint.X - line.LineStartPoint.X) *
+                                                              (Math.Abs(x - lineSegment.VectorB.X) /
+                                                               Math.Abs(lineSegment.VectorA.X - lineSegment.VectorB.X));
                                 incZ = -1;
                             }
                             else
                             {
-                                coordHeading.Coordinates.x += Math.Abs(line.LineEndPoint.X - line.LineStartPoint.X)
-                                                              *
-                                                              (Math.Abs(x - lineSegment.VectorA.X)
-                                                               / Math.Abs(lineSegment.VectorA.X - lineSegment.VectorB.X));
+                                coordHeading.Coordinates.x += Math.Abs(line.LineEndPoint.X - line.LineStartPoint.X) *
+                                                              (Math.Abs(x - lineSegment.VectorA.X) /
+                                                               Math.Abs(lineSegment.VectorA.X - lineSegment.VectorB.X));
                                 incZ = 1;
                             }
                         }
@@ -641,18 +641,16 @@ namespace ZoneEngine.Collision
                         {
                             if (lineSegment.VectorA.Z > lineSegment.VectorB.Z)
                             {
-                                coordHeading.Coordinates.z += Math.Abs(line.LineStartPoint.Z - line.LineEndPoint.Z)
-                                                              *
-                                                              (Math.Abs(z - lineSegment.VectorB.Z)
-                                                               / Math.Abs(lineSegment.VectorA.Z - lineSegment.VectorB.Z));
+                                coordHeading.Coordinates.z += Math.Abs(line.LineStartPoint.Z - line.LineEndPoint.Z) *
+                                                              (Math.Abs(z - lineSegment.VectorB.Z) /
+                                                               Math.Abs(lineSegment.VectorA.Z - lineSegment.VectorB.Z));
                                 incX = -1;
                             }
                             else
                             {
-                                coordHeading.Coordinates.z += Math.Abs(line.LineStartPoint.Z - line.LineEndPoint.Z)
-                                                              *
-                                                              (Math.Abs(z - lineSegment.VectorA.Z)
-                                                               / Math.Abs(lineSegment.VectorA.Z - lineSegment.VectorB.Z));
+                                coordHeading.Coordinates.z += Math.Abs(line.LineStartPoint.Z - line.LineEndPoint.Z) *
+                                                              (Math.Abs(z - lineSegment.VectorA.Z) /
+                                                               Math.Abs(lineSegment.VectorA.Z - lineSegment.VectorB.Z));
                                 incX = 1;
                             }
                         }
@@ -664,18 +662,16 @@ namespace ZoneEngine.Collision
                         {
                             if (lineSegment.VectorA.Z > lineSegment.VectorB.Z)
                             {
-                                coordHeading.Coordinates.z += Math.Abs(line.LineStartPoint.Z - line.LineEndPoint.Z)
-                                                              *
-                                                              (Math.Abs(z - lineSegment.VectorB.Z)
-                                                               / Math.Abs(lineSegment.VectorA.Z - lineSegment.VectorB.Z));
+                                coordHeading.Coordinates.z += Math.Abs(line.LineStartPoint.Z - line.LineEndPoint.Z) *
+                                                              (Math.Abs(z - lineSegment.VectorB.Z) /
+                                                               Math.Abs(lineSegment.VectorA.Z - lineSegment.VectorB.Z));
                                 incX = 1;
                             }
                             else
                             {
-                                coordHeading.Coordinates.z += Math.Abs(line.LineStartPoint.Z - line.LineEndPoint.Z)
-                                                              *
-                                                              (Math.Abs(z - lineSegment.VectorA.Z)
-                                                               / Math.Abs(lineSegment.VectorA.Z - lineSegment.VectorB.Z));
+                                coordHeading.Coordinates.z += Math.Abs(line.LineStartPoint.Z - line.LineEndPoint.Z) *
+                                                              (Math.Abs(z - lineSegment.VectorA.Z) /
+                                                               Math.Abs(lineSegment.VectorA.Z - lineSegment.VectorB.Z));
                                 incX = -1;
                             }
                         }
@@ -693,10 +689,10 @@ namespace ZoneEngine.Collision
                     }
                     temp.x = temp.x * incZ * 4;
                     temp.z = temp.z * incX * 4;
-
+                    
                     coordHeading.Coordinates.x += Convert.ToSingle(temp.z);
                     coordHeading.Coordinates.z += Convert.ToSingle(temp.x);
-
+                    
                     temp.y = temp.x;
                     temp.x = -temp.z;
                     temp.z = temp.y;
