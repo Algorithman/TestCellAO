@@ -8,6 +8,7 @@ namespace ZoneEngine.CoreClient
     using Cell.Core;
     using NiceHexOutput;
     using SmokeLounge.AOtomation.Messaging.Messages;
+    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
     using ZoneEngine.GameObject;
 
     public class Client : ClientBase
@@ -63,6 +64,14 @@ namespace ZoneEngine.CoreClient
             set
             {
                 this.serverSalt = value;
+            }
+        }
+
+        public Character Character
+        {
+            get
+            {
+                return character;
             }
         }
 
@@ -167,6 +176,15 @@ namespace ZoneEngine.CoreClient
             }
 
             this.Send(buffer);
+        }
+
+        public void SendChatText(string Text)
+        {
+            /* ChatTextMessage chatTextMessage = new ChatTextMessage();
+            chatTextMessage.Text = Text;
+            byte[] packet = 
+            */
+            throw new NotImplementedException("SendChatText not implemented yet");
         }
     }
 }

@@ -24,6 +24,8 @@
 
 #region Usings...
 #endregion
+using ZoneEngine.GameObject.Enums;
+using ZoneEngine.GameObject;
 
 namespace ZoneEngine.GameObject.Stats
 {

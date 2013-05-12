@@ -44,7 +44,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             get
             {
-                int level = ((Character)this.Parent).Stats.AlienLevel.Value;
+                int level = this.Parent.Stats.AlienLevel.Value;
                 return Convert.ToInt32(XPTable.TableAlienXP[level, 2]);
             }
             set

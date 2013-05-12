@@ -52,11 +52,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfoclass.cs" />
+    <Compile Include="GameObject\Corpse.cs" />
     <Compile Include="GameObject\Character.cs" />
     <Compile Include="Collision\BorderlineCheck.cs" />
     <Compile Include="CoreClient\Client.cs" />
     <Compile Include="GameObject\Dynel.cs" />
-    <Compile Include="GameObject.cs" />
+    <Compile Include="GameObject\GameObject.cs" />
+    <Compile Include="GameObject\Enums\MoveModes.cs" />
     <Compile Include="GameObject\IEntity.cs" />
     <Compile Include="GameObject\IInstancedEntity.cs" />
     <Compile Include="GameObject\INamedEntity.cs" />
@@ -82,7 +84,8 @@
     <Compile Include="GameObject\Stats\SpecialStats\StatTitleLevel.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\StatWeaponsStyle.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\XPTable.cs" />
-    <Compile Include="InstancedItem.cs" />
+    <Compile Include="GameObject\IInventory.cs" />
+    <Compile Include="GameObject\InstancedItem.cs" />
     <Compile Include="GameObject\IStats.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -90,6 +93,7 @@
     <Compile Include="Script\IAOScript.cs" />
     <Compile Include="Script\ScriptCompiler.cs" />
     <Compile Include="GameObject\Statel.cs" />
+    <Compile Include="GameObject\VendorShop.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config.xml">
