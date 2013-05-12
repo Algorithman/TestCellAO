@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
+using SmokeLounge.AOtomation.Messaging.GameData;
 
 namespace ZoneEngine.GameObject
 {
     public interface IInstancedEntity : IEntity
     {
-        int Playfield { get; set; }
+        Identity Playfield { get; set; }
     }
 }
