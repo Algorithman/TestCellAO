@@ -71,7 +71,7 @@ namespace ZoneEngine
             #endregion
 
 
-                        #region Console Commands...
+            #region Console Commands...
             string consoleCommand;
             ct.TextRead("zone_consolecommands.txt");
             // removed CheckDBs here, added commands check and updatedb (updatedb will change to a versioning 
@@ -203,7 +203,7 @@ namespace ZoneEngine
                 }
             }
         }
-                        #endregion
+            #endregion
 
 
 
