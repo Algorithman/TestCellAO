@@ -83,7 +83,7 @@ namespace ZoneEngine.GameObject.Stats
                 }
                 baseIP += 1500 + (characterLevel - 1) * 4000;
 
-                this.Set(baseIP - Convert.ToInt32(SkillUpdate.CalculateIP(ch.Client)));
+                this.Set(baseIP - Convert.ToInt32(SkillUpdate.CalculateIP(this.Parent)));
 
                 if (!this.Parent.Starting)
                 {

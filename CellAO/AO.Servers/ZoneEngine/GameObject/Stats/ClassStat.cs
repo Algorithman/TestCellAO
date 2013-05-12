@@ -9289,7 +9289,7 @@ namespace ZoneEngine.GameObject.Stats
             DataTable dt =
                 sql.ReadDatatable(
                     "SELECT Stat,Value FROM " + this.flags.Parent.GetSqlTablefromDynelType() + "_stats WHERE ID="
-                    + this.flags.Parent.Id); // Using Flags to address parent object
+                    + this.flags.Parent.Identity.Instance); // Using Flags to address parent object
             foreach (DataRow row in dt.Rows)
             {
                 this.SetBaseValue((Int32)row[0], (UInt32)((Int32)row[1]));
@@ -9454,7 +9454,7 @@ namespace ZoneEngine.GameObject.Stats
             }
 
             throw new StatDoesNotExistException(
-                "Stat " + statId + " does not exist.\r\nClient: " + client.Character.Id + "\r\nMethod: Send");
+                "Stat " + statId + " does not exist.\r\nClient: " + client.Character.Identity.Instance + "\r\nMethod: Send");
         }
         #endregion
 

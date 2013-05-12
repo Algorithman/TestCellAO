@@ -1,11 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using SmokeLounge.AOtomation.Messaging.GameData;
+using ZoneEngine.GameObject.Enums;
 
 namespace ZoneEngine.GameObject
 {
     public class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner, IAOEvents, IAOActions, IInstancedEntity
     {
+        protected MoveModes moveMode = MoveModes.None;
+
+        public MoveModes MoveMode
+        {
+            get
+            {
+                return this.moveMode;
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public Identity Playfield
         {
             get

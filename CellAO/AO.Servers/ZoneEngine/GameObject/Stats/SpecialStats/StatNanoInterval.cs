@@ -1,4 +1,6 @@
-﻿#region License
+﻿
+#region License
+
 // Copyright (c) 2005-2012, CellAO Team
 // 
 // All rights reserved.
@@ -20,14 +22,15 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#endregion
 
+#endregion
+    
 namespace ZoneEngine.GameObject.Stats
 {
     using System;
-
-    using AO.Core;
-
+    
+    using ZoneEngine.GameObject.Enums;
+        
     public class StatNanoInterval : ClassStat
     {
         public StatNanoInterval(
@@ -35,37 +38,36 @@ namespace ZoneEngine.GameObject.Stats
         {
             this.StatNumber = number;
             this.StatDefaultValue = (uint)defaultValue;
-
+            
             this.StatBaseValue = this.StatDefaultValue;
             this.SendBaseValue = true;
             this.DoNotDontWriteToSql = false;
             this.AnnounceToPlayfield = false;
         }
-
+            
         public override void CalcTrickle()
         {
             if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter))
             {
                 Character character = (Character)this.Parent;
-
+                                   
                 // calculating Nano and Heal Delta and interval
-                int nanoInterval = 28
-                                   -
-                                   (Math.Min((int)Math.Floor(Convert.ToDouble(character.Stats.Psychic.Value) / 60), 13)
-                                    * 2);
+                int nanoInterval = 28 -
+                                   (Math.Min((int)Math.Floor(Convert.ToDouble(character.Stats.Psychic.Value) / 60), 13) *
+                                    2);
                 character.Stats.NanoInterval.StatBaseValue = (uint)nanoInterval; // Healinterval
-
+                
                 character.PurgeTimer(1);
                 AOTimers at = new AOTimers();
                 at.Strain = 1;
-
+                
                 int nanoDelta = character.Stats.NanoDelta.Value;
                 if (character.MoveMode == MoveModes.Sit)
                 {
                     int nanoDelta2 = nanoDelta >> 1;
                     nanoDelta = nanoDelta + nanoDelta2;
                 }
-
+                
                 at.Timestamp = DateTime.Now + TimeSpan.FromSeconds(character.Stats.NanoInterval.Value);
                 at.Function.Target = this.Parent.Id; // changed from ItemHandler.itemtarget_self;
                 at.Function.TickCount = -2;
@@ -76,7 +78,7 @@ namespace ZoneEngine.GameObject.Stats
                 at.Function.Arguments.Values.Add(nanoDelta);
                 at.Function.Arguments.Values.Add(0);
                 character.Timers.Add(at);
-
+                    
                 if (!this.Parent.Starting)
                 {
                     this.AffectStats();

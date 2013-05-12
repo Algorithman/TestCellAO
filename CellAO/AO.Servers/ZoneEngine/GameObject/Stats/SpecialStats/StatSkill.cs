@@ -49,14 +49,13 @@ namespace ZoneEngine.GameObject.Stats
             double senseTrickle = SkillTrickleTable.table[this.StatNumber - 100, 5];
             double psychicTrickle = SkillTrickleTable.table[this.StatNumber - 100, 6];
 
-            CharacterStats characterStats = ((Character)this.Parent).Stats;
             this.Trickle =
                 Convert.ToInt32(
                     Math.Floor(
-                        (strengthTrickle * characterStats.Strength.Value + staminaTrickle * characterStats.Stamina.Value
-                         + senseTrickle * characterStats.Sense.Value + agilityTrickle * characterStats.Agility.Value
-                         + intelligenceTrickle * characterStats.Intelligence.Value
-                         + psychicTrickle * characterStats.Psychic.Value) / 4));
+                        (strengthTrickle * this.Parent.Stats.Strength.Value + staminaTrickle * this.Parent.Stats.Stamina.Value
+                         + senseTrickle * this.Parent.Stats.Sense.Value + agilityTrickle * this.Parent.Stats.Agility.Value
+                         + intelligenceTrickle * this.Parent.Stats.Intelligence.Value
+                         + psychicTrickle * this.Parent.Stats.Psychic.Value) / 4));
 
             if (!this.Parent.Starting)
             {
