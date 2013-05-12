@@ -24,7 +24,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #endregion
-    
+
 namespace ZoneEngine.GameObject.Stats
 {
     using System;
@@ -32,10 +32,11 @@ namespace ZoneEngine.GameObject.Stats
     using System.Data;
 
     using AO.Core;
+    using SmokeLounge.AOtomation.Messaging.Messages;
     using ZoneEngine.CoreClient;
-    
+
     #region StatChangedEventArgs
-    
+
     /// <summary>
     /// Event Arguments for changed stats
     /// </summary>
@@ -51,9 +52,9 @@ namespace ZoneEngine.GameObject.Stats
         }
 
         public ClassStat Stat { get; private set; }
-        
+
         public uint OldValue { get; set; }
-            
+
         public Dynel Parent
         {
             get
@@ -61,24 +62,24 @@ namespace ZoneEngine.GameObject.Stats
                 return this.Stat.Parent;
             }
         }
-    
+
         public uint NewValue { get; set; }
 
         public bool AnnounceToPlayfield { get; set; }
     }
-    
+
     #endregion
-        
+
     #region ClassStat  class for one stat
-        
+
     public class ClassStat
     {
         #region Eventhandlers
-            
+
         public event EventHandler<StatChangedEventArgs> RaiseBeforeStatChangedEvent;
-            
+
         public event EventHandler<StatChangedEventArgs> RaiseAfterStatChangedEvent;
-            
+
         private void OnBeforeStatChangedEvent(StatChangedEventArgs e)
         {
             EventHandler<StatChangedEventArgs> handler = this.RaiseBeforeStatChangedEvent;
@@ -87,7 +88,7 @@ namespace ZoneEngine.GameObject.Stats
                 handler(this, e);
             }
         }
-            
+
         private void OnAfterStatChangedEvent(StatChangedEventArgs e)
         {
             EventHandler<StatChangedEventArgs> handler = this.RaiseAfterStatChangedEvent;
@@ -96,11 +97,11 @@ namespace ZoneEngine.GameObject.Stats
                 handler(this, e);
             }
         }
-            
+
         #endregion
-                
+
         public int StatNumber { get; set; }
-                    
+
         public virtual int Value
         {
             get
@@ -115,13 +116,13 @@ namespace ZoneEngine.GameObject.Stats
                 this.Set(value);
             }
         }
-        
+
         public Dynel Parent { get; private set; }
-            
+
         public uint StatDefaultValue { get; set; }
-                
+
         public uint StatBaseValue { get; set; }
-            
+
         public int StatPercentageModifier
         {
             get
@@ -133,13 +134,13 @@ namespace ZoneEngine.GameObject.Stats
                 this.statPercentageModifier = value;
             }
         }
-        
+
         private int statPercentageModifier = 100; // From Items/Perks/Nanos
-            
+
         public int StatModifier { get; set; }
-                
+
         public int Trickle { get; set; }
-            
+
         public bool AnnounceToPlayfield
         {
             get
@@ -151,11 +152,11 @@ namespace ZoneEngine.GameObject.Stats
                 this.announceToPlayfield = value;
             }
         }
-            
+
         private bool announceToPlayfield = true;
-                
+
         public bool DoNotDontWriteToSql { get; set; }
-            
+
         public bool SendBaseValue
         {
             get
@@ -167,11 +168,11 @@ namespace ZoneEngine.GameObject.Stats
                 this.sendBaseValue = value;
             }
         }
-            
+
         private bool sendBaseValue = true;
-                
+
         public bool Changed { get; set; }
-        
+
         public List<int> Affects
         {
             get
@@ -179,9 +180,9 @@ namespace ZoneEngine.GameObject.Stats
                 return this.affects;
             }
         }
-            
+
         private readonly List<int> affects = new List<int>();
-            
+
         public ClassStat(
             int number, uint defaultValue, string name, bool sendBaseValue, bool dontWrite, bool announceToPlayfield)
         {
@@ -195,11 +196,11 @@ namespace ZoneEngine.GameObject.Stats
             this.announceToPlayfield = announceToPlayfield;
             // Obsolete            StatName = name;
         }
-        
+
         public ClassStat()
         {
         }
-            
+
         /// <summary>
         /// Calculate trickle value (prototype)
         /// </summary>
@@ -210,12 +211,12 @@ namespace ZoneEngine.GameObject.Stats
                 this.AffectStats();
             }
         }
-        
+
         public virtual uint GetMaxValue(uint val)
         {
             return val;
         }
-            
+
         public void Set(uint value)
         {
             if ((this.Parent == null) || (this.Parent.Starting))
@@ -239,19 +240,19 @@ namespace ZoneEngine.GameObject.Stats
                 }
             }
         }
-        
+
         public void Set(int value)
         {
             this.Set((uint)value);
         }
-        
+
         public void SetParent(Dynel parent)
         {
             this.Parent = parent;
         }
-            
+
         #region read and write to Sql
-                
+
         /// <summary>
         /// Write Stat to Sql
         /// </summary>
@@ -265,24 +266,26 @@ namespace ZoneEngine.GameObject.Stats
             SqlWrapper sql = new SqlWrapper();
             if (this.Changed)
             {
+                /* TODO: REDO
                 if (this.Parent is NonPlayerCharacter)
                 {
-                    sql.SqlInsert(
-                                  "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() +
-                                  "_stats (ID, Playfield, Stat, Value) VALUES (" + id + "," + this.Parent.PlayField + "," +
-                                  this.StatNumber + "," + ((Int32)this.StatBaseValue) + ") ON DUPLICATE KEY UPDATE Value=" +
-                                  ((Int32)this.StatBaseValue) + ";");
+                sql.SqlInsert(
+                "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() +
+                "_stats (ID, Playfield, Stat, Value) VALUES (" + id + "," + this.Parent.PlayField + "," +
+                this.StatNumber + "," + ((Int32)this.StatBaseValue) + ") ON DUPLICATE KEY UPDATE Value=" +
+                ((Int32)this.StatBaseValue) + ";");
                 }
                 else
                 {
-                    sql.SqlInsert(
-                                  "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() + "_stats (ID, Stat, Value) VALUES (" +
-                                  id + "," + this.StatNumber + "," + ((Int32)this.StatBaseValue) +
-                                  ") ON DUPLICATE KEY UPDATE Value=" + ((Int32)this.StatBaseValue) + ";");
+                sql.SqlInsert(
+                "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() + "_stats (ID, Stat, Value) VALUES (" +
+                id + "," + this.StatNumber + "," + ((Int32)this.StatBaseValue) +
+                ") ON DUPLICATE KEY UPDATE Value=" + ((Int32)this.StatBaseValue) + ";");
                 }
+                */
             }
         }
-                
+
         /// <summary>
         /// Write Stat to Sql
         /// </summary>
@@ -292,28 +295,30 @@ namespace ZoneEngine.GameObject.Stats
             {
                 return;
             }
-            int id = this.Parent.Id;
+            int id = this.Parent.Identity.Instance;
             SqlWrapper sql = new SqlWrapper();
             if (doit)
             {
+                /* TODO: REDO
                 if (this.Parent is NonPlayerCharacter)
                 {
-                    sql.SqlInsert(
-                                  "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() +
-                                  "_stats (ID, Playfield, Stat, Value) VALUES (" + id + "," + this.Parent.PlayField + "," +
-                                  this.StatNumber + "," + ((Int32)this.StatBaseValue) + ") ON DUPLICATE KEY UPDATE Value=" +
-                                  ((Int32)this.StatBaseValue) + ";");
+                sql.SqlInsert(
+                "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() +
+                "_stats (ID, Playfield, Stat, Value) VALUES (" + id + "," + this.Parent.PlayField + "," +
+                this.StatNumber + "," + ((Int32)this.StatBaseValue) + ") ON DUPLICATE KEY UPDATE Value=" +
+                ((Int32)this.StatBaseValue) + ";");
                 }
                 else
                 {
-                    sql.SqlInsert(
-                                  "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() + "_stats (ID, Stat, Value) VALUES (" +
-                                  id + "," + this.StatNumber + "," + ((Int32)this.StatBaseValue) +
-                                  ") ON DUPLICATE KEY UPDATE Value=" + ((Int32)this.StatBaseValue) + ";");
+                sql.SqlInsert(
+                "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() + "_stats (ID, Stat, Value) VALUES (" +
+                id + "," + this.StatNumber + "," + ((Int32)this.StatBaseValue) +
+                ") ON DUPLICATE KEY UPDATE Value=" + ((Int32)this.StatBaseValue) + ";");
                 }
+                */
             }
         }
-                
+
         /// <summary>
         /// Read stat from Sql
         /// </summary>
@@ -324,22 +329,23 @@ namespace ZoneEngine.GameObject.Stats
                 return;
             }
             SqlWrapper sql = new SqlWrapper();
-            int id = this.Parent.Id;
+            int id = this.Parent.Identity.Instance;
+            /* TODO: REDO
             DataTable dt =
-                sql.ReadDatatable(
-                                  "SELECT Value FROM " + this.Parent.GetSqlTablefromDynelType() + " WHERE ID=" + id + " AND Stat=" +
-                                  this.StatNumber + ";");
-
+            sql.ReadDatatable(
+            "SELECT Value FROM " + this.Parent.GetSqlTablefromDynelType() + " WHERE ID=" + id + " AND Stat=" +
+            this.StatNumber + ";");
             if (dt.Rows.Count > 0)
             {
-                this.Value = (Int32)dt.Rows[0][0];
+            this.Value = (Int32)dt.Rows[0][0];
             }
+            */
         }
-                
+
         #endregion
-            
+
         #region Call Stats affected by this stat
-                
+
         public void AffectStats()
         {
             if (!(this.Parent is Character) && !(this.Parent is NonPlayerCharacter))
@@ -354,23 +360,23 @@ namespace ZoneEngine.GameObject.Stats
 
         #endregion
     }
-        
+
     #endregion
-        
+
     #region Character_Stats holder for Character's stats
-        
+
     public class DynelStats
     {
         #region stats creation
-        
+
         private readonly ClassStat flags = new ClassStat(0, 8917569, "Flags", false, false, true);
-        
+
         private readonly StatHealth life = new StatHealth(1, 1, "Life", true, false, false);
-        
+
         private readonly ClassStat volumeMass = new ClassStat(2, 1234567890, "VolumeMass", false, false, false);
-        
+
         private readonly ClassStat attackSpeed = new ClassStat(3, 5, "AttackSpeed", false, false, false);
-        
+
         private readonly ClassStat breed = new ClassStat(4, 1234567890, "Breed", false, false, false);
 
         private readonly ClassStat clan = new ClassStat(5, 0, "Clan", false, false, false);
@@ -385,73 +391,73 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat professionLevel = new ClassStat(
             10, 1234567890, "ProfessionLevel", false, true, false);
-        
+
         private readonly ClassStat previousHealth = new ClassStat(11, 50, "PreviousHealth", false, false, false);
-        
+
         private readonly ClassStat mesh = new ClassStat(12, 17530, "Mesh", false, false, false);
-        
+
         private readonly ClassStat anim = new ClassStat(13, 1234567890, "Anim", false, false, false);
-        
+
         private readonly ClassStat name = new ClassStat(14, 1234567890, "Name", false, false, false);
-        
+
         private readonly ClassStat info = new ClassStat(15, 1234567890, "Info", false, false, false);
-        
+
         private readonly ClassStat strength = new ClassStat(16, 0, "Strength", true, false, false);
-        
+
         private readonly ClassStat agility = new ClassStat(17, 0, "Agility", true, false, false);
-        
+
         private readonly ClassStat stamina = new ClassStat(18, 0, "Stamina", true, false, false);
-        
+
         private readonly ClassStat intelligence = new ClassStat(19, 0, "Intelligence", true, false, false);
-        
+
         private readonly ClassStat sense = new ClassStat(20, 0, "Sense", true, false, false);
-        
+
         private readonly ClassStat psychic = new ClassStat(21, 0, "Psychic", true, false, false);
-        
+
         private readonly ClassStat ams = new ClassStat(22, 1234567890, "AMS", false, false, false);
-        
+
         private readonly ClassStat staticInstance = new ClassStat(23, 1234567890, "StaticInstance", false, false, false);
-        
+
         private readonly ClassStat maxMass = new ClassStat(24, 1234567890, "MaxMass", false, false, false);
-        
+
         private readonly ClassStat staticType = new ClassStat(25, 1234567890, "StaticType", false, false, false);
-        
+
         private readonly ClassStat energy = new ClassStat(26, 1234567890, "Energy", false, false, false);
-        
+
         private readonly StatHitPoints health = new StatHitPoints(27, 1, "Health", false, false, false);
-        
+
         private readonly ClassStat height = new ClassStat(28, 1234567890, "Height", false, false, false);
-        
+
         private readonly ClassStat dms = new ClassStat(29, 1234567890, "DMS", false, false, false);
-        
+
         private readonly ClassStat can = new ClassStat(30, 1234567890, "Can", false, false, false);
-        
+
         private readonly ClassStat face = new ClassStat(31, 1234567890, "Face", false, false, false);
-        
+
         private readonly ClassStat hairMesh = new ClassStat(32, 0, "HairMesh", false, false, false);
-        
+
         private readonly ClassStat side = new ClassStat(33, 0, "Side", false, false, false);
-        
+
         private readonly ClassStat deadTimer = new ClassStat(34, 0, "DeadTimer", false, false, false);
-        
+
         private readonly ClassStat accessCount = new ClassStat(35, 1234567890, "AccessCount", false, false, false);
-        
+
         private readonly ClassStat attackCount = new ClassStat(36, 1234567890, "AttackCount", false, false, false);
-        
+
         private readonly StatTitleLevel titleLevel = new StatTitleLevel(37, 1, "TitleLevel", false, false, false);
-        
+
         private readonly ClassStat backMesh = new ClassStat(38, 0, "BackMesh", false, false, false);
-        
+
         private readonly ClassStat shoulderMeshHolder = new ClassStat(39, 0, "WeaponMeshRight", false, false, false);
-        
+
         private readonly ClassStat alienXP = new ClassStat(40, 0, "AlienXP", false, false, false);
-        
+
         private readonly ClassStat fabricType = new ClassStat(41, 1234567890, "FabricType", false, false, false);
-        
+
         private readonly ClassStat catMesh = new ClassStat(42, 1234567890, "CATMesh", false, false, false);
-        
+
         private readonly ClassStat parentType = new ClassStat(43, 1234567890, "ParentType", false, false, false);
-        
+
         private readonly ClassStat parentInstance = new ClassStat(44, 1234567890, "ParentInstance", false, false, false);
 
         private readonly ClassStat beltSlots = new ClassStat(45, 0, "BeltSlots", false, false, false);
@@ -479,27 +485,27 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat timeSinceCreation = new ClassStat(
             56, 1234567890, "TimeSinceCreation", false, false, false);
-        
+
         private readonly ClassStat lastXP = new ClassStat(57, 0, "LastXP", false, false, false);
-        
+
         private readonly ClassStat age = new ClassStat(58, 0, "Age", false, false, false);
-        
+
         private readonly ClassStat sex = new ClassStat(59, 1234567890, "Sex", false, false, false);
-        
+
         private readonly ClassStat profession = new ClassStat(60, 1234567890, "Profession", false, false, false);
-        
+
         private readonly ClassStat cash = new ClassStat(61, 0, "Cash", false, false, false);
-        
+
         private readonly ClassStat alignment = new ClassStat(62, 0, "Alignment", false, false, false);
-        
+
         private readonly ClassStat attitude = new ClassStat(63, 0, "Attitude", false, false, false);
-        
+
         private readonly ClassStat headMesh = new ClassStat(64, 0, "HeadMesh", false, false, false);
-        
+
         private readonly ClassStat missionBits5 = new ClassStat(65, 0, "MissionBits5", false, false, false);
-        
+
         private readonly ClassStat missionBits6 = new ClassStat(66, 0, "MissionBits6", false, false, false);
-        
+
         private readonly ClassStat missionBits7 = new ClassStat(67, 0, "MissionBits7", false, false, false);
 
         private readonly ClassStat veteranPoints = new ClassStat(68, 0, "VeteranPoints", false, false, false);
@@ -514,71 +520,71 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat repairDifficulty = new ClassStat(
             73, 1234567890, "RepairDifficulty", false, false, false);
-        
+
         private readonly ClassStat price = new ClassStat(74, 1234567890, "Price", false, false, false);
 
         private readonly ClassStat metaType = new ClassStat(75, 0, "MetaType", false, false, false);
-            
+
         private readonly ClassStat itemClass = new ClassStat(76, 1234567890, "ItemClass", false, false, false);
-        
+
         private readonly ClassStat repairSkill = new ClassStat(77, 1234567890, "RepairSkill", false, false, false);
 
         private readonly ClassStat currentMass = new ClassStat(78, 0, "CurrentMass", false, false, false);
-            
+
         private readonly ClassStat icon = new ClassStat(79, 0, "Icon", false, false, false);
-        
+
         private readonly ClassStat primaryItemType = new ClassStat(
             80, 1234567890, "PrimaryItemType", false, false, false);
 
         private readonly ClassStat primaryItemInstance = new ClassStat(
             81, 1234567890, "PrimaryItemInstance", false, false, false);
-        
+
         private readonly ClassStat secondaryItemType = new ClassStat(
             82, 1234567890, "SecondaryItemType", false, false, false);
 
         private readonly ClassStat secondaryItemInstance = new ClassStat(
             83, 1234567890, "SecondaryItemInstance", false, false, false);
-        
+
         private readonly ClassStat userType = new ClassStat(84, 1234567890, "UserType", false, false, false);
-        
+
         private readonly ClassStat userInstance = new ClassStat(85, 1234567890, "UserInstance", false, false, false);
-        
+
         private readonly ClassStat areaType = new ClassStat(86, 1234567890, "AreaType", false, false, false);
-        
+
         private readonly ClassStat areaInstance = new ClassStat(87, 1234567890, "AreaInstance", false, false, false);
-        
+
         private readonly ClassStat defaultPos = new ClassStat(88, 1234567890, "DefaultPos", false, false, false);
-        
+
         private readonly ClassStat race = new ClassStat(89, 1, "Race", false, false, false);
-        
+
         private readonly ClassStat projectileAC = new ClassStat(90, 0, "ProjectileAC", true, false, false);
-        
+
         private readonly ClassStat meleeAC = new ClassStat(91, 0, "MeleeAC", true, false, false);
-        
+
         private readonly ClassStat energyAC = new ClassStat(92, 0, "EnergyAC", true, false, false);
-        
+
         private readonly ClassStat chemicalAC = new ClassStat(93, 0, "ChemicalAC", true, false, false);
-        
+
         private readonly ClassStat radiationAC = new ClassStat(94, 0, "RadiationAC", true, false, false);
-        
+
         private readonly ClassStat coldAC = new ClassStat(95, 0, "ColdAC", true, false, false);
-        
+
         private readonly ClassStat poisonAC = new ClassStat(96, 0, "PoisonAC", true, false, false);
-        
+
         private readonly ClassStat fireAC = new ClassStat(97, 0, "FireAC", true, false, false);
-        
+
         private readonly ClassStat stateAction = new ClassStat(98, 1234567890, "StateAction", true, false, false);
-        
+
         private readonly ClassStat itemAnim = new ClassStat(99, 1234567890, "ItemAnim", true, false, false);
-        
+
         private readonly StatSkill martialArts = new StatSkill(100, 5, "MartialArts", true, false, false);
-        
+
         private readonly StatSkill meleeMultiple = new StatSkill(101, 5, "MeleeMultiple", true, false, false);
-        
+
         private readonly StatSkill onehBluntWeapons = new StatSkill(102, 5, "1hBluntWeapons", true, false, false);
-        
+
         private readonly StatSkill onehEdgedWeapon = new StatSkill(103, 5, "1hEdgedWeapon", true, false, false);
-        
+
         private readonly StatSkill meleeEnergyWeapon = new StatSkill(104, 5, "MeleeEnergyWeapon", true, false, false);
 
         private readonly StatSkill twohEdgedWeapons = new StatSkill(105, 5, "2hEdgedWeapons", true, false, false);
@@ -593,15 +599,15 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly StatSkill thrownGrapplingWeapons = new StatSkill(
             110, 5, "ThrownGrapplingWeapons", true, false, false);
-        
+
         private readonly StatSkill bow = new StatSkill(111, 5, "Bow", true, false, false);
-        
+
         private readonly StatSkill pistol = new StatSkill(112, 5, "Pistol", true, false, false);
 
         private readonly StatSkill rifle = new StatSkill(113, 5, "Rifle", true, false, false);
-            
+
         private readonly StatSkill subMachineGun = new StatSkill(114, 5, "SubMachineGun", true, false, false);
-        
+
         private readonly StatSkill shotgun = new StatSkill(115, 5, "Shotgun", true, false, false);
 
         private readonly StatSkill assaultRifle = new StatSkill(116, 5, "AssaultRifle", true, false, false);
@@ -610,62 +616,62 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly StatSkill closeCombatInitiative = new StatSkill(
             118, 5, "CloseCombatInitiative", true, false, false);
-        
+
         private readonly StatSkill distanceWeaponInitiative = new StatSkill(
             119, 5, "DistanceWeaponInitiative", true, false, false);
-            
+
         private readonly StatSkill physicalProwessInitiative = new StatSkill(
             120, 5, "PhysicalProwessInitiative", true, false, false);
-            
+
         private readonly StatSkill bowSpecialAttack = new StatSkill(121, 5, "BowSpecialAttack", true, false, false);
-        
+
         private readonly StatSkill senseImprovement = new StatSkill(122, 5, "SenseImprovement", true, false, false);
 
         private readonly StatSkill firstAid = new StatSkill(123, 5, "FirstAid", true, false, false);
-            
+
         private readonly StatSkill treatment = new StatSkill(124, 5, "Treatment", true, false, false);
-        
+
         private readonly StatSkill mechanicalEngineering = new StatSkill(
             125, 5, "MechanicalEngineering", true, false, false);
-        
+
         private readonly StatSkill electricalEngineering = new StatSkill(
             126, 5, "ElectricalEngineering", true, false, false);
 
         private readonly StatSkill materialMetamorphose = new StatSkill(
             127, 5, "MaterialMetamorphose", true, false, false);
-        
+
         private readonly StatSkill biologicalMetamorphose = new StatSkill(
             128, 5, "BiologicalMetamorphose", true, false, false);
 
         private readonly StatSkill psychologicalModification = new StatSkill(
             129, 5, "PsychologicalModification", true, false, false);
-        
+
         private readonly StatSkill materialCreation = new StatSkill(130, 5, "MaterialCreation", true, false, false);
-        
+
         private readonly StatSkill materialLocation = new StatSkill(131, 5, "MaterialLocation", true, false, false);
-        
+
         private readonly StatSkill nanoEnergyPool = new StatSkill(132, 5, "NanoEnergyPool", true, false, false);
-        
+
         private readonly StatSkill lrEnergyWeapon = new StatSkill(133, 5, "LR_EnergyWeapon", true, false, false);
-        
+
         private readonly StatSkill lrMultipleWeapon = new StatSkill(134, 5, "LR_MultipleWeapon", true, false, false);
-        
+
         private readonly StatSkill disarmTrap = new StatSkill(135, 5, "DisarmTrap", true, false, false);
-        
+
         private readonly StatSkill perception = new StatSkill(136, 5, "Perception", true, false, false);
-        
+
         private readonly StatSkill adventuring = new StatSkill(137, 5, "Adventuring", true, false, false);
-        
+
         private readonly StatSkill swim = new StatSkill(138, 5, "Swim", true, false, false);
-        
+
         private readonly StatSkill driveAir = new StatSkill(139, 5, "DriveAir", true, false, false);
-        
+
         private readonly StatSkill mapNavigation = new StatSkill(140, 5, "MapNavigation", true, false, false);
-        
+
         private readonly StatSkill tutoring = new StatSkill(141, 5, "Tutoring", true, false, false);
-        
+
         private readonly StatSkill brawl = new StatSkill(142, 5, "Brawl", true, false, false);
-        
+
         private readonly StatSkill riposte = new StatSkill(143, 5, "Riposte", true, false, false);
 
         private readonly StatSkill dimach = new StatSkill(144, 5, "Dimach", true, false, false);
@@ -680,9 +686,9 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly StatSkill nanoProwessInitiative = new StatSkill(
             149, 5, "NanoProwessInitiative", true, false, false);
-        
+
         private readonly StatSkill flingShot = new StatSkill(150, 5, "FlingShot", true, false, false);
-        
+
         private readonly StatSkill aimedShot = new StatSkill(151, 5, "AimedShot", true, false, false);
 
         private readonly StatSkill bodyDevelopment = new StatSkill(152, 5, "BodyDevelopment", true, false, false);
@@ -697,27 +703,27 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly StatSkill fieldQuantumPhysics = new StatSkill(
             157, 5, "FieldQuantumPhysics", true, false, false);
-        
+
         private readonly StatSkill weaponSmithing = new StatSkill(158, 5, "WeaponSmithing", true, false, false);
-        
+
         private readonly StatSkill pharmaceuticals = new StatSkill(159, 5, "Pharmaceuticals", true, false, false);
-        
+
         private readonly StatSkill nanoProgramming = new StatSkill(160, 5, "NanoProgramming", true, false, false);
-        
+
         private readonly StatSkill computerLiteracy = new StatSkill(161, 5, "ComputerLiteracy", true, false, false);
-        
+
         private readonly StatSkill psychology = new StatSkill(162, 5, "Psychology", true, false, false);
-        
+
         private readonly StatSkill chemistry = new StatSkill(163, 5, "Chemistry", true, false, false);
-        
+
         private readonly StatSkill concealment = new StatSkill(164, 5, "Concealment", true, false, false);
 
         private readonly StatSkill breakingEntry = new StatSkill(165, 5, "BreakingEntry", true, false, false);
-            
+
         private readonly StatSkill driveGround = new StatSkill(166, 5, "DriveGround", true, false, false);
-        
+
         private readonly StatSkill fullAuto = new StatSkill(167, 5, "FullAuto", true, false, false);
-        
+
         private readonly StatSkill nanoAC = new StatSkill(168, 5, "NanoAC", true, false, false);
 
         private readonly ClassStat alienLevel = new ClassStat(169, 0, "AlienLevel", false, false, false);
@@ -737,7 +743,7 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat autoLockTimeDefault = new ClassStat(
             175, 1234567890, "AutoLockTimeDefault", false, false, false);
-        
+
         private readonly ClassStat autoUnlockTimeDefault = new ClassStat(
             176, 1234567890, "AutoUnlockTimeDefault", false, false, false);
 
@@ -745,15 +751,15 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly StatAlienNextXP alienNextXP = new StatAlienNextXP(
             178, 1500, "AlienNextXP", false, false, false);
-        
+
         private readonly ClassStat npcFlags = new ClassStat(179, 1234567890, "NPCFlags", false, false, false);
 
         private readonly ClassStat currentNCU = new ClassStat(180, 0, "CurrentNCU", false, false, false);
 
         private readonly ClassStat maxNCU = new ClassStat(181, 8, "MaxNCU", false, false, false);
-            
+
         private readonly ClassStat specialization = new ClassStat(182, 0, "Specialization", false, false, false);
-        
+
         private readonly ClassStat effectIcon = new ClassStat(183, 1234567890, "EffectIcon", false, false, false);
 
         private readonly ClassStat buildingType = new ClassStat(184, 1234567890, "BuildingType", false, false, false);
@@ -762,105 +768,105 @@ namespace ZoneEngine.GameObject.Stats
             185, 1234567890, "BuildingInstance", false, false, false);
 
         private readonly ClassStat cardOwnerType = new ClassStat(186, 1234567890, "CardOwnerType", false, false, false);
-            
+
         private readonly ClassStat cardOwnerInstance = new ClassStat(
             187, 1234567890, "CardOwnerInstance", false, false, false);
-            
+
         private readonly ClassStat buildingComplexInst = new ClassStat(
             188, 1234567890, "BuildingComplexInst", false, false, false);
-            
+
         private readonly ClassStat exitInstance = new ClassStat(189, 1234567890, "ExitInstance", false, false, false);
-        
+
         private readonly ClassStat nextDoorInBuilding = new ClassStat(
             190, 1234567890, "NextDoorInBuilding", false, false, false);
 
         private readonly ClassStat lastConcretePlayfieldInstance = new ClassStat(
             191, 0, "LastConcretePlayfieldInstance", false, false, false);
-        
+
         private readonly ClassStat extenalPlayfieldInstance = new ClassStat(
             192, 1234567890, "ExtenalPlayfieldInstance", false, false, false);
-        
+
         private readonly ClassStat extenalDoorInstance = new ClassStat(
             193, 1234567890, "ExtenalDoorInstance", false, false, false);
 
         private readonly ClassStat inPlay = new ClassStat(194, 0, "InPlay", false, false, false);
 
         private readonly ClassStat accessKey = new ClassStat(195, 1234567890, "AccessKey", false, false, false);
-            
+
         private readonly ClassStat petMaster = new ClassStat(196, 1234567890, "PetMaster", false, false, false);
-        
+
         private readonly ClassStat orientationMode = new ClassStat(
             197, 1234567890, "OrientationMode", false, false, false);
 
         private readonly ClassStat sessionTime = new ClassStat(198, 1234567890, "SessionTime", false, false, false);
-            
+
         private readonly ClassStat rp = new ClassStat(199, 0, "RP", false, false, false);
-        
+
         private readonly ClassStat conformity = new ClassStat(200, 1234567890, "Conformity", false, false, false);
 
         private readonly ClassStat aggressiveness = new ClassStat(
             201, 1234567890, "Aggressiveness", false, false, false);
-        
+
         private readonly ClassStat stability = new ClassStat(202, 1234567890, "Stability", false, false, false);
-        
+
         private readonly ClassStat extroverty = new ClassStat(203, 1234567890, "Extroverty", false, false, false);
-        
+
         private readonly ClassStat breedHostility = new ClassStat(
             204, 1234567890, "BreedHostility", false, false, false);
 
         private readonly ClassStat reflectProjectileAC = new ClassStat(
             205, 0, "ReflectProjectileAC", true, false, false);
-        
+
         private readonly ClassStat reflectMeleeAC = new ClassStat(206, 0, "ReflectMeleeAC", true, false, false);
-        
+
         private readonly ClassStat reflectEnergyAC = new ClassStat(207, 0, "ReflectEnergyAC", true, false, false);
-        
+
         private readonly ClassStat reflectChemicalAC = new ClassStat(208, 0, "ReflectChemicalAC", true, false, false);
-        
+
         private readonly ClassStat weaponMeshHolder = new ClassStat(209, 0, "WeaponMeshRight", false, false, false);
-        
+
         private readonly ClassStat rechargeDelay = new ClassStat(210, 1234567890, "RechargeDelay", false, false, false);
-        
+
         private readonly ClassStat equipDelay = new ClassStat(211, 1234567890, "EquipDelay", false, false, false);
-        
+
         private readonly ClassStat maxEnergy = new ClassStat(212, 1234567890, "MaxEnergy", false, false, false);
-        
+
         private readonly ClassStat teamSide = new ClassStat(213, 0, "TeamSide", false, false, false);
-        
+
         private readonly StatNanoPoints currentNano = new StatNanoPoints(214, 1, "CurrentNano", false, false, false);
-        
+
         private readonly ClassStat gmLevel = new ClassStat(215, 0, "GmLevel", false, true, false);
-        
+
         private readonly ClassStat reflectRadiationAC = new ClassStat(216, 0, "ReflectRadiationAC", true, false, false);
 
         private readonly ClassStat reflectColdAC = new ClassStat(217, 0, "ReflectColdAC", true, false, false);
-            
+
         private readonly ClassStat reflectNanoAC = new ClassStat(218, 0, "ReflectNanoAC", true, false, false);
-        
+
         private readonly ClassStat reflectFireAC = new ClassStat(219, 0, "ReflectFireAC", true, false, false);
-        
+
         private readonly ClassStat currBodyLocation = new ClassStat(220, 0, "CurrBodyLocation", false, false, false);
-        
+
         private readonly StatNano maxNanoEnergy = new StatNano(221, 1, "MaxNanoEnergy", false, false, false);
-        
+
         private readonly ClassStat accumulatedDamage = new ClassStat(
             222, 1234567890, "AccumulatedDamage", false, false, false);
 
         private readonly ClassStat canChangeClothes = new ClassStat(
             223, 1234567890, "CanChangeClothes", false, false, false);
-        
+
         private readonly ClassStat features = new ClassStat(224, 6, "Features", false, false, false);
-        
+
         private readonly ClassStat reflectPoisonAC = new ClassStat(225, 0, "ReflectPoisonAC", false, false, false);
-        
+
         private readonly ClassStat shieldProjectileAC = new ClassStat(226, 0, "ShieldProjectileAC", true, false, false);
-        
+
         private readonly ClassStat shieldMeleeAC = new ClassStat(227, 0, "ShieldMeleeAC", true, false, false);
-        
+
         private readonly ClassStat shieldEnergyAC = new ClassStat(228, 0, "ShieldEnergyAC", true, false, false);
-        
+
         private readonly ClassStat shieldChemicalAC = new ClassStat(229, 0, "ShieldChemicalAC", true, false, false);
-        
+
         private readonly ClassStat shieldRadiationAC = new ClassStat(230, 0, "ShieldRadiationAC", true, false, false);
 
         private readonly ClassStat shieldColdAC = new ClassStat(231, 0, "ShieldColdAC", true, false, false);
@@ -875,15 +881,15 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat insurancePercentage = new ClassStat(
             236, 0, "InsurancePercentage", false, false, false);
-        
+
         private readonly ClassStat changeSideCount = new ClassStat(237, 0, "ChangeSideCount", false, false, false);
-        
+
         private readonly ClassStat absorbProjectileAC = new ClassStat(238, 0, "AbsorbProjectileAC", true, false, false);
-        
+
         private readonly ClassStat absorbMeleeAC = new ClassStat(239, 0, "AbsorbMeleeAC", true, false, false);
-        
+
         private readonly ClassStat absorbEnergyAC = new ClassStat(240, 0, "AbsorbEnergyAC", true, false, false);
-        
+
         private readonly ClassStat absorbChemicalAC = new ClassStat(241, 0, "AbsorbChemicalAC", true, false, false);
 
         private readonly ClassStat absorbRadiationAC = new ClassStat(242, 0, "AbsorbRadiationAC", true, false, false);
@@ -902,83 +908,83 @@ namespace ZoneEngine.GameObject.Stats
         private readonly ClassStat birthDate = new ClassStat(248, 1234567890, "BirthDate", false, false, false);
 
         private readonly ClassStat lastSaved = new ClassStat(249, 1234567890, "LastSaved", false, false, false);
-            
+
         private readonly ClassStat soundVolume = new ClassStat(250, 1234567890, "SoundVolume", false, false, false);
-        
+
         private readonly ClassStat petCounter = new ClassStat(251, 1234567890, "PetCounter", false, false, false);
 
         private readonly ClassStat metersWalked = new ClassStat(252, 1234567890, "MeetersWalked", false, false, false);
 
         private readonly ClassStat questLevelsSolved = new ClassStat(
             253, 1234567890, "QuestLevelsSolved", false, false, false);
-        
+
         // Accumulated Tokens?
-        
+
         private readonly ClassStat monsterLevelsKilled = new ClassStat(
             254, 1234567890, "MonsterLevelsKilled", false, false, false);
 
         private readonly ClassStat pvPLevelsKilled = new ClassStat(
             255, 1234567890, "PvPLevelsKilled", false, false, false);
-        
+
         private readonly ClassStat missionBits1 = new ClassStat(256, 0, "MissionBits1", false, false, false);
 
         private readonly ClassStat missionBits2 = new ClassStat(257, 0, "MissionBits2", false, false, false);
-            
+
         private readonly ClassStat accessGrant = new ClassStat(258, 1234567890, "AccessGrant", false, false, false);
-        
+
         private readonly ClassStat doorFlags = new ClassStat(259, 1234567890, "DoorFlags", false, false, false);
 
         private readonly ClassStat clanHierarchy = new ClassStat(260, 1234567890, "ClanHierarchy", false, false, false);
-            
+
         private readonly ClassStat questStat = new ClassStat(261, 1234567890, "QuestStat", false, false, false);
-        
+
         private readonly ClassStat clientActivated = new ClassStat(
             262, 1234567890, "ClientActivated", false, false, false);
 
         private readonly ClassStat personalResearchLevel = new ClassStat(
             263, 0, "PersonalResearchLevel", false, false, false);
-        
+
         private readonly ClassStat globalResearchLevel = new ClassStat(
             264, 0, "GlobalResearchLevel", false, false, false);
 
         private readonly ClassStat personalResearchGoal = new ClassStat(
             265, 0, "PersonalResearchGoal", false, false, false);
-        
+
         private readonly ClassStat globalResearchGoal = new ClassStat(266, 0, "GlobalResearchGoal", false, false, false);
-        
+
         private readonly ClassStat turnSpeed = new ClassStat(267, 40000, "TurnSpeed", false, false, false);
 
         private readonly ClassStat liquidType = new ClassStat(268, 1234567890, "LiquidType", false, false, false);
-            
+
         private readonly ClassStat gatherSound = new ClassStat(269, 1234567890, "GatherSound", false, false, false);
-        
+
         private readonly ClassStat castSound = new ClassStat(270, 1234567890, "CastSound", false, false, false);
-        
+
         private readonly ClassStat travelSound = new ClassStat(271, 1234567890, "TravelSound", false, false, false);
-        
+
         private readonly ClassStat hitSound = new ClassStat(272, 1234567890, "HitSound", false, false, false);
-        
+
         private readonly ClassStat secondaryItemTemplate = new ClassStat(
             273, 1234567890, "SecondaryItemTemplate", false, false, false);
-        
+
         private readonly ClassStat equippedWeapons = new ClassStat(
             274, 1234567890, "EquippedWeapons", false, false, false);
-        
+
         private readonly ClassStat xpKillRange = new ClassStat(275, 5, "XPKillRange", false, false, false);
 
         private readonly ClassStat amsModifier = new ClassStat(276, 0, "AMSModifier", false, false, false);
-            
+
         private readonly ClassStat dmsModifier = new ClassStat(277, 0, "DMSModifier", false, false, false);
-        
+
         private readonly ClassStat projectileDamageModifier = new ClassStat(
             278, 0, "ProjectileDamageModifier", false, false, false);
-        
+
         private readonly ClassStat meleeDamageModifier = new ClassStat(
             279, 0, "MeleeDamageModifier", false, false, false);
 
         private readonly ClassStat energyDamageModifier = new ClassStat(
             280, 0, "EnergyDamageModifier", false, false, false);
-        
+
         private readonly ClassStat chemicalDamageModifier = new ClassStat(
             281, 0, "ChemicalDamageModifier", false, false, false);
 
@@ -986,38 +992,38 @@ namespace ZoneEngine.GameObject.Stats
             282, 0, "RadiationDamageModifier", false, false, false);
 
         private readonly ClassStat itemHateValue = new ClassStat(283, 1234567890, "ItemHateValue", false, false, false);
-            
+
         private readonly ClassStat damageBonus = new ClassStat(284, 1234567890, "DamageBonus", false, false, false);
-        
+
         private readonly ClassStat maxDamage = new ClassStat(285, 1234567890, "MaxDamage", false, false, false);
-        
+
         private readonly ClassStat minDamage = new ClassStat(286, 1234567890, "MinDamage", false, false, false);
 
         private readonly ClassStat attackRange = new ClassStat(287, 1234567890, "AttackRange", false, false, false);
-            
+
         private readonly ClassStat hateValueModifyer = new ClassStat(
             288, 1234567890, "HateValueModifyer", false, false, false);
 
         private readonly ClassStat trapDifficulty = new ClassStat(
             289, 1234567890, "TrapDifficulty", false, false, false);
-        
+
         private readonly ClassStat statOne = new ClassStat(290, 1234567890, "StatOne", false, false, false);
 
         private readonly ClassStat numAttackEffects = new ClassStat(
             291, 1234567890, "NumAttackEffects", false, false, false);
-        
+
         private readonly ClassStat defaultAttackType = new ClassStat(
             292, 1234567890, "DefaultAttackType", false, false, false);
-        
+
         private readonly ClassStat itemSkill = new ClassStat(293, 1234567890, "ItemSkill", false, false, false);
-        
+
         private readonly ClassStat itemDelay = new ClassStat(294, 1234567890, "ItemDelay", false, false, false);
 
         private readonly ClassStat itemOpposedSkill = new ClassStat(
             295, 1234567890, "ItemOpposedSkill", false, false, false);
-        
+
         private readonly ClassStat itemSIS = new ClassStat(296, 1234567890, "ItemSIS", false, false, false);
-        
+
         private readonly ClassStat interactionRadius = new ClassStat(
             297, 1234567890, "InteractionRadius", false, false, false);
 
@@ -1025,38 +1031,38 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat lockDifficulty = new ClassStat(
             299, 1234567890, "LockDifficulty", false, false, false);
-        
+
         private readonly ClassStat members = new ClassStat(300, 999, "Members", false, false, false);
-        
+
         private readonly ClassStat minMembers = new ClassStat(301, 1234567890, "MinMembers", false, false, false);
-        
+
         private readonly ClassStat clanPrice = new ClassStat(302, 1234567890, "ClanPrice", false, false, false);
 
         private readonly ClassStat missionBits3 = new ClassStat(303, 0, "MissionBits3", false, false, false);
-            
+
         private readonly ClassStat clanType = new ClassStat(304, 1234567890, "ClanType", false, false, false);
-        
+
         private readonly ClassStat clanInstance = new ClassStat(305, 1234567890, "ClanInstance", false, false, false);
 
         private readonly ClassStat voteCount = new ClassStat(306, 1234567890, "VoteCount", false, false, false);
-            
+
         private readonly ClassStat memberType = new ClassStat(307, 1234567890, "MemberType", false, false, false);
-        
+
         private readonly ClassStat memberInstance = new ClassStat(
             308, 1234567890, "MemberInstance", false, false, false);
-        
+
         private readonly ClassStat globalClanType = new ClassStat(
             309, 1234567890, "GlobalClanType", false, false, false);
-        
+
         private readonly ClassStat globalClanInstance = new ClassStat(
             310, 1234567890, "GlobalClanInstance", false, false, false);
 
         private readonly ClassStat coldDamageModifier = new ClassStat(
             311, 1234567890, "ColdDamageModifier", false, false, false);
-        
+
         private readonly ClassStat clanUpkeepInterval = new ClassStat(
             312, 1234567890, "ClanUpkeepInterval", false, false, false);
-        
+
         private readonly ClassStat timeSinceUpkeep = new ClassStat(
             313, 1234567890, "TimeSinceUpkeep", false, false, false);
 
@@ -1068,24 +1074,24 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat poisonDamageModifier = new ClassStat(
             317, 0, "PoisonDamageModifier", false, false, false);
-        
+
         private readonly ClassStat npCostModifier = new ClassStat(318, 0, "NPCostModifier", false, false, false);
-        
+
         private readonly ClassStat xpModifier = new ClassStat(319, 0, "XPModifier", false, false, false);
 
         private readonly ClassStat breedLimit = new ClassStat(320, 1234567890, "BreedLimit", false, false, false);
-            
+
         private readonly ClassStat genderLimit = new ClassStat(321, 1234567890, "GenderLimit", false, false, false);
-        
+
         private readonly ClassStat levelLimit = new ClassStat(322, 1234567890, "LevelLimit", false, false, false);
-        
+
         private readonly ClassStat playerKilling = new ClassStat(323, 1234567890, "PlayerKilling", false, false, false);
-        
+
         private readonly ClassStat teamAllowed = new ClassStat(324, 1234567890, "TeamAllowed", false, false, false);
-        
+
         private readonly ClassStat weaponDisallowedType = new ClassStat(
             325, 1234567890, "WeaponDisallowedType", false, false, false);
-            
+
         private readonly ClassStat weaponDisallowedInstance = new ClassStat(
             326, 1234567890, "WeaponDisallowedInstance", false, false, false);
 
@@ -1096,38 +1102,38 @@ namespace ZoneEngine.GameObject.Stats
         private readonly ClassStat skillDisabled = new ClassStat(329, 1234567890, "SkillDisabled", false, false, false);
 
         private readonly ClassStat clanItemType = new ClassStat(330, 1234567890, "ClanItemType", false, false, false);
-            
+
         private readonly ClassStat clanItemInstance = new ClassStat(
             331, 1234567890, "ClanItemInstance", false, false, false);
-            
+
         private readonly ClassStat debuffFormula = new ClassStat(332, 1234567890, "DebuffFormula", false, false, false);
-        
+
         private readonly ClassStat pvpRating = new ClassStat(333, 1300, "PvP_Rating", false, false, false);
-        
+
         private readonly ClassStat savedXP = new ClassStat(334, 0, "SavedXP", false, false, false);
 
         private readonly ClassStat doorBlockTime = new ClassStat(335, 1234567890, "DoorBlockTime", false, false, false);
 
         private readonly ClassStat overrideTexture = new ClassStat(
             336, 1234567890, "OverrideTexture", false, false, false);
-        
+
         private readonly ClassStat overrideMaterial = new ClassStat(
             337, 1234567890, "OverrideMaterial", false, false, false);
-        
+
         private readonly ClassStat deathReason = new ClassStat(338, 1234567890, "DeathReason", false, false, false);
-        
+
         private readonly ClassStat damageOverrideType = new ClassStat(
             339, 1234567890, "DamageOverrideType", false, false, false);
-        
+
         private readonly ClassStat brainType = new ClassStat(340, 1234567890, "BrainType", false, false, false);
 
         private readonly ClassStat xpBonus = new ClassStat(341, 1234567890, "XPBonus", false, false, false);
 
         private readonly StatHealInterval healInterval = new StatHealInterval(
             342, 29, "HealInterval", false, false, false);
-        
+
         private readonly StatHealDelta healDelta = new StatHealDelta(343, 1234567890, "HealDelta", false, false, false);
-        
+
         private readonly ClassStat monsterTexture = new ClassStat(
             344, 1234567890, "MonsterTexture", false, false, false);
 
@@ -1165,16 +1171,16 @@ namespace ZoneEngine.GameObject.Stats
         private readonly ClassStat monsterData = new ClassStat(359, 0, "MonsterData", false, false, true);
 
         private readonly ClassStat monsterScale = new ClassStat(360, 1234567890, "MonsterScale", false, false, true);
-            
+
         private readonly ClassStat hitEffectType = new ClassStat(361, 1234567890, "HitEffectType", false, false, false);
-        
+
         private readonly ClassStat resurrectDest = new ClassStat(362, 1234567890, "ResurrectDest", false, false, false);
-        
+
         private readonly StatNanoInterval nanoInterval = new StatNanoInterval(
             363, 28, "NanoInterval", false, false, false);
-        
+
         private readonly StatNanoDelta nanoDelta = new StatNanoDelta(364, 1234567890, "NanoDelta", false, false, false);
-        
+
         private readonly ClassStat reclaimItem = new ClassStat(365, 1234567890, "ReclaimItem", false, false, false);
 
         private readonly ClassStat gatherEffectType = new ClassStat(
@@ -1184,27 +1190,27 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat visualProfession = new ClassStat(
             368, 1234567890, "VisualProfession", false, false, true);
-        
+
         private readonly ClassStat visualSex = new ClassStat(369, 1234567890, "VisualSex", false, false, true);
-        
+
         private readonly ClassStat ritualTargetInst = new ClassStat(
             370, 1234567890, "RitualTargetInst", false, false, false);
-        
+
         private readonly ClassStat skillTimeOnSelectedTarget = new ClassStat(
             371, 1234567890, "SkillTimeOnSelectedTarget", false, false, false);
-        
+
         private readonly ClassStat lastSaveXP = new ClassStat(372, 0, "LastSaveXP", false, false, false);
 
         private readonly ClassStat extendedTime = new ClassStat(373, 1234567890, "ExtendedTime", false, false, false);
-            
+
         private readonly ClassStat burstRecharge = new ClassStat(374, 1234567890, "BurstRecharge", false, false, false);
-        
+
         private readonly ClassStat fullAutoRecharge = new ClassStat(
             375, 1234567890, "FullAutoRecharge", false, false, false);
-        
+
         private readonly ClassStat gatherAbstractAnim = new ClassStat(
             376, 1234567890, "GatherAbstractAnim", false, false, false);
-        
+
         private readonly ClassStat castTargetAbstractAnim = new ClassStat(
             377, 1234567890, "CastTargetAbstractAnim", false, false, false);
 
@@ -1218,39 +1224,39 @@ namespace ZoneEngine.GameObject.Stats
             380, 0, "RangeIncreaserWeapon", false, false, false);
 
         private readonly ClassStat rangeIncreaserNF = new ClassStat(381, 0, "RangeIncreaserNF", false, false, false);
-            
+
         private readonly ClassStat skillLockModifier = new ClassStat(382, 0, "SkillLockModifier", false, false, false);
-        
+
         private readonly ClassStat interruptModifier = new ClassStat(
             383, 1234567890, "InterruptModifier", false, false, false);
 
         private readonly ClassStat acgEntranceStyles = new ClassStat(
             384, 1234567890, "ACGEntranceStyles", false, false, false);
-        
+
         private readonly ClassStat chanceOfBreakOnSpellAttack = new ClassStat(
             385, 1234567890, "ChanceOfBreakOnSpellAttack", false, false, false);
-            
+
         private readonly ClassStat chanceOfBreakOnDebuff = new ClassStat(
             386, 1234567890, "ChanceOfBreakOnDebuff", false, false, false);
 
         private readonly ClassStat dieAnim = new ClassStat(387, 1234567890, "DieAnim", false, false, false);
-            
+
         private readonly ClassStat towerType = new ClassStat(388, 1234567890, "TowerType", false, false, false);
-        
+
         private readonly ClassStat expansion = new ClassStat(389, 0, "Expansion", false, true, false);
-        
+
         private readonly ClassStat lowresMesh = new ClassStat(390, 1234567890, "LowresMesh", false, false, false);
 
         private readonly ClassStat criticalDecrease = new ClassStat(
             391, 1234567890, "CriticalDecrease", false, false, false);
-        
+
         private readonly ClassStat oldTimeExist = new ClassStat(392, 1234567890, "OldTimeExist", false, false, false);
 
         private readonly ClassStat resistModifier = new ClassStat(
             393, 1234567890, "ResistModifier", false, false, false);
-        
+
         private readonly ClassStat chestFlags = new ClassStat(394, 1234567890, "ChestFlags", false, false, false);
-        
+
         private readonly ClassStat primaryTemplateId = new ClassStat(
             395, 1234567890, "PrimaryTemplateID", false, false, false);
 
@@ -1260,18 +1266,18 @@ namespace ZoneEngine.GameObject.Stats
             397, 1234567890, "SelectedTargetType", false, false, false);
 
         private readonly ClassStat corpseHash = new ClassStat(398, 1234567890, "Corpse_Hash", false, false, false);
-            
+
         private readonly ClassStat ammoName = new ClassStat(399, 1234567890, "AmmoName", false, false, false);
-        
+
         private readonly ClassStat rotation = new ClassStat(400, 1234567890, "Rotation", false, false, false);
-        
+
         private readonly ClassStat catAnim = new ClassStat(401, 1234567890, "CATAnim", false, false, false);
-        
+
         private readonly ClassStat catAnimFlags = new ClassStat(402, 1234567890, "CATAnimFlags", false, false, false);
-        
+
         private readonly ClassStat displayCATAnim = new ClassStat(
             403, 1234567890, "DisplayCATAnim", false, false, false);
-            
+
         private readonly ClassStat displayCATMesh = new ClassStat(
             404, 1234567890, "DisplayCATMesh", false, false, false);
 
@@ -1282,16 +1288,16 @@ namespace ZoneEngine.GameObject.Stats
         private readonly ClassStat nanoPoints = new ClassStat(407, 1234567890, "NanoPoints", false, false, false);
 
         private readonly ClassStat trainSkill = new ClassStat(408, 1234567890, "TrainSkill", false, false, false);
-            
+
         private readonly ClassStat trainSkillCost = new ClassStat(
             409, 1234567890, "TrainSkillCost", false, false, false);
 
         private readonly ClassStat isFightingMe = new ClassStat(410, 0, "IsFightingMe", false, false, false);
-            
+
         private readonly ClassStat nextFormula = new ClassStat(411, 1234567890, "NextFormula", false, false, false);
-        
+
         private readonly ClassStat multipleCount = new ClassStat(412, 1234567890, "MultipleCount", false, false, false);
-        
+
         private readonly ClassStat effectType = new ClassStat(413, 1234567890, "EffectType", false, false, false);
 
         private readonly ClassStat impactEffectType = new ClassStat(
@@ -1301,19 +1307,19 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat corpseInstance = new ClassStat(
             416, 1234567890, "CorpseInstance", false, false, false);
-        
+
         private readonly ClassStat corpseAnimKey = new ClassStat(417, 1234567890, "CorpseAnimKey", false, false, false);
-        
+
         private readonly ClassStat unarmedTemplateInstance = new ClassStat(
             418, 0, "UnarmedTemplateInstance", false, false, false);
 
         private readonly ClassStat tracerEffectType = new ClassStat(
             419, 1234567890, "TracerEffectType", false, false, false);
-        
+
         private readonly ClassStat ammoType = new ClassStat(420, 1234567890, "AmmoType", false, false, false);
-        
+
         private readonly ClassStat charRadius = new ClassStat(421, 1234567890, "CharRadius", false, false, false);
-        
+
         private readonly ClassStat chanceOfUse = new ClassStat(422, 1234567890, "ChanceOfUse", false, false, false);
 
         private readonly ClassStat currentState = new ClassStat(423, 0, "CurrentState", false, false, false);
@@ -1321,11 +1327,11 @@ namespace ZoneEngine.GameObject.Stats
         private readonly ClassStat armourType = new ClassStat(424, 1234567890, "ArmourType", false, false, false);
 
         private readonly ClassStat restModifier = new ClassStat(425, 1234567890, "RestModifier", false, false, false);
-            
+
         private readonly ClassStat buyModifier = new ClassStat(426, 1234567890, "BuyModifier", false, false, false);
-        
+
         private readonly ClassStat sellModifier = new ClassStat(427, 1234567890, "SellModifier", false, false, false);
-        
+
         private readonly ClassStat castEffectType = new ClassStat(
             428, 1234567890, "CastEffectType", false, false, false);
 
@@ -1341,11 +1347,11 @@ namespace ZoneEngine.GameObject.Stats
         private readonly ClassStat ownerInstance = new ClassStat(433, 1234567890, "OwnerInstance", false, false, false);
 
         private readonly ClassStat charState = new ClassStat(434, 1234567890, "CharState", false, false, false);
-            
+
         private readonly ClassStat readOnly = new ClassStat(435, 1234567890, "ReadOnly", false, false, false);
-        
+
         private readonly ClassStat damageType = new ClassStat(436, 1234567890, "DamageType", false, false, false);
-        
+
         private readonly ClassStat collideCheckInterval = new ClassStat(
             437, 1234567890, "CollideCheckInterval", false, false, false);
 
@@ -1355,29 +1361,29 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat initiativeType = new ClassStat(
             440, 1234567890, "InitiativeType", false, false, false);
-        
+
         private readonly ClassStat charTmp1 = new ClassStat(441, 1234567890, "CharTmp1", false, false, false);
 
         private readonly ClassStat charTmp2 = new ClassStat(442, 1234567890, "CharTmp2", false, false, false);
 
         private readonly ClassStat charTmp3 = new ClassStat(443, 1234567890, "CharTmp3", false, false, false);
-            
+
         private readonly ClassStat charTmp4 = new ClassStat(444, 1234567890, "CharTmp4", false, false, false);
-        
+
         private readonly ClassStat npcCommandArg = new ClassStat(445, 1234567890, "NPCCommandArg", false, false, false);
-        
+
         private readonly ClassStat nameTemplate = new ClassStat(446, 1234567890, "NameTemplate", false, false, false);
 
         private readonly ClassStat desiredTargetDistance = new ClassStat(
             447, 1234567890, "DesiredTargetDistance", false, false, false);
 
         private readonly ClassStat vicinityRange = new ClassStat(448, 1234567890, "VicinityRange", false, false, false);
-            
+
         private readonly ClassStat npcIsSurrendering = new ClassStat(
             449, 1234567890, "NPCIsSurrendering", false, false, false);
-            
+
         private readonly ClassStat stateMachine = new ClassStat(450, 1234567890, "StateMachine", false, false, false);
-        
+
         private readonly ClassStat npcSurrenderInstance = new ClassStat(
             451, 1234567890, "NPCSurrenderInstance", false, false, false);
 
@@ -1386,7 +1392,7 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat npcVicinityChars = new ClassStat(
             453, 1234567890, "NPCVicinityChars", false, false, false);
-        
+
         private readonly ClassStat proximityRangeOutdoors = new ClassStat(
             454, 1234567890, "ProximityRangeOutdoors", false, false, false);
 
@@ -1396,67 +1402,67 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat npcHatelistSize = new ClassStat(
             457, 1234567890, "NPCHatelistSize", false, false, false);
-        
+
         private readonly ClassStat npcNumPets = new ClassStat(458, 1234567890, "NPCNumPets", false, false, false);
 
         private readonly ClassStat odMinSizeAdd = new ClassStat(459, 1234567890, "ODMinSizeAdd", false, false, false);
-            
+
         private readonly ClassStat effectRed = new ClassStat(460, 1234567890, "EffectRed", false, false, false);
-        
+
         private readonly ClassStat effectGreen = new ClassStat(461, 1234567890, "EffectGreen", false, false, false);
-        
+
         private readonly ClassStat effectBlue = new ClassStat(462, 1234567890, "EffectBlue", false, false, false);
-        
+
         private readonly ClassStat odMaxSizeAdd = new ClassStat(463, 1234567890, "ODMaxSizeAdd", false, false, false);
-        
+
         private readonly ClassStat durationModifier = new ClassStat(
             464, 1234567890, "DurationModifier", false, false, false);
 
         private readonly ClassStat npcCryForHelpRange = new ClassStat(
             465, 1234567890, "NPCCryForHelpRange", false, false, false);
-        
+
         private readonly ClassStat losHeight = new ClassStat(466, 1234567890, "LOSHeight", false, false, false);
-        
+
         private readonly ClassStat petReq1 = new ClassStat(467, 1234567890, "PetReq1", false, false, false);
-        
+
         private readonly ClassStat petReq2 = new ClassStat(468, 1234567890, "PetReq2", false, false, false);
-        
+
         private readonly ClassStat petReq3 = new ClassStat(469, 1234567890, "PetReq3", false, false, false);
 
         private readonly ClassStat mapOptions = new ClassStat(470, 0, "MapOptions", false, false, false);
-            
+
         private readonly ClassStat mapAreaPart1 = new ClassStat(471, 0, "MapAreaPart1", false, false, false);
-        
+
         private readonly ClassStat mapAreaPart2 = new ClassStat(472, 0, "MapAreaPart2", false, false, false);
 
         private readonly ClassStat fixtureFlags = new ClassStat(473, 1234567890, "FixtureFlags", false, false, false);
-            
+
         private readonly ClassStat fallDamage = new ClassStat(474, 1234567890, "FallDamage", false, false, false);
-        
+
         private readonly ClassStat reflectReturnedProjectileAC = new ClassStat(
             475, 0, "ReflectReturnedProjectileAC", false, false, false);
-        
+
         private readonly ClassStat reflectReturnedMeleeAC = new ClassStat(
             476, 0, "ReflectReturnedMeleeAC", false, false, false);
-        
+
         private readonly ClassStat reflectReturnedEnergyAC = new ClassStat(
             477, 0, "ReflectReturnedEnergyAC", false, false, false);
-        
+
         private readonly ClassStat reflectReturnedChemicalAC = new ClassStat(
             478, 0, "ReflectReturnedChemicalAC", false, false, false);
-        
+
         private readonly ClassStat reflectReturnedRadiationAC = new ClassStat(
             479, 0, "ReflectReturnedRadiationAC", false, false, false);
-        
+
         private readonly ClassStat reflectReturnedColdAC = new ClassStat(
             480, 0, "ReflectReturnedColdAC", false, false, false);
-        
+
         private readonly ClassStat reflectReturnedNanoAC = new ClassStat(
             481, 0, "ReflectReturnedNanoAC", false, false, false);
 
         private readonly ClassStat reflectReturnedFireAC = new ClassStat(
             482, 0, "ReflectReturnedFireAC", false, false, false);
-        
+
         private readonly ClassStat reflectReturnedPoisonAC = new ClassStat(
             483, 0, "ReflectReturnedPoisonAC", false, false, false);
 
@@ -1475,48 +1481,48 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat originatorType = new ClassStat(
             490, 1234567890, "OriginatorType", false, false, false);
-        
+
         private readonly ClassStat questInstance = new ClassStat(491, 1234567890, "QuestInstance", false, false, false);
 
         private readonly ClassStat questIndex1 = new ClassStat(492, 1234567890, "QuestIndex1", false, false, false);
 
         private readonly ClassStat questIndex2 = new ClassStat(493, 1234567890, "QuestIndex2", false, false, false);
-            
+
         private readonly ClassStat questIndex3 = new ClassStat(494, 1234567890, "QuestIndex3", false, false, false);
-        
+
         private readonly ClassStat questIndex4 = new ClassStat(495, 1234567890, "QuestIndex4", false, false, false);
-        
+
         private readonly ClassStat questIndex5 = new ClassStat(496, 1234567890, "QuestIndex5", false, false, false);
-        
+
         private readonly ClassStat qtDungeonInstance = new ClassStat(
             497, 1234567890, "QTDungeonInstance", false, false, false);
-            
+
         private readonly ClassStat qtNumMonsters = new ClassStat(498, 1234567890, "QTNumMonsters", false, false, false);
-        
+
         private readonly ClassStat qtKilledMonsters = new ClassStat(
             499, 1234567890, "QTKilledMonsters", false, false, false);
-        
+
         private readonly ClassStat animPos = new ClassStat(500, 1234567890, "AnimPos", false, false, false);
 
         private readonly ClassStat animPlay = new ClassStat(501, 1234567890, "AnimPlay", false, false, false);
-            
+
         private readonly ClassStat animSpeed = new ClassStat(502, 1234567890, "AnimSpeed", false, false, false);
-        
+
         private readonly ClassStat qtKillNumMonsterId1 = new ClassStat(
             503, 1234567890, "QTKillNumMonsterID1", false, false, false);
-        
+
         private readonly ClassStat qtKillNumMonsterCount1 = new ClassStat(
             504, 1234567890, "QTKillNumMonsterCount1", false, false, false);
-        
+
         private readonly ClassStat qtKillNumMonsterId2 = new ClassStat(
             505, 1234567890, "QTKillNumMonsterID2", false, false, false);
 
         private readonly ClassStat qtKillNumMonsterCount2 = new ClassStat(
             506, 1234567890, "QTKillNumMonsterCount2", false, false, false);
-        
+
         private readonly ClassStat qtKillNumMonsterID3 = new ClassStat(
             507, 1234567890, "QTKillNumMonsterID3", false, false, false);
-            
+
         private readonly ClassStat qtKillNumMonsterCount3 = new ClassStat(
             508, 1234567890, "QTKillNumMonsterCount3", false, false, false);
 
@@ -1525,12 +1531,12 @@ namespace ZoneEngine.GameObject.Stats
         private readonly ClassStat questTimeout = new ClassStat(510, 1234567890, "QuestTimeout", false, false, false);
 
         private readonly ClassStat towerNpcHash = new ClassStat(511, 1234567890, "Tower_NPCHash", false, false, false);
-            
+
         private readonly ClassStat petType = new ClassStat(512, 1234567890, "PetType", false, false, false);
-        
+
         private readonly ClassStat onTowerCreation = new ClassStat(
             513, 1234567890, "OnTowerCreation", false, false, false);
-        
+
         private readonly ClassStat ownedTowers = new ClassStat(514, 1234567890, "OwnedTowers", false, false, false);
 
         private readonly ClassStat towerInstance = new ClassStat(515, 1234567890, "TowerInstance", false, false, false);
@@ -1539,30 +1545,30 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat specialAttackShield = new ClassStat(
             517, 1234567890, "SpecialAttackShield", false, false, false);
-        
+
         private readonly ClassStat npcVicinityPlayers = new ClassStat(
             518, 1234567890, "NPCVicinityPlayers", false, false, false);
-            
+
         private readonly ClassStat npcUseFightModeRegenRate = new ClassStat(
             519, 1234567890, "NPCUseFightModeRegenRate", false, false, false);
-            
+
         private readonly ClassStat rnd = new ClassStat(520, 1234567890, "Rnd", false, false, false);
-        
+
         private readonly ClassStat socialStatus = new ClassStat(521, 0, "SocialStatus", false, false, false);
 
         private readonly ClassStat lastRnd = new ClassStat(522, 1234567890, "LastRnd", false, false, false);
-            
+
         private readonly ClassStat itemDelayCap = new ClassStat(523, 1234567890, "ItemDelayCap", false, false, false);
-        
+
         private readonly ClassStat rechargeDelayCap = new ClassStat(
             524, 1234567890, "RechargeDelayCap", false, false, false);
-            
+
         private readonly ClassStat percentRemainingHealth = new ClassStat(
             525, 1234567890, "PercentRemainingHealth", false, false, false);
-            
+
         private readonly ClassStat percentRemainingNano = new ClassStat(
             526, 1234567890, "PercentRemainingNano", false, false, false);
-            
+
         private readonly ClassStat targetDistance = new ClassStat(
             527, 1234567890, "TargetDistance", false, false, false);
 
@@ -1570,109 +1576,109 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat numberOnHateList = new ClassStat(
             529, 1234567890, "NumberOnHateList", false, false, false);
-        
+
         private readonly ClassStat conditionState = new ClassStat(
             530, 1234567890, "ConditionState", false, false, false);
-        
+
         private readonly ClassStat expansionPlayfield = new ClassStat(
             531, 1234567890, "ExpansionPlayfield", false, false, false);
-        
+
         private readonly ClassStat shadowBreed = new ClassStat(532, 0, "ShadowBreed", false, false, false);
 
         private readonly ClassStat npcFovStatus = new ClassStat(533, 1234567890, "NPCFovStatus", false, false, false);
 
         private readonly ClassStat dudChance = new ClassStat(534, 1234567890, "DudChance", false, false, false);
-            
+
         private readonly ClassStat healMultiplier = new ClassStat(
             535, 1234567890, "HealMultiplier", false, false, false);
-            
+
         private readonly ClassStat nanoDamageMultiplier = new ClassStat(
             536, 0, "NanoDamageMultiplier", false, false, false);
-            
+
         private readonly ClassStat nanoVulnerability = new ClassStat(
             537, 1234567890, "NanoVulnerability", false, false, false);
-            
+
         private readonly ClassStat amsCap = new ClassStat(538, 1234567890, "AmsCap", false, false, false);
-        
+
         private readonly ClassStat procInitiative1 = new ClassStat(
             539, 1234567890, "ProcInitiative1", false, false, false);
-        
+
         private readonly ClassStat procInitiative2 = new ClassStat(
             540, 1234567890, "ProcInitiative2", false, false, false);
 
         private readonly ClassStat procInitiative3 = new ClassStat(
             541, 1234567890, "ProcInitiative3", false, false, false);
-        
+
         private readonly ClassStat procInitiative4 = new ClassStat(
             542, 1234567890, "ProcInitiative4", false, false, false);
 
         private readonly ClassStat factionModifier = new ClassStat(
             543, 1234567890, "FactionModifier", false, false, false);
-        
+
         private readonly ClassStat missionBits8 = new ClassStat(544, 0, "MissionBits8", false, false, false);
-        
+
         private readonly ClassStat missionBits9 = new ClassStat(545, 0, "MissionBits9", false, false, false);
-        
+
         private readonly ClassStat stackingLine2 = new ClassStat(546, 1234567890, "StackingLine2", false, false, false);
-        
+
         private readonly ClassStat stackingLine3 = new ClassStat(547, 1234567890, "StackingLine3", false, false, false);
-        
+
         private readonly ClassStat stackingLine4 = new ClassStat(548, 1234567890, "StackingLine4", false, false, false);
-        
+
         private readonly ClassStat stackingLine5 = new ClassStat(549, 1234567890, "StackingLine5", false, false, false);
-        
+
         private readonly ClassStat stackingLine6 = new ClassStat(550, 1234567890, "StackingLine6", false, false, false);
-        
+
         private readonly ClassStat stackingOrder = new ClassStat(551, 1234567890, "StackingOrder", false, false, false);
-        
+
         private readonly ClassStat procNano1 = new ClassStat(552, 1234567890, "ProcNano1", false, false, false);
-        
+
         private readonly ClassStat procNano2 = new ClassStat(553, 1234567890, "ProcNano2", false, false, false);
-        
+
         private readonly ClassStat procNano3 = new ClassStat(554, 1234567890, "ProcNano3", false, false, false);
-        
+
         private readonly ClassStat procNano4 = new ClassStat(555, 1234567890, "ProcNano4", false, false, false);
-        
+
         private readonly ClassStat procChance1 = new ClassStat(556, 1234567890, "ProcChance1", false, false, false);
-        
+
         private readonly ClassStat procChance2 = new ClassStat(557, 1234567890, "ProcChance2", false, false, false);
-        
+
         private readonly ClassStat procChance3 = new ClassStat(558, 1234567890, "ProcChance3", false, false, false);
-        
+
         private readonly ClassStat procChance4 = new ClassStat(559, 1234567890, "ProcChance4", false, false, false);
-        
+
         private readonly ClassStat otArmedForces = new ClassStat(560, 0, "OTArmedForces", false, false, false);
-        
+
         private readonly ClassStat clanSentinels = new ClassStat(561, 0, "ClanSentinels", false, false, false);
-        
+
         private readonly ClassStat otMed = new ClassStat(562, 1234567890, "OTMed", false, false, false);
-        
+
         private readonly ClassStat clanGaia = new ClassStat(563, 0, "ClanGaia", false, false, false);
-        
+
         private readonly ClassStat otTrans = new ClassStat(564, 0, "OTTrans", false, false, false);
-        
+
         private readonly ClassStat clanVanguards = new ClassStat(565, 0, "ClanVanguards", false, false, false);
-        
+
         private readonly ClassStat gos = new ClassStat(566, 0, "GOS", false, false, false);
-        
+
         private readonly ClassStat otFollowers = new ClassStat(567, 0, "OTFollowers", false, false, false);
-        
+
         private readonly ClassStat otOperator = new ClassStat(568, 0, "OTOperator", false, false, false);
-        
+
         private readonly ClassStat otUnredeemed = new ClassStat(569, 0, "OTUnredeemed", false, false, false);
-        
+
         private readonly ClassStat clanDevoted = new ClassStat(570, 0, "ClanDevoted", false, false, false);
-        
+
         private readonly ClassStat clanConserver = new ClassStat(571, 0, "ClanConserver", false, false, false);
-        
+
         private readonly ClassStat clanRedeemed = new ClassStat(572, 0, "ClanRedeemed", false, false, false);
-        
+
         private readonly ClassStat sk = new ClassStat(573, 0, "SK", false, false, false);
 
         private readonly ClassStat lastSK = new ClassStat(574, 0, "LastSK", false, false, false);
-            
+
         private readonly StatNextSK nextSK = new StatNextSK(575, 0, "NextSK", false, false, false);
-        
+
         private readonly ClassStat playerOptions = new ClassStat(576, 0, "PlayerOptions", false, false, false);
 
         private readonly ClassStat lastPerkResetTime = new ClassStat(577, 0, "LastPerkResetTime", false, false, false);
@@ -1684,12 +1690,12 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat npcVicinityFamily = new ClassStat(
             580, 1234567890, "NPCVicinityFamily", false, false, false);
-        
+
         private readonly ClassStat npcScriptAmsScale = new ClassStat(
             581, 1234567890, "NPCScriptAMSScale", false, false, false);
-            
+
         private readonly ClassStat apartmentsAllowed = new ClassStat(582, 1, "ApartmentsAllowed", false, false, false);
-        
+
         private readonly ClassStat apartmentsOwned = new ClassStat(583, 0, "ApartmentsOwned", false, false, false);
 
         private readonly ClassStat apartmentAccessCard = new ClassStat(
@@ -1698,13 +1704,13 @@ namespace ZoneEngine.GameObject.Stats
         private readonly ClassStat mapAreaPart3 = new ClassStat(585, 0, "MapAreaPart3", false, false, false);
 
         private readonly ClassStat mapAreaPart4 = new ClassStat(586, 0, "MapAreaPart4", false, false, false);
-            
+
         private readonly ClassStat numberOfTeamMembers = new ClassStat(
             587, 1234567890, "NumberOfTeamMembers", false, false, false);
 
         private readonly ClassStat actionCategory = new ClassStat(
             588, 1234567890, "ActionCategory", false, false, false);
-        
+
         private readonly ClassStat currentPlayfield = new ClassStat(
             589, 1234567890, "CurrentPlayfield", false, false, false);
 
@@ -1712,39 +1718,39 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat districtNanoInterval = new ClassStat(
             591, 1234567890, "DistrictNanoInterval", false, false, false);
-        
+
         private readonly ClassStat unsavedXP = new ClassStat(592, 0, "UnsavedXP", false, false, false);
-        
+
         private readonly ClassStat regainXPPercentage = new ClassStat(593, 0, "RegainXPPercentage", false, false, false);
-        
+
         private readonly ClassStat tempSaveTeamId = new ClassStat(594, 0, "TempSaveTeamID", false, false, false);
-        
+
         private readonly ClassStat tempSavePlayfield = new ClassStat(595, 0, "TempSavePlayfield", false, false, false);
-        
+
         private readonly ClassStat tempSaveX = new ClassStat(596, 0, "TempSaveX", false, false, false);
-        
+
         private readonly ClassStat tempSaveY = new ClassStat(597, 0, "TempSaveY", false, false, false);
-        
+
         private readonly ClassStat extendedFlags = new ClassStat(598, 1234567890, "ExtendedFlags", false, false, false);
-        
+
         private readonly ClassStat shopPrice = new ClassStat(599, 1234567890, "ShopPrice", false, false, false);
-        
+
         private readonly ClassStat newbieHP = new ClassStat(600, 1234567890, "NewbieHP", false, false, false);
-        
+
         private readonly ClassStat hpLevelUp = new ClassStat(601, 1234567890, "HPLevelUp", false, false, false);
-        
+
         private readonly ClassStat hpPerSkill = new ClassStat(602, 1234567890, "HPPerSkill", false, false, false);
-        
+
         private readonly ClassStat newbieNP = new ClassStat(603, 1234567890, "NewbieNP", false, false, false);
-        
+
         private readonly ClassStat npLevelUp = new ClassStat(604, 1234567890, "NPLevelUp", false, false, false);
-        
+
         private readonly ClassStat npPerSkill = new ClassStat(605, 1234567890, "NPPerSkill", false, false, false);
-        
+
         private readonly ClassStat maxShopItems = new ClassStat(606, 1234567890, "MaxShopItems", false, false, false);
-        
+
         private readonly ClassStat playerId = new ClassStat(607, 1234567890, "PlayerID", false, true, false);
-        
+
         private readonly ClassStat shopRent = new ClassStat(608, 1234567890, "ShopRent", false, false, false);
 
         private readonly ClassStat synergyHash = new ClassStat(609, 1234567890, "SynergyHash", false, false, false);
@@ -1759,95 +1765,95 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat leaderLockDownTime = new ClassStat(
             614, 1234567890, "LeaderLockDownTime", false, false, false);
-        
+
         private readonly ClassStat invadersKilled = new ClassStat(615, 0, "InvadersKilled", false, false, false);
 
         private readonly ClassStat killedByInvaders = new ClassStat(616, 0, "KilledByInvaders", false, false, false);
-            
+
         private readonly ClassStat missionBits10 = new ClassStat(617, 0, "MissionBits10", false, false, false);
-        
+
         private readonly ClassStat missionBits11 = new ClassStat(618, 0, "MissionBits11", false, false, false);
 
         private readonly ClassStat missionBits12 = new ClassStat(619, 0, "MissionBits12", false, false, false);
-            
+
         private readonly ClassStat houseTemplate = new ClassStat(620, 1234567890, "HouseTemplate", false, false, false);
-        
+
         private readonly ClassStat percentFireDamage = new ClassStat(
             621, 1234567890, "PercentFireDamage", false, false, false);
-        
+
         private readonly ClassStat percentColdDamage = new ClassStat(
             622, 1234567890, "PercentColdDamage", false, false, false);
-        
+
         private readonly ClassStat percentMeleeDamage = new ClassStat(
             623, 1234567890, "PercentMeleeDamage", false, false, false);
-        
+
         private readonly ClassStat percentProjectileDamage = new ClassStat(
             624, 1234567890, "PercentProjectileDamage", false, false, false);
-        
+
         private readonly ClassStat percentPoisonDamage = new ClassStat(
             625, 1234567890, "PercentPoisonDamage", false, false, false);
-            
+
         private readonly ClassStat percentRadiationDamage = new ClassStat(
             626, 1234567890, "PercentRadiationDamage", false, false, false);
-            
+
         private readonly ClassStat percentEnergyDamage = new ClassStat(
             627, 1234567890, "PercentEnergyDamage", false, false, false);
-            
+
         private readonly ClassStat percentChemicalDamage = new ClassStat(
             628, 1234567890, "PercentChemicalDamage", false, false, false);
-            
+
         private readonly ClassStat totalDamage = new ClassStat(629, 1234567890, "TotalDamage", false, false, false);
-        
+
         private readonly ClassStat trackProjectileDamage = new ClassStat(
             630, 1234567890, "TrackProjectileDamage", false, false, false);
-        
+
         private readonly ClassStat trackMeleeDamage = new ClassStat(
             631, 1234567890, "TrackMeleeDamage", false, false, false);
-        
+
         private readonly ClassStat trackEnergyDamage = new ClassStat(
             632, 1234567890, "TrackEnergyDamage", false, false, false);
-        
+
         private readonly ClassStat trackChemicalDamage = new ClassStat(
             633, 1234567890, "TrackChemicalDamage", false, false, false);
-        
+
         private readonly ClassStat trackRadiationDamage = new ClassStat(
             634, 1234567890, "TrackRadiationDamage", false, false, false);
 
         private readonly ClassStat trackColdDamage = new ClassStat(
             635, 1234567890, "TrackColdDamage", false, false, false);
-        
+
         private readonly ClassStat trackPoisonDamage = new ClassStat(
             636, 1234567890, "TrackPoisonDamage", false, false, false);
-        
+
         private readonly ClassStat trackFireDamage = new ClassStat(
             637, 1234567890, "TrackFireDamage", false, false, false);
-        
+
         private readonly ClassStat npcSpellArg1 = new ClassStat(638, 1234567890, "NPCSpellArg1", false, false, false);
-        
+
         private readonly ClassStat npcSpellRet1 = new ClassStat(639, 1234567890, "NPCSpellRet1", false, false, false);
 
         private readonly ClassStat cityInstance = new ClassStat(640, 1234567890, "CityInstance", false, false, false);
-            
+
         private readonly ClassStat distanceToSpawnpoint = new ClassStat(
             641, 1234567890, "DistanceToSpawnpoint", false, false, false);
-            
+
         private readonly ClassStat cityTerminalRechargePercent = new ClassStat(
             642, 1234567890, "CityTerminalRechargePercent", false, false, false);
-            
+
         private readonly ClassStat unreadMailCount = new ClassStat(649, 0, "UnreadMailCount", false, false, false);
-        
+
         private readonly ClassStat lastMailCheckTime = new ClassStat(
             650, 1283065897, "LastMailCheckTime", false, false, false);
-        
+
         private readonly ClassStat advantageHash1 = new ClassStat(
             651, 1234567890, "AdvantageHash1", false, false, false);
-        
+
         private readonly ClassStat advantageHash2 = new ClassStat(
             652, 1234567890, "AdvantageHash2", false, false, false);
 
         private readonly ClassStat advantageHash3 = new ClassStat(
             653, 1234567890, "AdvantageHash3", false, false, false);
-        
+
         private readonly ClassStat advantageHash4 = new ClassStat(
             654, 1234567890, "AdvantageHash4", false, false, false);
 
@@ -1866,29 +1872,29 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat damageToNanoMultiplier = new ClassStat(
             661, 1234567890, "DamageToNanoMultiplier", false, false, false);
-        
+
         private readonly ClassStat mechData = new ClassStat(662, 0, "MechData", false, false, false);
-        
+
         private readonly ClassStat vehicleAC = new ClassStat(664, 1234567890, "VehicleAC", false, false, false);
-        
+
         private readonly ClassStat vehicleDamage = new ClassStat(665, 1234567890, "VehicleDamage", false, false, false);
-        
+
         private readonly ClassStat vehicleHealth = new ClassStat(666, 1234567890, "VehicleHealth", false, false, false);
-        
+
         private readonly ClassStat vehicleSpeed = new ClassStat(667, 1234567890, "VehicleSpeed", false, false, false);
-        
+
         private readonly ClassStat battlestationSide = new ClassStat(668, 0, "BattlestationSide", false, false, false);
-        
+
         private readonly ClassStat victoryPoints = new ClassStat(669, 0, "VP", false, false, false);
-        
+
         private readonly ClassStat battlestationRep = new ClassStat(670, 10, "BattlestationRep", false, false, false);
 
         private readonly ClassStat petState = new ClassStat(671, 1234567890, "PetState", false, false, false);
-            
+
         private readonly ClassStat paidPoints = new ClassStat(672, 0, "PaidPoints", false, false, false);
-        
+
         private readonly ClassStat visualFlags = new ClassStat(673, 31, "VisualFlags", false, false, false);
-        
+
         private readonly ClassStat pvpDuelKills = new ClassStat(674, 0, "PVPDuelKills", false, false, false);
 
         private readonly ClassStat pvpDuelDeaths = new ClassStat(675, 0, "PVPDuelDeaths", false, false, false);
@@ -1898,9 +1904,9 @@ namespace ZoneEngine.GameObject.Stats
 
         private readonly ClassStat pvpProfessionDuelDeaths = new ClassStat(
             677, 0, "PVPProfessionDuelDeaths", false, false, false);
-        
+
         private readonly ClassStat pvpRankedSoloKills = new ClassStat(678, 0, "PVPRankedSoloKills", false, false, false);
-        
+
         private readonly ClassStat pvpRankedSoloDeaths = new ClassStat(
             679, 0, "PVPRankedSoloDeaths", false, false, false);
 
@@ -1910,92 +1916,92 @@ namespace ZoneEngine.GameObject.Stats
             681, 0, "PVPRankedTeamDeaths", false, false, false);
 
         private readonly ClassStat pvpSoloScore = new ClassStat(682, 0, "PVPSoloScore", false, false, false);
-            
+
         private readonly ClassStat pvpTeamScore = new ClassStat(683, 0, "PVPTeamScore", false, false, false);
-        
+
         private readonly ClassStat pvpDuelScore = new ClassStat(684, 0, "PVPDuelScore", false, false, false);
 
         private readonly ClassStat acgItemSeed = new ClassStat(700, 1234567890, "ACGItemSeed", false, false, false);
 
         private readonly ClassStat acgItemLevel = new ClassStat(701, 1234567890, "ACGItemLevel", false, false, false);
-            
+
         private readonly ClassStat acgItemTemplateId = new ClassStat(
             702, 1234567890, "ACGItemTemplateID", false, false, false);
-            
+
         private readonly ClassStat acgItemTemplateId2 = new ClassStat(
             703, 1234567890, "ACGItemTemplateID2", false, false, false);
-            
+
         private readonly ClassStat acgItemCategoryId = new ClassStat(
             704, 1234567890, "ACGItemCategoryID", false, false, false);
-            
+
         private readonly ClassStat hasKnuBotData = new ClassStat(768, 1234567890, "HasKnuBotData", false, false, false);
-        
+
         private readonly ClassStat questBoothDifficulty = new ClassStat(
             800, 1234567890, "QuestBoothDifficulty", false, false, false);
-        
+
         private readonly ClassStat questAsMinimumRange = new ClassStat(
             801, 1234567890, "QuestASMinimumRange", false, false, false);
-        
+
         private readonly ClassStat questAsMaximumRange = new ClassStat(
             802, 1234567890, "QuestASMaximumRange", false, false, false);
-        
+
         private readonly ClassStat visualLodLevel = new ClassStat(
             888, 1234567890, "VisualLODLevel", false, false, false);
 
         private readonly ClassStat targetDistanceChange = new ClassStat(
             889, 1234567890, "TargetDistanceChange", false, false, false);
-        
+
         private readonly ClassStat tideRequiredDynelId = new ClassStat(
             900, 1234567890, "TideRequiredDynelID", false, false, false);
 
         private readonly ClassStat streamCheckMagic = new ClassStat(
             999, 1234567890, "StreamCheckMagic", false, false, false);
-        
+
         private readonly ClassStat objectType = new ClassStat(1001, 1234567890, "Type", false, true, false);
-        
+
         private readonly ClassStat instance = new ClassStat(1002, 1234567890, "Instance", false, true, false);
 
         private readonly ClassStat weaponsStyle = new ClassStat(1003, 1234567890, "WeaponType", false, false, false);
-            
+
         private readonly ClassStat shoulderMeshRight = new ClassStat(1004, 0, "ShoulderMeshRight", false, false, false);
-        
+
         private readonly ClassStat shoulderMeshLeft = new ClassStat(1005, 0, "ShoulderMeshLeft", false, false, false);
 
         private readonly ClassStat weaponMeshRight = new ClassStat(1006, 0, "WeaponMeshRight", false, false, false);
-            
+
         private readonly ClassStat weaponMeshLeft = new ClassStat(1007, 0, "WeaponMeshLeft", false, false, false);
-        
+
         private readonly ClassStat overrideTextureHead = new ClassStat(
             1008, 0, "OverrideTextureHead", false, false, false);
-        
+
         private readonly ClassStat overrideTextureWeaponRight = new ClassStat(
             1009, 0, "OverrideTextureWeaponRight", false, false, false);
-        
+
         private readonly ClassStat overrideTextureWeaponLeft = new ClassStat(
             1010, 0, "OverrideTextureWeaponLeft", false, false, false);
-        
+
         private readonly ClassStat overrideTextureShoulderpadRight = new ClassStat(
             1011, 0, "OverrideTextureShoulderpadRight", false, false, false);
-        
+
         private readonly ClassStat overrideTextureShoulderpadLeft = new ClassStat(
             1012, 0, "OverrideTextureShoulderpadLeft", false, false, false);
 
         private readonly ClassStat overrideTextureBack = new ClassStat(
             1013, 0, "OverrideTextureBack", false, false, false);
-        
+
         private readonly ClassStat overrideTextureAttractor = new ClassStat(
             1014, 0, "OverrideTextureAttractor", false, false, false);
-        
+
         private readonly ClassStat weaponStyleLeft = new ClassStat(1015, 0, "WeaponStyleLeft", false, false, false);
-        
+
         private readonly ClassStat weaponStyleRight = new ClassStat(1016, 0, "WeaponStyleRight", false, false, false);
-            
+
         #endregion
-            
+
         private readonly List<ClassStat> all = new List<ClassStat>();
-            
+
         #region Create Stats
-            
+
         /// <summary>
         /// Character_Stats
         /// Class for character's stats
@@ -2004,7 +2010,7 @@ namespace ZoneEngine.GameObject.Stats
         public DynelStats(Dynel parent)
         {
             #region Add stats to list
-            
+
             this.all.Add(this.flags);
             this.all.Add(this.life);
             this.all.Add(this.volumeMass);
@@ -2708,11 +2714,11 @@ namespace ZoneEngine.GameObject.Stats
             this.all.Add(this.overrideTextureShoulderpadRight);
             this.all.Add(this.overrideTextureWeaponLeft);
             this.all.Add(this.overrideTextureWeaponRight);
-            
+
             #endregion
-            
+
             #region Trickles and effects
-            
+
             // add Tricklers, try not to do circulars!!
             this.SetAbilityTricklers();
             this.bodyDevelopment.Affects.Add(this.life.StatNumber);
@@ -2734,9 +2740,9 @@ namespace ZoneEngine.GameObject.Stats
             this.stamina.Affects.Add(this.healInterval.StatNumber);
             this.psychic.Affects.Add(this.nanoInterval.StatNumber);
             this.level.Affects.Add(this.ip.StatNumber);
-                
+
             #endregion
-                
+
             foreach (ClassStat c in this.all)
             {
                 c.SetParent(parent);
@@ -2744,7 +2750,7 @@ namespace ZoneEngine.GameObject.Stats
             if (!(parent is NonPlayerCharacter))
             {
                 #region Set standard Eventhandler for Stats (announce to player or playfield)
-                
+
                 /*
                 Flags.RaiseBeforeStatChangedEvent += Send;
                 Life.RaiseBeforeStatChangedEvent += Send;
@@ -3442,12 +3448,12 @@ namespace ZoneEngine.GameObject.Stats
                 WeaponMeshRight.RaiseBeforeStatChangedEvent += Send;
                 WeaponMeshLeft.RaiseBeforeStatChangedEvent += Send;
                 */
-        
+
                 #endregion
             }
-        
+
             #region Setting our special stats to 'dontwriteme'-mode
-            
+
             this.expansion.DoNotDontWriteToSql = true;
             this.accountFlags.DoNotDontWriteToSql = true;
             this.playerId.DoNotDontWriteToSql = true;
@@ -3455,10 +3461,10 @@ namespace ZoneEngine.GameObject.Stats
             this.gmLevel.DoNotDontWriteToSql = true;
             this.objectType.DoNotDontWriteToSql = true;
             this.instance.DoNotDontWriteToSql = true;
-            
+
             #endregion
         }
-        
+
         public ClassStat Flags
         {
             get
@@ -3466,7 +3472,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.flags;
             }
         }
-        
+
         public StatHealth Life
         {
             get
@@ -3474,7 +3480,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.life;
             }
         }
-        
+
         public ClassStat VolumeMass
         {
             get
@@ -3482,7 +3488,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.volumeMass;
             }
         }
-        
+
         public ClassStat AttackSpeed
         {
             get
@@ -3490,7 +3496,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.attackSpeed;
             }
         }
-        
+
         public ClassStat Breed
         {
             get
@@ -3498,7 +3504,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.breed;
             }
         }
-        
+
         public ClassStat Clan
         {
             get
@@ -3506,7 +3512,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clan;
             }
         }
-        
+
         public ClassStat Team
         {
             get
@@ -3514,7 +3520,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.team;
             }
         }
-        
+
         public ClassStat State
         {
             get
@@ -3522,7 +3528,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.state;
             }
         }
-        
+
         public ClassStat TimeExist
         {
             get
@@ -3530,7 +3536,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.timeExist;
             }
         }
-        
+
         public ClassStat MapFlags
         {
             get
@@ -3538,7 +3544,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.mapFlags;
             }
         }
-        
+
         public ClassStat ProfessionLevel
         {
             get
@@ -3546,7 +3552,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.professionLevel;
             }
         }
-        
+
         public ClassStat PreviousHealth
         {
             get
@@ -3554,7 +3560,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.previousHealth;
             }
         }
-        
+
         public ClassStat Mesh
         {
             get
@@ -3562,7 +3568,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.mesh;
             }
         }
-        
+
         public ClassStat Anim
         {
             get
@@ -3570,7 +3576,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.anim;
             }
         }
-        
+
         public ClassStat Name
         {
             get
@@ -3578,7 +3584,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.name;
             }
         }
-        
+
         public ClassStat Info
         {
             get
@@ -3586,7 +3592,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.info;
             }
         }
-        
+
         public ClassStat Strength
         {
             get
@@ -3594,7 +3600,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.strength;
             }
         }
-        
+
         public ClassStat Agility
         {
             get
@@ -3602,7 +3608,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.agility;
             }
         }
-        
+
         public ClassStat Stamina
         {
             get
@@ -3610,7 +3616,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.stamina;
             }
         }
-        
+
         public ClassStat Intelligence
         {
             get
@@ -3618,7 +3624,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.intelligence;
             }
         }
-        
+
         public ClassStat Sense
         {
             get
@@ -3626,7 +3632,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.sense;
             }
         }
-        
+
         public ClassStat Psychic
         {
             get
@@ -3634,7 +3640,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.psychic;
             }
         }
-        
+
         public ClassStat Ams
         {
             get
@@ -3642,7 +3648,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.ams;
             }
         }
-        
+
         public ClassStat StaticInstance
         {
             get
@@ -3650,7 +3656,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.staticInstance;
             }
         }
-        
+
         public ClassStat MaxMass
         {
             get
@@ -3658,7 +3664,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.maxMass;
             }
         }
-        
+
         public ClassStat StaticType
         {
             get
@@ -3666,7 +3672,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.staticType;
             }
         }
-        
+
         public ClassStat Energy
         {
             get
@@ -3674,7 +3680,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.energy;
             }
         }
-        
+
         public StatHitPoints Health
         {
             get
@@ -3682,7 +3688,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.health;
             }
         }
-        
+
         public ClassStat Height
         {
             get
@@ -3690,7 +3696,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.height;
             }
         }
-        
+
         public ClassStat Dms
         {
             get
@@ -3698,7 +3704,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.dms;
             }
         }
-        
+
         public ClassStat Can
         {
             get
@@ -3706,7 +3712,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.can;
             }
         }
-        
+
         public ClassStat Face
         {
             get
@@ -3714,7 +3720,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.face;
             }
         }
-        
+
         public ClassStat HairMesh
         {
             get
@@ -3722,7 +3728,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.hairMesh;
             }
         }
-        
+
         public ClassStat Side
         {
             get
@@ -3730,7 +3736,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.side;
             }
         }
-        
+
         public ClassStat DeadTimer
         {
             get
@@ -3738,7 +3744,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.deadTimer;
             }
         }
-        
+
         public ClassStat AccessCount
         {
             get
@@ -3746,7 +3752,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.accessCount;
             }
         }
-        
+
         public ClassStat AttackCount
         {
             get
@@ -3754,7 +3760,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.attackCount;
             }
         }
-        
+
         public StatTitleLevel TitleLevel
         {
             get
@@ -3762,7 +3768,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.titleLevel;
             }
         }
-        
+
         public ClassStat BackMesh
         {
             get
@@ -3770,7 +3776,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.backMesh;
             }
         }
-        
+
         public ClassStat ShoulderMeshHolder
         {
             get
@@ -3778,7 +3784,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shoulderMeshHolder;
             }
         }
-        
+
         public ClassStat AlienXP
         {
             get
@@ -3786,7 +3792,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.alienXP;
             }
         }
-        
+
         public ClassStat FabricType
         {
             get
@@ -3794,7 +3800,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.fabricType;
             }
         }
-        
+
         public ClassStat CatMesh
         {
             get
@@ -3802,7 +3808,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.catMesh;
             }
         }
-        
+
         public ClassStat ParentType
         {
             get
@@ -3810,7 +3816,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.parentType;
             }
         }
-        
+
         public ClassStat ParentInstance
         {
             get
@@ -3818,7 +3824,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.parentInstance;
             }
         }
-        
+
         public ClassStat BeltSlots
         {
             get
@@ -3826,7 +3832,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.beltSlots;
             }
         }
-        
+
         public ClassStat BandolierSlots
         {
             get
@@ -3834,7 +3840,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.bandolierSlots;
             }
         }
-        
+
         public ClassStat Fatness
         {
             get
@@ -3842,7 +3848,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.fatness;
             }
         }
-        
+
         public ClassStat ClanLevel
         {
             get
@@ -3850,7 +3856,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanLevel;
             }
         }
-        
+
         public ClassStat InsuranceTime
         {
             get
@@ -3858,7 +3864,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.insuranceTime;
             }
         }
-        
+
         public ClassStat InventoryTimeout
         {
             get
@@ -3866,7 +3872,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.inventoryTimeout;
             }
         }
-        
+
         public ClassStat AggDef
         {
             get
@@ -3874,7 +3880,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.aggDef;
             }
         }
-        
+
         public ClassStat XP
         {
             get
@@ -3882,7 +3888,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.xp;
             }
         }
-        
+
         public StatIP IP
         {
             get
@@ -3890,7 +3896,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.ip;
             }
         }
-        
+
         public ClassStat Level
         {
             get
@@ -3898,7 +3904,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.level;
             }
         }
-        
+
         public ClassStat InventoryId
         {
             get
@@ -3906,7 +3912,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.inventoryId;
             }
         }
-        
+
         public ClassStat TimeSinceCreation
         {
             get
@@ -3914,7 +3920,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.timeSinceCreation;
             }
         }
-        
+
         public ClassStat LastXP
         {
             get
@@ -3922,7 +3928,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.lastXP;
             }
         }
-        
+
         public ClassStat Age
         {
             get
@@ -3930,7 +3936,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.age;
             }
         }
-        
+
         public ClassStat Sex
         {
             get
@@ -3938,7 +3944,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.sex;
             }
         }
-        
+
         public ClassStat Profession
         {
             get
@@ -3946,7 +3952,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.profession;
             }
         }
-        
+
         public ClassStat Cash
         {
             get
@@ -3954,7 +3960,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.cash;
             }
         }
-        
+
         public ClassStat Alignment
         {
             get
@@ -3962,7 +3968,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.alignment;
             }
         }
-        
+
         public ClassStat Attitude
         {
             get
@@ -3970,7 +3976,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.attitude;
             }
         }
-        
+
         public ClassStat HeadMesh
         {
             get
@@ -3978,7 +3984,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.headMesh;
             }
         }
-        
+
         public ClassStat MissionBits5
         {
             get
@@ -3986,7 +3992,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.missionBits5;
             }
         }
-        
+
         public ClassStat MissionBits6
         {
             get
@@ -3994,7 +4000,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.missionBits6;
             }
         }
-        
+
         public ClassStat MissionBits7
         {
             get
@@ -4002,7 +4008,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.missionBits7;
             }
         }
-        
+
         public ClassStat VeteranPoints
         {
             get
@@ -4010,7 +4016,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.veteranPoints;
             }
         }
-        
+
         public ClassStat MonthsPaid
         {
             get
@@ -4018,7 +4024,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.monthsPaid;
             }
         }
-        
+
         public ClassStat SpeedPenalty
         {
             get
@@ -4026,7 +4032,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.speedPenalty;
             }
         }
-        
+
         public ClassStat TotalMass
         {
             get
@@ -4034,7 +4040,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.totalMass;
             }
         }
-        
+
         public ClassStat ItemType
         {
             get
@@ -4042,7 +4048,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.itemType;
             }
         }
-        
+
         public ClassStat RepairDifficulty
         {
             get
@@ -4050,7 +4056,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.repairDifficulty;
             }
         }
-        
+
         public ClassStat Price
         {
             get
@@ -4058,7 +4064,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.price;
             }
         }
-        
+
         public ClassStat MetaType
         {
             get
@@ -4066,7 +4072,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.metaType;
             }
         }
-        
+
         public ClassStat ItemClass
         {
             get
@@ -4074,7 +4080,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.itemClass;
             }
         }
-        
+
         public ClassStat RepairSkill
         {
             get
@@ -4082,7 +4088,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.repairSkill;
             }
         }
-        
+
         public ClassStat CurrentMass
         {
             get
@@ -4090,7 +4096,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.currentMass;
             }
         }
-        
+
         public ClassStat PrimaryItemType
         {
             get
@@ -4098,7 +4104,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.primaryItemType;
             }
         }
-        
+
         public ClassStat Icon
         {
             get
@@ -4106,7 +4112,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.icon;
             }
         }
-        
+
         public ClassStat PrimaryItemInstance
         {
             get
@@ -4114,7 +4120,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.primaryItemInstance;
             }
         }
-        
+
         public ClassStat SecondaryItemType
         {
             get
@@ -4122,7 +4128,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.secondaryItemType;
             }
         }
-        
+
         public ClassStat SecondaryItemInstance
         {
             get
@@ -4130,7 +4136,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.secondaryItemInstance;
             }
         }
-        
+
         public ClassStat UserType
         {
             get
@@ -4138,7 +4144,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.userType;
             }
         }
-        
+
         public ClassStat UserInstance
         {
             get
@@ -4146,7 +4152,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.userInstance;
             }
         }
-        
+
         public ClassStat AreaType
         {
             get
@@ -4154,7 +4160,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.areaType;
             }
         }
-        
+
         public ClassStat AreaInstance
         {
             get
@@ -4162,7 +4168,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.areaInstance;
             }
         }
-        
+
         public ClassStat DefaultPos
         {
             get
@@ -4170,7 +4176,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.defaultPos;
             }
         }
-        
+
         public ClassStat Race
         {
             get
@@ -4178,7 +4184,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.race;
             }
         }
-        
+
         public ClassStat ProjectileAC
         {
             get
@@ -4186,7 +4192,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.projectileAC;
             }
         }
-        
+
         public ClassStat MeleeAC
         {
             get
@@ -4194,7 +4200,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.meleeAC;
             }
         }
-        
+
         public ClassStat EnergyAC
         {
             get
@@ -4202,7 +4208,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.energyAC;
             }
         }
-        
+
         public ClassStat ChemicalAC
         {
             get
@@ -4210,7 +4216,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.chemicalAC;
             }
         }
-        
+
         public ClassStat RadiationAC
         {
             get
@@ -4218,7 +4224,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.radiationAC;
             }
         }
-        
+
         public ClassStat ColdAC
         {
             get
@@ -4226,7 +4232,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.coldAC;
             }
         }
-        
+
         public ClassStat PoisonAC
         {
             get
@@ -4234,7 +4240,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.poisonAC;
             }
         }
-        
+
         public ClassStat FireAC
         {
             get
@@ -4242,7 +4248,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.fireAC;
             }
         }
-        
+
         public ClassStat StateAction
         {
             get
@@ -4250,7 +4256,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.stateAction;
             }
         }
-        
+
         public ClassStat ItemAnim
         {
             get
@@ -4258,7 +4264,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.itemAnim;
             }
         }
-        
+
         public StatSkill MartialArts
         {
             get
@@ -4266,7 +4272,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.martialArts;
             }
         }
-        
+
         public StatSkill MeleeMultiple
         {
             get
@@ -4274,7 +4280,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.meleeMultiple;
             }
         }
-        
+
         public StatSkill OnehBluntWeapons
         {
             get
@@ -4282,7 +4288,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.onehBluntWeapons;
             }
         }
-        
+
         public StatSkill OnehEdgedWeapon
         {
             get
@@ -4290,7 +4296,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.onehEdgedWeapon;
             }
         }
-        
+
         public StatSkill MeleeEnergyWeapon
         {
             get
@@ -4298,7 +4304,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.meleeEnergyWeapon;
             }
         }
-        
+
         public StatSkill TwohEdgedWeapons
         {
             get
@@ -4306,7 +4312,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.twohEdgedWeapons;
             }
         }
-        
+
         public StatSkill Piercing
         {
             get
@@ -4314,7 +4320,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.piercing;
             }
         }
-        
+
         public StatSkill TwohBluntWeapons
         {
             get
@@ -4322,7 +4328,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.twohBluntWeapons;
             }
         }
-        
+
         public StatSkill ThrowingKnife
         {
             get
@@ -4330,7 +4336,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.throwingKnife;
             }
         }
-        
+
         public StatSkill Grenade
         {
             get
@@ -4338,7 +4344,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.grenade;
             }
         }
-        
+
         public StatSkill ThrownGrapplingWeapons
         {
             get
@@ -4346,7 +4352,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.thrownGrapplingWeapons;
             }
         }
-        
+
         public StatSkill Bow
         {
             get
@@ -4354,7 +4360,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.bow;
             }
         }
-        
+
         public StatSkill Pistol
         {
             get
@@ -4362,7 +4368,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pistol;
             }
         }
-        
+
         public StatSkill Rifle
         {
             get
@@ -4370,7 +4376,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.rifle;
             }
         }
-        
+
         public StatSkill SubMachineGun
         {
             get
@@ -4378,7 +4384,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.subMachineGun;
             }
         }
-        
+
         public StatSkill Shotgun
         {
             get
@@ -4386,7 +4392,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shotgun;
             }
         }
-        
+
         public StatSkill AssaultRifle
         {
             get
@@ -4394,7 +4400,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.assaultRifle;
             }
         }
-        
+
         public StatSkill DriveWater
         {
             get
@@ -4402,7 +4408,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.driveWater;
             }
         }
-        
+
         public StatSkill CloseCombatInitiative
         {
             get
@@ -4410,7 +4416,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.closeCombatInitiative;
             }
         }
-        
+
         public StatSkill DistanceWeaponInitiative
         {
             get
@@ -4418,7 +4424,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.distanceWeaponInitiative;
             }
         }
-        
+
         public StatSkill PhysicalProwessInitiative
         {
             get
@@ -4426,7 +4432,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.physicalProwessInitiative;
             }
         }
-        
+
         public StatSkill BowSpecialAttack
         {
             get
@@ -4434,7 +4440,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.bowSpecialAttack;
             }
         }
-        
+
         public StatSkill SenseImprovement
         {
             get
@@ -4442,7 +4448,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.senseImprovement;
             }
         }
-        
+
         public StatSkill FirstAid
         {
             get
@@ -4450,7 +4456,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.firstAid;
             }
         }
-        
+
         public StatSkill Treatment
         {
             get
@@ -4458,7 +4464,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.treatment;
             }
         }
-        
+
         public StatSkill MechanicalEngineering
         {
             get
@@ -4466,7 +4472,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.mechanicalEngineering;
             }
         }
-        
+
         public StatSkill ElectricalEngineering
         {
             get
@@ -4474,7 +4480,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.electricalEngineering;
             }
         }
-        
+
         public StatSkill MaterialMetamorphose
         {
             get
@@ -4482,7 +4488,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.materialMetamorphose;
             }
         }
-        
+
         public StatSkill BiologicalMetamorphose
         {
             get
@@ -4490,7 +4496,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.biologicalMetamorphose;
             }
         }
-        
+
         public StatSkill PsychologicalModification
         {
             get
@@ -4498,7 +4504,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.psychologicalModification;
             }
         }
-        
+
         public StatSkill MaterialCreation
         {
             get
@@ -4506,7 +4512,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.materialCreation;
             }
         }
-        
+
         public StatSkill MaterialLocation
         {
             get
@@ -4514,7 +4520,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.materialLocation;
             }
         }
-        
+
         public StatSkill NanoEnergyPool
         {
             get
@@ -4522,7 +4528,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nanoEnergyPool;
             }
         }
-        
+
         public StatSkill LREnergyWeapon
         {
             get
@@ -4530,7 +4536,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.lrEnergyWeapon;
             }
         }
-        
+
         public StatSkill LRMultipleWeapon
         {
             get
@@ -4538,7 +4544,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.lrMultipleWeapon;
             }
         }
-        
+
         public StatSkill DisarmTrap
         {
             get
@@ -4546,7 +4552,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.disarmTrap;
             }
         }
-        
+
         public StatSkill Perception
         {
             get
@@ -4554,7 +4560,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.perception;
             }
         }
-        
+
         public StatSkill Adventuring
         {
             get
@@ -4562,7 +4568,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.adventuring;
             }
         }
-        
+
         public StatSkill Swim
         {
             get
@@ -4570,7 +4576,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.swim;
             }
         }
-        
+
         public StatSkill DriveAir
         {
             get
@@ -4578,7 +4584,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.driveAir;
             }
         }
-        
+
         public StatSkill MapNavigation
         {
             get
@@ -4586,7 +4592,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.mapNavigation;
             }
         }
-        
+
         public StatSkill Tutoring
         {
             get
@@ -4594,7 +4600,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.tutoring;
             }
         }
-        
+
         public StatSkill Brawl
         {
             get
@@ -4602,7 +4608,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.brawl;
             }
         }
-        
+
         public StatSkill Riposte
         {
             get
@@ -4610,7 +4616,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.riposte;
             }
         }
-        
+
         public StatSkill Dimach
         {
             get
@@ -4618,7 +4624,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.dimach;
             }
         }
-        
+
         public StatSkill Parry
         {
             get
@@ -4626,7 +4632,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.parry;
             }
         }
-        
+
         public StatSkill SneakAttack
         {
             get
@@ -4634,7 +4640,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.sneakAttack;
             }
         }
-        
+
         public StatSkill FastAttack
         {
             get
@@ -4642,7 +4648,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.fastAttack;
             }
         }
-        
+
         public StatSkill Burst
         {
             get
@@ -4650,7 +4656,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.burst;
             }
         }
-        
+
         public StatSkill NanoProwessInitiative
         {
             get
@@ -4658,7 +4664,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nanoProwessInitiative;
             }
         }
-        
+
         public StatSkill FlingShot
         {
             get
@@ -4666,7 +4672,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.flingShot;
             }
         }
-        
+
         public StatSkill AimedShot
         {
             get
@@ -4674,7 +4680,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.aimedShot;
             }
         }
-        
+
         public StatSkill BodyDevelopment
         {
             get
@@ -4682,7 +4688,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.bodyDevelopment;
             }
         }
-        
+
         public StatSkill Duck
         {
             get
@@ -4690,7 +4696,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.duck;
             }
         }
-        
+
         public StatSkill Dodge
         {
             get
@@ -4698,7 +4704,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.dodge;
             }
         }
-        
+
         public StatSkill Evade
         {
             get
@@ -4706,7 +4712,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.evade;
             }
         }
-        
+
         public StatSkill RunSpeed
         {
             get
@@ -4714,7 +4720,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.runSpeed;
             }
         }
-        
+
         public StatSkill FieldQuantumPhysics
         {
             get
@@ -4722,7 +4728,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.fieldQuantumPhysics;
             }
         }
-        
+
         public StatSkill WeaponSmithing
         {
             get
@@ -4730,7 +4736,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.weaponSmithing;
             }
         }
-        
+
         public StatSkill Pharmaceuticals
         {
             get
@@ -4738,7 +4744,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pharmaceuticals;
             }
         }
-        
+
         public StatSkill NanoProgramming
         {
             get
@@ -4746,7 +4752,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nanoProgramming;
             }
         }
-        
+
         public StatSkill ComputerLiteracy
         {
             get
@@ -4754,7 +4760,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.computerLiteracy;
             }
         }
-        
+
         public StatSkill Psychology
         {
             get
@@ -4762,7 +4768,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.psychology;
             }
         }
-        
+
         public StatSkill Chemistry
         {
             get
@@ -4770,7 +4776,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.chemistry;
             }
         }
-        
+
         public StatSkill Concealment
         {
             get
@@ -4778,7 +4784,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.concealment;
             }
         }
-        
+
         public StatSkill BreakingEntry
         {
             get
@@ -4786,7 +4792,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.breakingEntry;
             }
         }
-        
+
         public StatSkill DriveGround
         {
             get
@@ -4794,7 +4800,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.driveGround;
             }
         }
-        
+
         public StatSkill FullAuto
         {
             get
@@ -4802,7 +4808,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.fullAuto;
             }
         }
-        
+
         public StatSkill NanoAC
         {
             get
@@ -4810,7 +4816,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nanoAC;
             }
         }
-        
+
         public ClassStat AlienLevel
         {
             get
@@ -4818,7 +4824,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.alienLevel;
             }
         }
-        
+
         public ClassStat HealthChangeBest
         {
             get
@@ -4826,7 +4832,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.healthChangeBest;
             }
         }
-        
+
         public ClassStat HealthChangeWorst
         {
             get
@@ -4834,7 +4840,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.healthChangeWorst;
             }
         }
-        
+
         public ClassStat HealthChange
         {
             get
@@ -4842,7 +4848,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.healthChange;
             }
         }
-        
+
         public ClassStat CurrentMovementMode
         {
             get
@@ -4850,7 +4856,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.currentMovementMode;
             }
         }
-        
+
         public ClassStat PrevMovementMode
         {
             get
@@ -4858,7 +4864,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.prevMovementMode;
             }
         }
-        
+
         public ClassStat AutoLockTimeDefault
         {
             get
@@ -4866,7 +4872,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.autoLockTimeDefault;
             }
         }
-        
+
         public ClassStat AutoUnlockTimeDefault
         {
             get
@@ -4874,7 +4880,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.autoUnlockTimeDefault;
             }
         }
-        
+
         public ClassStat MoreFlags
         {
             get
@@ -4882,7 +4888,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.moreFlags;
             }
         }
-        
+
         public StatAlienNextXP AlienNextXP
         {
             get
@@ -4890,7 +4896,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.alienNextXP;
             }
         }
-        
+
         public ClassStat NpcFlags
         {
             get
@@ -4898,7 +4904,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcFlags;
             }
         }
-        
+
         public ClassStat CurrentNcu
         {
             get
@@ -4906,7 +4912,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.currentNCU;
             }
         }
-        
+
         public ClassStat MaxNcu
         {
             get
@@ -4914,7 +4920,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.maxNCU;
             }
         }
-        
+
         public ClassStat Specialization
         {
             get
@@ -4922,7 +4928,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.specialization;
             }
         }
-        
+
         public ClassStat EffectIcon
         {
             get
@@ -4930,7 +4936,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.effectIcon;
             }
         }
-        
+
         public ClassStat BuildingType
         {
             get
@@ -4938,7 +4944,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.buildingType;
             }
         }
-        
+
         public ClassStat BuildingInstance
         {
             get
@@ -4946,7 +4952,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.buildingInstance;
             }
         }
-        
+
         public ClassStat CardOwnerType
         {
             get
@@ -4954,7 +4960,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.cardOwnerType;
             }
         }
-        
+
         public ClassStat CardOwnerInstance
         {
             get
@@ -4962,7 +4968,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.cardOwnerInstance;
             }
         }
-        
+
         public ClassStat BuildingComplexInst
         {
             get
@@ -4970,7 +4976,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.buildingComplexInst;
             }
         }
-        
+
         public ClassStat ExitInstance
         {
             get
@@ -4978,7 +4984,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.exitInstance;
             }
         }
-        
+
         public ClassStat NextDoorInBuilding
         {
             get
@@ -4986,7 +4992,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nextDoorInBuilding;
             }
         }
-        
+
         public ClassStat LastConcretePlayfieldInstance
         {
             get
@@ -4994,7 +5000,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.lastConcretePlayfieldInstance;
             }
         }
-        
+
         public ClassStat ExtenalPlayfieldInstance
         {
             get
@@ -5002,7 +5008,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.extenalPlayfieldInstance;
             }
         }
-        
+
         public ClassStat ExtenalDoorInstance
         {
             get
@@ -5010,7 +5016,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.extenalDoorInstance;
             }
         }
-        
+
         public ClassStat InPlay
         {
             get
@@ -5018,7 +5024,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.inPlay;
             }
         }
-        
+
         public ClassStat AccessKey
         {
             get
@@ -5026,7 +5032,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.accessKey;
             }
         }
-        
+
         public ClassStat PetMaster
         {
             get
@@ -5034,7 +5040,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.petMaster;
             }
         }
-        
+
         public ClassStat OrientationMode
         {
             get
@@ -5042,7 +5048,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.orientationMode;
             }
         }
-        
+
         public ClassStat SessionTime
         {
             get
@@ -5050,7 +5056,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.sessionTime;
             }
         }
-        
+
         public ClassStat RP
         {
             get
@@ -5058,7 +5064,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.rp;
             }
         }
-        
+
         public ClassStat Conformity
         {
             get
@@ -5066,7 +5072,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.conformity;
             }
         }
-        
+
         public ClassStat Aggressiveness
         {
             get
@@ -5074,7 +5080,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.aggressiveness;
             }
         }
-        
+
         public ClassStat Stability
         {
             get
@@ -5082,7 +5088,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.stability;
             }
         }
-        
+
         public ClassStat Extroverty
         {
             get
@@ -5090,7 +5096,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.extroverty;
             }
         }
-        
+
         public ClassStat BreedHostility
         {
             get
@@ -5098,7 +5104,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.breedHostility;
             }
         }
-        
+
         public ClassStat ReflectProjectileAC
         {
             get
@@ -5106,7 +5112,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectProjectileAC;
             }
         }
-        
+
         public ClassStat ReflectMeleeAC
         {
             get
@@ -5114,7 +5120,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectMeleeAC;
             }
         }
-        
+
         public ClassStat ReflectEnergyAC
         {
             get
@@ -5122,7 +5128,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectEnergyAC;
             }
         }
-        
+
         public ClassStat ReflectChemicalAC
         {
             get
@@ -5130,7 +5136,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectChemicalAC;
             }
         }
-        
+
         public ClassStat WeaponMeshHolder
         {
             get
@@ -5138,7 +5144,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.weaponMeshHolder;
             }
         }
-        
+
         public ClassStat RechargeDelay
         {
             get
@@ -5146,7 +5152,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.rechargeDelay;
             }
         }
-        
+
         public ClassStat EquipDelay
         {
             get
@@ -5154,7 +5160,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.equipDelay;
             }
         }
-        
+
         public ClassStat MaxEnergy
         {
             get
@@ -5162,7 +5168,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.maxEnergy;
             }
         }
-        
+
         public ClassStat TeamSide
         {
             get
@@ -5170,7 +5176,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.teamSide;
             }
         }
-        
+
         public StatNanoPoints CurrentNano
         {
             get
@@ -5178,7 +5184,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.currentNano;
             }
         }
-        
+
         public ClassStat GMLevel
         {
             get
@@ -5186,7 +5192,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.gmLevel;
             }
         }
-        
+
         public ClassStat ReflectRadiationAC
         {
             get
@@ -5194,7 +5200,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectRadiationAC;
             }
         }
-        
+
         public ClassStat ReflectColdAC
         {
             get
@@ -5202,7 +5208,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectColdAC;
             }
         }
-        
+
         public ClassStat ReflectNanoAC
         {
             get
@@ -5210,7 +5216,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectNanoAC;
             }
         }
-        
+
         public ClassStat ReflectFireAC
         {
             get
@@ -5218,7 +5224,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectFireAC;
             }
         }
-        
+
         public ClassStat CurrBodyLocation
         {
             get
@@ -5226,7 +5232,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.currBodyLocation;
             }
         }
-        
+
         public StatNano MaxNanoEnergy
         {
             get
@@ -5234,7 +5240,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.maxNanoEnergy;
             }
         }
-        
+
         public ClassStat AccumulatedDamage
         {
             get
@@ -5242,7 +5248,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.accumulatedDamage;
             }
         }
-        
+
         public ClassStat CanChangeClothes
         {
             get
@@ -5250,7 +5256,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.canChangeClothes;
             }
         }
-        
+
         public ClassStat Features
         {
             get
@@ -5258,7 +5264,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.features;
             }
         }
-        
+
         public ClassStat ReflectPoisonAC
         {
             get
@@ -5266,7 +5272,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectPoisonAC;
             }
         }
-        
+
         public ClassStat ShieldProjectileAC
         {
             get
@@ -5274,7 +5280,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shieldProjectileAC;
             }
         }
-        
+
         public ClassStat ShieldMeleeAC
         {
             get
@@ -5282,7 +5288,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shieldMeleeAC;
             }
         }
-        
+
         public ClassStat ShieldEnergyAC
         {
             get
@@ -5290,7 +5296,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shieldEnergyAC;
             }
         }
-        
+
         public ClassStat ShieldChemicalAC
         {
             get
@@ -5298,7 +5304,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shieldChemicalAC;
             }
         }
-        
+
         public ClassStat ShieldRadiationAC
         {
             get
@@ -5306,7 +5312,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shieldRadiationAC;
             }
         }
-        
+
         public ClassStat ShieldColdAC
         {
             get
@@ -5314,7 +5320,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shieldColdAC;
             }
         }
-        
+
         public ClassStat ShieldNanoAC
         {
             get
@@ -5322,7 +5328,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shieldNanoAC;
             }
         }
-        
+
         public ClassStat ShieldFireAC
         {
             get
@@ -5330,7 +5336,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shieldFireAC;
             }
         }
-        
+
         public ClassStat ShieldPoisonAC
         {
             get
@@ -5338,7 +5344,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shieldPoisonAC;
             }
         }
-        
+
         public ClassStat BerserkMode
         {
             get
@@ -5346,7 +5352,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.berserkMode;
             }
         }
-        
+
         public ClassStat InsurancePercentage
         {
             get
@@ -5354,7 +5360,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.insurancePercentage;
             }
         }
-        
+
         public ClassStat ChangeSideCount
         {
             get
@@ -5362,7 +5368,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.changeSideCount;
             }
         }
-        
+
         public ClassStat AbsorbProjectileAC
         {
             get
@@ -5370,7 +5376,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.absorbProjectileAC;
             }
         }
-        
+
         public ClassStat AbsorbMeleeAC
         {
             get
@@ -5378,7 +5384,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.absorbMeleeAC;
             }
         }
-        
+
         public ClassStat AbsorbEnergyAC
         {
             get
@@ -5386,7 +5392,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.absorbEnergyAC;
             }
         }
-        
+
         public ClassStat AbsorbChemicalAC
         {
             get
@@ -5394,7 +5400,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.absorbChemicalAC;
             }
         }
-        
+
         public ClassStat AbsorbRadiationAC
         {
             get
@@ -5402,7 +5408,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.absorbRadiationAC;
             }
         }
-        
+
         public ClassStat AbsorbColdAC
         {
             get
@@ -5410,7 +5416,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.absorbColdAC;
             }
         }
-        
+
         public ClassStat AbsorbFireAC
         {
             get
@@ -5418,7 +5424,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.absorbFireAC;
             }
         }
-        
+
         public ClassStat AbsorbPoisonAC
         {
             get
@@ -5426,7 +5432,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.absorbPoisonAC;
             }
         }
-        
+
         public ClassStat AbsorbNanoAC
         {
             get
@@ -5434,7 +5440,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.absorbNanoAC;
             }
         }
-        
+
         public ClassStat TemporarySkillReduction
         {
             get
@@ -5442,7 +5448,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.temporarySkillReduction;
             }
         }
-        
+
         public ClassStat BirthDate
         {
             get
@@ -5450,7 +5456,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.birthDate;
             }
         }
-        
+
         public ClassStat LastSaved
         {
             get
@@ -5458,7 +5464,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.lastSaved;
             }
         }
-        
+
         public ClassStat SoundVolume
         {
             get
@@ -5466,7 +5472,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.soundVolume;
             }
         }
-        
+
         public ClassStat PetCounter
         {
             get
@@ -5474,7 +5480,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.petCounter;
             }
         }
-        
+
         public ClassStat MetersWalked
         {
             get
@@ -5482,7 +5488,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.metersWalked;
             }
         }
-        
+
         public ClassStat QuestLevelsSolved
         {
             get
@@ -5490,7 +5496,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.questLevelsSolved;
             }
         }
-        
+
         public ClassStat MonsterLevelsKilled
         {
             get
@@ -5498,7 +5504,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.monsterLevelsKilled;
             }
         }
-        
+
         public ClassStat PvPLevelsKilled
         {
             get
@@ -5506,7 +5512,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pvPLevelsKilled;
             }
         }
-        
+
         public ClassStat MissionBits1
         {
             get
@@ -5514,7 +5520,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.missionBits1;
             }
         }
-        
+
         public ClassStat MissionBits2
         {
             get
@@ -5522,7 +5528,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.missionBits2;
             }
         }
-        
+
         public ClassStat AccessGrant
         {
             get
@@ -5530,7 +5536,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.accessGrant;
             }
         }
-        
+
         public ClassStat DoorFlags
         {
             get
@@ -5538,7 +5544,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.doorFlags;
             }
         }
-        
+
         public ClassStat ClanHierarchy
         {
             get
@@ -5546,7 +5552,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanHierarchy;
             }
         }
-        
+
         public ClassStat QuestStat
         {
             get
@@ -5554,7 +5560,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.questStat;
             }
         }
-        
+
         public ClassStat ClientActivated
         {
             get
@@ -5562,7 +5568,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clientActivated;
             }
         }
-        
+
         public ClassStat PersonalResearchLevel
         {
             get
@@ -5570,7 +5576,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.personalResearchLevel;
             }
         }
-        
+
         public ClassStat GlobalResearchLevel
         {
             get
@@ -5578,7 +5584,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.globalResearchLevel;
             }
         }
-        
+
         public ClassStat PersonalResearchGoal
         {
             get
@@ -5586,7 +5592,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.personalResearchGoal;
             }
         }
-        
+
         public ClassStat GlobalResearchGoal
         {
             get
@@ -5594,7 +5600,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.globalResearchGoal;
             }
         }
-        
+
         public ClassStat TurnSpeed
         {
             get
@@ -5602,7 +5608,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.turnSpeed;
             }
         }
-        
+
         public ClassStat LiquidType
         {
             get
@@ -5610,7 +5616,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.liquidType;
             }
         }
-        
+
         public ClassStat GatherSound
         {
             get
@@ -5618,7 +5624,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.gatherSound;
             }
         }
-        
+
         public ClassStat CastSound
         {
             get
@@ -5626,7 +5632,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.castSound;
             }
         }
-        
+
         public ClassStat TravelSound
         {
             get
@@ -5634,7 +5640,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.travelSound;
             }
         }
-        
+
         public ClassStat HitSound
         {
             get
@@ -5642,7 +5648,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.hitSound;
             }
         }
-        
+
         public ClassStat SecondaryItemTemplate
         {
             get
@@ -5650,7 +5656,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.secondaryItemTemplate;
             }
         }
-        
+
         public ClassStat EquippedWeapons
         {
             get
@@ -5658,7 +5664,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.equippedWeapons;
             }
         }
-        
+
         public ClassStat XPKillRange
         {
             get
@@ -5666,7 +5672,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.xpKillRange;
             }
         }
-        
+
         public ClassStat AmsModifier
         {
             get
@@ -5674,7 +5680,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.amsModifier;
             }
         }
-        
+
         public ClassStat DmsModifier
         {
             get
@@ -5682,7 +5688,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.dmsModifier;
             }
         }
-        
+
         public ClassStat ProjectileDamageModifier
         {
             get
@@ -5690,7 +5696,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.projectileDamageModifier;
             }
         }
-        
+
         public ClassStat MeleeDamageModifier
         {
             get
@@ -5698,7 +5704,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.meleeDamageModifier;
             }
         }
-        
+
         public ClassStat EnergyDamageModifier
         {
             get
@@ -5706,7 +5712,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.energyDamageModifier;
             }
         }
-        
+
         public ClassStat ChemicalDamageModifier
         {
             get
@@ -5714,7 +5720,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.chemicalDamageModifier;
             }
         }
-        
+
         public ClassStat RadiationDamageModifier
         {
             get
@@ -5722,7 +5728,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.radiationDamageModifier;
             }
         }
-        
+
         public ClassStat ItemHateValue
         {
             get
@@ -5730,7 +5736,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.itemHateValue;
             }
         }
-        
+
         public ClassStat DamageBonus
         {
             get
@@ -5738,7 +5744,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.damageBonus;
             }
         }
-        
+
         public ClassStat MaxDamage
         {
             get
@@ -5746,7 +5752,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.maxDamage;
             }
         }
-        
+
         public ClassStat MinDamage
         {
             get
@@ -5754,7 +5760,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.minDamage;
             }
         }
-        
+
         public ClassStat AttackRange
         {
             get
@@ -5762,7 +5768,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.attackRange;
             }
         }
-        
+
         public ClassStat HateValueModifyer
         {
             get
@@ -5770,7 +5776,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.hateValueModifyer;
             }
         }
-        
+
         public ClassStat TrapDifficulty
         {
             get
@@ -5778,7 +5784,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.trapDifficulty;
             }
         }
-        
+
         public ClassStat StatOne
         {
             get
@@ -5786,7 +5792,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.statOne;
             }
         }
-        
+
         public ClassStat NumAttackEffects
         {
             get
@@ -5794,7 +5800,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.numAttackEffects;
             }
         }
-        
+
         public ClassStat DefaultAttackType
         {
             get
@@ -5802,7 +5808,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.defaultAttackType;
             }
         }
-        
+
         public ClassStat ItemSkill
         {
             get
@@ -5810,7 +5816,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.itemSkill;
             }
         }
-        
+
         public ClassStat ItemDelay
         {
             get
@@ -5818,7 +5824,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.itemDelay;
             }
         }
-        
+
         public ClassStat ItemOpposedSkill
         {
             get
@@ -5826,7 +5832,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.itemOpposedSkill;
             }
         }
-        
+
         public ClassStat ItemSis
         {
             get
@@ -5834,7 +5840,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.itemSIS;
             }
         }
-        
+
         public ClassStat InteractionRadius
         {
             get
@@ -5842,7 +5848,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.interactionRadius;
             }
         }
-        
+
         public ClassStat Placement
         {
             get
@@ -5850,7 +5856,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.placement;
             }
         }
-        
+
         public ClassStat LockDifficulty
         {
             get
@@ -5858,7 +5864,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.lockDifficulty;
             }
         }
-        
+
         public ClassStat Members
         {
             get
@@ -5866,7 +5872,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.members;
             }
         }
-        
+
         public ClassStat MinMembers
         {
             get
@@ -5874,7 +5880,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.minMembers;
             }
         }
-        
+
         public ClassStat ClanPrice
         {
             get
@@ -5882,7 +5888,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanPrice;
             }
         }
-        
+
         public ClassStat MissionBits3
         {
             get
@@ -5890,7 +5896,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.missionBits3;
             }
         }
-        
+
         public ClassStat ClanType
         {
             get
@@ -5898,7 +5904,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanType;
             }
         }
-        
+
         public ClassStat ClanInstance
         {
             get
@@ -5906,7 +5912,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanInstance;
             }
         }
-        
+
         public ClassStat VoteCount
         {
             get
@@ -5914,7 +5920,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.voteCount;
             }
         }
-        
+
         public ClassStat MemberType
         {
             get
@@ -5922,7 +5928,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.memberType;
             }
         }
-        
+
         public ClassStat MemberInstance
         {
             get
@@ -5930,7 +5936,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.memberInstance;
             }
         }
-        
+
         public ClassStat GlobalClanType
         {
             get
@@ -5938,7 +5944,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.globalClanType;
             }
         }
-        
+
         public ClassStat GlobalClanInstance
         {
             get
@@ -5946,7 +5952,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.globalClanInstance;
             }
         }
-        
+
         public ClassStat ColdDamageModifier
         {
             get
@@ -5954,7 +5960,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.coldDamageModifier;
             }
         }
-        
+
         public ClassStat ClanUpkeepInterval
         {
             get
@@ -5962,7 +5968,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanUpkeepInterval;
             }
         }
-        
+
         public ClassStat TimeSinceUpkeep
         {
             get
@@ -5970,7 +5976,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.timeSinceUpkeep;
             }
         }
-        
+
         public ClassStat ClanFinalized
         {
             get
@@ -5978,7 +5984,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanFinalized;
             }
         }
-        
+
         public ClassStat NanoDamageModifier
         {
             get
@@ -5986,7 +5992,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nanoDamageModifier;
             }
         }
-        
+
         public ClassStat FireDamageModifier
         {
             get
@@ -5994,7 +6000,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.fireDamageModifier;
             }
         }
-        
+
         public ClassStat PoisonDamageModifier
         {
             get
@@ -6002,7 +6008,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.poisonDamageModifier;
             }
         }
-        
+
         public ClassStat NPCostModifier
         {
             get
@@ -6010,7 +6016,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npCostModifier;
             }
         }
-        
+
         public ClassStat XPModifier
         {
             get
@@ -6018,7 +6024,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.xpModifier;
             }
         }
-        
+
         public ClassStat BreedLimit
         {
             get
@@ -6026,7 +6032,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.breedLimit;
             }
         }
-        
+
         public ClassStat GenderLimit
         {
             get
@@ -6034,7 +6040,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.genderLimit;
             }
         }
-        
+
         public ClassStat LevelLimit
         {
             get
@@ -6042,7 +6048,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.levelLimit;
             }
         }
-        
+
         public ClassStat PlayerKilling
         {
             get
@@ -6050,7 +6056,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.playerKilling;
             }
         }
-        
+
         public ClassStat TeamAllowed
         {
             get
@@ -6058,7 +6064,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.teamAllowed;
             }
         }
-        
+
         public ClassStat WeaponDisallowedType
         {
             get
@@ -6066,7 +6072,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.weaponDisallowedType;
             }
         }
-        
+
         public ClassStat WeaponDisallowedInstance
         {
             get
@@ -6074,7 +6080,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.weaponDisallowedInstance;
             }
         }
-        
+
         public ClassStat Taboo
         {
             get
@@ -6082,7 +6088,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.taboo;
             }
         }
-        
+
         public ClassStat Compulsion
         {
             get
@@ -6090,7 +6096,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.compulsion;
             }
         }
-        
+
         public ClassStat SkillDisabled
         {
             get
@@ -6098,7 +6104,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.skillDisabled;
             }
         }
-        
+
         public ClassStat ClanItemType
         {
             get
@@ -6106,7 +6112,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanItemType;
             }
         }
-        
+
         public ClassStat ClanItemInstance
         {
             get
@@ -6114,7 +6120,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanItemInstance;
             }
         }
-        
+
         public ClassStat DebuffFormula
         {
             get
@@ -6122,7 +6128,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.debuffFormula;
             }
         }
-        
+
         public ClassStat PvpRating
         {
             get
@@ -6130,7 +6136,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pvpRating;
             }
         }
-        
+
         public ClassStat SavedXP
         {
             get
@@ -6138,7 +6144,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.savedXP;
             }
         }
-        
+
         public ClassStat DoorBlockTime
         {
             get
@@ -6146,7 +6152,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.doorBlockTime;
             }
         }
-        
+
         public ClassStat OverrideTexture
         {
             get
@@ -6154,7 +6160,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.overrideTexture;
             }
         }
-        
+
         public ClassStat OverrideMaterial
         {
             get
@@ -6162,7 +6168,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.overrideMaterial;
             }
         }
-        
+
         public ClassStat DeathReason
         {
             get
@@ -6170,7 +6176,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.deathReason;
             }
         }
-        
+
         public ClassStat DamageOverrideType
         {
             get
@@ -6178,7 +6184,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.damageOverrideType;
             }
         }
-        
+
         public ClassStat BrainType
         {
             get
@@ -6186,7 +6192,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.brainType;
             }
         }
-        
+
         public ClassStat XPBonus
         {
             get
@@ -6194,7 +6200,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.xpBonus;
             }
         }
-        
+
         public StatHealInterval HealInterval
         {
             get
@@ -6202,7 +6208,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.healInterval;
             }
         }
-        
+
         public StatHealDelta HealDelta
         {
             get
@@ -6210,7 +6216,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.healDelta;
             }
         }
-        
+
         public ClassStat MonsterTexture
         {
             get
@@ -6218,7 +6224,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.monsterTexture;
             }
         }
-        
+
         public ClassStat HasAlwaysLootable
         {
             get
@@ -6226,7 +6232,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.hasAlwaysLootable;
             }
         }
-        
+
         public ClassStat TradeLimit
         {
             get
@@ -6234,7 +6240,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.tradeLimit;
             }
         }
-        
+
         public ClassStat FaceTexture
         {
             get
@@ -6242,7 +6248,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.faceTexture;
             }
         }
-        
+
         public ClassStat SpecialCondition
         {
             get
@@ -6250,7 +6256,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.specialCondition;
             }
         }
-        
+
         public ClassStat AutoAttackFlags
         {
             get
@@ -6258,7 +6264,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.autoAttackFlags;
             }
         }
-        
+
         public StatNextXP NextXP
         {
             get
@@ -6266,7 +6272,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nextXP;
             }
         }
-        
+
         public ClassStat TeleportPauseMilliSeconds
         {
             get
@@ -6274,7 +6280,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.teleportPauseMilliSeconds;
             }
         }
-        
+
         public ClassStat SisCap
         {
             get
@@ -6282,7 +6288,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.sisCap;
             }
         }
-        
+
         public ClassStat AnimSet
         {
             get
@@ -6290,7 +6296,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.animSet;
             }
         }
-        
+
         public ClassStat AttackType
         {
             get
@@ -6298,7 +6304,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.attackType;
             }
         }
-        
+
         public ClassStat NanoFocusLevel
         {
             get
@@ -6306,7 +6312,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nanoFocusLevel;
             }
         }
-        
+
         public ClassStat NpcHash
         {
             get
@@ -6314,7 +6320,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcHash;
             }
         }
-        
+
         public ClassStat CollisionRadius
         {
             get
@@ -6322,7 +6328,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.collisionRadius;
             }
         }
-        
+
         public ClassStat OuterRadius
         {
             get
@@ -6330,7 +6336,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.outerRadius;
             }
         }
-        
+
         public ClassStat MonsterData
         {
             get
@@ -6338,7 +6344,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.monsterData;
             }
         }
-        
+
         public ClassStat MonsterScale
         {
             get
@@ -6346,7 +6352,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.monsterScale;
             }
         }
-        
+
         public ClassStat HitEffectType
         {
             get
@@ -6354,7 +6360,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.hitEffectType;
             }
         }
-        
+
         public ClassStat ResurrectDest
         {
             get
@@ -6362,7 +6368,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.resurrectDest;
             }
         }
-        
+
         public StatNanoInterval NanoInterval
         {
             get
@@ -6370,7 +6376,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nanoInterval;
             }
         }
-        
+
         public StatNanoDelta NanoDelta
         {
             get
@@ -6378,7 +6384,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nanoDelta;
             }
         }
-        
+
         public ClassStat ReclaimItem
         {
             get
@@ -6386,7 +6392,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reclaimItem;
             }
         }
-        
+
         public ClassStat GatherEffectType
         {
             get
@@ -6394,7 +6400,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.gatherEffectType;
             }
         }
-        
+
         public ClassStat VisualBreed
         {
             get
@@ -6402,7 +6408,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.visualBreed;
             }
         }
-        
+
         public ClassStat VisualProfession
         {
             get
@@ -6410,7 +6416,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.visualProfession;
             }
         }
-        
+
         public ClassStat VisualSex
         {
             get
@@ -6418,7 +6424,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.visualSex;
             }
         }
-        
+
         public ClassStat RitualTargetInst
         {
             get
@@ -6426,7 +6432,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.ritualTargetInst;
             }
         }
-        
+
         public ClassStat SkillTimeOnSelectedTarget
         {
             get
@@ -6434,7 +6440,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.skillTimeOnSelectedTarget;
             }
         }
-        
+
         public ClassStat LastSaveXP
         {
             get
@@ -6442,7 +6448,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.lastSaveXP;
             }
         }
-        
+
         public ClassStat ExtendedTime
         {
             get
@@ -6450,7 +6456,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.extendedTime;
             }
         }
-        
+
         public ClassStat BurstRecharge
         {
             get
@@ -6458,7 +6464,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.burstRecharge;
             }
         }
-        
+
         public ClassStat FullAutoRecharge
         {
             get
@@ -6466,7 +6472,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.fullAutoRecharge;
             }
         }
-        
+
         public ClassStat GatherAbstractAnim
         {
             get
@@ -6474,7 +6480,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.gatherAbstractAnim;
             }
         }
-        
+
         public ClassStat CastTargetAbstractAnim
         {
             get
@@ -6482,7 +6488,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.castTargetAbstractAnim;
             }
         }
-        
+
         public ClassStat CastSelfAbstractAnim
         {
             get
@@ -6490,7 +6496,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.castSelfAbstractAnim;
             }
         }
-        
+
         public ClassStat CriticalIncrease
         {
             get
@@ -6498,7 +6504,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.criticalIncrease;
             }
         }
-        
+
         public ClassStat RangeIncreaserWeapon
         {
             get
@@ -6506,7 +6512,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.rangeIncreaserWeapon;
             }
         }
-        
+
         public ClassStat RangeIncreaserNF
         {
             get
@@ -6514,7 +6520,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.rangeIncreaserNF;
             }
         }
-        
+
         public ClassStat SkillLockModifier
         {
             get
@@ -6522,7 +6528,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.skillLockModifier;
             }
         }
-        
+
         public ClassStat InterruptModifier
         {
             get
@@ -6530,7 +6536,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.interruptModifier;
             }
         }
-        
+
         public ClassStat AcgEntranceStyles
         {
             get
@@ -6538,7 +6544,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.acgEntranceStyles;
             }
         }
-        
+
         public ClassStat ChanceOfBreakOnSpellAttack
         {
             get
@@ -6546,7 +6552,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.chanceOfBreakOnSpellAttack;
             }
         }
-        
+
         public ClassStat ChanceOfBreakOnDebuff
         {
             get
@@ -6554,7 +6560,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.chanceOfBreakOnDebuff;
             }
         }
-        
+
         public ClassStat DieAnim
         {
             get
@@ -6562,7 +6568,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.dieAnim;
             }
         }
-        
+
         public ClassStat TowerType
         {
             get
@@ -6570,7 +6576,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.towerType;
             }
         }
-        
+
         public ClassStat Expansion
         {
             get
@@ -6578,7 +6584,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.expansion;
             }
         }
-        
+
         public ClassStat LowresMesh
         {
             get
@@ -6586,7 +6592,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.lowresMesh;
             }
         }
-        
+
         public ClassStat CriticalDecrease
         {
             get
@@ -6594,7 +6600,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.criticalDecrease;
             }
         }
-        
+
         public ClassStat OldTimeExist
         {
             get
@@ -6602,7 +6608,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.oldTimeExist;
             }
         }
-        
+
         public ClassStat ResistModifier
         {
             get
@@ -6610,7 +6616,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.resistModifier;
             }
         }
-        
+
         public ClassStat ChestFlags
         {
             get
@@ -6618,7 +6624,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.chestFlags;
             }
         }
-        
+
         public ClassStat PrimaryTemplateId
         {
             get
@@ -6626,7 +6632,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.primaryTemplateId;
             }
         }
-        
+
         public ClassStat NumberOfItems
         {
             get
@@ -6634,7 +6640,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.numberOfItems;
             }
         }
-        
+
         public ClassStat SelectedTargetType
         {
             get
@@ -6642,7 +6648,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.selectedTargetType;
             }
         }
-        
+
         public ClassStat CorpseHash
         {
             get
@@ -6650,7 +6656,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.corpseHash;
             }
         }
-        
+
         public ClassStat AmmoName
         {
             get
@@ -6658,7 +6664,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.ammoName;
             }
         }
-        
+
         public ClassStat Rotation
         {
             get
@@ -6666,7 +6672,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.rotation;
             }
         }
-        
+
         public ClassStat CatAnim
         {
             get
@@ -6674,7 +6680,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.catAnim;
             }
         }
-        
+
         public ClassStat CatAnimFlags
         {
             get
@@ -6682,7 +6688,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.catAnimFlags;
             }
         }
-        
+
         public ClassStat DisplayCatAnim
         {
             get
@@ -6690,7 +6696,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.displayCATAnim;
             }
         }
-        
+
         public ClassStat DisplayCatMesh
         {
             get
@@ -6698,7 +6704,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.displayCATMesh;
             }
         }
-        
+
         public ClassStat School
         {
             get
@@ -6706,7 +6712,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.school;
             }
         }
-        
+
         public ClassStat NanoSpeed
         {
             get
@@ -6714,7 +6720,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nanoSpeed;
             }
         }
-        
+
         public ClassStat NanoPoints
         {
             get
@@ -6722,7 +6728,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nanoPoints;
             }
         }
-        
+
         public ClassStat TrainSkill
         {
             get
@@ -6730,7 +6736,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.trainSkill;
             }
         }
-        
+
         public ClassStat TrainSkillCost
         {
             get
@@ -6738,7 +6744,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.trainSkillCost;
             }
         }
-        
+
         public ClassStat IsFightingMe
         {
             get
@@ -6746,7 +6752,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.isFightingMe;
             }
         }
-        
+
         public ClassStat NextFormula
         {
             get
@@ -6754,7 +6760,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nextFormula;
             }
         }
-        
+
         public ClassStat MultipleCount
         {
             get
@@ -6762,7 +6768,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.multipleCount;
             }
         }
-        
+
         public ClassStat EffectType
         {
             get
@@ -6770,7 +6776,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.effectType;
             }
         }
-        
+
         public ClassStat ImpactEffectType
         {
             get
@@ -6778,7 +6784,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.impactEffectType;
             }
         }
-        
+
         public ClassStat CorpseType
         {
             get
@@ -6786,7 +6792,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.corpseType;
             }
         }
-        
+
         public ClassStat CorpseInstance
         {
             get
@@ -6794,7 +6800,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.corpseInstance;
             }
         }
-        
+
         public ClassStat CorpseAnimKey
         {
             get
@@ -6802,7 +6808,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.corpseAnimKey;
             }
         }
-        
+
         public ClassStat UnarmedTemplateInstance
         {
             get
@@ -6810,7 +6816,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.unarmedTemplateInstance;
             }
         }
-        
+
         public ClassStat TracerEffectType
         {
             get
@@ -6818,7 +6824,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.tracerEffectType;
             }
         }
-        
+
         public ClassStat AmmoType
         {
             get
@@ -6826,7 +6832,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.ammoType;
             }
         }
-        
+
         public ClassStat CharRadius
         {
             get
@@ -6834,7 +6840,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.charRadius;
             }
         }
-        
+
         public ClassStat ChanceOfUse
         {
             get
@@ -6842,7 +6848,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.chanceOfUse;
             }
         }
-        
+
         public ClassStat CurrentState
         {
             get
@@ -6850,7 +6856,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.currentState;
             }
         }
-        
+
         public ClassStat ArmourType
         {
             get
@@ -6858,7 +6864,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.armourType;
             }
         }
-        
+
         public ClassStat RestModifier
         {
             get
@@ -6866,7 +6872,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.restModifier;
             }
         }
-        
+
         public ClassStat BuyModifier
         {
             get
@@ -6874,7 +6880,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.buyModifier;
             }
         }
-        
+
         public ClassStat SellModifier
         {
             get
@@ -6882,7 +6888,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.sellModifier;
             }
         }
-        
+
         public ClassStat CastEffectType
         {
             get
@@ -6890,7 +6896,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.castEffectType;
             }
         }
-        
+
         public ClassStat NpcBrainState
         {
             get
@@ -6898,7 +6904,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcBrainState;
             }
         }
-        
+
         public ClassStat WaitState
         {
             get
@@ -6906,7 +6912,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.waitState;
             }
         }
-        
+
         public ClassStat SelectedTarget
         {
             get
@@ -6914,7 +6920,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.selectedTarget;
             }
         }
-        
+
         public ClassStat MissionBits4
         {
             get
@@ -6922,7 +6928,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.missionBits4;
             }
         }
-        
+
         public ClassStat OwnerInstance
         {
             get
@@ -6930,7 +6936,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.ownerInstance;
             }
         }
-        
+
         public ClassStat CharState
         {
             get
@@ -6938,7 +6944,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.charState;
             }
         }
-        
+
         public ClassStat ReadOnly
         {
             get
@@ -6946,7 +6952,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.readOnly;
             }
         }
-        
+
         public ClassStat DamageType
         {
             get
@@ -6954,7 +6960,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.damageType;
             }
         }
-        
+
         public ClassStat CollideCheckInterval
         {
             get
@@ -6962,7 +6968,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.collideCheckInterval;
             }
         }
-        
+
         public ClassStat PlayfieldType
         {
             get
@@ -6970,7 +6976,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.playfieldType;
             }
         }
-        
+
         public ClassStat NpcCommand
         {
             get
@@ -6978,7 +6984,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcCommand;
             }
         }
-        
+
         public ClassStat InitiativeType
         {
             get
@@ -6986,7 +6992,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.initiativeType;
             }
         }
-        
+
         public ClassStat CharTmp1
         {
             get
@@ -6994,7 +7000,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.charTmp1;
             }
         }
-        
+
         public ClassStat CharTmp2
         {
             get
@@ -7002,7 +7008,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.charTmp2;
             }
         }
-        
+
         public ClassStat CharTmp3
         {
             get
@@ -7010,7 +7016,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.charTmp3;
             }
         }
-        
+
         public ClassStat CharTmp4
         {
             get
@@ -7018,7 +7024,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.charTmp4;
             }
         }
-        
+
         public ClassStat NpcCommandArg
         {
             get
@@ -7026,7 +7032,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcCommandArg;
             }
         }
-        
+
         public ClassStat NameTemplate
         {
             get
@@ -7034,7 +7040,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nameTemplate;
             }
         }
-        
+
         public ClassStat DesiredTargetDistance
         {
             get
@@ -7042,7 +7048,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.desiredTargetDistance;
             }
         }
-        
+
         public ClassStat VicinityRange
         {
             get
@@ -7050,7 +7056,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.vicinityRange;
             }
         }
-        
+
         public ClassStat NpcIsSurrendering
         {
             get
@@ -7058,7 +7064,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcIsSurrendering;
             }
         }
-        
+
         public ClassStat StateMachine
         {
             get
@@ -7066,7 +7072,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.stateMachine;
             }
         }
-        
+
         public ClassStat NpcSurrenderInstance
         {
             get
@@ -7074,7 +7080,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcSurrenderInstance;
             }
         }
-        
+
         public ClassStat NpcHasPatrolList
         {
             get
@@ -7082,7 +7088,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcHasPatrolList;
             }
         }
-        
+
         public ClassStat NpcVicinityChars
         {
             get
@@ -7090,7 +7096,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcVicinityChars;
             }
         }
-        
+
         public ClassStat ProximityRangeOutdoors
         {
             get
@@ -7098,7 +7104,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.proximityRangeOutdoors;
             }
         }
-        
+
         public ClassStat NpcFamily
         {
             get
@@ -7106,7 +7112,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcFamily;
             }
         }
-        
+
         public ClassStat CommandRange
         {
             get
@@ -7114,7 +7120,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.commandRange;
             }
         }
-        
+
         public ClassStat NpcHatelistSize
         {
             get
@@ -7122,7 +7128,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcHatelistSize;
             }
         }
-        
+
         public ClassStat NpcNumPets
         {
             get
@@ -7130,7 +7136,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcNumPets;
             }
         }
-        
+
         public ClassStat ODMinSizeAdd
         {
             get
@@ -7138,7 +7144,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.odMinSizeAdd;
             }
         }
-        
+
         public ClassStat EffectRed
         {
             get
@@ -7146,7 +7152,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.effectRed;
             }
         }
-        
+
         public ClassStat EffectGreen
         {
             get
@@ -7154,7 +7160,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.effectGreen;
             }
         }
-        
+
         public ClassStat EffectBlue
         {
             get
@@ -7162,7 +7168,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.effectBlue;
             }
         }
-        
+
         public ClassStat ODMaxSizeAdd
         {
             get
@@ -7170,7 +7176,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.odMaxSizeAdd;
             }
         }
-        
+
         public ClassStat DurationModifier
         {
             get
@@ -7178,7 +7184,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.durationModifier;
             }
         }
-        
+
         public ClassStat NpcCryForHelpRange
         {
             get
@@ -7186,7 +7192,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcCryForHelpRange;
             }
         }
-        
+
         public ClassStat LosHeight
         {
             get
@@ -7194,7 +7200,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.losHeight;
             }
         }
-        
+
         public ClassStat PetReq1
         {
             get
@@ -7202,7 +7208,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.petReq1;
             }
         }
-        
+
         public ClassStat PetReq2
         {
             get
@@ -7210,7 +7216,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.petReq2;
             }
         }
-        
+
         public ClassStat PetReq3
         {
             get
@@ -7218,7 +7224,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.petReq3;
             }
         }
-        
+
         public ClassStat MapOptions
         {
             get
@@ -7226,7 +7232,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.mapOptions;
             }
         }
-        
+
         public ClassStat MapAreaPart1
         {
             get
@@ -7234,7 +7240,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.mapAreaPart1;
             }
         }
-        
+
         public ClassStat MapAreaPart2
         {
             get
@@ -7242,7 +7248,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.mapAreaPart2;
             }
         }
-        
+
         public ClassStat FixtureFlags
         {
             get
@@ -7250,7 +7256,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.fixtureFlags;
             }
         }
-        
+
         public ClassStat FallDamage
         {
             get
@@ -7258,7 +7264,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.fallDamage;
             }
         }
-        
+
         public ClassStat ReflectReturnedProjectileAC
         {
             get
@@ -7266,7 +7272,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectReturnedProjectileAC;
             }
         }
-        
+
         public ClassStat ReflectReturnedMeleeAC
         {
             get
@@ -7274,7 +7280,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectReturnedMeleeAC;
             }
         }
-        
+
         public ClassStat ReflectReturnedEnergyAC
         {
             get
@@ -7282,7 +7288,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectReturnedEnergyAC;
             }
         }
-        
+
         public ClassStat ReflectReturnedChemicalAC
         {
             get
@@ -7290,7 +7296,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectReturnedChemicalAC;
             }
         }
-        
+
         public ClassStat ReflectReturnedRadiationAC
         {
             get
@@ -7298,7 +7304,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectReturnedRadiationAC;
             }
         }
-        
+
         public ClassStat ReflectReturnedColdAC
         {
             get
@@ -7306,7 +7312,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectReturnedColdAC;
             }
         }
-        
+
         public ClassStat ReflectReturnedNanoAC
         {
             get
@@ -7314,7 +7320,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectReturnedNanoAC;
             }
         }
-        
+
         public ClassStat ReflectReturnedFireAC
         {
             get
@@ -7322,7 +7328,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectReturnedFireAC;
             }
         }
-        
+
         public ClassStat ReflectReturnedPoisonAC
         {
             get
@@ -7330,7 +7336,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.reflectReturnedPoisonAC;
             }
         }
-        
+
         public ClassStat ProximityRangeIndoors
         {
             get
@@ -7338,7 +7344,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.proximityRangeIndoors;
             }
         }
-        
+
         public ClassStat PetReqVal1
         {
             get
@@ -7346,7 +7352,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.petReqVal1;
             }
         }
-        
+
         public ClassStat PetReqVal2
         {
             get
@@ -7354,7 +7360,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.petReqVal2;
             }
         }
-        
+
         public ClassStat PetReqVal3
         {
             get
@@ -7362,7 +7368,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.petReqVal3;
             }
         }
-        
+
         public ClassStat TargetFacing
         {
             get
@@ -7370,7 +7376,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.targetFacing;
             }
         }
-        
+
         public ClassStat Backstab
         {
             get
@@ -7378,7 +7384,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.backstab;
             }
         }
-        
+
         public ClassStat OriginatorType
         {
             get
@@ -7386,7 +7392,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.originatorType;
             }
         }
-        
+
         public ClassStat QuestInstance
         {
             get
@@ -7394,7 +7400,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.questInstance;
             }
         }
-        
+
         public ClassStat QuestIndex1
         {
             get
@@ -7402,7 +7408,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.questIndex1;
             }
         }
-        
+
         public ClassStat QuestIndex2
         {
             get
@@ -7410,7 +7416,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.questIndex2;
             }
         }
-        
+
         public ClassStat QuestIndex3
         {
             get
@@ -7418,7 +7424,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.questIndex3;
             }
         }
-        
+
         public ClassStat QuestIndex4
         {
             get
@@ -7426,7 +7432,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.questIndex4;
             }
         }
-        
+
         public ClassStat QuestIndex5
         {
             get
@@ -7434,7 +7440,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.questIndex5;
             }
         }
-        
+
         public ClassStat QTDungeonInstance
         {
             get
@@ -7442,7 +7448,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.qtDungeonInstance;
             }
         }
-        
+
         public ClassStat QTNumMonsters
         {
             get
@@ -7450,7 +7456,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.qtNumMonsters;
             }
         }
-        
+
         public ClassStat QTKilledMonsters
         {
             get
@@ -7458,7 +7464,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.qtKilledMonsters;
             }
         }
-        
+
         public ClassStat AnimPos
         {
             get
@@ -7466,7 +7472,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.animPos;
             }
         }
-        
+
         public ClassStat AnimPlay
         {
             get
@@ -7474,7 +7480,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.animPlay;
             }
         }
-        
+
         public ClassStat AnimSpeed
         {
             get
@@ -7482,7 +7488,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.animSpeed;
             }
         }
-        
+
         public ClassStat QTKillNumMonsterId1
         {
             get
@@ -7490,7 +7496,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.qtKillNumMonsterId1;
             }
         }
-        
+
         public ClassStat QTKillNumMonsterCount1
         {
             get
@@ -7498,7 +7504,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.qtKillNumMonsterCount1;
             }
         }
-        
+
         public ClassStat QTKillNumMonsterId2
         {
             get
@@ -7506,7 +7512,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.qtKillNumMonsterId2;
             }
         }
-        
+
         public ClassStat QTKillNumMonsterCount2
         {
             get
@@ -7514,7 +7520,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.qtKillNumMonsterCount2;
             }
         }
-        
+
         public ClassStat QTKillNumMonsterId3
         {
             get
@@ -7522,7 +7528,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.qtKillNumMonsterID3;
             }
         }
-        
+
         public ClassStat QTKillNumMonsterCount3
         {
             get
@@ -7530,7 +7536,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.qtKillNumMonsterCount3;
             }
         }
-        
+
         public ClassStat QuestIndex0
         {
             get
@@ -7538,7 +7544,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.questIndex0;
             }
         }
-        
+
         public ClassStat QuestTimeout
         {
             get
@@ -7546,7 +7552,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.questTimeout;
             }
         }
-        
+
         public ClassStat TowerNpcHash
         {
             get
@@ -7554,7 +7560,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.towerNpcHash;
             }
         }
-        
+
         public ClassStat PetType
         {
             get
@@ -7562,7 +7568,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.petType;
             }
         }
-        
+
         public ClassStat OnTowerCreation
         {
             get
@@ -7570,7 +7576,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.onTowerCreation;
             }
         }
-        
+
         public ClassStat OwnedTowers
         {
             get
@@ -7578,7 +7584,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.ownedTowers;
             }
         }
-        
+
         public ClassStat TowerInstance
         {
             get
@@ -7586,7 +7592,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.towerInstance;
             }
         }
-        
+
         public ClassStat AttackShield
         {
             get
@@ -7594,7 +7600,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.attackShield;
             }
         }
-        
+
         public ClassStat SpecialAttackShield
         {
             get
@@ -7602,7 +7608,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.specialAttackShield;
             }
         }
-        
+
         public ClassStat NpcVicinityPlayers
         {
             get
@@ -7610,7 +7616,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcVicinityPlayers;
             }
         }
-        
+
         public ClassStat NpcUseFightModeRegenRate
         {
             get
@@ -7618,7 +7624,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcUseFightModeRegenRate;
             }
         }
-        
+
         public ClassStat Rnd
         {
             get
@@ -7626,7 +7632,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.rnd;
             }
         }
-        
+
         public ClassStat SocialStatus
         {
             get
@@ -7634,7 +7640,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.socialStatus;
             }
         }
-        
+
         public ClassStat LastRnd
         {
             get
@@ -7642,7 +7648,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.lastRnd;
             }
         }
-        
+
         public ClassStat ItemDelayCap
         {
             get
@@ -7650,7 +7656,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.itemDelayCap;
             }
         }
-        
+
         public ClassStat RechargeDelayCap
         {
             get
@@ -7658,7 +7664,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.rechargeDelayCap;
             }
         }
-        
+
         public ClassStat PercentRemainingHealth
         {
             get
@@ -7666,7 +7672,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.percentRemainingHealth;
             }
         }
-        
+
         public ClassStat PercentRemainingNano
         {
             get
@@ -7674,7 +7680,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.percentRemainingNano;
             }
         }
-        
+
         public ClassStat TargetDistance
         {
             get
@@ -7682,7 +7688,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.targetDistance;
             }
         }
-        
+
         public ClassStat TeamCloseness
         {
             get
@@ -7690,7 +7696,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.teamCloseness;
             }
         }
-        
+
         public ClassStat NumberOnHateList
         {
             get
@@ -7698,7 +7704,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.numberOnHateList;
             }
         }
-        
+
         public ClassStat ConditionState
         {
             get
@@ -7706,7 +7712,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.conditionState;
             }
         }
-        
+
         public ClassStat ExpansionPlayfield
         {
             get
@@ -7714,7 +7720,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.expansionPlayfield;
             }
         }
-        
+
         public ClassStat ShadowBreed
         {
             get
@@ -7722,7 +7728,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shadowBreed;
             }
         }
-        
+
         public ClassStat NpcFovStatus
         {
             get
@@ -7730,7 +7736,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcFovStatus;
             }
         }
-        
+
         public ClassStat DudChance
         {
             get
@@ -7738,7 +7744,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.dudChance;
             }
         }
-        
+
         public ClassStat HealMultiplier
         {
             get
@@ -7746,7 +7752,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.healMultiplier;
             }
         }
-        
+
         public ClassStat NanoDamageMultiplier
         {
             get
@@ -7754,7 +7760,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nanoDamageMultiplier;
             }
         }
-        
+
         public ClassStat NanoVulnerability
         {
             get
@@ -7762,7 +7768,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nanoVulnerability;
             }
         }
-        
+
         public ClassStat AmsCap
         {
             get
@@ -7770,7 +7776,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.amsCap;
             }
         }
-        
+
         public ClassStat ProcInitiative1
         {
             get
@@ -7778,7 +7784,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.procInitiative1;
             }
         }
-        
+
         public ClassStat ProcInitiative2
         {
             get
@@ -7786,7 +7792,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.procInitiative2;
             }
         }
-        
+
         public ClassStat ProcInitiative3
         {
             get
@@ -7794,7 +7800,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.procInitiative3;
             }
         }
-        
+
         public ClassStat ProcInitiative4
         {
             get
@@ -7802,7 +7808,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.procInitiative4;
             }
         }
-        
+
         public ClassStat FactionModifier
         {
             get
@@ -7810,7 +7816,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.factionModifier;
             }
         }
-        
+
         public ClassStat MissionBits8
         {
             get
@@ -7818,7 +7824,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.missionBits8;
             }
         }
-        
+
         public ClassStat MissionBits9
         {
             get
@@ -7826,7 +7832,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.missionBits9;
             }
         }
-        
+
         public ClassStat StackingLine2
         {
             get
@@ -7834,7 +7840,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.stackingLine2;
             }
         }
-        
+
         public ClassStat StackingLine3
         {
             get
@@ -7842,7 +7848,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.stackingLine3;
             }
         }
-        
+
         public ClassStat StackingLine4
         {
             get
@@ -7850,7 +7856,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.stackingLine4;
             }
         }
-        
+
         public ClassStat StackingLine5
         {
             get
@@ -7858,7 +7864,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.stackingLine5;
             }
         }
-        
+
         public ClassStat StackingLine6
         {
             get
@@ -7866,7 +7872,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.stackingLine6;
             }
         }
-        
+
         public ClassStat StackingOrder
         {
             get
@@ -7874,7 +7880,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.stackingOrder;
             }
         }
-        
+
         public ClassStat ProcNano1
         {
             get
@@ -7882,7 +7888,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.procNano1;
             }
         }
-        
+
         public ClassStat ProcNano2
         {
             get
@@ -7890,7 +7896,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.procNano2;
             }
         }
-        
+
         public ClassStat ProcNano3
         {
             get
@@ -7898,7 +7904,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.procNano3;
             }
         }
-        
+
         public ClassStat ProcNano4
         {
             get
@@ -7906,7 +7912,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.procNano4;
             }
         }
-        
+
         public ClassStat ProcChance1
         {
             get
@@ -7914,7 +7920,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.procChance1;
             }
         }
-        
+
         public ClassStat ProcChance2
         {
             get
@@ -7922,7 +7928,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.procChance2;
             }
         }
-        
+
         public ClassStat ProcChance3
         {
             get
@@ -7930,7 +7936,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.procChance3;
             }
         }
-        
+
         public ClassStat ProcChance4
         {
             get
@@ -7938,7 +7944,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.procChance4;
             }
         }
-        
+
         public ClassStat OTArmedForces
         {
             get
@@ -7946,7 +7952,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.otArmedForces;
             }
         }
-        
+
         public ClassStat ClanSentinels
         {
             get
@@ -7954,7 +7960,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanSentinels;
             }
         }
-        
+
         public ClassStat OTMed
         {
             get
@@ -7962,7 +7968,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.otMed;
             }
         }
-        
+
         public ClassStat ClanGaia
         {
             get
@@ -7970,7 +7976,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanGaia;
             }
         }
-        
+
         public ClassStat OTTrans
         {
             get
@@ -7978,7 +7984,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.otTrans;
             }
         }
-        
+
         public ClassStat ClanVanguards
         {
             get
@@ -7986,7 +7992,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanVanguards;
             }
         }
-        
+
         public ClassStat Gos
         {
             get
@@ -7994,7 +8000,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.gos;
             }
         }
-        
+
         public ClassStat OTFollowers
         {
             get
@@ -8002,7 +8008,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.otFollowers;
             }
         }
-        
+
         public ClassStat OTOperator
         {
             get
@@ -8010,7 +8016,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.otOperator;
             }
         }
-        
+
         public ClassStat OTUnredeemed
         {
             get
@@ -8018,7 +8024,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.otUnredeemed;
             }
         }
-        
+
         public ClassStat ClanDevoted
         {
             get
@@ -8026,7 +8032,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanDevoted;
             }
         }
-        
+
         public ClassStat ClanConserver
         {
             get
@@ -8034,7 +8040,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanConserver;
             }
         }
-        
+
         public ClassStat ClanRedeemed
         {
             get
@@ -8042,7 +8048,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.clanRedeemed;
             }
         }
-        
+
         public ClassStat SK
         {
             get
@@ -8050,7 +8056,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.sk;
             }
         }
-        
+
         public ClassStat LastSK
         {
             get
@@ -8058,7 +8064,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.lastSK;
             }
         }
-        
+
         public StatNextSK NextSK
         {
             get
@@ -8066,7 +8072,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.nextSK;
             }
         }
-        
+
         public ClassStat PlayerOptions
         {
             get
@@ -8074,7 +8080,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.playerOptions;
             }
         }
-        
+
         public ClassStat LastPerkResetTime
         {
             get
@@ -8082,7 +8088,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.lastPerkResetTime;
             }
         }
-        
+
         public ClassStat CurrentTime
         {
             get
@@ -8090,7 +8096,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.currentTime;
             }
         }
-        
+
         public ClassStat ShadowBreedTemplate
         {
             get
@@ -8098,7 +8104,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shadowBreedTemplate;
             }
         }
-        
+
         public ClassStat NpcVicinityFamily
         {
             get
@@ -8106,7 +8112,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcVicinityFamily;
             }
         }
-        
+
         public ClassStat NpcScriptAmsScale
         {
             get
@@ -8114,7 +8120,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcScriptAmsScale;
             }
         }
-        
+
         public ClassStat ApartmentsAllowed
         {
             get
@@ -8122,7 +8128,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.apartmentsAllowed;
             }
         }
-        
+
         public ClassStat ApartmentsOwned
         {
             get
@@ -8130,7 +8136,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.apartmentsOwned;
             }
         }
-        
+
         public ClassStat ApartmentAccessCard
         {
             get
@@ -8138,7 +8144,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.apartmentAccessCard;
             }
         }
-        
+
         public ClassStat MapAreaPart3
         {
             get
@@ -8146,7 +8152,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.mapAreaPart3;
             }
         }
-        
+
         public ClassStat MapAreaPart4
         {
             get
@@ -8154,7 +8160,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.mapAreaPart4;
             }
         }
-        
+
         public ClassStat NumberOfTeamMembers
         {
             get
@@ -8162,7 +8168,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.numberOfTeamMembers;
             }
         }
-        
+
         public ClassStat ActionCategory
         {
             get
@@ -8170,7 +8176,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.actionCategory;
             }
         }
-        
+
         public ClassStat CurrentPlayfield
         {
             get
@@ -8178,7 +8184,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.currentPlayfield;
             }
         }
-        
+
         public ClassStat DistrictNano
         {
             get
@@ -8186,7 +8192,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.districtNano;
             }
         }
-        
+
         public ClassStat DistrictNanoInterval
         {
             get
@@ -8194,7 +8200,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.districtNanoInterval;
             }
         }
-        
+
         public ClassStat UnsavedXP
         {
             get
@@ -8202,7 +8208,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.unsavedXP;
             }
         }
-        
+
         public ClassStat RegainXPPercentage
         {
             get
@@ -8210,7 +8216,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.regainXPPercentage;
             }
         }
-        
+
         public ClassStat TempSaveTeamId
         {
             get
@@ -8218,7 +8224,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.tempSaveTeamId;
             }
         }
-        
+
         public ClassStat TempSavePlayfield
         {
             get
@@ -8226,7 +8232,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.tempSavePlayfield;
             }
         }
-        
+
         public ClassStat TempSaveX
         {
             get
@@ -8234,7 +8240,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.tempSaveX;
             }
         }
-        
+
         public ClassStat TempSaveY
         {
             get
@@ -8242,7 +8248,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.tempSaveY;
             }
         }
-        
+
         public ClassStat ExtendedFlags
         {
             get
@@ -8250,7 +8256,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.extendedFlags;
             }
         }
-        
+
         public ClassStat ShopPrice
         {
             get
@@ -8258,7 +8264,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shopPrice;
             }
         }
-        
+
         public ClassStat NewbieHP
         {
             get
@@ -8266,7 +8272,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.newbieHP;
             }
         }
-        
+
         public ClassStat HPLevelUp
         {
             get
@@ -8274,7 +8280,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.hpLevelUp;
             }
         }
-        
+
         public ClassStat HPPerSkill
         {
             get
@@ -8282,7 +8288,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.hpPerSkill;
             }
         }
-        
+
         public ClassStat NewbieNP
         {
             get
@@ -8290,7 +8296,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.newbieNP;
             }
         }
-        
+
         public ClassStat NPLevelUp
         {
             get
@@ -8298,7 +8304,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npLevelUp;
             }
         }
-        
+
         public ClassStat NPPerSkill
         {
             get
@@ -8306,7 +8312,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npPerSkill;
             }
         }
-        
+
         public ClassStat MaxShopItems
         {
             get
@@ -8314,7 +8320,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.maxShopItems;
             }
         }
-        
+
         public ClassStat PlayerId
         {
             get
@@ -8322,7 +8328,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.playerId;
             }
         }
-        
+
         public ClassStat ShopRent
         {
             get
@@ -8330,7 +8336,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shopRent;
             }
         }
-        
+
         public ClassStat SynergyHash
         {
             get
@@ -8338,7 +8344,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.synergyHash;
             }
         }
-        
+
         public ClassStat ShopFlags
         {
             get
@@ -8346,7 +8352,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shopFlags;
             }
         }
-        
+
         public ClassStat ShopLastUsed
         {
             get
@@ -8354,7 +8360,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shopLastUsed;
             }
         }
-        
+
         public ClassStat ShopType
         {
             get
@@ -8362,7 +8368,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shopType;
             }
         }
-        
+
         public ClassStat LockDownTime
         {
             get
@@ -8370,7 +8376,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.lockDownTime;
             }
         }
-        
+
         public ClassStat LeaderLockDownTime
         {
             get
@@ -8378,7 +8384,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.leaderLockDownTime;
             }
         }
-        
+
         public ClassStat InvadersKilled
         {
             get
@@ -8386,7 +8392,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.invadersKilled;
             }
         }
-        
+
         public ClassStat KilledByInvaders
         {
             get
@@ -8394,7 +8400,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.killedByInvaders;
             }
         }
-        
+
         public ClassStat MissionBits10
         {
             get
@@ -8402,7 +8408,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.missionBits10;
             }
         }
-        
+
         public ClassStat MissionBits11
         {
             get
@@ -8410,7 +8416,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.missionBits11;
             }
         }
-        
+
         public ClassStat MissionBits12
         {
             get
@@ -8418,7 +8424,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.missionBits12;
             }
         }
-        
+
         public ClassStat HouseTemplate
         {
             get
@@ -8426,7 +8432,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.houseTemplate;
             }
         }
-        
+
         public ClassStat PercentFireDamage
         {
             get
@@ -8434,7 +8440,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.percentFireDamage;
             }
         }
-        
+
         public ClassStat PercentColdDamage
         {
             get
@@ -8442,7 +8448,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.percentColdDamage;
             }
         }
-        
+
         public ClassStat PercentMeleeDamage
         {
             get
@@ -8450,7 +8456,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.percentMeleeDamage;
             }
         }
-        
+
         public ClassStat PercentProjectileDamage
         {
             get
@@ -8458,7 +8464,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.percentProjectileDamage;
             }
         }
-        
+
         public ClassStat PercentPoisonDamage
         {
             get
@@ -8466,7 +8472,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.percentPoisonDamage;
             }
         }
-        
+
         public ClassStat PercentRadiationDamage
         {
             get
@@ -8474,7 +8480,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.percentRadiationDamage;
             }
         }
-        
+
         public ClassStat PercentEnergyDamage
         {
             get
@@ -8482,7 +8488,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.percentEnergyDamage;
             }
         }
-        
+
         public ClassStat PercentChemicalDamage
         {
             get
@@ -8490,7 +8496,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.percentChemicalDamage;
             }
         }
-        
+
         public ClassStat TotalDamage
         {
             get
@@ -8498,7 +8504,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.totalDamage;
             }
         }
-        
+
         public ClassStat TrackProjectileDamage
         {
             get
@@ -8506,7 +8512,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.trackProjectileDamage;
             }
         }
-        
+
         public ClassStat TrackMeleeDamage
         {
             get
@@ -8514,7 +8520,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.trackMeleeDamage;
             }
         }
-        
+
         public ClassStat TrackEnergyDamage
         {
             get
@@ -8522,7 +8528,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.trackEnergyDamage;
             }
         }
-        
+
         public ClassStat TrackChemicalDamage
         {
             get
@@ -8530,7 +8536,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.trackChemicalDamage;
             }
         }
-        
+
         public ClassStat TrackRadiationDamage
         {
             get
@@ -8538,7 +8544,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.trackRadiationDamage;
             }
         }
-        
+
         public ClassStat TrackPoisonDamage
         {
             get
@@ -8546,7 +8552,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.trackPoisonDamage;
             }
         }
-        
+
         public ClassStat TrackColdDamage
         {
             get
@@ -8554,7 +8560,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.trackColdDamage;
             }
         }
-        
+
         public ClassStat TrackFireDamage
         {
             get
@@ -8562,7 +8568,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.trackFireDamage;
             }
         }
-        
+
         public ClassStat NpcSpellArg1
         {
             get
@@ -8570,7 +8576,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcSpellArg1;
             }
         }
-        
+
         public ClassStat NpcSpellRet1
         {
             get
@@ -8578,7 +8584,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.npcSpellRet1;
             }
         }
-        
+
         public ClassStat CityInstance
         {
             get
@@ -8586,7 +8592,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.cityInstance;
             }
         }
-        
+
         public ClassStat DistanceToSpawnpoint
         {
             get
@@ -8594,7 +8600,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.distanceToSpawnpoint;
             }
         }
-        
+
         public ClassStat CityTerminalRechargePercent
         {
             get
@@ -8602,7 +8608,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.cityTerminalRechargePercent;
             }
         }
-        
+
         public ClassStat UnreadMailCount
         {
             get
@@ -8610,7 +8616,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.unreadMailCount;
             }
         }
-        
+
         public ClassStat LastMailCheckTime
         {
             get
@@ -8618,7 +8624,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.lastMailCheckTime;
             }
         }
-        
+
         public ClassStat AdvantageHash1
         {
             get
@@ -8626,7 +8632,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.advantageHash1;
             }
         }
-        
+
         public ClassStat AdvantageHash2
         {
             get
@@ -8634,7 +8640,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.advantageHash2;
             }
         }
-        
+
         public ClassStat AdvantageHash3
         {
             get
@@ -8642,7 +8648,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.advantageHash3;
             }
         }
-        
+
         public ClassStat AdvantageHash4
         {
             get
@@ -8650,7 +8656,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.advantageHash4;
             }
         }
-        
+
         public ClassStat AdvantageHash5
         {
             get
@@ -8658,7 +8664,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.advantageHash5;
             }
         }
-        
+
         public ClassStat ShopIndex
         {
             get
@@ -8666,7 +8672,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shopIndex;
             }
         }
-        
+
         public ClassStat ShopId
         {
             get
@@ -8674,7 +8680,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shopId;
             }
         }
-        
+
         public ClassStat IsVehicle
         {
             get
@@ -8682,7 +8688,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.isVehicle;
             }
         }
-        
+
         public ClassStat DamageToNano
         {
             get
@@ -8690,7 +8696,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.damageToNano;
             }
         }
-        
+
         public ClassStat AccountFlags
         {
             get
@@ -8698,7 +8704,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.accountFlags;
             }
         }
-        
+
         public ClassStat DamageToNanoMultiplier
         {
             get
@@ -8706,7 +8712,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.damageToNanoMultiplier;
             }
         }
-        
+
         public ClassStat MechData
         {
             get
@@ -8714,7 +8720,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.mechData;
             }
         }
-        
+
         public ClassStat VehicleAC
         {
             get
@@ -8722,7 +8728,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.vehicleAC;
             }
         }
-        
+
         public ClassStat VehicleDamage
         {
             get
@@ -8730,7 +8736,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.vehicleDamage;
             }
         }
-        
+
         public ClassStat VehicleHealth
         {
             get
@@ -8738,7 +8744,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.vehicleHealth;
             }
         }
-        
+
         public ClassStat VehicleSpeed
         {
             get
@@ -8746,7 +8752,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.vehicleSpeed;
             }
         }
-        
+
         public ClassStat BattlestationSide
         {
             get
@@ -8754,7 +8760,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.battlestationSide;
             }
         }
-        
+
         public ClassStat VictoryPoints
         {
             get
@@ -8762,7 +8768,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.victoryPoints;
             }
         }
-        
+
         public ClassStat BattlestationRep
         {
             get
@@ -8770,7 +8776,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.battlestationRep;
             }
         }
-        
+
         public ClassStat PetState
         {
             get
@@ -8778,7 +8784,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.petState;
             }
         }
-        
+
         public ClassStat PaidPoints
         {
             get
@@ -8786,7 +8792,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.paidPoints;
             }
         }
-        
+
         public ClassStat VisualFlags
         {
             get
@@ -8794,7 +8800,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.visualFlags;
             }
         }
-        
+
         public ClassStat PvpDuelKills
         {
             get
@@ -8802,7 +8808,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pvpDuelKills;
             }
         }
-        
+
         public ClassStat PvpDuelDeaths
         {
             get
@@ -8810,7 +8816,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pvpDuelDeaths;
             }
         }
-        
+
         public ClassStat PvpProfessionDuelKills
         {
             get
@@ -8818,7 +8824,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pvpProfessionDuelKills;
             }
         }
-        
+
         public ClassStat PvpProfessionDuelDeaths
         {
             get
@@ -8826,7 +8832,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pvpProfessionDuelDeaths;
             }
         }
-        
+
         public ClassStat PvpRankedSoloKills
         {
             get
@@ -8834,7 +8840,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pvpRankedSoloKills;
             }
         }
-        
+
         public ClassStat PvpRankedSoloDeaths
         {
             get
@@ -8842,7 +8848,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pvpRankedSoloDeaths;
             }
         }
-        
+
         public ClassStat PvpRankedTeamKills
         {
             get
@@ -8850,7 +8856,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pvpRankedTeamKills;
             }
         }
-        
+
         public ClassStat PvpRankedTeamDeaths
         {
             get
@@ -8858,7 +8864,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pvpRankedTeamDeaths;
             }
         }
-        
+
         public ClassStat PvpSoloScore
         {
             get
@@ -8866,7 +8872,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pvpSoloScore;
             }
         }
-        
+
         public ClassStat PvpTeamScore
         {
             get
@@ -8874,7 +8880,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pvpTeamScore;
             }
         }
-        
+
         public ClassStat PvpDuelScore
         {
             get
@@ -8882,7 +8888,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.pvpDuelScore;
             }
         }
-        
+
         public ClassStat AcgItemSeed
         {
             get
@@ -8890,7 +8896,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.acgItemSeed;
             }
         }
-        
+
         public ClassStat AcgItemLevel
         {
             get
@@ -8898,7 +8904,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.acgItemLevel;
             }
         }
-        
+
         public ClassStat AcgItemTemplateId
         {
             get
@@ -8906,7 +8912,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.acgItemTemplateId;
             }
         }
-        
+
         public ClassStat AcgItemTemplateId2
         {
             get
@@ -8914,7 +8920,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.acgItemTemplateId2;
             }
         }
-        
+
         public ClassStat AcgItemCategoryId
         {
             get
@@ -8922,7 +8928,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.acgItemCategoryId;
             }
         }
-        
+
         public ClassStat HasKnuBotData
         {
             get
@@ -8930,7 +8936,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.hasKnuBotData;
             }
         }
-        
+
         public ClassStat QuestBoothDifficulty
         {
             get
@@ -8938,7 +8944,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.questBoothDifficulty;
             }
         }
-        
+
         public ClassStat QuestAsMinimumRange
         {
             get
@@ -8946,7 +8952,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.questAsMinimumRange;
             }
         }
-        
+
         public ClassStat QuestAsMaximumRange
         {
             get
@@ -8954,7 +8960,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.questAsMaximumRange;
             }
         }
-        
+
         public ClassStat VisualLodLevel
         {
             get
@@ -8962,7 +8968,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.visualLodLevel;
             }
         }
-        
+
         public ClassStat TargetDistanceChange
         {
             get
@@ -8970,7 +8976,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.targetDistanceChange;
             }
         }
-        
+
         public ClassStat TideRequiredDynelId
         {
             get
@@ -8978,7 +8984,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.tideRequiredDynelId;
             }
         }
-        
+
         public ClassStat StreamCheckMagic
         {
             get
@@ -8986,7 +8992,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.streamCheckMagic;
             }
         }
-        
+
         public ClassStat ObjectType
         {
             get
@@ -8994,7 +9000,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.objectType;
             }
         }
-        
+
         public ClassStat Instance
         {
             get
@@ -9002,7 +9008,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.instance;
             }
         }
-        
+
         public ClassStat WeaponsStyle
         {
             get
@@ -9010,7 +9016,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.weaponsStyle;
             }
         }
-        
+
         public ClassStat ShoulderMeshRight
         {
             get
@@ -9018,7 +9024,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shoulderMeshRight;
             }
         }
-        
+
         public ClassStat ShoulderMeshLeft
         {
             get
@@ -9026,7 +9032,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.shoulderMeshLeft;
             }
         }
-        
+
         public ClassStat WeaponMeshRight
         {
             get
@@ -9034,7 +9040,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.weaponMeshRight;
             }
         }
-        
+
         public ClassStat WeaponMeshLeft
         {
             get
@@ -9042,7 +9048,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.weaponMeshLeft;
             }
         }
-        
+
         public ClassStat OverrideTextureHead
         {
             get
@@ -9050,7 +9056,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.overrideTextureHead;
             }
         }
-        
+
         public ClassStat OverrideTextureWeaponRight
         {
             get
@@ -9058,7 +9064,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.overrideTextureWeaponRight;
             }
         }
-        
+
         public ClassStat OverrideTextureWeaponLeft
         {
             get
@@ -9066,7 +9072,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.overrideTextureWeaponLeft;
             }
         }
-        
+
         public ClassStat OverrideTextureShoulderpadRight
         {
             get
@@ -9074,7 +9080,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.overrideTextureShoulderpadRight;
             }
         }
-        
+
         public ClassStat OverrideTextureShoulderpadLeft
         {
             get
@@ -9082,7 +9088,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.overrideTextureShoulderpadLeft;
             }
         }
-        
+
         public ClassStat OverrideTextureBack
         {
             get
@@ -9090,7 +9096,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.overrideTextureBack;
             }
         }
-        
+
         public ClassStat OverrideTextureAttractor
         {
             get
@@ -9098,7 +9104,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.overrideTextureAttractor;
             }
         }
-        
+
         public ClassStat WeaponStyleLeft
         {
             get
@@ -9106,7 +9112,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.weaponStyleLeft;
             }
         }
-            
+
         public ClassStat WeaponStyleRight
         {
             get
@@ -9114,7 +9120,7 @@ namespace ZoneEngine.GameObject.Stats
                 return this.weaponStyleRight;
             }
         }
-                    
+
         public List<ClassStat> All
         {
             get
@@ -9122,11 +9128,11 @@ namespace ZoneEngine.GameObject.Stats
                 return this.all;
             }
         }
-                    
+
         #endregion
-                
+
         #region SetAbilityTricklers
-                    
+
         public void SetAbilityTricklers()
         {
             for (int c = 0; c < SkillTrickleTable.table.Length / 7; c++)
@@ -9158,11 +9164,11 @@ namespace ZoneEngine.GameObject.Stats
                 }
             }
         }
-                
+
         #endregion
-                    
+
         #region Get Stat object by number
-                
+
         public ClassStat GetStatbyNumber(int number)
         {
             foreach (ClassStat c in this.all)
@@ -9175,31 +9181,37 @@ namespace ZoneEngine.GameObject.Stats
             }
             return null;
         }
-        
+
         #endregion
-        
+
         #region Announce Statchange to player(s)
-        
+
         public void Send(object sender, StatChangedEventArgs e)
         {
-            if (!((Character)((ClassStat)sender).Parent).DoNotDoTimers)
+            if (!(((ClassStat)sender).Parent).DoNotDoTimers)
             {
+                var messageBody = new SmokeLounge.AOtomation.Messaging.Messages.N3Messages.SetStatMessage();
+                messageBody.Stat = (SmokeLounge.AOtomation.Messaging.GameData.CharacterStat)e.Stat.StatNumber;
+
+                messageBody.Value = (int)e.NewValue;
+                messageBody.Identity = e.Stat.Parent.Identity;
                 if (e.Stat.SendBaseValue)
                 {
-                    Message((Character)e.Stat.Parent).Client.SendToPlayfield(((Character)e.Stat.Parent).Client, e.Stat.StatNumber, e.NewValue, e.AnnounceToPlayfield);
+                    ((Character)e.Stat.Parent).Send(messageBody, e.AnnounceToPlayfield);
                 }
                 else
                 {
-                    Stat.Send(((Character)e.Stat.Parent).Client, e.Stat.StatNumber, e.NewValue, e.AnnounceToPlayfield);
+
+                    ((Character)e.Stat.Parent).Send(messageBody, e.AnnounceToPlayfield);
                 }
                 e.Stat.Changed = false;
             }
         }
-        
+
         #endregion
-        
+
         #region Access Stat by number
-            
+
         /// <summary>
         /// Returns Stat's value
         /// </summary>
@@ -9217,7 +9229,7 @@ namespace ZoneEngine.GameObject.Stats
             }
             throw new StatDoesNotExistException("Stat " + number + " does not exist.\r\nMethod: Get");
         }
-        
+
         /// <summary>
         /// Sets Stat's value
         /// </summary>
@@ -9237,11 +9249,11 @@ namespace ZoneEngine.GameObject.Stats
             throw new StatDoesNotExistException(
                 "Stat " + number + " does not exist.\r\nValue: " + newValue + "\r\nMethod: Set");
         }
-        
+
         #endregion
-        
+
         #region Access Stat by name
-            
+
         /// <summary>
         /// Returns Stat's value
         /// </summary>
@@ -9260,7 +9272,7 @@ namespace ZoneEngine.GameObject.Stats
             }
             throw new StatDoesNotExistException("Stat " + name + " does not exist.\r\nMethod: Get");
         }
-                
+
         /// <summary>
         /// Sets Stat's value
         /// </summary>
@@ -9281,7 +9293,7 @@ namespace ZoneEngine.GameObject.Stats
             throw new StatDoesNotExistException(
                 "Stat " + statName + " does not exist.\r\nValue: " + newValue + "\r\nMethod: GetID");
         }
-            
+
         public int StatIdByName(string statName)
         {
             int statid = StatsList.GetStatId(statName.ToLower());
@@ -9295,16 +9307,17 @@ namespace ZoneEngine.GameObject.Stats
             }
             throw new StatDoesNotExistException("Stat " + statName + " does not exist.\r\nMethod: GetID");
         }
-                
+
         #endregion
-                
+
         #region Read all Stats from Sql
-            
+
         /// <summary>
         /// Read all stats from Sql
         /// </summary>
         public void ReadStatsfromSql()
         {
+            /* TODO: Redo
             SqlWrapper sql = new SqlWrapper();
             DataTable dt =
                 sql.ReadDatatable(
@@ -9314,8 +9327,9 @@ namespace ZoneEngine.GameObject.Stats
             {
                 this.SetBaseValue((Int32)row[0], (UInt32)((Int32)row[1]));
             }
+             */
         }
-            
+
         /// <summary>
         /// Write all Stats to Sql
         /// </summary>
@@ -9330,7 +9344,7 @@ namespace ZoneEngine.GameObject.Stats
                 c.WriteStatToSql(true);
             }
         }
-                
+
         #endregion
 
         #region Get/Set Stat Modifier
@@ -9347,7 +9361,7 @@ namespace ZoneEngine.GameObject.Stats
             }
             throw new StatDoesNotExistException("Stat " + stat + " does not exist.\r\nMethod: GetModifier");
         }
-        
+
         public void SetModifier(int stat, int value)
         {
             foreach (ClassStat c in this.all)
@@ -9362,11 +9376,11 @@ namespace ZoneEngine.GameObject.Stats
             throw new StatDoesNotExistException(
                 "Stat " + stat + " does not exist.\r\nValue: " + value + "\r\nMethod: SetModifier");
         }
-        
+
         #endregion
-        
+
         #region Get/Set Stat Percentage Modifier
-        
+
         public int GetPercentageModifier(int stat)
         {
             foreach (ClassStat c in this.all)
@@ -9394,11 +9408,11 @@ namespace ZoneEngine.GameObject.Stats
             throw new StatDoesNotExistException(
                 "Stat " + stat + " does not exist.\r\nValue: " + value + "\r\nMethod: SetPercentageModifier");
         }
-        
+
         #endregion
-        
+
         #region Get/Set Stat Base Value
-        
+
         public uint GetBaseValue(int stat)
         {
             foreach (ClassStat c in this.all)
@@ -9411,7 +9425,7 @@ namespace ZoneEngine.GameObject.Stats
             }
             throw new StatDoesNotExistException("Stat " + stat + " does not exist.\r\nMethod: GetBaseValue");
         }
-        
+
         public void SetBaseValue(int stat, uint value)
         {
             foreach (ClassStat c in this.all)
@@ -9429,9 +9443,9 @@ namespace ZoneEngine.GameObject.Stats
         }
 
         #endregion
-        
+
         #region Clear Modifiers for recalculation
-            
+
         public void ClearModifiers()
         {
             foreach (ClassStat c in this.all)
@@ -9441,11 +9455,11 @@ namespace ZoneEngine.GameObject.Stats
                 c.Trickle = 0;
             }
         }
-                
+
         #endregion
-                
+
         #region Set Trickle values
-                
+
         public void SetTrickle(int statId, int value)
         {
             foreach (ClassStat c in this.all)
@@ -9459,11 +9473,11 @@ namespace ZoneEngine.GameObject.Stats
             }
             throw new StatDoesNotExistException("Stat " + statId + " does not exist.\r\nMethod: Trickle");
         }
-            
+
         #endregion
-            
+
         #region send stat value by ID
-    
+
         public void Send(Client client, int statId)
         {
             foreach (ClassStat c in this.all)
@@ -9481,7 +9495,10 @@ namespace ZoneEngine.GameObject.Stats
                 {
                     val = c.Value;
                 }
+
+                /* TODO: Redo
                 Stat.Send(client, statId, val, c.AnnounceToPlayfield);
+                 */
                 return;
             }
 

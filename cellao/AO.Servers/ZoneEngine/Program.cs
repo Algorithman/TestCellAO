@@ -37,6 +37,7 @@ namespace ZoneEngine
     using System.Net;
     using System.Threading.Tasks;
     using AO.Core;
+    using MySql.Data.MySqlClient;
     using ZoneEngine.Collision;
     using ZoneEngine.CoreClient;
     using ZoneEngine.CoreServer;
@@ -62,7 +63,7 @@ namespace ZoneEngine
         static void Main(string[] args)
         {
             bool processedargs = false;
-
+            
             #region NLog
             
             LoggingConfiguration config = new LoggingConfiguration();
@@ -89,9 +90,9 @@ namespace ZoneEngine
             //TODO: ADD More Handlers.
             
             #endregion
-          
+            
             #region Console Text...
-                            
+            
             Console.Title = "CellAO " + AssemblyInfoclass.Title + " Console. Version: " + AssemblyInfoclass.Description +
                             " " + AssemblyInfoclass.AssemblyVersion + " " + AssemblyInfoclass.Trademark;
             
@@ -127,7 +128,7 @@ namespace ZoneEngine
                 Console.ReadKey();
                 return;
             }
-
+            
             #region Console Commands...
             
             string consoleCommand;
@@ -287,12 +288,14 @@ namespace ZoneEngine
                 }
                 */
                 Console.ForegroundColor = ConsoleColor.Green;
+                /* TODO: Readd when necessary classes are done again
                 Console.WriteLine("Loaded {0} items", ItemHandler.CacheAllItems());
                 Console.WriteLine("Loaded {0} nanos", NanoHandler.CacheAllNanos());
                 Console.WriteLine("Loaded {0} spawns", NonPlayerCharacterHandler.CacheAllFromDB());
                 Console.WriteLine("Loaded {0} vendors", VendorHandler.CacheAllFromDB());
                 Console.WriteLine("Loaded {0} teleports", DoorHandler.CacheAllFromDB());
                 Console.WriteLine("Loaded {0} statels", Statels.CacheAllStatels());
+                */
                 
                 /* Same as above
                 LootHandler.CacheAllFromDB();
@@ -314,7 +317,6 @@ namespace ZoneEngine
                 logfile.WriteLine(current + " " + e.Source + " Exception: " + e.Message);
                 logfile.Close();
                 zoneServer.Stop();
-                ThreadMgr.Stop();
                 Process.GetCurrentProcess().Kill();
             }
         }

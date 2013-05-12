@@ -9,6 +9,7 @@ namespace ZoneEngine.CoreClient
     using NiceHexOutput;
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+    using ZoneEngine.CoreServer;
     using ZoneEngine.GameObject;
 
     public class Client : ClientBase
@@ -23,6 +24,14 @@ namespace ZoneEngine.CoreClient
         private ushort packetNumber = 1;
 
         private readonly Character character = new Character();
+
+        private ZoneServer server
+        {
+            get
+            {
+                return (ZoneServer)_server;
+            }
+        }
 
         #region Public Properties
 
@@ -136,14 +145,14 @@ namespace ZoneEngine.CoreClient
                 Header =
                     new Header
                     {
-                        MessageId = packetNumber,
+                        MessageId = this.packetNumber,
                         PacketType = messageBody.PacketType,
                         Unknown = 0x0001,
                         Sender = 0x00000001,
                         Receiver = receiver
                     }
             };
-            packetNumber++;
+            this.packetNumber++;
             var buffer = this.messageSerializer.Serialize(message);
 
             /* Uncomment for Debug outgoing Messages
@@ -166,10 +175,26 @@ namespace ZoneEngine.CoreClient
 
             ChatTextMessage chatTextMessage = new ChatTextMessage();
             chatTextMessage.Text = text;
-            Send(character.Identity.Instance, chatTextMessage);
+            this.Send(this.character.Identity.Instance, chatTextMessage);
 
-            
             throw new NotImplementedException("SendChatText not implemented yet");
+        }
+
+        public void SendToPlayfield(Message message, bool announceToPlayfield)
+        {
+            foreach (Client client in server.Clients)
+            {
+                if (client.Character.Playfield != this.Character.Playfield)
+                {
+                    continue;
+                }
+                if (client.Character.Identity.Instance == this.Character.Identity.Instance)
+                {
+                    continue;
+                }
+                // TODO: pass it over to the normal Send
+
+            }
         }
     }
 }

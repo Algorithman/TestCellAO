@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cell.Core;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using ZoneEngine.GameObject.Enums;
 
@@ -8,6 +9,16 @@ namespace ZoneEngine.GameObject
     public class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner, IAOEvents, IAOActions, IInstancedEntity
     {
         protected MoveModes moveMode = MoveModes.None;
+
+        protected IClient client;
+
+        public IClient Client
+        {
+            get
+            {
+                return this.client;
+            }
+        }
 
         public MoveModes MoveMode
         {
@@ -56,6 +67,11 @@ namespace ZoneEngine.GameObject
                 // TODO: Implement this property getter
                 throw new NotImplementedException();
             }
+        }
+
+        internal void Send(SmokeLounge.AOtomation.Messaging.Messages.MessageBody message, bool announceToPlayfield)
+        {
+            throw new NotImplementedException();
         }
     }
 }

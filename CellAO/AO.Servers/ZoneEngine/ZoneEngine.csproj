@@ -56,6 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CharacterStats.cs" />
     <Compile Include="Component\ClientFactory.cs" />
     <Compile Include="GameObject\Items\AOItem.cs" />
     <Compile Include="AssemblyInfoclass.cs" />
