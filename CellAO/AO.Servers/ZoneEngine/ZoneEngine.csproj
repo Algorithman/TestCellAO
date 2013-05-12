@@ -43,6 +43,7 @@
       <HintPath>..\..\packages\NLog.2.0.1.2\lib\net40\NLog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -51,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Component\ClientFactory.cs" />
     <Compile Include="GameObject\Items\AOItem.cs" />
     <Compile Include="AssemblyInfoclass.cs" />
     <Compile Include="GameObject\Corpse.cs" />
@@ -100,6 +102,7 @@
     <Compile Include="Script\ScriptCompiler.cs" />
     <Compile Include="GameObject\Statel.cs" />
     <Compile Include="GameObject\VendorShop.cs" />
+    <Compile Include="ZoneServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config.xml">

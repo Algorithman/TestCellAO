@@ -11,6 +11,7 @@ namespace ZoneEngine.GameObject
     {
         protected DynelStats stats;
 
+        public bool Starting = true;
 
         public Dynel()
         {
