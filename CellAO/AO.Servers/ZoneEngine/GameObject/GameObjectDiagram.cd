@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
   <Class Name="ZoneEngine.GameObject.GameObject">
-    <Position X="5.25" Y="0.5" Width="1.5" />
+    <Position X="6.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\GameObject.cs</FileName>
@@ -40,7 +40,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ZoneEngine.GameObject.Statel">
-    <Position X="9.75" Y="2" Width="1.5" />
+    <Position X="12" Y="2" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\Statel.cs</FileName>
@@ -54,7 +54,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="ZoneEngine.GameObject.VendorShop">
-    <Position X="7.5" Y="2" Width="1.5" />
+    <Position X="9.75" Y="2" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\VendorShop.cs</FileName>
@@ -62,7 +62,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ZoneEngine.GameObject.Corpse">
-    <Position X="6.5" Y="3.5" Width="1.5" />
+    <Position X="7.5" Y="2" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\Corpse.cs</FileName>
@@ -70,52 +70,59 @@
     <Lollipop Position="0.2" />
   </Class>
   <Interface Name="ZoneEngine.GameObject.IEntity">
-    <Position X="3.5" Y="6.5" Width="1.5" />
+    <Position X="3.25" Y="6.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\IEntity.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.GameObject.IInstancedEntity">
-    <Position X="3.5" Y="8" Width="1.5" />
+    <Position X="3.25" Y="8" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\IInstancedEntity.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.GameObject.INamedEntity">
-    <Position X="3.5" Y="9.75" Width="1.5" />
+    <Position X="3.25" Y="9.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\INamedEntity.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.GameObject.IPacketReceivingEntity" Collapsed="true">
-    <Position X="14" Y="0.5" Width="1.5" />
+    <Position X="18" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\IPacketReceivingEntity.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.GameObject.ISummoner" Collapsed="true">
-    <Position X="14" Y="1.25" Width="1.5" />
+    <Position X="16.25" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\ISummoner.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.GameObject.IStats" Collapsed="true">
-    <Position X="12.25" Y="1.25" Width="1.5" />
+    <Position X="14.5" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>ABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\IStats.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.IInventory" Collapsed="true">
-    <Position X="12.25" Y="0.5" Width="1.5" />
+    <Position X="14.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\IInventory.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="ZoneEngine.GameObject.ILootInventory" Collapsed="true">
+    <Position X="16.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>GameObject\ILootInventory.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Font Name="Segoe UI" Size="9" />
