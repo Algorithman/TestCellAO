@@ -58,10 +58,12 @@ namespace ZoneEngine.GameObject.Stats
 
                 character.Stats.HealInterval.StatBaseValue = (uint)healinterval; // Healinterval
 
+                /* TODO: Create Timed Queue for this stuff
+                 * TODO: Create AOFunctions properly
                 character.PurgeTimer(0);
                 AOFunctions aof = new AOFunctions();
                 character.AddTimer(0, DateTime.Now + TimeSpan.FromSeconds(healinterval * 1000), aof, true);
-
+                */
                 int sitBonusInterval = 0;
                 int healDelta = character.Stats.HealDelta.Value;
                 if (character.MoveMode == MoveModes.Sit)
@@ -71,6 +73,7 @@ namespace ZoneEngine.GameObject.Stats
                     healDelta = healDelta + healDelta2;
                 }
 
+                /*
                 character.PurgeTimer(0);
                 AOTimers at = new AOTimers();
                 at.Strain = 0;
@@ -85,7 +88,7 @@ namespace ZoneEngine.GameObject.Stats
                 at.Function.Arguments.Values.Add(healDelta);
                 at.Function.Arguments.Values.Add(0);
                 character.Timers.Add(at);
-
+                */
                 if (!this.Parent.Starting)
                 {
                     this.AffectStats();

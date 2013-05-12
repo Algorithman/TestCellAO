@@ -22,44 +22,47 @@
 // 
   
 using System;
+using AO.Core.Components;
 using NBug;
 using NBug.Properties;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
-using System.Threading.Tasks;
-using AO.Core.Components;
 
 namespace ZoneEngine
 {
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Net;
     using System.Threading.Tasks;
     using AO.Core;
     using ZoneEngine.Collision;
     using ZoneEngine.CoreClient;
     using ZoneEngine.CoreServer;
     using ZoneEngine.Script;
+    using Config = AO.Core.Config.ConfigReadWrite;
 
     class Program
     {
         #region Static Fields
-
+        
         private static readonly
         IContainer Container = new MefContainer();
-
+        
         private static
         ZoneServer zoneServer;
-
+        
         #endregion
-
+        
         public static WallCollision ZoneBorderHandler = new WallCollision();
-
+        
         public static ScriptCompiler csc;
-
+        
         static void Main(string[] args)
         {
+            bool processedargs = false;
+
             #region NLog
             
             LoggingConfiguration config = new LoggingConfiguration();
@@ -86,33 +89,11 @@ namespace ZoneEngine
             //TODO: ADD More Handlers.
             
             #endregion
-
-            ZoneServer = Container.GetInstance<ZoneServer>();
-            bool TCPEnable = true;
-            bool UDPEnable = false;
-            int Port = Convert.ToInt32(Config.Instance.CurrentConfig.ZonePort);
-            try
-            {
-                if (Config.Instance.CurrentConfig.ListenIP == "0.0.0.0")
-                {
-                    ZoneServer.TcpEndPoint = new IPEndPoint(IPAddress.Any, Port);
-                }
-                else
-                {
-                    ZoneServer.TcpIP = IPAddress.Parse(Config.Instance.CurrentConfig.ListenIP);
-                }
-            }
-            catch
-            {
-                ct.TextRead("ip_config_parse_error.txt");
-                Console.ReadKey();
-                return;
-            }
-           
+          
             #region Console Text...
-            
+                            
             Console.Title = "CellAO " + AssemblyInfoclass.Title + " Console. Version: " + AssemblyInfoclass.Description +
-                    " " + AssemblyInfoclass.AssemblyVersion + " " + AssemblyInfoclass.Trademark;
+                            " " + AssemblyInfoclass.AssemblyVersion + " " + AssemblyInfoclass.Trademark;
             
             ConsoleText ct = new ConsoleText();
             ct.TextRead("main.txt");
@@ -125,6 +106,28 @@ namespace ZoneEngine
             
             #endregion
             
+            zoneServer = Container.GetInstance<ZoneServer>();
+            bool TCPEnable = true;
+            bool UDPEnable = false;
+            int Port = Convert.ToInt32(Config.Instance.CurrentConfig.ZonePort);
+            try
+            {
+                if (Config.Instance.CurrentConfig.ListenIP == "0.0.0.0")
+                {
+                    zoneServer.TcpEndPoint = new IPEndPoint(IPAddress.Any, Port);
+                }
+                else
+                {
+                    zoneServer.TcpIP = IPAddress.Parse(Config.Instance.CurrentConfig.ListenIP);
+                }
+            }
+            catch
+            {
+                ct.TextRead("ip_config_parse_error.txt");
+                Console.ReadKey();
+                return;
+            }
+
             #region Console Commands...
             
             string consoleCommand;
@@ -185,7 +188,6 @@ namespace ZoneEngine
                             break;
                         }
                         zoneServer.Stop();
-                        ThreadMgr.Stop();
                         break;
                     case "check":
                     case "updatedb":
@@ -200,7 +202,6 @@ namespace ZoneEngine
                         if (zoneServer.Running)
                         {
                             zoneServer.Stop();
-                            ThreadMgr.Stop();
                         }
                         Process.GetCurrentProcess().Kill();
                         break;
@@ -266,24 +267,25 @@ namespace ZoneEngine
             try
             {
                 Console.ForegroundColor = ConsoleColor.Green;
+                /* TODO: Readd the things, Algorithman
                 zoneServer.Monsters = new List<NonPlayerCharacterClass>();
                 zoneServer.Vendors = new List<VendingMachine>();
                 zoneServer.Doors = new List<Doors>();
                 
                 using (SqlWrapper sqltester = new SqlWrapper())
                 {
-                    if (sqltester.SQLCheck() != SqlWrapper.DBCheckCodes.DBC_ok)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Database setup not correct");
-                        Console.WriteLine("Error: #" + sqltester.lasterrorcode + " - " + sqltester.lasterrormessage);
-                        Console.WriteLine("Please press Enter to exit.");
-                        Console.ReadLine();
-                        Process.GetCurrentProcess().Kill();
-                    }
-                    sqltester.CheckDBs();
+                if (sqltester.SQLCheck() != SqlWrapper.DBCheckCodes.DBC_ok)
+                {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Database setup not correct");
+                Console.WriteLine("Error: #" + sqltester.lasterrorcode + " - " + sqltester.lasterrormessage);
+                Console.WriteLine("Please press Enter to exit.");
+                Console.ReadLine();
+                Process.GetCurrentProcess().Kill();
                 }
-                
+                sqltester.CheckDBs();
+                }
+                */
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Loaded {0} items", ItemHandler.CacheAllItems());
                 Console.WriteLine("Loaded {0} nanos", NanoHandler.CacheAllNanos());
@@ -292,14 +294,14 @@ namespace ZoneEngine
                 Console.WriteLine("Loaded {0} teleports", DoorHandler.CacheAllFromDB());
                 Console.WriteLine("Loaded {0} statels", Statels.CacheAllStatels());
                 
+                /* Same as above
                 LootHandler.CacheAllFromDB();
                 Tradeskill.CacheItemNames();
-                
+                */
                 csc.AddScriptMembers();
                 csc.CallMethod("Init", null);
                 
-                ThreadMgr.Start();
-                zoneServer.Start();
+                zoneServer.Start(true, false);
                 Console.ResetColor();
             }
             catch (MySqlException e)

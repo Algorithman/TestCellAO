@@ -57,17 +57,18 @@ namespace ZoneEngine.GameObject.Stats
                                     2);
                 character.Stats.NanoInterval.StatBaseValue = (uint)nanoInterval; // Healinterval
                 
+                /* TODO Add Proper Timers w/e is in the other file too
                 character.PurgeTimer(1);
                 AOTimers at = new AOTimers();
                 at.Strain = 1;
-                
+                */
                 int nanoDelta = character.Stats.NanoDelta.Value;
                 if (character.MoveMode == MoveModes.Sit)
                 {
                     int nanoDelta2 = nanoDelta >> 1;
                     nanoDelta = nanoDelta + nanoDelta2;
                 }
-                
+                /*
                 at.Timestamp = DateTime.Now + TimeSpan.FromSeconds(character.Stats.NanoInterval.Value);
                 at.Function.Target = this.Parent.Identity.Instance; // changed from ItemHandler.itemtarget_self;
                 at.Function.TickCount = -2;
@@ -78,7 +79,7 @@ namespace ZoneEngine.GameObject.Stats
                 at.Function.Arguments.Values.Add(nanoDelta);
                 at.Function.Arguments.Values.Add(0);
                 character.Timers.Add(at);
-                    
+                  */  
                 if (!this.Parent.Starting)
                 {
                     this.AffectStats();

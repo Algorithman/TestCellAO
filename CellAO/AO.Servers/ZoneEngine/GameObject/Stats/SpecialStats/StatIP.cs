@@ -83,8 +83,9 @@ namespace ZoneEngine.GameObject.Stats
                 }
                 baseIP += 1500 + (characterLevel - 1) * 4000;
 
+                /* TODO: Readd SkillUpdate
                 this.Set(baseIP - Convert.ToInt32(SkillUpdate.CalculateIP(this.Parent)));
-
+                */
                 if (!this.Parent.Starting)
                 {
                     this.AffectStats();

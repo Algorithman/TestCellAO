@@ -136,7 +136,7 @@ namespace ZoneEngine.CoreClient
                 Header =
                     new Header
                     {
-                        MessageId = (short)packetNumber,
+                        MessageId = packetNumber,
                         PacketType = messageBody.PacketType,
                         Unknown = 0x0001,
                         Sender = 0x00000001,

@@ -145,7 +145,7 @@ namespace LoginEngine.CoreClient
                 Header =
                     new Header
                     {
-                        MessageId = BitConverter.ToInt16(new byte[] { 0xDF, 0xDF }, 0),
+                        MessageId = BitConverter.ToUInt16(new byte[] { 0xDF, 0xDF }, 0),
                         PacketType = messageBody.PacketType,
                         Unknown = 0x0001,
                         Sender = 0x00000001,
