@@ -3,14 +3,12 @@
 namespace ZoneEngine.CoreClient
 {
     using System.Globalization;
-
     using AO.Core.Components;
     using AO.Core.Events;
-
     using Cell.Core;
     using NiceHexOutput;
-
     using SmokeLounge.AOtomation.Messaging.Messages;
+    using ZoneEngine.GameObject;
 
     public class Client : ClientBase
     {
@@ -24,6 +22,8 @@ namespace ZoneEngine.CoreClient
         private ushort packetNumber = 1;
 
         private string serverSalt = string.Empty;
+
+        private Character character = new Character();
 
         #region Public Properties
 

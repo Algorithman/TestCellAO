@@ -26,8 +26,6 @@ namespace ZoneEngine.GameObject.Stats
 {
     using System;
 
-    using ZoneEngine.PacketHandlers;
-
     public class StatIP : ClassStat
     {
         public StatIP(

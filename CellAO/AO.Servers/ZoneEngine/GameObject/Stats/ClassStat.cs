@@ -29,6 +29,7 @@ namespace ZoneEngine.GameObject.Stats
     using System.Data;
 
     using AO.Core;
+    using ZoneEngine.CoreClient;
 
 
     #region StatChangedEventArgs
@@ -361,7 +362,7 @@ namespace ZoneEngine.GameObject.Stats
     #endregion
 
     #region Character_Stats holder for Character's stats
-    public class CharacterStats
+    public class DynelStats
     {
         #region stats creation
         private readonly ClassStat flags = new ClassStat(0, 8917569, "Flags", false, false, true);
@@ -2000,7 +2001,7 @@ namespace ZoneEngine.GameObject.Stats
         /// Class for character's stats
         /// </summary>
         /// <param name="parent">Stat's owner (Character or derived class)</param>
-        public CharacterStats(Character parent)
+        public DynelStats(Dynel parent)
         {
             #region Add stats to list
             this.all.Add(this.flags);

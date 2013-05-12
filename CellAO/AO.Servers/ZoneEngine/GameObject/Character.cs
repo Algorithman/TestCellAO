@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ZoneEngine.GameObject.Stats;
 
 namespace ZoneEngine.GameObject
 {
-    public class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner, IStats
+    public class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner
     {
+
     }
 }
