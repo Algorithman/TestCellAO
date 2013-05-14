@@ -6,11 +6,15 @@ using ZoneEngine.GameObject.Enums;
 
 namespace ZoneEngine.GameObject
 {
+    using System.Diagnostics.Contracts;
+
     public class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner, IAOEvents, IAOActions, IInstancedEntity
     {
         protected MoveModes moveMode = MoveModes.None;
 
         protected IClient client;
+
+        protected IList<Pet> pets = new List<Pet>();
 
         public IClient Client
         {
@@ -50,11 +54,15 @@ namespace ZoneEngine.GameObject
         {
             get
             {
+                Contract.Ensures(Name != null, "Name is Null");
+                Contract.Ensures(Name != "", "No name set");
                 // TODO: Implement this property getter
                 throw new NotImplementedException();
             }
             set
             {
+                Contract.Requires(value != null);
+                Contract.Requires(value != "");
                 // TODO: Implement this property setter
                 throw new NotImplementedException();
             }
@@ -64,8 +72,7 @@ namespace ZoneEngine.GameObject
         {
             get
             {
-                // TODO: Implement this property getter
-                throw new NotImplementedException();
+                return pets;
             }
         }
 
