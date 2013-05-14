@@ -1,21 +1,68 @@
-﻿using System;
-using System.Collections.Generic;
-using Cell.Core;
-using SmokeLounge.AOtomation.Messaging.GameData;
-using ZoneEngine.GameObject.Enums;
+﻿#region License
+
+// Copyright (c) 2005-2013, CellAO Team
+// 
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// 
+//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
 
 namespace ZoneEngine.GameObject
 {
-    using System.Diagnostics.Contracts;
+    #region Usings ...
 
+    using System;
+    using System.Collections.Generic;
+
+    using Cell.Core;
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
+
+    using ZoneEngine.GameObject.Enums;
+
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner, IAOEvents, IAOActions
     {
-        protected MoveModes moveMode = MoveModes.None;
+        #region Fields
 
+        /// <summary>
+        /// </summary>
         protected IClient client;
 
+        /// <summary>
+        /// </summary>
+        protected MoveModes moveMode = MoveModes.None;
+
+        /// <summary>
+        /// </summary>
         protected IList<Pet> pets = new List<Pet>();
 
+        #endregion
+
+        #region Public Properties
+
+        /// <summary>
+        /// </summary>
         public IClient Client
         {
             get
@@ -24,32 +71,27 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public MoveModes MoveMode
         {
             get
             {
                 return this.moveMode;
             }
+
             set
             {
                 throw new NotImplementedException();
             }
         }
 
-        public Identity Playfield
-        {
-            get
-            {
-                // TODO: Implement this property getter
-                throw new NotImplementedException();
-            }
-            set
-            {
-                // TODO: Implement this property setter
-                throw new NotImplementedException();
-            }
-        }
-
+        /// <summary>
+        /// </summary>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public string Name
         {
             get
@@ -57,6 +99,7 @@ namespace ZoneEngine.GameObject
                 // TODO: Implement this property getter
                 throw new NotImplementedException();
             }
+
             set
             {
                 // TODO: Implement this property setter
@@ -64,17 +107,50 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        /// <summary>
+        /// </summary>
         public IList<Pet> Pets
         {
             get
             {
-                return pets;
+                return this.pets;
             }
         }
 
-        internal void Send(SmokeLounge.AOtomation.Messaging.Messages.MessageBody message, bool announceToPlayfield)
+        /// <summary>
+        /// </summary>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public Identity Playfield
+        {
+            get
+            {
+                // TODO: Implement this property getter
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                // TODO: Implement this property setter
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// </summary>
+        /// <param name="message">
+        /// </param>
+        /// <param name="announceToPlayfield">
+        /// </param>
+        internal void Send(MessageBody message, bool announceToPlayfield)
         {
             this.client.SendCompressed(message);
         }
+
+        #endregion
     }
 }

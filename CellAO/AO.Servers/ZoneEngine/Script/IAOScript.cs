@@ -1,7 +1,6 @@
-﻿
-#region License
+﻿#region License
 
-// Copyright (c) 2005-2012, CellAO Team
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -22,34 +21,26 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-#endregion
-
-#region Usings...
-
 #endregion
 
 #region NameSpace
-    
+
 namespace ZoneEngine.Script
 {
+
     #region Class AoScript
-    
+
     /// <summary>
     /// The Class in charge of printing information to our consoles
     /// </summary>
     public interface IAOScript
     {
-        #region Fields
-        
-        #endregion
-    
-        #region Properties
+        #region Public Methods and Operators
 
-        #endregion
-
-        #region Script Entry
-
+        /// <summary>
+        /// </summary>
+        /// <param name="args">
+        /// </param>
         void Main(string[] args);
 
         #endregion

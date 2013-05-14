@@ -69,6 +69,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MsgPack">
+      <HintPath>..\..\packages\MsgPack.Cli.0.3.1\lib\net40-client\MsgPack.dll</HintPath>
+    </Reference>
     <Reference Include="MySql.Data, Version=6.2.3.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\1 CellAO NEW\CellAO\Libraries\Binaries\Mysql\MySql.Data.dll</HintPath>
@@ -91,8 +94,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CharacterStats.cs" />
+    <Compile Include="GameObject\Stats\CharacterStats.cs" />
     <Compile Include="Component\ClientFactory.cs" />
+    <Compile Include="GameObject\Items\AOEvents.cs" />
+    <Compile Include="GameObject\Items\AOFunctionArguments.cs" />
+    <Compile Include="GameObject\Items\AOFunctions.cs" />
     <Compile Include="GameObject\Items\AOItem.cs" />
     <Compile Include="AssemblyInfoclass.cs" />
     <Compile Include="GameObject\Corpse.cs" />
@@ -107,6 +113,7 @@
     <Compile Include="GameObject\INamedEntity.cs" />
     <Compile Include="GameObject\IPacketReceivingEntity.cs" />
     <Compile Include="GameObject\ISummoner.cs" />
+    <Compile Include="GameObject\Items\AORequirements.cs" />
     <Compile Include="GameObject\Items\LootTable.cs" />
     <Compile Include="GameObject\NonPlayerCharacter.cs" />
     <Compile Include="GameObject\Pet.cs" />

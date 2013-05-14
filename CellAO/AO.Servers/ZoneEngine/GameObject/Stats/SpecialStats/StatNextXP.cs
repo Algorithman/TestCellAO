@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -24,10 +25,32 @@
 
 namespace ZoneEngine.GameObject.Stats
 {
+    #region Usings ...
+
     using System;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public class StatNextXP : ClassStat
     {
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// </summary>
+        /// <param name="number">
+        /// </param>
+        /// <param name="defaultValue">
+        /// </param>
+        /// <param name="name">
+        /// </param>
+        /// <param name="sendBaseValue">
+        /// </param>
+        /// <param name="doNotWrite">
+        /// </param>
+        /// <param name="announceToPlayfield">
+        /// </param>
         public StatNextXP(
             int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
@@ -40,27 +63,43 @@ namespace ZoneEngine.GameObject.Stats
             this.AnnounceToPlayfield = false;
         }
 
+        #endregion
+
+        #region Public Properties
+
+        /// <summary>
+        /// </summary>
         public override int Value
         {
             get
             {
-                int level = ((Character)this.Parent).Stats.Level.Value;
+                int level = this.Parent.Stats.Level.Value;
                 if (level >= 200)
                 {
                     return 0;
                 }
+
                 return Convert.ToInt32(XPTable.TableRKXP[level - 1, 2]);
             }
+
             set
             {
                 Set(value);
             }
         }
 
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// </summary>
         public override void CalcTrickle()
         {
             base.CalcTrickle();
             this.Set(this.Value);
         }
+
+        #endregion
     }
 }

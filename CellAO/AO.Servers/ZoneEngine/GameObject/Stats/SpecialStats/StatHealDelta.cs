@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -24,10 +25,32 @@
 
 namespace ZoneEngine.GameObject.Stats
 {
+    #region Usings ...
+
     using System;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public class StatHealDelta : ClassStat
     {
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// </summary>
+        /// <param name="number">
+        /// </param>
+        /// <param name="defaultValue">
+        /// </param>
+        /// <param name="name">
+        /// </param>
+        /// <param name="sendBaseValue">
+        /// </param>
+        /// <param name="doNotWrite">
+        /// </param>
+        /// <param name="announceToPlayfield">
+        /// </param>
         public StatHealDelta(
             int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
@@ -40,10 +63,17 @@ namespace ZoneEngine.GameObject.Stats
             this.AnnounceToPlayfield = false;
         }
 
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// </summary>
         public override void CalcTrickle()
         {
-            if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter)) // This condition could be obsolete
+            if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter))
             {
+                // This condition could be obsolete
                 Character ch = (Character)this.Parent;
                 uint[] healDelta = { 3, 3, 2, 4, 12, 15, 20 };
 
@@ -56,5 +86,7 @@ namespace ZoneEngine.GameObject.Stats
                 }
             }
         }
+
+        #endregion
     }
 }

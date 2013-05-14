@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -24,10 +25,32 @@
 
 namespace ZoneEngine.GameObject.Stats
 {
+    #region Usings ...
+
     using System;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public class StatHitPoints : ClassStat
     {
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// </summary>
+        /// <param name="number">
+        /// </param>
+        /// <param name="defaultValue">
+        /// </param>
+        /// <param name="name">
+        /// </param>
+        /// <param name="sendBaseValue">
+        /// </param>
+        /// <param name="doNotWrite">
+        /// </param>
+        /// <param name="announceToPlayfield">
+        /// </param>
         public StatHitPoints(
             int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
@@ -40,14 +63,27 @@ namespace ZoneEngine.GameObject.Stats
             this.AnnounceToPlayfield = true;
         }
 
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// </summary>
+        /// <param name="val">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public override uint GetMaxValue(uint val)
         {
             if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter))
             {
                 Character character = (Character)this.Parent;
-                return (uint)(Math.Min(val, character.Stats.Life.Value));
+                return (uint)Math.Min(val, character.Stats.Life.Value);
             }
+
             return base.GetMaxValue(val);
         }
+
+        #endregion
     }
 }

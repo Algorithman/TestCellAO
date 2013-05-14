@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -22,19 +23,36 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-#region Usings...
-#endregion
-using ZoneEngine.GameObject.Enums;
-using ZoneEngine.GameObject;
-
 namespace ZoneEngine.GameObject.Stats
 {
+    #region Usings ...
+
     using System;
 
-    using AO.Core;
+    using ZoneEngine.GameObject.Enums;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public class StatHealInterval : ClassStat
     {
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// </summary>
+        /// <param name="number">
+        /// </param>
+        /// <param name="defaultValue">
+        /// </param>
+        /// <param name="name">
+        /// </param>
+        /// <param name="sendBaseValue">
+        /// </param>
+        /// <param name="doNotWrite">
+        /// </param>
+        /// <param name="announceToPlayfield">
+        /// </param>
         public StatHealInterval(
             int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
@@ -47,6 +65,12 @@ namespace ZoneEngine.GameObject.Stats
             this.AnnounceToPlayfield = false;
         }
 
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// </summary>
         public override void CalcTrickle()
         {
             if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter))
@@ -95,5 +119,7 @@ namespace ZoneEngine.GameObject.Stats
                 }
             }
         }
+
+        #endregion
     }
 }

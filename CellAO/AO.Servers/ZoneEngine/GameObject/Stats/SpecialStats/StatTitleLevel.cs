@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -24,8 +25,26 @@
 
 namespace ZoneEngine.GameObject.Stats
 {
+    /// <summary>
+    /// </summary>
     public class StatTitleLevel : ClassStat
     {
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// </summary>
+        /// <param name="number">
+        /// </param>
+        /// <param name="defaultValue">
+        /// </param>
+        /// <param name="name">
+        /// </param>
+        /// <param name="sendBaseValue">
+        /// </param>
+        /// <param name="doNotWrite">
+        /// </param>
+        /// <param name="announceToPlayfield">
+        /// </param>
         public StatTitleLevel(
             int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
@@ -38,10 +57,17 @@ namespace ZoneEngine.GameObject.Stats
             this.AnnounceToPlayfield = false;
         }
 
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// </summary>
         public override void CalcTrickle()
         {
-            if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter)) // This condition could be obsolete
+            if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter))
             {
+                // This condition could be obsolete
                 Character character = (Character)this.Parent;
                 int level = character.Stats.Level.Value;
 
@@ -80,5 +106,7 @@ namespace ZoneEngine.GameObject.Stats
                 }
             }
         }
+
+        #endregion
     }
 }

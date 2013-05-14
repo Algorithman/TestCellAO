@@ -23,11 +23,47 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine
+namespace ZoneEngine.GameObject.Items
 {
+    #region Usings ...
+
+    using System;
+
+    #endregion
+
     /// <summary>
+    /// AORequirements
     /// </summary>
-    public interface IAOEvents
+    [Serializable]
+    public class AORequirements
     {
+        #region Fields
+
+        /// <summary>
+        /// Child operator
+        /// </summary>
+        public int ChildOperator;
+
+        /// <summary>
+        /// Operator
+        /// </summary>
+        public int Operator;
+
+        /// <summary>
+        /// Stat to check against
+        /// </summary>
+        public int Statnumber;
+
+        /// <summary>
+        /// Target, from constants
+        /// </summary>
+        public int Target;
+
+        /// <summary>
+        /// Value to check against
+        /// </summary>
+        public int Value;
+
+        #endregion
     }
 }

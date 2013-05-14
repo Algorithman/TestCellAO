@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -24,8 +25,26 @@
 
 namespace ZoneEngine.GameObject.Stats
 {
+    /// <summary>
+    /// </summary>
     public class StatNano : ClassStat
     {
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// </summary>
+        /// <param name="number">
+        /// </param>
+        /// <param name="defaultValue">
+        /// </param>
+        /// <param name="name">
+        /// </param>
+        /// <param name="sendBaseValue">
+        /// </param>
+        /// <param name="doNotWrite">
+        /// </param>
+        /// <param name="announceToPlayfield">
+        /// </param>
         public StatNano(
             int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
@@ -38,28 +57,39 @@ namespace ZoneEngine.GameObject.Stats
             this.AnnounceToPlayfield = false;
         }
 
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// </summary>
         public override void CalcTrickle()
         {
-            #region table
             int[,] tableProfessionNanoPoints =
                 {
-                    //Sol|MA|ENG|FIX|AGE|ADV|TRA|CRA|ENF|DOC| NT| MP|KEP|SHA  // geprüfte Prof & TL = Soldier, Martial Artist, Engineer, Fixer, Agent, Advy, Trader, Doc
-                    { 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4 }, //TitleLevel 1
-                    { 4, 4, 5, 4, 5, 5, 5, 5, 4, 5, 5, 5, 4, 4 }, //TitleLevel 2
-                    { 4, 4, 6, 4, 6, 5, 5, 5, 4, 6, 6, 6, 4, 4 }, //TitleLevel 3
-                    { 4, 4, 7, 4, 6, 6, 5, 5, 4, 7, 7, 7, 4, 4 }, //TitleLevel 4
-                    { 4, 4, 8, 4, 7, 6, 6, 6, 4, 8, 8, 8, 4, 4 }, //TitleLevel 5
-                    { 4, 4, 9, 4, 7, 7, 7, 7, 4, 10, 10, 10, 4, 5 }, //TitleLevel 6
-                    { 5, 5, 10, 5, 8, 8, 8, 8, 5, 11, 11, 11, 5, 7 }, //TitleLevel 7
+                    { 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4 }, 
+                    { 4, 4, 5, 4, 5, 5, 5, 5, 4, 5, 5, 5, 4, 4 }, 
+                    { 4, 4, 6, 4, 6, 5, 5, 5, 4, 6, 6, 6, 4, 4 }, 
+                    { 4, 4, 7, 4, 6, 6, 5, 5, 4, 7, 7, 7, 4, 4 }, 
+                    
+                    // TitleLevel 4
+                    { 4, 4, 8, 4, 7, 6, 6, 6, 4, 8, 8, 8, 4, 4 }, // TitleLevel 5
+                    { 4, 4, 9, 4, 7, 7, 7, 7, 4, 10, 10, 10, 4, 5 }, // TitleLevel 6
+                    { 5, 5, 10, 5, 8, 8, 8, 8, 5, 11, 11, 11, 5, 7 }, // TitleLevel 7
+                    // TitleLevel 3
+                    // TitleLevel 2
+                    // TitleLevel 1
+                    // Sol|MA|ENG|FIX|AGE|ADV|TRA|CRA|ENF|DOC| NT| MP|KEP|SHA  // geprüfte Prof & TL = Soldier, Martial Artist, Engineer, Fixer, Agent, Advy, Trader, Doc
                 };
-            //Sol|Opi|Nan|Tro
+
+            // Sol|Opi|Nan|Tro
             int[] breedBaseNanoPoints = { 10, 10, 15, 8, 10, 10, 10 };
             int[] breedMultiplicatorNanoPoints = { 3, 3, 4, 2, 3, 3, 3 };
             int[] breedModificatorNanoPoints = { 0, -1, 1, -2, 0, 0, 0 };
-            #endregion
 
-            if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter)) // This condition could be obsolete
+            if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter))
             {
+                // This condition could be obsolete
                 Character character = (Character)this.Parent;
                 uint breed = character.Stats.Breed.StatBaseValue;
                 uint profession = character.Stats.Profession.StatBaseValue;
@@ -67,19 +97,19 @@ namespace ZoneEngine.GameObject.Stats
                 {
                     profession--;
                 }
+
                 uint titleLevel = character.Stats.TitleLevel.StatBaseValue;
                 uint level = character.Stats.Level.StatBaseValue;
 
-                //BreedBaseNP+(Level*(TableProfNP+BreedModiNP))+(NanoEnergyPool*BreedMultiNP))
+                // BreedBaseNP+(Level*(TableProfNP+BreedModiNP))+(NanoEnergyPool*BreedMultiNP))
                 if (this.Parent is NonPlayerCharacter)
                 {
                     // TODO: correct calculation of mob NP
                     this.Set(
                         (uint)
                         (breedBaseNanoPoints[breed - 1]
-                         +
-                         (character.Stats.Level.Value
-                          * (tableProfessionNanoPoints[6, 8] + breedModificatorNanoPoints[breed - 1]))
+                         + (character.Stats.Level.Value
+                            * (tableProfessionNanoPoints[6, 8] + breedModificatorNanoPoints[breed - 1]))
                          + (character.Stats.NanoEnergyPool.Value * breedMultiplicatorNanoPoints[breed - 1])));
                 }
                 else
@@ -87,18 +117,19 @@ namespace ZoneEngine.GameObject.Stats
                     this.Set(
                         (uint)
                         (breedBaseNanoPoints[breed - 1]
-                         +
-                         (character.Stats.Level.Value
-                          *
-                          (tableProfessionNanoPoints[titleLevel - 1, profession - 1]
-                           + breedModificatorNanoPoints[breed - 1]))
+                         + (character.Stats.Level.Value
+                            * (tableProfessionNanoPoints[titleLevel - 1, profession - 1]
+                               + breedModificatorNanoPoints[breed - 1]))
                          + (character.Stats.NanoEnergyPool.Value * breedMultiplicatorNanoPoints[breed - 1])));
                 }
             }
+
             if (!this.Parent.Starting)
             {
                 this.AffectStats();
             }
         }
+
+        #endregion
     }
 }

@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -22,12 +23,10 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-#region Using
-#endregion
-
-// TODO: Get rid of this, move things over to ClassStat.cs
-namespace ZoneEngine
+namespace ZoneEngine.GameObject.Stats
 {
+    #region Usings ...
+
     using System;
     using System.Collections.Generic;
     using System.Data;
@@ -36,13 +35,41 @@ namespace ZoneEngine
 
     using AO.Core;
 
+    #endregion
+
     #region StatTypes Class
+
     /// <summary>
     /// 
     /// </summary>
     public class StatTypes
     {
-        #region Constructors
+        #region Fields
+
+        /// <summary>
+        /// </summary>
+        [XmlElement("Default")]
+        public int defaultValue = 1234567890;
+
+        /// <summary>
+        /// </summary>
+        [XmlElement("FullName")]
+        public string statFullName = string.Empty;
+
+        /// <summary>
+        /// </summary>
+        [XmlAttribute("id")]
+        public int statId;
+
+        /// <summary>
+        /// </summary>
+        [XmlAttribute("Name")]
+        public string statName;
+
+        #endregion
+
+        #region Constructors and Destructors
+
         /// <summary>
         /// 
         /// </summary>
@@ -51,10 +78,11 @@ namespace ZoneEngine
         }
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="statId"></param>
-        /// <param name="statName"></param>
+        /// <param name="statId">
+        /// </param>
+        /// <param name="statName">
+        /// </param>
         public StatTypes(int statId, string statName)
         {
             this.statId = statId;
@@ -62,11 +90,13 @@ namespace ZoneEngine
         }
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="statId"></param>
-        /// <param name="statName"></param>
-        /// <param name="defaultValue"></param>
+        /// <param name="statId">
+        /// </param>
+        /// <param name="statName">
+        /// </param>
+        /// <param name="defaultValue">
+        /// </param>
         public StatTypes(int statId, string statName, int defaultValue)
             : this(statId, statName)
         {
@@ -74,11 +104,13 @@ namespace ZoneEngine
         }
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="statId"></param>
-        /// <param name="statName"></param>
-        /// <param name="statFullName"></param>
+        /// <param name="statId">
+        /// </param>
+        /// <param name="statName">
+        /// </param>
+        /// <param name="statFullName">
+        /// </param>
         public StatTypes(int statId, string statName, string statFullName)
             : this(statId, statName)
         {
@@ -86,85 +118,140 @@ namespace ZoneEngine
         }
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="statId"></param>
-        /// <param name="statName"></param>
-        /// <param name="defaultValue"></param>
-        /// <param name="statFullName"></param>
+        /// <param name="statId">
+        /// </param>
+        /// <param name="statName">
+        /// </param>
+        /// <param name="defaultValue">
+        /// </param>
+        /// <param name="statFullName">
+        /// </param>
         public StatTypes(int statId, string statName, int defaultValue, string statFullName)
             : this(statId, statName, statFullName)
         {
             this.defaultValue = defaultValue;
         }
+
         #endregion
-
-        [XmlAttribute("id")]
-        public int statId;
-
-        [XmlAttribute("Name")]
-        public string statName;
-
-        [XmlElement("FullName")]
-        public string statFullName = string.Empty;
-
-        [XmlElement("Default")]
-        public int defaultValue = 1234567890;
     }
+
     #endregion
 
     #region StatsList Class
+
     /// <summary>
     /// 
     /// </summary>
     [XmlRoot("Stats")]
     public class StatsList
     {
+        #region Static Fields
+
+        /// <summary>
+        /// </summary>
         [XmlIgnore]
         public static readonly StatsList Instance;
 
-        #region Constructors
-        private StatsList()
-        {
-        }
+        #endregion
 
+        #region Fields
+
+        /// <summary>
+        /// </summary>
+        [XmlElement("Stat")]
+        public List<StatTypes> stats;
+
+        #endregion
+
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// </summary>
         static StatsList()
         {
             Instance = LoadXML(Path.Combine("XML Data", "Stats.xml"));
         }
-        #endregion
 
-        #region XML
-        // Generally this shouldn't be used outside of the static constructor
-        public static StatsList LoadXML(string fileName)
+        /// <summary>
+        /// </summary>
+        private StatsList()
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(StatsList));
-            TextReader reader = new StreamReader(fileName);
-            StatsList data = (StatsList)serializer.Deserialize(reader);
-            reader.Close();
-            return data;
         }
 
+        #endregion
+
+        // Generally this shouldn't be used outside of the static constructor
+
         // This really should only be used for development. Included for completeness.
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// </summary>
+        /// <param name="fileName">
+        /// </param>
         public static void DumpXML(string fileName)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(StatsList));
             XmlSerializerNamespaces xsn = new XmlSerializerNamespaces();
-            xsn.Add(String.Empty, String.Empty);
+            xsn.Add(string.Empty, string.Empty);
             TextWriter writer = new StreamWriter(fileName);
             serializer.Serialize(writer, Instance, xsn);
             writer.Close();
         }
-        #endregion
-
-        [XmlElement("Stat")]
-        public List<StatTypes> stats;
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="statName"></param>
-        /// <returns></returns>
+        /// <param name="statId">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static int GetDefaultValue(int statId)
+        {
+            foreach (StatTypes stat in Instance.stats)
+            {
+                if (stat.statId == statId)
+                {
+                    return stat.defaultValue;
+                }
+            }
+
+            Console.WriteLine("Using generic DefaultValue for statId " + statId);
+
+            // Generic default value
+            return 1234567890;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="statName">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static StatTypes GetStatByName(string statName)
+        {
+            if (statName == string.Empty)
+            {
+                throw new ArgumentNullException("statName cannot be null or empty");
+            }
+
+            foreach (StatTypes stat in Instance.stats)
+            {
+                if (stat.statName.ToLower() == statName.ToLower())
+                {
+                    return stat;
+                }
+            }
+
+            throw new StatDoesNotExistException("Stat with name '" + statName + "' does not exist.");
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="statName">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static int GetStatId(string statName)
         {
             if (statName == string.Empty)
@@ -175,7 +262,6 @@ namespace ZoneEngine
             try
             {
                 // Are we passed a StatId? If so, return it as an int
-
                 int statId = int.Parse(statName);
 
                 if (statId >= 0)
@@ -201,33 +287,11 @@ namespace ZoneEngine
         }
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="statName"></param>
-        /// <returns></returns>
-        public static StatTypes GetStatByName(string statName)
-        {
-            if (statName == string.Empty)
-            {
-                throw new ArgumentNullException("statName cannot be null or empty");
-            }
-
-            foreach (StatTypes stat in Instance.stats)
-            {
-                if (stat.statName.ToLower() == statName.ToLower())
-                {
-                    return stat;
-                }
-            }
-
-            throw new StatDoesNotExistException("Stat with name '" + statName + "' does not exist.");
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="statId"></param>
-        /// <returns></returns>
+        /// <param name="statId">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static string GetStatName(int statId)
         {
             foreach (StatTypes stat in Instance.stats)
@@ -244,35 +308,50 @@ namespace ZoneEngine
         }
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="statId"></param>
-        /// <returns></returns>
-        public static int GetDefaultValue(int statId)
+        /// <param name="fileName">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static StatsList LoadXML(string fileName)
         {
-            foreach (StatTypes stat in Instance.stats)
-            {
-                if (stat.statId == statId)
-                {
-                    return stat.defaultValue;
-                }
-            }
-
-            Console.WriteLine("Using generic DefaultValue for statId " + statId);
-
-            // Generic default value
-            return 1234567890;
+            XmlSerializer serializer = new XmlSerializer(typeof(StatsList));
+            TextReader reader = new StreamReader(fileName);
+            StatsList data = (StatsList)serializer.Deserialize(reader);
+            reader.Close();
+            return data;
         }
+
+        #endregion
     }
+
     #endregion
 
+    /// <summary>
+    /// </summary>
     internal class OrgMisc
     {
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// </summary>
+        /// <param name="orgId">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static List<int> GetOrgMembers(uint orgId)
         {
             return GetOrgMembers(orgId, false);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="orgId">
+        /// </param>
+        /// <param name="excludePresident">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static List<int> GetOrgMembers(uint orgId, bool excludePresident)
         {
             // Stat #5 == Clan == OrgID
@@ -297,7 +376,10 @@ namespace ZoneEngine
                     orgMembers.Add((Int32)row[0]);
                 }
             }
+
             return orgMembers;
         }
+
+        #endregion
     }
 }

@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -24,10 +25,32 @@
 
 namespace ZoneEngine.GameObject.Stats
 {
+    #region Usings ...
+
     using System;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public class StatNanoDelta : ClassStat
     {
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// </summary>
+        /// <param name="number">
+        /// </param>
+        /// <param name="defaultValue">
+        /// </param>
+        /// <param name="name">
+        /// </param>
+        /// <param name="sendBaseValue">
+        /// </param>
+        /// <param name="doNotWrite">
+        /// </param>
+        /// <param name="announceToPlayfield">
+        /// </param>
         public StatNanoDelta(
             int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
@@ -40,14 +63,22 @@ namespace ZoneEngine.GameObject.Stats
             this.AnnounceToPlayfield = false;
         }
 
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// </summary>
         public override void CalcTrickle()
         {
-            if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter)) // This condition could be obsolete
+            if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter))
             {
+                // This condition could be obsolete
                 Character character = (Character)this.Parent;
                 uint[] nanodelta = { 3, 3, 4, 2, 12, 15, 20 };
                 uint nanoDelta = nanodelta[character.Stats.Breed.Value - 1]
                                  + (uint)Math.Floor((double)(character.Stats.NanoEnergyPool.Value / 100));
+
                 // Whats this? TODO: Find the original routine again
                 this.StatBaseValue = nanoDelta;
 
@@ -57,5 +88,7 @@ namespace ZoneEngine.GameObject.Stats
                 }
             }
         }
+
+        #endregion
     }
 }

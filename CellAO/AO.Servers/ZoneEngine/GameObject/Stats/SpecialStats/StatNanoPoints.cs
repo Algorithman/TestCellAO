@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -24,10 +25,32 @@
 
 namespace ZoneEngine.GameObject.Stats
 {
+    #region Usings ...
+
     using System;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public class StatNanoPoints : ClassStat
     {
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// </summary>
+        /// <param name="number">
+        /// </param>
+        /// <param name="defaultValue">
+        /// </param>
+        /// <param name="name">
+        /// </param>
+        /// <param name="sendBaseValue">
+        /// </param>
+        /// <param name="dontWrite">
+        /// </param>
+        /// <param name="announce">
+        /// </param>
         public StatNanoPoints(
             int number, int defaultValue, string name, bool sendBaseValue, bool dontWrite, bool announce)
         {
@@ -40,14 +63,27 @@ namespace ZoneEngine.GameObject.Stats
             this.AnnounceToPlayfield = false;
         }
 
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// </summary>
+        /// <param name="val">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public override uint GetMaxValue(uint val)
         {
             if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter))
             {
                 Character c = (Character)this.Parent;
-                return (uint)(Math.Min(val, c.Stats.MaxNanoEnergy.Value));
+                return (uint)Math.Min(val, c.Stats.MaxNanoEnergy.Value);
             }
+
             return base.GetMaxValue(val);
         }
+
+        #endregion
     }
 }

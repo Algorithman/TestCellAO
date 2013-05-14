@@ -1,7 +1,6 @@
-﻿
-#region License
+﻿#region License
 
-// Copyright (c) 2005-2012, CellAO Team
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -22,41 +21,68 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 #endregion
-    
+
 namespace ZoneEngine.GameObject.Stats
 {
+    #region Usings ...
+
     using System;
-    
+
     using ZoneEngine.GameObject.Enums;
-        
+
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public class StatNanoInterval : ClassStat
     {
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// </summary>
+        /// <param name="number">
+        /// </param>
+        /// <param name="defaultValue">
+        /// </param>
+        /// <param name="name">
+        /// </param>
+        /// <param name="sendBaseValue">
+        /// </param>
+        /// <param name="doNotWrite">
+        /// </param>
+        /// <param name="announceToPlayfield">
+        /// </param>
         public StatNanoInterval(
             int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
             this.StatNumber = number;
             this.StatDefaultValue = (uint)defaultValue;
-            
+
             this.StatBaseValue = this.StatDefaultValue;
             this.SendBaseValue = true;
             this.DoNotDontWriteToSql = false;
             this.AnnounceToPlayfield = false;
         }
-            
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// </summary>
         public override void CalcTrickle()
         {
             if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter))
             {
                 Character character = (Character)this.Parent;
-                                   
+
                 // calculating Nano and Heal Delta and interval
-                int nanoInterval = 28 -
-                                   (Math.Min((int)Math.Floor(Convert.ToDouble(character.Stats.Psychic.Value) / 60), 13) *
-                                    2);
+                int nanoInterval = 28
+                                   - (Math.Min(
+                                       (int)Math.Floor(Convert.ToDouble(character.Stats.Psychic.Value) / 60), 13) * 2);
                 character.Stats.NanoInterval.StatBaseValue = (uint)nanoInterval; // Healinterval
-                
+
                 /* TODO Add Proper Timers w/e is in the other file too
                 character.PurgeTimer(1);
                 AOTimers at = new AOTimers();
@@ -68,6 +94,7 @@ namespace ZoneEngine.GameObject.Stats
                     int nanoDelta2 = nanoDelta >> 1;
                     nanoDelta = nanoDelta + nanoDelta2;
                 }
+
                 /*
                 at.Timestamp = DateTime.Now + TimeSpan.FromSeconds(character.Stats.NanoInterval.Value);
                 at.Function.Target = this.Parent.Identity.Instance; // changed from ItemHandler.itemtarget_self;
@@ -79,12 +106,14 @@ namespace ZoneEngine.GameObject.Stats
                 at.Function.Arguments.Values.Add(nanoDelta);
                 at.Function.Arguments.Values.Add(0);
                 character.Timers.Add(at);
-                  */  
+                  */
                 if (!this.Parent.Starting)
                 {
                     this.AffectStats();
                 }
             }
         }
+
+        #endregion
     }
 }

@@ -23,11 +23,32 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine
+namespace ZoneEngine.GameObject.Items
 {
+    #region Usings ...
+
+    using System;
+    using System.Collections.Generic;
+
+    #endregion
+
     /// <summary>
     /// </summary>
-    public interface IAOEvents
+    [Serializable]
+    public class AOEvents
     {
+        #region Fields
+
+        /// <summary>
+        /// Type of the Event (constants in ItemHandler)
+        /// </summary>
+        public int EventType;
+
+        /// <summary>
+        /// List of Functions of the Event
+        /// </summary>
+        public List<AOFunctions> Functions = new List<AOFunctions>();
+
+        #endregion
     }
 }

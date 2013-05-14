@@ -1,7 +1,6 @@
-﻿
-#region License
+﻿#region License
 
-// Copyright (c) 2005-2012, CellAO Team
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -22,30 +21,27 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-#endregion
-
-#region Usings...
-
 #endregion
 
 #region NameSpace
-    
+
 namespace ZoneEngine.Script
 {
+    #region Usings ...
+
     using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
 
-    using AO.Core;
+    using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.CoreClient;
-    
-    using SmokeLounge.AOtomation.Messaging.GameData;
-    
+
+    #endregion
+
     #region Class AOChatCommand
-    
+
     /// <summary>
     /// The Class in charge of printing information to our consoles
     /// To add a new chat command refer to the ones already inside Scripts/ChatCommands
@@ -53,53 +49,16 @@ namespace ZoneEngine.Script
     /// </summary>
     public abstract class AOChatCommand
     {
-        #region Fields
-        
-        #endregion
-        
-        #region Properties
-        
-        #endregion
+        #region Public Methods and Operators
 
-        #region Script Entry points
-        
         /// <summary>
-        /// Execute the chat command
         /// </summary>
-        /// <param name="client">client</param>
-        /// <param name="target">Target identity</param>
-        /// <param name="args">command arguments</param>
-        public abstract void ExecuteCommand(Client client, Identity target, string[] args);
-        
-        /// <summary>
-        /// Returns the GM Level needed for this command
-        /// </summary>
-        /// <returns>GMLevel needed</returns>
-        public abstract int GMLevelNeeded();
-        
-        /// <summary>
-        /// Returns Help for this command
-        /// </summary>
-        /// <returns>Help text</returns>
-        public abstract void CommandHelp(Client client);
-        
-        /// <summary>
-        /// Returns a list of commands handled by this class
-        /// </summary>
-        /// <returns>List of command strings</returns>
-        public abstract List<string> ListCommands();
-        
-        /// <summary>
-        /// Checks the command Arguments
-        /// </summary>
-        /// <param name="args">True if command arguments are fine</param>
-        /// <returns></returns>
-        public abstract bool CheckCommandArguments(string[] args);
-            
-        #endregion
-            
-        #region Helper to check Command Arguments
-            
+        /// <param name="typeList">
+        /// </param>
+        /// <param name="args">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static bool CheckArgumentHelper(List<Type> typeList, string[] args)
         {
             // Return false if number of args dont match (first argument is Command, so it doesnt count)
@@ -107,7 +66,7 @@ namespace ZoneEngine.Script
             {
                 return false;
             }
-                    
+
             bool argumentsok = true;
             for (int argcounter = 0; argcounter < typeList.Count; argcounter++)
             {
@@ -115,35 +74,35 @@ namespace ZoneEngine.Script
                 {
                     continue;
                 }
-                    
+
                 if (typeList.ElementAt(argcounter) == typeof(int))
                 {
                     int temp;
                     argumentsok &= int.TryParse(args[argcounter + 1], out temp);
                     continue;
                 }
-                    
+
                 if (typeList.ElementAt(argcounter) == typeof(Int32))
                 {
-                    Int32 temp;
-                    argumentsok &= Int32.TryParse(args[argcounter + 1], out temp);
+                    int temp;
+                    argumentsok &= int.TryParse(args[argcounter + 1], out temp);
                     continue;
                 }
-                    
+
                 if (typeList.ElementAt(argcounter) == typeof(bool))
                 {
                     bool temp;
                     argumentsok &= bool.TryParse(args[argcounter + 1], out temp);
                     continue;
                 }
-                    
+
                 if (typeList.ElementAt(argcounter) == typeof(uint))
                 {
                     uint temp;
                     argumentsok &= uint.TryParse(args[argcounter + 1], out temp);
                     continue;
                 }
-    
+
                 if (typeList.ElementAt(argcounter) == typeof(float))
                 {
                     float temp;
@@ -151,10 +110,54 @@ namespace ZoneEngine.Script
                         args[argcounter + 1], NumberStyles.Any, CultureInfo.InvariantCulture, out temp);
                 }
             }
+
             return argumentsok;
         }
 
-        #endregion Helper to check Command Arguments
+        /// <summary>
+        /// Checks the command Arguments
+        /// </summary>
+        /// <param name="args">
+        /// True if command arguments are fine
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public abstract bool CheckCommandArguments(string[] args);
+
+        /// <summary>
+        /// Returns Help for this command
+        /// </summary>
+        /// <param name="client">
+        /// </param>
+        public abstract void CommandHelp(Client client);
+
+        /// <summary>
+        /// Execute the chat command
+        /// </summary>
+        /// <param name="client">
+        /// client
+        /// </param>
+        /// <param name="target">
+        /// Target identity
+        /// </param>
+        /// <param name="args">
+        /// command arguments
+        /// </param>
+        public abstract void ExecuteCommand(Client client, Identity target, string[] args);
+
+        /// <summary>
+        /// Returns the GM Level needed for this command
+        /// </summary>
+        /// <returns>GMLevel needed</returns>
+        public abstract int GMLevelNeeded();
+
+        /// <summary>
+        /// Returns a list of commands handled by this class
+        /// </summary>
+        /// <returns>List of command strings</returns>
+        public abstract List<string> ListCommands();
+
+        #endregion
     }
 
     #endregion Class AOChatCommand

@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -24,10 +25,32 @@
 
 namespace ZoneEngine.GameObject.Stats
 {
+    #region Usings ...
+
     using System;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public class StatSkill : ClassStat
     {
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// </summary>
+        /// <param name="number">
+        /// </param>
+        /// <param name="defaultValue">
+        /// </param>
+        /// <param name="name">
+        /// </param>
+        /// <param name="sendBaseValue">
+        /// </param>
+        /// <param name="doNotWrite">
+        /// </param>
+        /// <param name="announceToPlayfield">
+        /// </param>
         public StatSkill(
             int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
@@ -40,6 +63,12 @@ namespace ZoneEngine.GameObject.Stats
             this.AnnounceToPlayfield = false;
         }
 
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// </summary>
         public override void CalcTrickle()
         {
             double strengthTrickle = SkillTrickleTable.table[this.StatNumber - 100, 1];
@@ -52,8 +81,10 @@ namespace ZoneEngine.GameObject.Stats
             this.Trickle =
                 Convert.ToInt32(
                     Math.Floor(
-                        (strengthTrickle * this.Parent.Stats.Strength.Value + staminaTrickle * this.Parent.Stats.Stamina.Value
-                         + senseTrickle * this.Parent.Stats.Sense.Value + agilityTrickle * this.Parent.Stats.Agility.Value
+                        (strengthTrickle * this.Parent.Stats.Strength.Value
+                         + staminaTrickle * this.Parent.Stats.Stamina.Value
+                         + senseTrickle * this.Parent.Stats.Sense.Value
+                         + agilityTrickle * this.Parent.Stats.Agility.Value
                          + intelligenceTrickle * this.Parent.Stats.Intelligence.Value
                          + psychicTrickle * this.Parent.Stats.Psychic.Value) / 4));
 
@@ -62,5 +93,7 @@ namespace ZoneEngine.GameObject.Stats
                 this.AffectStats();
             }
         }
+
+        #endregion
     }
 }

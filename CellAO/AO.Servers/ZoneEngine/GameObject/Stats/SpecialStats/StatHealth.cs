@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -22,13 +23,28 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-#region Usings...
-#endregion
-
 namespace ZoneEngine.GameObject.Stats
 {
+    /// <summary>
+    /// </summary>
     public class StatHealth : ClassStat
     {
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// </summary>
+        /// <param name="number">
+        /// </param>
+        /// <param name="defaultValue">
+        /// </param>
+        /// <param name="name">
+        /// </param>
+        /// <param name="sendBaseValue">
+        /// </param>
+        /// <param name="doNotWrite">
+        /// </param>
+        /// <param name="announceToPlayfield">
+        /// </param>
         public StatHealth(
             int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
@@ -41,28 +57,39 @@ namespace ZoneEngine.GameObject.Stats
             this.AnnounceToPlayfield = announceToPlayfield;
         }
 
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// </summary>
         public override void CalcTrickle()
         {
-            #region table
             int[,] tableProfessionHitPoints =
                 {
+                    { 6, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6 }, 
+                    { 7, 7, 6, 7, 7, 7, 6, 7, 8, 6, 6, 6, 7, 7 }, 
+                    { 8, 7, 6, 7, 7, 8, 7, 7, 9, 6, 6, 6, 8, 7 }, 
+                    { 9, 8, 6, 8, 8, 8, 7, 7, 10, 6, 6, 6, 9, 8 }, 
+                    
+                    // TitleLevel 4
+                    { 10, 9, 6, 9, 8, 9, 8, 8, 11, 6, 6, 6, 10, 9 }, // TitleLevel 5
+                    { 11, 12, 6, 10, 9, 9, 9, 9, 12, 6, 6, 6, 11, 10 }, // TitleLevel 6
+                    { 12, 13, 7, 11, 10, 10, 10, 10, 13, 7, 7, 7, 12, 11 }, // TitleLevel 7
+                    // TitleLevel 3
+                    // TitleLevel 2
+                    // TitleLevel 1
                     // Sol| MA|ENG|FIX|AGE|ADV|TRA|CRA|ENF|DOC| NT| MP| KEP|SHA   // geprüfte Prof & TL = Soldier, Martial Artist, Engineer, Fixer, Agent, Advy, Trader, Crat
-                    { 6, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6 }, //TitleLevel 1
-                    { 7, 7, 6, 7, 7, 7, 6, 7, 8, 6, 6, 6, 7, 7 }, //TitleLevel 2
-                    { 8, 7, 6, 7, 7, 8, 7, 7, 9, 6, 6, 6, 8, 7 }, //TitleLevel 3
-                    { 9, 8, 6, 8, 8, 8, 7, 7, 10, 6, 6, 6, 9, 8 }, //TitleLevel 4
-                    { 10, 9, 6, 9, 8, 9, 8, 8, 11, 6, 6, 6, 10, 9 }, //TitleLevel 5
-                    { 11, 12, 6, 10, 9, 9, 9, 9, 12, 6, 6, 6, 11, 10 }, //TitleLevel 6
-                    { 12, 13, 7, 11, 10, 10, 10, 10, 13, 7, 7, 7, 12, 11 }, //TitleLevel 7
                 };
+
             // Sol|Opi|Nan|Tro
             int[] breedBaseHitPoints = { 10, 15, 10, 25, 30, 30, 30 };
             int[] breedMultiplicatorHitPoints = { 3, 3, 2, 4, 8, 8, 10 };
             int[] breedModificatorHitPoints = { 0, -1, -1, 0, 0, 0, 0 };
-            #endregion
 
-            if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter)) // This condition could be obsolete
+            if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter))
             {
+                // This condition could be obsolete
                 Character character = (Character)this.Parent;
                 uint breed = character.Stats.Breed.StatBaseValue;
                 uint profession = character.Stats.Profession.StatBaseValue;
@@ -70,10 +97,11 @@ namespace ZoneEngine.GameObject.Stats
                 {
                     profession--;
                 }
+
                 uint titleLevel = character.Stats.TitleLevel.StatBaseValue;
                 uint level = character.Stats.Level.StatBaseValue;
 
-                //BreedBaseHP+(Level*(TableProfHP+BreedModiHP))+(BodyDevelopment*BreedMultiHP))
+                // BreedBaseHP+(Level*(TableProfHP+BreedModiHP))+(BodyDevelopment*BreedMultiHP))
                 if (this.Parent is NonPlayerCharacter)
                 {
                     // TODO: correct calculation of mob HP
@@ -85,20 +113,21 @@ namespace ZoneEngine.GameObject.Stats
                 {
                     Set(
                         breedBaseHitPoints[breed - 1]
-                        +
-                        (character.Stats.Level.Value
-                         *
-                         (tableProfessionHitPoints[titleLevel - 1, profession - 1]
-                          + breedModificatorHitPoints[breed - 1]))
+                        + (character.Stats.Level.Value
+                           * (tableProfessionHitPoints[titleLevel - 1, profession - 1]
+                              + breedModificatorHitPoints[breed - 1]))
                         + (character.Stats.BodyDevelopment.Value * breedMultiplicatorHitPoints[breed - 1]));
                 }
 
-                //ch.Stats.Health.StatBaseValue = (UInt32)Math.Min(ch.Stats.Health.Value, StatBaseValue);
+                // ch.Stats.Health.StatBaseValue = (UInt32)Math.Min(ch.Stats.Health.Value, StatBaseValue);
             }
+
             if (!this.Parent.Starting)
             {
                 this.AffectStats();
             }
         }
+
+        #endregion
     }
 }

@@ -1,7 +1,6 @@
-﻿
-#region License
+﻿#region License
 
-// Copyright (c) 2005-2012, CellAO Team
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -22,17 +21,14 @@
 // LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-#endregion
-
-#region Usings...
-
 #endregion
 
 #region NameSpace
-    
+
 namespace ZoneEngine.Script
 {
+    #region Usings ...
+
     using System;
     using System.CodeDom.Compiler;
     using System.Collections.Generic;
@@ -42,15 +38,17 @@ namespace ZoneEngine.Script
     using System.Reflection;
     using System.Text;
 
-    using ZoneEngine.GameObject;
-    using ZoneEngine.CoreClient;
-
     using Microsoft.CSharp;
-    
+
     using SmokeLounge.AOtomation.Messaging.GameData;
-    
+
+    using ZoneEngine.CoreClient;
+    using ZoneEngine.GameObject;
+
+    #endregion
+
     #region Class ScriptCompiler
-    
+
     /// <summary>
     /// Controls Compilation and loading
     /// of *.cs files contained in the
@@ -59,7 +57,12 @@ namespace ZoneEngine.Script
     /// </summary>
     public class ScriptCompiler : IDisposable
     {
+        // Holder for Chat commands
         #region Fields
+
+        /// <summary>
+        /// </summary>
+        private readonly Dictionary<string, Type> chatCommands = new Dictionary<string, Type>();
 
         /// <summary>
         /// Our CSharp compiler object
@@ -67,94 +70,384 @@ namespace ZoneEngine.Script
         private readonly CodeDomProvider compiler =
             new CSharpCodeProvider(new Dictionary<string, string> { { "CompilerVersion", "v4.0" } });
 
-        // Holder for usermade scripts
-        private readonly Dictionary<string, Type> scriptList = new Dictionary<string, Type>();
-        
-        // Holder for Chat commands
-        private readonly Dictionary<string, Type> chatCommands = new Dictionary<string, Type>();
-        
+        /// <summary>
+        /// </summary>
+        private readonly List<Assembly> multipleDllList = new List<Assembly>();
+
         /// <summary>
         /// Our compiler parameter command line to pass 
         /// when we compile the scripts.
         /// </summary>
         private readonly CompilerParameters p = new CompilerParameters
-        {
-            GenerateInMemory = false,
-            GenerateExecutable = false,
-            IncludeDebugInformation = true,
-            OutputAssembly = "Scripts.dll",
-            // TODO: Figure out how to parse the file and return the usings, then load those.
-            ReferencedAssemblies = {
-                "System.dll",
-                "System.Core.dll",
-                "AO.Core.dll",
-                "Cell.Core.dll",
-                "MySql.Data.dll",
-                "ZoneEngine.exe",
-                "ChatEngine.exe",
-                "LoginEngine.exe"
-            },
-            TreatWarningsAsErrors = false,
-            WarningLevel = 3,
-            CompilerOptions = "/optimize"
-        };
-        
-        #endregion
-        
-        #region Properties
-        
-        private string[] ScriptsList { get; set; }
-        
-        #endregion
-        
-        private readonly List<Assembly> multipleDllList = new List<Assembly>();
-        
-        #region Compiler
-            
+                                                    {
+                                                        GenerateInMemory = false, 
+                                                        GenerateExecutable = false, 
+                                                        IncludeDebugInformation = true, 
+                                                        OutputAssembly = "Scripts.dll", 
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        // TODO: Figure out how to parse the file and return the usings, then load those.
+                                                        ReferencedAssemblies =
+                                                            {
+                                                                "System.dll", 
+                                                                "System.Core.dll", 
+                                                                "AO.Core.dll", 
+                                                                "Cell.Core.dll", 
+                                                                "MySql.Data.dll", 
+                                                                "ZoneEngine.exe", 
+                                                                "ChatEngine.exe", 
+                                                                "LoginEngine.exe"
+                                                            }, 
+                                                        TreatWarningsAsErrors = false, 
+                                                        WarningLevel = 3, 
+                                                        CompilerOptions = "/optimize"
+                                                    };
+
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="multipleFiles"></param>
-        /// <returns></returns>
+        private readonly Dictionary<string, Type> scriptList = new Dictionary<string, Type>();
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// </summary>
+        private string[] ScriptsList { get; set; }
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        /// Turn our script names into dll names.
+        /// </summary>
+        /// <param name="scriptName">
+        /// The script name.
+        /// </param>
+        /// <returns>
+        /// The dll name.
+        /// </returns>
+        public static string DllName(string scriptName)
+        {
+            scriptName = RemoveCharactersAfterChar(scriptName, '.');
+            scriptName = RemoveCharactersBeforeChar(scriptName, '\\');
+            scriptName = RemoveCharactersBeforeChar(scriptName, '/');
+
+            return scriptName + ".dll";
+        }
+
+        /// <summary>
+        /// Logs messages to the console.
+        /// </summary>
+        /// <param name="owner">
+        /// Who or what to log as.
+        /// </param>
+        /// <param name="ownerColor">
+        /// The color of the text the owner shows.
+        /// </param>
+        /// <param name="message">
+        /// The message to display.
+        /// </param>
+        /// <param name="messageColor">
+        /// The color to display the message in.
+        /// </param>
+        public static void LogScriptAction(
+            string owner, ConsoleColor ownerColor, string message, ConsoleColor messageColor)
+        {
+            Console.ForegroundColor = ownerColor;
+            Console.Write(owner + " ");
+            Console.ForegroundColor = messageColor;
+            Console.Write(message + "\n");
+            Console.ResetColor();
+        }
+
+        /// <summary>
+        /// Removes all text from a string
+        /// after char chars
+        /// </summary>
+        /// <param name="hayStack">
+        /// The string to trim.
+        /// </param>
+        /// <param name="needle">
+        /// The char to remove all text after EX: '.'
+        /// </param>
+        /// <returns>
+        /// The corrected string.
+        /// </returns>
+        public static string RemoveCharactersAfterChar(string hayStack, char needle)
+        {
+            string input = hayStack;
+            int index = input.IndexOf(needle);
+            if (index > 0)
+            {
+                input = input.Substring(0, index);
+            }
+
+            return input;
+        }
+
+        /// <summary>
+        /// Remove all text in a string before
+        /// the first chars it finds.
+        /// If chars is '\\' then 
+        /// Debug\\Scripts turns into Scripts
+        /// </summary>
+        /// <param name="hayStack">
+        /// The string to trim the front of.
+        /// </param>
+        /// <param name="needle">
+        /// The first text char in the string 
+        /// that matches this, and everything before it will be removed.
+        /// </param>
+        /// <returns>
+        /// The corrected string.
+        /// </returns>
+        public static string RemoveCharactersBeforeChar(string hayStack, char needle)
+        {
+            string input = hayStack;
+            int index = input.IndexOf(needle);
+            if (index >= 0)
+            {
+                return input.Substring(index + 1);
+            }
+
+            // Hmm if we got here then it has no .'s in it so just return input
+            return input;
+        }
+
+        /// <summary>
+        /// </summary>
+        public void AddScriptMembers()
+        {
+            this.scriptList.Clear();
+            foreach (Assembly assembly in this.multipleDllList)
+            {
+                foreach (Type t in assembly.GetTypes())
+                {
+                    if (t.GetInterface("IAOScript") != null)
+                    {
+                        if (t.Name != "IAOScript")
+                        {
+                            foreach (MemberInfo mi in t.GetMembers())
+                            {
+                                if ((mi.Name == "GetType") || (mi.Name == ".ctor") || (mi.Name == "GetHashCode")
+                                    || (mi.Name == "ToString") || (mi.Name == "Equals"))
+                                {
+                                    continue;
+                                }
+
+                                if (mi.MemberType == MemberTypes.Method)
+                                {
+                                    if (!this.scriptList.ContainsKey(t.Namespace + "." + t.Name + ":" + mi.Name))
+                                    {
+                                        this.scriptList.Add(t.Namespace + "." + t.Name + ":" + mi.Name, t);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            this.chatCommands.Clear();
+            Assembly wholeassembly = Assembly.GetExecutingAssembly();
+            foreach (Type t in wholeassembly.GetTypes())
+            {
+                if (t.Namespace == "ZoneEngine.ChatCommands")
+                {
+                    if (t.Name != "AOChatCommand")
+                    {
+                        if (!this.chatCommands.ContainsKey(t.Namespace + "." + t.Name))
+                        {
+                            AOChatCommand aoc = (AOChatCommand)wholeassembly.CreateInstance(t.Namespace + "." + t.Name);
+                            List<string> acceptedcommands = aoc.ListCommands();
+                            foreach (string command in acceptedcommands)
+                            {
+                                this.chatCommands.Add(t.Namespace + "." + t.Name + ":" + command, t);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="commandName">
+        /// </param>
+        /// <param name="client">
+        /// </param>
+        /// <param name="target">
+        /// </param>
+        /// <param name="commandArguments">
+        /// </param>
+        public void CallChatCommand(string commandName, Client client, Identity target, string[] commandArguments)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            if (commandName.ToUpperInvariant() != "LISTCOMMANDS")
+            {
+                foreach (KeyValuePair<string, Type> kv in this.chatCommands)
+                {
+                    if (kv.Key.Substring(kv.Key.IndexOf(":", StringComparison.Ordinal) + 1).ToUpperInvariant()
+                        == commandName.ToUpperInvariant())
+                    {
+                        AOChatCommand aoc =
+                            (AOChatCommand)
+                            assembly.CreateInstance(kv.Key.Substring(0, kv.Key.IndexOf(":", StringComparison.Ordinal)));
+                        if (aoc != null)
+                        {
+                            // Check GM Level bitwise
+                            if ((client.Character.Stats.GMLevel.Value < aoc.GMLevelNeeded())
+                                && (aoc.GMLevelNeeded() > 0))
+                            {
+                                client.SendChatText(
+                                    "You are not authorized to use this command!. This incident will be recorded.");
+
+                                // It is not yet :)
+                                return;
+                            }
+
+                            // Check if only one argument has been passed for "help"
+                            if (commandArguments.Length == 2)
+                            {
+                                if (commandArguments[1].ToUpperInvariant() == "HELP")
+                                {
+                                    aoc.CommandHelp(client);
+                                    return;
+                                }
+                            }
+
+                            // Execute the command with the given command arguments, if CheckCommandArguments is true else print command help
+                            if (aoc.CheckCommandArguments(commandArguments))
+                            {
+                                aoc.ExecuteCommand(client, target, commandArguments);
+                            }
+                            else
+                            {
+                                aoc.CommandHelp(client);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                client.SendChatText("Available Commands:");
+                string[] scriptNames = this.chatCommands.Keys.ToArray();
+                for (int i = 0; i < scriptNames.Length; i++)
+                {
+                    scriptNames[i] = scriptNames[i].Substring(scriptNames[i].IndexOf(":", StringComparison.Ordinal) + 1)
+                                     + ":"
+                                     + scriptNames[i].Substring(
+                                         0, scriptNames[i].IndexOf(":", StringComparison.Ordinal));
+                }
+
+                Array.Sort(scriptNames);
+
+                foreach (string scriptName in scriptNames)
+                {
+                    string typename = scriptName.Substring(scriptName.IndexOf(":", StringComparison.Ordinal) + 1);
+                    AOChatCommand aoc = (AOChatCommand)assembly.CreateInstance(typename);
+                    if (aoc != null)
+                    {
+                        if (client.Character.Stats.GMLevel.Value >= aoc.GMLevelNeeded())
+                        {
+                            client.SendChatText(
+                                scriptName.Substring(0, scriptName.IndexOf(":", StringComparison.Ordinal)));
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="functionName">
+        /// </param>
+        /// <param name="character">
+        /// </param>
+        public void CallMethod(string functionName, Character character)
+        {
+            foreach (Assembly assembly in this.multipleDllList)
+            {
+                foreach (KeyValuePair<string, Type> kv in this.scriptList)
+                {
+                    if (kv.Key.Substring(kv.Key.IndexOf(":", StringComparison.Ordinal)) == ":" + functionName)
+                    {
+                        IAOScript aoScript =
+                            (IAOScript)
+                            assembly.CreateInstance(kv.Key.Substring(0, kv.Key.IndexOf(":", StringComparison.Ordinal)));
+                        if (aoScript != null)
+                        {
+                            kv.Value.InvokeMember(
+                                functionName, 
+                                BindingFlags.Default | BindingFlags.InvokeMethod, 
+                                null, 
+                                aoScript, 
+                                new object[] { character }, 
+                                CultureInfo.InvariantCulture);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="multipleFiles">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public bool Compile(bool multipleFiles)
         {
             if (!this.LoadFiles())
             {
                 return false;
             }
+
             if (multipleFiles)
             {
                 LogScriptAction(
-                    "ScriptCompiler:",
-                    ConsoleColor.Yellow,
-                    "multiple scripts configuration active.",
+                    "ScriptCompiler:", 
+                    ConsoleColor.Yellow, 
+                    "multiple scripts configuration active.", 
                     ConsoleColor.Magenta);
                 foreach (string scriptFile in this.ScriptsList)
                 {
-                    this.p.OutputAssembly = String.Format(
+                    this.p.OutputAssembly = string.Format(
                         CultureInfo.CurrentCulture, Path.Combine("tmp", DllName(scriptFile)));
+
                     // Create the directory if it doesnt exist
                     FileInfo file = new FileInfo(Path.Combine("tmp", DllName(scriptFile)));
                     if (file.Directory != null)
                     {
                         file.Directory.Create();
                     }
+
                     // Now compile the dll's
                     CompilerResults results = this.compiler.CompileAssemblyFromFile(this.p, scriptFile);
+
                     // And check for errors
-                    if (ErrorReporting(results).Length != 0) // We have errors, display them
+                    if (ErrorReporting(results).Length != 0)
                     {
+                        // We have errors, display them
                         LogScriptAction("Error:", ConsoleColor.Yellow, ErrorReporting(results), ConsoleColor.Red);
                         return false;
                     }
+
                     LogScriptAction(
-                        "Script " + scriptFile,
-                        ConsoleColor.Green,
-                        "Compiled to: " + this.p.OutputAssembly,
+                        "Script " + scriptFile, 
+                        ConsoleColor.Green, 
+                        "Compiled to: " + this.p.OutputAssembly, 
                         ConsoleColor.Green);
+
                     // Add the compiled assembly to our list
                     this.multipleDllList.Add(Assembly.LoadFile(file.FullName));
                 }
+
                 // Ok all good, load em
                 foreach (Assembly a in this.multipleDllList)
                 {
@@ -165,13 +458,16 @@ namespace ZoneEngine.Script
             {
                 // Compile the full Scripts.dll
                 CompilerResults results = this.compiler.CompileAssemblyFromFile(this.p, this.ScriptsList);
+
                 // And check for errors
-                if (ErrorReporting(results).Length != 0) // We have errors, display them
+                if (ErrorReporting(results).Length != 0)
                 {
+                    // We have errors, display them
                     LogScriptAction("Error:", ConsoleColor.Yellow, ErrorReporting(results), ConsoleColor.Red);
                     return false;
                 }
-                //Load the full dll
+
+                // Load the full dll
                 try
                 {
                     FileInfo file = new FileInfo("Scripts.dll");
@@ -195,28 +491,78 @@ namespace ZoneEngine.Script
                     LogScriptAction("ERROR", ConsoleColor.Red, "Bad image format:\r\n" + ee, ConsoleColor.Red);
                     return false;
                 }
+
                 this.AddScriptMembers();
             }
-        
+
             return true;
         }
-        
-        #endregion Compiler
-        
-        #region AppDomain Script Loading using interface IAOScript
-        
+
+        /// <summary>
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// </summary>
+        /// <param name="disposing">
+        /// </param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.compiler.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Our Error reporting method.
+        /// </summary>
+        /// <param name="results">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        private static string ErrorReporting(CompilerResults results)
+        {
+            StringBuilder report = new StringBuilder();
+            if (results.Errors.HasErrors)
+            {
+                // Count the errors and return them
+                int count = results.Errors.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    report.Append(results.Errors[i].FileName);
+                    report.AppendLine(
+                        " In Line: " + results.Errors[i].Line + " Error: " + results.Errors[i].ErrorNumber + " "
+                        + results.Errors[i].ErrorText);
+                }
+            }
+
+            return report.ToString();
+        }
+
         /// <summary>
         /// Loads all classes contained in our
         /// Assembly file that publically inherit
         /// our IAOScript class.
         /// Entry point for each script is public void Main(string[] args){}
         /// </summary>
-        /// <param name="script">Our .NET dll or exe file.</param>
+        /// <param name="script">
+        /// Our .NET dll or exe file.
+        /// </param>
         private static void RunScript(Assembly script)
         {
             // Now that we have a compiled script, lets run them
-            foreach (Type type in script.GetExportedTypes()) // returns all public types in the asembly
+            foreach (Type type in script.GetExportedTypes())
             {
+                // returns all public types in the asembly
                 foreach (Type iface in type.GetInterfaces())
                 {
                     if (iface == typeof(IAOScript))
@@ -234,11 +580,12 @@ namespace ZoneEngine.Script
                             if (scriptObject != null)
                             {
                                 LogScriptAction(
-                                    "Script",
-                                    ConsoleColor.Green,
-                                    scriptObject.GetType().Name + " Loaded.",
+                                    "Script", 
+                                    ConsoleColor.Green, 
+                                    scriptObject.GetType().Name + " Loaded.", 
                                     ConsoleColor.Green);
-                                //Lets run our script and display its results
+
+                                // Lets run our script and display its results
                                 scriptObject.Main(null);
                             }
                             else
@@ -260,91 +607,7 @@ namespace ZoneEngine.Script
                 }
             }
         }
-        
-        #endregion AppDomain Script Loading using interface IAOScript
-            
-        #region ErrorReporting Logging and Misc Tools
-            
-        /// <summary>
-        /// Our Error reporting method.
-        /// </summary>
-        /// <param name="results"></param>
-        /// <returns></returns>
-        private static string ErrorReporting(CompilerResults results)
-        {
-            StringBuilder report = new StringBuilder();
-            if (results.Errors.HasErrors)
-            {
-                //Count the errors and return them
-                var count = results.Errors.Count;
-                for (var i = 0; i < count; i++)
-                {
-                    report.Append(results.Errors[i].FileName);
-                    report.AppendLine(
-                                      " In Line: " + results.Errors[i].Line + " Error: " + results.Errors[i].ErrorNumber + " " +
-                                      results.Errors[i].ErrorText);
-                }
-            }
-        
-            return report.ToString();
-        }
-        
-        /// <summary>
-        /// Remove all text in a string before
-        /// the first chars it finds.
-        /// If chars is '\\' then 
-        /// Debug\\Scripts turns into Scripts
-        /// </summary>
-        /// <param name="hayStack">The string to trim the front of.</param>
-        /// <param name="needle">
-        /// The first text char in the string 
-        /// that matches this, and everything before it will be removed.
-        /// </param>
-        /// <returns>The corrected string.</returns>
-        public static string RemoveCharactersBeforeChar(string hayStack, char needle)
-        {
-            string input = hayStack;
-            int index = input.IndexOf(needle);
-            if (index >= 0)
-            {
-                return input.Substring(index + 1);
-            }
-            //Hmm if we got here then it has no .'s in it so just return input
-            return input;
-        }
-            
-        /// <summary>
-        /// Removes all text from a string
-        /// after char chars
-        /// </summary>
-        /// <param name="hayStack">The string to trim.</param>
-        /// <param name="needle">The char to remove all text after EX: '.'</param>
-        /// <returns>The corrected string.</returns>
-        public static string RemoveCharactersAfterChar(string hayStack, char needle)
-        {
-            string input = hayStack;
-            int index = input.IndexOf(needle);
-            if (index > 0)
-            {
-                input = input.Substring(0, index);
-            }
-            return input;
-        }
-            
-        /// <summary>
-        /// Turn our script names into dll names.
-        /// </summary>
-        /// <param name="scriptName">The script name.</param>
-        /// <returns>The dll name.</returns>
-        public static string DllName(string scriptName)
-        {
-            scriptName = RemoveCharactersAfterChar(scriptName, '.');
-            scriptName = RemoveCharactersBeforeChar(scriptName, '\\');
-            scriptName = RemoveCharactersBeforeChar(scriptName, '/');
-        
-            return scriptName + ".dll";
-        }
-            
+
         /// <summary>
         /// If the Scripts directory is empty
         /// or the Scripts directory is missing
@@ -382,218 +645,24 @@ namespace ZoneEngine.Script
             catch (IOException)
             {
                 LogScriptAction(
-                    "Error",
-                    ConsoleColor.Red,
-                    "I/O Error occured. (Path is filename or network error)",
+                    "Error", 
+                    ConsoleColor.Red, 
+                    "I/O Error occured. (Path is filename or network error)", 
                     ConsoleColor.Red);
                 return false;
             }
-        
+
             if (this.ScriptsList.Length == 0)
             {
                 LogScriptAction(
                     "Error:", ConsoleColor.Red, "Scripts directory contains no scripts!", ConsoleColor.Yellow);
                 return false;
             }
+
             return true;
         }
-        
-        /// <summary>
-        /// Logs messages to the console.
-        /// </summary>
-        /// <param name="owner">Who or what to log as.</param>
-        /// <param name="ownerColor">The color of the text the owner shows.</param>
-        /// <param name="message">The message to display.</param>
-        /// <param name="messageColor">The color to display the message in.</param>
-        public static void LogScriptAction(
-            string owner, ConsoleColor ownerColor, string message, ConsoleColor messageColor)
-        {
-            Console.ForegroundColor = ownerColor;
-            Console.Write(owner + " ");
-            Console.ForegroundColor = messageColor;
-            Console.Write(message + "\n");
-            Console.ResetColor();
-        }
-                
-        #endregion ErrorReporting Logging and Misc Tools
-                    
-        #region Read all Classes and their Members into a Dictionary
-                        
-        public void AddScriptMembers()
-        {
-            this.scriptList.Clear();
-            foreach (Assembly assembly in this.multipleDllList)
-            {
-                foreach (Type t in assembly.GetTypes())
-                {
-                    if (t.GetInterface("IAOScript") != null)
-                    {
-                        if (t.Name != "IAOScript")
-                        {
-                            foreach (MemberInfo mi in t.GetMembers())
-                            {
-                                if ((mi.Name == "GetType") || (mi.Name == ".ctor") || (mi.Name == "GetHashCode") ||
-                                    (mi.Name == "ToString") || (mi.Name == "Equals"))
-                                {
-                                    continue;
-                                }
-                                if (mi.MemberType == MemberTypes.Method)
-                                {
-                                    if (!this.scriptList.ContainsKey(t.Namespace + "." + t.Name + ":" + mi.Name))
-                                    {
-                                        this.scriptList.Add(t.Namespace + "." + t.Name + ":" + mi.Name, t);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            this.chatCommands.Clear();
-            Assembly wholeassembly = Assembly.GetExecutingAssembly();
-            foreach (Type t in wholeassembly.GetTypes())
-            {
-                if (t.Namespace == "ZoneEngine.ChatCommands")
-                {
-                    if (t.Name != "AOChatCommand")
-                    {
-                        if (!this.chatCommands.ContainsKey(t.Namespace + "." + t.Name))
-                        {
-                            AOChatCommand aoc = (AOChatCommand)wholeassembly.CreateInstance(t.Namespace + "." + t.Name);
-                            List<string> acceptedcommands = aoc.ListCommands();
-                            foreach (string command in acceptedcommands)
-                            {
-                                this.chatCommands.Add(t.Namespace + "." + t.Name + ":" + command, t);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-                    
-        #endregion
-                            
-        #region Function Calling
-                        
-        public void CallMethod(string functionName, Character character)
-        {
-            foreach (Assembly assembly in this.multipleDllList)
-            {
-                foreach (KeyValuePair<string, Type> kv in this.scriptList)
-                {
-                    if (kv.Key.Substring(kv.Key.IndexOf(":", StringComparison.Ordinal)) == ":" + functionName)
-                    {
-                        IAOScript aoScript =
-                            (IAOScript)
-                            assembly.CreateInstance(kv.Key.Substring(0, kv.Key.IndexOf(":", StringComparison.Ordinal)));
-                        if (aoScript != null)
-                        {
-                            kv.Value.InvokeMember(
-                                functionName,
-                                BindingFlags.Default | BindingFlags.InvokeMethod,
-                                null,
-                                aoScript,
-                                new object[] { character },
-                                CultureInfo.InvariantCulture);
-                        }
-                    }
-                }
-            }
-        }
-                        
-        #endregion
-                        
-        #region ChatCommand Calling
-                            
-        public void CallChatCommand(string commandName, Client client, Identity target, string[] commandArguments)
-        {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            if (commandName.ToUpperInvariant() != "LISTCOMMANDS")
-            {
-                foreach (KeyValuePair<string, Type> kv in this.chatCommands)
-                {
-                    if (kv.Key.Substring(kv.Key.IndexOf(":", StringComparison.Ordinal) + 1).ToUpperInvariant() ==
-                        commandName.ToUpperInvariant())
-                    {
-                        AOChatCommand aoc =
-                            (AOChatCommand)
-                            assembly.CreateInstance(kv.Key.Substring(0, kv.Key.IndexOf(":", StringComparison.Ordinal)));
-                        if (aoc != null)
-                        {
-                            // Check GM Level bitwise
-                            if ((client.Character.Stats.GMLevel.Value < aoc.GMLevelNeeded()) &&
-                                (aoc.GMLevelNeeded() > 0))
-                            {
-                                client.SendChatText(
-                                    "You are not authorized to use this command!. This incident will be recorded.");
-                                // It is not yet :)
-                                return;
-                            }
-                            // Check if only one argument has been passed for "help"
-                            if (commandArguments.Length == 2)
-                            {
-                                if (commandArguments[1].ToUpperInvariant() == "HELP")
-                                {
-                                    aoc.CommandHelp(client);
-                                    return;
-                                }
-                            }
-                            // Execute the command with the given command arguments, if CheckCommandArguments is true else print command help
-                            if (aoc.CheckCommandArguments(commandArguments))
-                            {
-                                aoc.ExecuteCommand(client, target, commandArguments);
-                            }
-                            else
-                            {
-                                aoc.CommandHelp(client);
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                client.SendChatText("Available Commands:");
-                string[] scriptNames = this.chatCommands.Keys.ToArray();
-                for (int i = 0; i < scriptNames.Length; i++)
-                {
-                    scriptNames[i] = scriptNames[i].Substring(scriptNames[i].IndexOf(":", StringComparison.Ordinal) + 1) +
-                                     ":" +
-                                     scriptNames[i].Substring(0, scriptNames[i].IndexOf(":", StringComparison.Ordinal));
-                }
-                Array.Sort(scriptNames);
-                
-                foreach (string scriptName in scriptNames)
-                {
-                    string typename = scriptName.Substring(scriptName.IndexOf(":", StringComparison.Ordinal) + 1);
-                    AOChatCommand aoc = (AOChatCommand)assembly.CreateInstance(typename);
-                    if (aoc != null)
-                    {
-                        if (client.Character.Stats.GMLevel.Value >= aoc.GMLevelNeeded())
-                        {
-                            client.SendChatText(
-                                scriptName.Substring(0, scriptName.IndexOf(":", StringComparison.Ordinal)));
-                        }
-                    }
-                }
-            }
-        }
-                
-        #endregion ChatCommand Calling
-        
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                this.compiler.Dispose();
-            }
-        }
+        #endregion
     }
 
     #endregion Class ScriptCompiler
