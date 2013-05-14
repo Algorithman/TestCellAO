@@ -8,7 +8,7 @@ namespace ZoneEngine.GameObject
 {
     using System.Diagnostics.Contracts;
 
-    public class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner, IAOEvents, IAOActions, IInstancedEntity
+    public class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner, IAOEvents, IAOActions
     {
         protected MoveModes moveMode = MoveModes.None;
 
@@ -54,15 +54,11 @@ namespace ZoneEngine.GameObject
         {
             get
             {
-                Contract.Ensures(Name != null, "Name is Null");
-                Contract.Ensures(Name != "", "No name set");
                 // TODO: Implement this property getter
                 throw new NotImplementedException();
             }
             set
             {
-                Contract.Requires(value != null);
-                Contract.Requires(value != "");
                 // TODO: Implement this property setter
                 throw new NotImplementedException();
             }
@@ -78,7 +74,7 @@ namespace ZoneEngine.GameObject
 
         internal void Send(SmokeLounge.AOtomation.Messaging.Messages.MessageBody message, bool announceToPlayfield)
         {
-            throw new NotImplementedException();
+            this.client.SendCompressed(message);
         }
     }
 }

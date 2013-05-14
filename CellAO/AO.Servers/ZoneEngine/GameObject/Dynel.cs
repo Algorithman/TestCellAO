@@ -7,6 +7,8 @@ using ZoneEngine.GameObject.Stats;
 
 namespace ZoneEngine.GameObject
 {
+    using System.Diagnostics.Contracts;
+
     public class Dynel : GameObject, IInstancedEntity, IStats
     {
         protected DynelStats stats;
@@ -38,6 +40,7 @@ namespace ZoneEngine.GameObject
         {
             get
             {
+                Contract.Ensures(stats != null);
                 return stats;
             }
         }
