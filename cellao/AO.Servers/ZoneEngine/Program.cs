@@ -78,8 +78,6 @@ namespace ZoneEngine
 
         #endregion
 
-        #endregion
-
         #region Public Methods and Operators
 
         /// <summary>
@@ -208,8 +206,6 @@ namespace ZoneEngine
                 Console.ReadKey();
                 return;
             }
-
-            
 
             string consoleCommand;
             ct.TextRead("zone_consolecommands.txt");
@@ -348,6 +344,6 @@ namespace ZoneEngine
             }
         }
 
-        
+        #endregion
     }
 }

@@ -29,6 +29,7 @@ namespace ZoneEngine.CoreClient
 
     using System;
     using System.Globalization;
+    using System.Net.Sockets;
 
     using AO.Core.Components;
     using AO.Core.Events;
@@ -66,6 +67,18 @@ namespace ZoneEngine.CoreClient
         /// <summary>
         /// </summary>
         private string accountName = string.Empty;
+
+        /// <summary>
+        /// </summary>
+        private bool zStreamSetup;
+
+        /// <summary>
+        /// </summary>
+        private NetworkStream netStream;
+
+        /// <summary>
+        /// </summary>
+        private ZOutputStream zStream;
 
         /// <summary>
         /// </summary>
@@ -197,129 +210,177 @@ namespace ZoneEngine.CoreClient
 
         /// <summary>
         /// </summary>
-        /// <param name="text">
+        /// <param name="packet">
         /// </param>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public void SendChatText(string text)
+        public void SendCompressed(byte[] packet)
         {
-            var message = new Message();
+            int tries = 0;
+            bool done = false;
 
-            ChatTextMessage chatTextMessage = new ChatTextMessage();
-            chatTextMessage.Text = text;
-            this.Send(this.character.Identity.Instance, chatTextMessage);
-
-            throw new NotImplementedException("SendChatText not implemented yet");
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="message">
-        /// </param>
-        /// <param name="announceToPlayfield">
-        /// </param>
-        public void SendToPlayfield(Message message, bool announceToPlayfield)
-        {
-            foreach (Client client in this.server.Clients)
+            // 18.1 Fix
+            byte[] pn = BitConverter.GetBytes(this.packetNumber++);
+            packet[0] = pn[1];
+            packet[1] = pn[0];
+            while ((!done) && (tries < 3))
             {
-                if (client.Character.Playfield != this.Character.Playfield)
+                try
                 {
-                    continue;
-                }
+                    done = true;
+                    if (!this.zStreamSetup)
+                    {
+                        // Create the zStream
+                        this.netStream = new NetworkStream(this.TcpSocket);
+                        this.zStream = new ZOutputStream(this.netStream, zlibConst.Z_BEST_COMPRESSION);
+                        this.zStream.FlushMode = zlibConst.Z_SYNC_FLUSH;
+                        this.zStreamSetup = true;
+                    }
 
-                if (client.Character.Identity.Instance == this.Character.Identity.Instance)
+                    this.zStream.Write(packet, 0, packet.Length);
+                    this.zStream.Flush();
+                }
+                catch (Exception)
                 {
-                    continue;
+                    tries++;
+                    done = false;
+                    this.Server.DisconnectClient(this);
+                    return;
                 }
-
-                // TODO: pass it over to the normal Send
             }
-        }
 
-        #endregion
+                // <summary>
+                // </summary>
+                /// <param name="text">
+                /// </param>
+                /// <exception cref="NotImplementedException">
+                /// </exception>
+            public
+            void SendChatText 
+            string text)
+            {
+                var message = new Message();
 
-        #region Methods
+                ChatTextMessage chatTextMessage = new ChatTextMessage();
+                chatTextMessage.Text = text;
+                this.Send(this.character.Identity.Instance, chatTextMessage);
 
-        /// <summary>
-        /// </summary>
-        /// <param name="segment">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        protected uint GetMessageNumber(BufferSegment segment)
-        {
-            var messageNumberArray = new byte[4];
-            messageNumberArray[3] = segment.SegmentData[16];
-            messageNumberArray[2] = segment.SegmentData[17];
-            messageNumberArray[1] = segment.SegmentData[18];
-            messageNumberArray[0] = segment.SegmentData[19];
-            uint reply = BitConverter.ToUInt32(messageNumberArray, 0);
-            return reply;
-        }
+                throw new NotImplementedException("SendChatText not implemented yet");
+            }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="segment">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        protected uint GetMessageNumber(byte[] segment)
-        {
-            var messageNumberArray = new byte[4];
-            messageNumberArray[3] = segment[16];
-            messageNumberArray[2] = segment[17];
-            messageNumberArray[1] = segment[18];
-            messageNumberArray[0] = segment[19];
-            uint reply = BitConverter.ToUInt32(messageNumberArray, 0);
-            return reply;
-        }
+            // <summary>
+            // </summary>
+            /// <param name="message">
+            /// </param>
+            /// <param name="announceToPlayfield">
+            /// </param>
+        public
+            void SendToPlayfield 
+            (Message message, bool announceToPlayfield)
+            {
+                foreach (Client client in this.server.Clients)
+                {
+                    if (client.Character.Playfield != this.Character.Playfield)
+                    {
+                        continue;
+                    }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="buffer">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        protected override bool OnReceive(BufferSegment buffer)
-        {
-            Message message = null;
+                    if (client.Character.Identity.Instance == this.Character.Identity.Instance)
+                    {
+                        continue;
+                    }
 
-            var packet = new byte[this._remainingLength];
-            Array.Copy(buffer.SegmentData, packet, this._remainingLength);
+                    // TODO: pass it over to the normal Send
+                }
+            }
 
-            /* Uncomment for Incoming Messages
+            #endregion
+
+            /// <summary>
+            /// </summary>
+            /// <param name="segment">
+            /// </param>
+            /// <returns>
+            /// </returns>
+        protected
+            uint GetMessageNumber 
+            BufferSegment segment)
+            {
+                var messageNumberArray = new byte[4];
+                messageNumberArray[3] = segment.SegmentData[16];
+                messageNumberArray[2] = segment.SegmentData[17];
+                messageNumberArray[1] = segment.SegmentData[18];
+                messageNumberArray[0] = segment.SegmentData[19];
+                uint reply = BitConverter.ToUInt32(messageNumberArray, 0);
+                return reply;
+            }
+
+            /// <summary>
+            /// </summary>
+            /// <param name="segment">
+            /// </param>
+            /// <returns>
+            /// </returns>
+        protected
+            uint GetMessageNumber 
+            byte[] segment)
+            {
+                var messageNumberArray = new byte[4];
+                messageNumberArray[3] = segment[16];
+                messageNumberArray[2] = segment[17];
+                messageNumberArray[1] = segment[18];
+                messageNumberArray[0] = segment[19];
+                uint reply = BitConverter.ToUInt32(messageNumberArray, 0);
+                return reply;
+            }
+
+            /// <summary>
+            /// </summary>
+            /// <param name="buffer">
+            /// </param>
+            /// <returns>
+            /// </returns>
+        protected override
+            bool OnReceive 
+            BufferSegment buffer)
+            {
+                Message message = null;
+
+                var packet = new byte[this._remainingLength];
+                Array.Copy(buffer.SegmentData, packet, this._remainingLength);
+
+                /* Uncomment for Incoming Messages
             */
-            Console.WriteLine("Offset: " + buffer.Offset.ToString() + " -- RemainingLength: " + this._remainingLength);
-            Console.WriteLine(NiceHexOutput.Output(packet));
+                Console.WriteLine(
+                    "Offset: " + buffer.Offset.ToString() + " -- RemainingLength: " + this._remainingLength);
+                Console.WriteLine(NiceHexOutput.Output(packet));
 
-            this._remainingLength = 0;
-            try
-            {
-                message = this.messageSerializer.Deserialize(packet);
+                this._remainingLength = 0;
+                try
+                {
+                    message = this.messageSerializer.Deserialize(packet);
+                }
+                catch (Exception)
+                {
+                    uint messageNumber = this.GetMessageNumber(packet);
+                    this.Server.Warning(
+                        this, "Client sent malformed message {0}", messageNumber.ToString(CultureInfo.InvariantCulture));
+                    return false;
+                }
+
+                buffer.IncrementUsage();
+
+                if (message == null)
+                {
+                    uint messageNumber = this.GetMessageNumber(packet);
+                    this.Server.Warning(
+                        this, "Client sent unknown message {0}", messageNumber.ToString(CultureInfo.InvariantCulture));
+                    return false;
+                }
+
+                this.bus.Publish(new MessageReceivedEvent(this, message));
+
+                return true;
             }
-            catch (Exception)
-            {
-                uint messageNumber = this.GetMessageNumber(packet);
-                this.Server.Warning(
-                    this, "Client sent malformed message {0}", messageNumber.ToString(CultureInfo.InvariantCulture));
-                return false;
-            }
-
-            buffer.IncrementUsage();
-
-            if (message == null)
-            {
-                uint messageNumber = this.GetMessageNumber(packet);
-                this.Server.Warning(
-                    this, "Client sent unknown message {0}", messageNumber.ToString(CultureInfo.InvariantCulture));
-                return false;
-            }
-
-            this.bus.Publish(new MessageReceivedEvent(this, message));
-
-            return true;
         }
-
-        #endregion
     }
-}

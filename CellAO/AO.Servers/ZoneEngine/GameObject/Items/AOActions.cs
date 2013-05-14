@@ -33,52 +33,19 @@ namespace ZoneEngine.GameObject.Items
     #endregion
 
     /// <summary>
+    /// AOActions covers all action types, with their reqs
     /// </summary>
     [Serializable]
-    public class AOEvents
+    public class AOActions
     {
-        #region Fields
+        /// <summary>
+        /// Type of Action (constants in ItemHandler)
+        /// </summary>
+        public int ActionType;
 
         /// <summary>
-        /// Type of the Event (constants in ItemHandler)
+        /// List of Requirements for this action
         /// </summary>
-        private int eventType;
-
-        /// <summary>
-        /// List of Functions of the Event
-        /// </summary>
-        private List<AOFunctions> functions = new List<AOFunctions>();
-
-        #endregion
-
-        /// <summary>
-        /// List of Functions of the Event
-        /// </summary>
-        public List<AOFunctions> Functions
-        {
-            get
-            {
-                return this.functions;
-            }
-            set
-            {
-                this.functions = value;
-            }
-        }
-
-        /// <summary>
-        /// Type of the Event (constants in ItemHandler)
-        /// </summary>
-        public int EventType
-        {
-            get
-            {
-                return this.eventType;
-            }
-            set
-            {
-                this.eventType = value;
-            }
-        }
+        public List<AORequirements> Requirements = new List<AORequirements>();
     }
 }

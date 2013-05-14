@@ -94,6 +94,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameObject\Items\AOActions.cs" />
+    <Compile Include="GameObject\Items\AOItemAttribute.cs" />
     <Compile Include="GameObject\Stats\CharacterStats.cs" />
     <Compile Include="Component\ClientFactory.cs" />
     <Compile Include="GameObject\Items\AOEvents.cs" />

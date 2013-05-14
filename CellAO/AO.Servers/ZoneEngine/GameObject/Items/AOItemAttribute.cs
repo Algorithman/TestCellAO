@@ -28,57 +28,32 @@ namespace ZoneEngine.GameObject.Items
     #region Usings ...
 
     using System;
-    using System.Collections.Generic;
 
     #endregion
 
     /// <summary>
+    /// AOItemAttribute
     /// </summary>
     [Serializable]
-    public class AOEvents
+    public class AOItemAttribute
     {
-        #region Fields
+        /// <summary>
+        /// Stat number of attribute
+        /// </summary>
+        public int Stat;
 
         /// <summary>
-        /// Type of the Event (constants in ItemHandler)
+        /// Value of attribute
         /// </summary>
-        private int eventType;
+        public int Value;
 
         /// <summary>
-        /// List of Functions of the Event
+        /// Create a empty AOItemAttribute
         /// </summary>
-        private List<AOFunctions> functions = new List<AOFunctions>();
-
-        #endregion
-
-        /// <summary>
-        /// List of Functions of the Event
-        /// </summary>
-        public List<AOFunctions> Functions
+        public AOItemAttribute()
         {
-            get
-            {
-                return this.functions;
-            }
-            set
-            {
-                this.functions = value;
-            }
-        }
-
-        /// <summary>
-        /// Type of the Event (constants in ItemHandler)
-        /// </summary>
-        public int EventType
-        {
-            get
-            {
-                return this.eventType;
-            }
-            set
-            {
-                this.eventType = value;
-            }
+            this.Stat = 0;
+            this.Value = 0;
         }
     }
 }
