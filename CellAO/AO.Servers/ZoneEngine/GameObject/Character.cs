@@ -32,6 +32,8 @@ namespace ZoneEngine.GameObject
 
     using Cell.Core;
 
+    using NiceHexOutput;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
 
@@ -41,13 +43,13 @@ namespace ZoneEngine.GameObject
 
     /// <summary>
     /// </summary>
-    public class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner, IAOEvents, IAOActions
+    public sealed class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner, IAOEvents, IAOActions
     {
         #region Fields
 
         /// <summary>
         /// </summary>
-        protected IClient client;
+        protected IZoneClient client;
 
         /// <summary>
         /// </summary>
@@ -117,25 +119,6 @@ namespace ZoneEngine.GameObject
             }
         }
 
-        /// <summary>
-        /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public Identity Playfield
-        {
-            get
-            {
-                // TODO: Implement this property getter
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                // TODO: Implement this property setter
-                throw new NotImplementedException();
-            }
-        }
-
         #endregion
 
         #region Methods
@@ -146,9 +129,9 @@ namespace ZoneEngine.GameObject
         /// </param>
         /// <param name="announceToPlayfield">
         /// </param>
-        internal void Send(MessageBody message, bool announceToPlayfield)
+        internal void Send(MessageBody messageBody, bool announceToPlayfield)
         {
-            this.client.SendCompressed(message);
+            this.client.SendCompressed(messageBody, this.Identity.Instance, announceToPlayfield);
         }
 
         #endregion

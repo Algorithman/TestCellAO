@@ -56,8 +56,8 @@
     <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
     <CodeContractsFailBuildOnWarnings>False</CodeContractsFailBuildOnWarnings>
     <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
-    <CodeContractsReferenceAssembly>%28none%29</CodeContractsReferenceAssembly>
-    <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
+    <CodeContractsReferenceAssembly>Build</CodeContractsReferenceAssembly>
+    <CodeContractsAnalysisWarningLevel>3</CodeContractsAnalysisWarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -106,7 +106,7 @@
     <Compile Include="GameObject\Corpse.cs" />
     <Compile Include="GameObject\Character.cs" />
     <Compile Include="Collision\BorderlineCheck.cs" />
-    <Compile Include="CoreClient\Client.cs" />
+    <Compile Include="Network\Client.cs" />
     <Compile Include="GameObject\Dynel.cs" />
     <Compile Include="GameObject\GameObject.cs" />
     <Compile Include="GameObject\Enums\MoveModes.cs" />
@@ -144,6 +144,7 @@
     <Compile Include="GameObject\ILootInventory.cs" />
     <Compile Include="GameObject\IAOEvents.cs" />
     <Compile Include="GameObject\IAOActions.cs" />
+    <Compile Include="Network\IZoneClient.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Script\AOChatCommand.cs" />
@@ -151,7 +152,7 @@
     <Compile Include="Script\ScriptCompiler.cs" />
     <Compile Include="GameObject\Statel.cs" />
     <Compile Include="GameObject\VendorShop.cs" />
-    <Compile Include="ZoneServer.cs" />
+    <Compile Include="Network\ZoneServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Config.xml">
@@ -2206,7 +2207,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="GameObject\GameObjectDiagram.cd" />
-    <None Include="NBug.ZoneEngine.config" />
+    <None Include="NBug.ZoneEngine.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -2224,6 +2227,10 @@
     <ProjectReference Include="..\..\Libraries\Source\Cell.Core\Cell.Core.csproj">
       <Project>{71ab07ad-4d94-4693-8560-47862e5b6e61}</Project>
       <Name>Cell.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\zlib\source\zlib.net.csproj">
+      <Project>{0c89b7a2-a218-49e4-b545-5b044a45f977}</Project>
+      <Name>zlib.net</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\NiceHexOutput\NiceHexOutput.csproj">
       <Project>{6079cb15-9d05-4142-ab50-00db492dd871}</Project>

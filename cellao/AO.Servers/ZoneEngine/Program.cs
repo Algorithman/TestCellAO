@@ -35,6 +35,7 @@ namespace ZoneEngine
 
     using AO.Core;
     using AO.Core.Components;
+    using AO.Core.Logger;
 
     using MySql.Data.MySqlClient;
 
@@ -154,23 +155,21 @@ namespace ZoneEngine
         {
             bool processedargs = false;
 
-            LoggingConfiguration config = new LoggingConfiguration();
-            ColoredConsoleTarget consoleTarget = new ColoredConsoleTarget();
-            consoleTarget.Layout = "${date:format=HH\\:MM\\:ss} ${logger} ${message}";
-            FileTarget fileTarget = new FileTarget();
-            config.AddTarget("file", fileTarget);
-            fileTarget.FileName = "${basedir}/ZoneEngineLog.txt";
-            fileTarget.Layout = "${date:format=HH\\:MM\\:ss} ${logger} ${message}";
-            LoggingRule rule1 = new LoggingRule("*", LogLevel.Trace, consoleTarget);
-            config.LoggingRules.Add(rule1);
-            LoggingRule rule2 = new LoggingRule("*", LogLevel.Trace, fileTarget);
-            config.LoggingRules.Add(rule2);
-            LogManager.Configuration = config;
+            #region NLog Setup
+            LogUtil.SetupConsoleLogging(LogLevel.Debug);
+            LogUtil.SetupFileLogging("${basedir}/ZoneEngineLog.txt",LogLevel.Trace);
+            #endregion
 
+            #region NBug Setup
             SettingsOverride.LoadCustomSettings("NBug.ZoneEngine.Config");
             Settings.WriteLogToDisk = true;
             AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
             TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
+            #endregion
+
+            #region Script Loading Code Area..
+            csc = new ScriptCompiler();
+            #endregion
 
             // TODO: ADD More Handlers.
             Console.Title = "CellAO " + AssemblyInfoclass.Title + " Console. Version: " + AssemblyInfoclass.Description
@@ -186,8 +185,6 @@ namespace ZoneEngine
             Console.ResetColor();
 
             zoneServer = Container.GetInstance<ZoneServer>();
-            bool TCPEnable = true;
-            bool UDPEnable = false;
             int Port = Convert.ToInt32(Config.Instance.CurrentConfig.ZonePort);
             try
             {

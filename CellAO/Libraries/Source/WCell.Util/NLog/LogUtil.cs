@@ -7,8 +7,9 @@ using NLog.Targets;
 
 namespace WCell.Util.NLog
 {
+    using System.Collections.Generic;
 
-	public static class LogUtil
+    public static class LogUtil
 	{
 		private static Logger log = LogManager.GetCurrentClassLogger();
 
@@ -150,12 +151,6 @@ namespace WCell.Util.NLog
 				}
 			}
 
-			if (e != null)
-			{
-				logger("");
-				logger(e.GetAllMessages().ToString("\n\t"));
-			}
-
 			var evt = ExceptionRaised;
 			if (evt != null)
 			{
@@ -166,8 +161,15 @@ namespace WCell.Util.NLog
 
 		public static void LogStacktrace(Action<string> logger)
 		{
-			logger(new StackTrace(Thread.CurrentThread, true).GetFrames().ToString("\n\t", frame => frame.ToString().Trim()));
+		    StackTrace stackTrace = new StackTrace(Thread.CurrentThread, true);
+		    string temp = "";
+            foreach (StackFrame stackFrame in stackTrace.GetFrames())
+            {
+                temp += stackFrame.ToString().Trim() + "\r\n\t";
+            }
+            logger(temp);
 		}
+
 
 		private static void LogSystemInfo(Action<string> logger)
 		{

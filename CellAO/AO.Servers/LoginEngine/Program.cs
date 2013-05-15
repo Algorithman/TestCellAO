@@ -8,13 +8,15 @@ namespace LoginEngine
     using System.Text.RegularExpressions;
     using AO.Core;
     using AO.Core.Components;
+    using AO.Core.Logger;
+
     using LoginEngine.CoreServer;
     using MySql.Data.MySqlClient;
     using NBug;
     using NBug.Properties;
     using NLog;
-    using NLog.Config;
-    using NLog.Targets;
+
+
     using Config = AO.Core.Config.ConfigReadWrite;
 
     class Program
@@ -64,6 +66,22 @@ namespace LoginEngine
         private static
         void Main(string[] args)
         {
+
+
+            #region NLog Setup
+            LogUtil.SetupConsoleLogging(LogLevel.Debug);
+            LogUtil.SetupFileLogging("${basedir}/LoginEngineLog.txt", LogLevel.Trace);
+            #endregion
+
+            #region NBug Setup
+            SettingsOverride.LoadCustomSettings("NBug.LoginEngine.Config");
+            NBug.Settings.WriteLogToDisk = true;
+            AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
+            TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
+            #endregion
+
+
+
             Console.Title = "CellAO " + AssemblyInfoclass.Title + " Console. Version: " +
                             AssemblyInfoclass.Description + " " + AssemblyInfoclass.AssemblyVersion + " " +
                             AssemblyInfoclass.Trademark;
@@ -100,23 +118,6 @@ namespace LoginEngine
                 return;
             }
             
-            var config = new LoggingConfiguration();
-            var consoleTarget = new ColoredConsoleTarget();
-            consoleTarget.Layout = "${date:format=HH\\:MM\\:ss} ${logger} ${message}";
-            var fileTarget = new FileTarget();
-            config.AddTarget("file", fileTarget);
-            fileTarget.FileName = "${basedir}/LoginEngineLog.txt";
-            fileTarget.Layout = "${date:format=HH\\:MM\\:ss} ${logger} ${message}";
-            var rule1 = new LoggingRule("*", LogLevel.Trace, consoleTarget);
-            config.LoggingRules.Add(rule1);
-            var rule2 = new LoggingRule("*", LogLevel.Trace, fileTarget);
-            config.LoggingRules.Add(rule2);
-            LogManager.Configuration = config;
-            
-            SettingsOverride.LoadCustomSettings("NBug.LoginEngine.Config");
-            NBug.Settings.WriteLogToDisk = true;
-            AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
-            TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
             
             // TODO: ADD More Handlers.
             loginServer.MaximumPendingConnections = 100;

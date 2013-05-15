@@ -5,6 +5,8 @@ namespace LoginEngine.CoreServer
     using System.ComponentModel.Composition;
     using System.Net;
 
+    using AO.Core.Logger;
+
     using Cell.Core;
 
     using LoginEngine.Component;
@@ -49,14 +51,8 @@ namespace LoginEngine.CoreServer
         static LoginServer()
         {
             StartTime = DateTime.Now;
-
+            LogUtil.Debug("Server is starting at " + StartTime.ToString());
         }
 
-        protected static readonly Logger Log = LogManager.GetCurrentClassLogger();
-
-        protected LoginServer()
-        {
-            Log.Debug("Server is starting at " + StartTime.ToString());
-        }
     }
 }

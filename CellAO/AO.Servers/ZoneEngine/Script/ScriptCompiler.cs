@@ -32,6 +32,7 @@ namespace ZoneEngine.Script
     using System;
     using System.CodeDom.Compiler;
     using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -531,6 +532,7 @@ namespace ZoneEngine.Script
         /// </returns>
         private static string ErrorReporting(CompilerResults results)
         {
+            Contract.Requires(results != null);
             StringBuilder report = new StringBuilder();
             if (results.Errors.HasErrors)
             {
@@ -559,6 +561,7 @@ namespace ZoneEngine.Script
         /// </param>
         private static void RunScript(Assembly script)
         {
+            Contract.Requires(script != null);
             // Now that we have a compiled script, lets run them
             foreach (Type type in script.GetExportedTypes())
             {
