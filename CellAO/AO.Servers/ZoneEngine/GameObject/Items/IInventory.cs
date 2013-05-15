@@ -61,6 +61,8 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         int FindFreeSlot();
 
+        /// <summary>
+        /// </summary>
         int InventoryOffset { get; }
 
         /// <summary>

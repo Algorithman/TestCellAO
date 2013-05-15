@@ -1,34 +1,32 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CharacterName.cs" company="CellAO Team">
-//   Copyright © 2005-2013 CellAO Team.
-//   
-//   All rights reserved.
-//   
-//   Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-//   
-//       * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//       * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-//       * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-//   
-//   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-//   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-//   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-//   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-//   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-//   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-//   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-//   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// </copyright>
-// <summary>
-//   Defines the CharacterName type.
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿#region License
+
+// Copyright (c) 2005-2013, CellAO Team
+// 
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// 
+//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
 
 namespace LoginEngine.Packets
 {
+    #region Usings ...
+
     using System;
     using System.Data;
     using System.Text;
@@ -37,55 +35,89 @@ namespace LoginEngine.Packets
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public class CharacterName
     {
         #region Static Fields
 
+        /// <summary>
+        /// </summary>
         private static string mandatoryVowel = "aiueo"; /* 5 chars */
 
+        /// <summary>
+        /// </summary>
         private static string optionalOrdCon = "vybcfghjqktdnpmrlws"; /* 19 chars */
 
+        /// <summary>
+        /// </summary>
         private static string optionalOrdEnd = "nmrlstyzx"; /* 9 chars */
 
         #endregion
 
         #region Public Properties
 
+        /// <summary>
+        /// </summary>
         public string AccountName { get; set; }
 
+        /// <summary>
+        /// </summary>
         public int Breed { get; set; }
 
+        /// <summary>
+        /// </summary>
         public int Fatness { get; set; }
 
+        /// <summary>
+        /// </summary>
         public int Gender { get; set; }
 
+        /// <summary>
+        /// </summary>
         public int HeadMesh { get; set; }
 
+        /// <summary>
+        /// </summary>
         public int Level { get; set; }
 
+        /// <summary>
+        /// </summary>
         public int MonsterScale { get; set; }
 
+        /// <summary>
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// </summary>
         public int Profession { get; set; }
 
         #endregion
 
         #region Properties
 
+        /// <summary>
+        /// </summary>
         private int[] Abis { get; set; }
 
         #endregion
 
         #region Public Methods and Operators
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public int CheckAgainstDatabase()
         {
             var ms = new SqlWrapper();
-            var charCount = 0;
+            int charCount = 0;
 
             // TODO:COUNT
-            var sqlQuery = "SELECT count(`ID`) FROM `characters` WHERE Name = " + "'" + this.Name + "'";
+            string sqlQuery = "SELECT count(`ID`) FROM `characters` WHERE Name = " + "'" + this.Name + "'";
             charCount = ms.SqlCount(sqlQuery);
 
             /* name in use */
@@ -97,6 +129,10 @@ namespace LoginEngine.Packets
             return this.CreateNewChar();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="charid">
+        /// </param>
         public void DeleteChar(int charid)
         {
             var ms = new SqlWrapper();
@@ -105,7 +141,7 @@ namespace LoginEngine.Packets
             {
                 /* delete char */
                 /* i assume there should be somewhere a flag, caus FC can reenable a deleted char.. */
-                var sqlQuery = "DELETE FROM `characters` WHERE ID = " + charid;
+                string sqlQuery = "DELETE FROM `characters` WHERE ID = " + charid;
                 ms.SqlDelete(sqlQuery);
                 sqlQuery = "DELETE FROM `characters_stats` WHERE ID = " + charid;
                 ms.SqlDelete(sqlQuery);
@@ -120,6 +156,12 @@ namespace LoginEngine.Packets
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="profession">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public string GetRandomName(Profession profession)
         {
             var random = new Random();
@@ -146,17 +188,23 @@ namespace LoginEngine.Packets
                 randomNameLength++;
             }
 
-            var name = sb.ToString();
+            string name = sb.ToString();
             name = char.ToUpper(name[0]) + name.Substring(1);
             return name;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="startInSL">
+        /// </param>
+        /// <param name="charid">
+        /// </param>
         public void SendNameToStartPlayfield(bool startInSL, int charid)
         {
             var ms = new SqlWrapper();
 
             /* set startplayfield */
-            var sqlUpdate = "UPDATE `characters` set ";
+            string sqlUpdate = "UPDATE `characters` set ";
 
             if (startInSL)
             {
@@ -176,10 +224,14 @@ namespace LoginEngine.Packets
 
         #region Methods
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         private int CreateNewChar()
         {
             var ms = new SqlWrapper();
-            var charID = 0;
+            int charID = 0;
             switch (this.Breed)
             {
                 case 0x1: /* solitus */
@@ -206,8 +258,8 @@ namespace LoginEngine.Packets
              *           ~NV
              */
             ms.SqlDelete("DELETE FROM `characters_stats` WHERE ID=" + charID);
-            var sqlInsert = "INSERT INTO `characters` (`Username`,`Name`,`FirstName`,`LastName`,";
-            var sqlValues = "VALUES('" + this.AccountName + "','" + this.Name + "','','',";
+            string sqlInsert = "INSERT INTO `characters` (`Username`,`Name`,`FirstName`,`LastName`,";
+            string sqlValues = "VALUES('" + this.AccountName + "','" + this.Name + "','','',";
             sqlInsert += "`playfield`,`X`,`Y`,`Z`,`HeadingX`,`HeadingY`,`HeadingZ`,`HeadingW`)";
             sqlValues += "0,0,0,0,0,0,0,0)";
             sqlInsert += sqlValues;
@@ -225,8 +277,8 @@ namespace LoginEngine.Packets
             try
             {
                 /* select new char id */
-                var sqlQuery = "SELECT `ID` FROM `characters` WHERE Name = " + "'" + this.Name + "'";
-                var dt = ms.ReadDatatable(sqlQuery);
+                string sqlQuery = "SELECT `ID` FROM `characters` WHERE Name = " + "'" + this.Name + "'";
+                DataTable dt = ms.ReadDatatable(sqlQuery);
 
                 foreach (DataRow row in dt.Rows)
                 {

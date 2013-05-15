@@ -30,7 +30,6 @@ namespace ZoneEngine.GameObject.Stats
     using System;
     using System.Collections.Generic;
     using System.Data;
-    using System.Diagnostics.Contracts;
     using System.IO;
     using System.Xml.Serialization;
 
@@ -231,7 +230,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </returns>
         public static StatTypes GetStatByName(string statName)
         {
-            if ((statName==null) || (statName == string.Empty))
+            if ((statName == null) || (statName == string.Empty))
             {
                 throw new ArgumentNullException("statName cannot be null or empty");
             }

@@ -32,9 +32,6 @@ namespace ZoneEngine.GameObject
 
     using Cell.Core;
 
-    using NiceHexOutput;
-
-    using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
 
     using ZoneEngine.GameObject.Enums;
@@ -44,7 +41,13 @@ namespace ZoneEngine.GameObject
 
     /// <summary>
     /// </summary>
-    public sealed class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner, IAOEvents, IAOActions, IItemContainer
+    public sealed class Character : Dynel, 
+                                    IPacketReceivingEntity, 
+                                    INamedEntity, 
+                                    ISummoner, 
+                                    IAOEvents, 
+                                    IAOActions, 
+                                    IItemContainer
     {
         #region Fields
 
@@ -54,11 +57,11 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        private  MoveModes moveMode = MoveModes.None;
+        private MoveModes moveMode = MoveModes.None;
 
         /// <summary>
         /// </summary>
-        private IList<Pet> pets = new List<Pet>();
+        private readonly IList<Pet> pets = new List<Pet>();
 
         #endregion
 
@@ -126,7 +129,7 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        /// <param name="message">
+        /// <param name="messageBody">
         /// </param>
         /// <param name="announceToPlayfield">
         /// </param>
@@ -137,6 +140,8 @@ namespace ZoneEngine.GameObject
 
         #endregion
 
+        /// <summary>
+        /// </summary>
         public BaseInventory BaseInventory { get; private set; }
     }
 }

@@ -1,23 +1,49 @@
-﻿
-#region Usings...
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using ComponentAce.Compression.Libs.zlib;
-using MsgPack.Serialization;
+﻿#region License
+
+// Copyright (c) 2005-2013, CellAO Team
+// 
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// 
+//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
 namespace ZoneEngine.Gameobject.Items
 {
+    #region Usings ...
+
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    using ComponentAce.Compression.Libs.zlib;
+
+    using MsgPack.Serialization;
+
     using ZoneEngine.GameObject.Items;
+
+    #endregion
 
     /// <summary>
     /// Item handler class
     /// </summary>
     public class ItemHandler
     {
-
         /// <summary>
         /// Cache of all item templates
         /// </summary>
@@ -44,7 +70,7 @@ namespace ZoneEngine.Gameobject.Items
             int packaged = BitConverter.ToInt32(buffer, 0);
 
             BinaryReader br = new BinaryReader(ms);
-            var bf2 = MessagePackSerializer.Create<List<AOItem>>();
+            MessagePackSerializer<List<AOItem>> bf2 = MessagePackSerializer.Create<List<AOItem>>();
 
             while (true)
             {
@@ -54,9 +80,12 @@ namespace ZoneEngine.Gameobject.Items
                 {
                     break;
                 }
-                Console.Write("Loaded {0} items in {1}\r",
-                              new object[] { ItemList.Count, new DateTime((DateTime.Now - _now).Ticks).ToString("mm:ss.ff") });
+
+                Console.Write(
+                    "Loaded {0} items in {1}\r", 
+                    new object[] { ItemList.Count, new DateTime((DateTime.Now - _now).Ticks).ToString("mm:ss.ff") });
             }
+
             GC.Collect();
             return ItemList.Count;
         }
@@ -64,7 +93,11 @@ namespace ZoneEngine.Gameobject.Items
         /// <summary>
         /// Cache all item templates
         /// </summary>
-        /// <returns>number of cached items</returns>
+        /// <param name="fname">
+        /// </param>
+        /// <returns>
+        /// number of cached items
+        /// </returns>
         public static int CacheAllItems(string fname)
         {
             DateTime _now = DateTime.Now;
@@ -77,8 +110,7 @@ namespace ZoneEngine.Gameobject.Items
 
             ms.Seek(0, SeekOrigin.Begin);
             BinaryReader br = new BinaryReader(ms);
-            var bf2 = MessagePackSerializer.Create<List<AOItem>>();
-
+            MessagePackSerializer<List<AOItem>> bf2 = MessagePackSerializer.Create<List<AOItem>>();
 
             byte[] buffer = new byte[4];
             ms.Read(buffer, 0, 4);
@@ -92,14 +124,22 @@ namespace ZoneEngine.Gameobject.Items
                 {
                     break;
                 }
-                Console.Write("Loaded {0} items in {1}\r",
-                              new object[] { ItemList.Count, new DateTime((DateTime.Now - _now).Ticks).ToString("mm:ss.ff") });
+
+                Console.Write(
+                    "Loaded {0} items in {1}\r", 
+                    new object[] { ItemList.Count, new DateTime((DateTime.Now - _now).Ticks).ToString("mm:ss.ff") });
             }
+
             GC.Collect();
             return ItemList.Count;
         }
 
-
+        /// <summary>
+        /// </summary>
+        /// <param name="input">
+        /// </param>
+        /// <param name="output">
+        /// </param>
         private static void CopyStream(Stream input, Stream output)
         {
             byte[] buffer = new byte[2097152];
@@ -107,19 +147,25 @@ namespace ZoneEngine.Gameobject.Items
             while ((len = input.Read(buffer, 0, 2097152)) > 0)
             {
                 output.Write(buffer, 0, len);
-                Console.Write("\rDeflating " + Convert.ToInt32(Math.Floor((double)input.Position / input.Length * 100.0)) +
-                              "%");
+                Console.Write(
+                    "\rDeflating " + Convert.ToInt32(Math.Floor((double)input.Position / input.Length * 100.0)) + "%");
             }
+
             output.Flush();
             Console.Write("\r                                             \r");
         }
 
         #region Item
+
         /// <summary>
         /// Get new object of item template with specified ID
         /// </summary>
-        /// <param name="ID">AOID</param>
-        /// <returns>copied AOItem</returns>
+        /// <param name="ID">
+        /// AOID
+        /// </param>
+        /// <returns>
+        /// copied AOItem
+        /// </returns>
         public static AOItem GetItemTemplate(int ID)
         {
             foreach (AOItem it in ItemList)
@@ -129,16 +175,25 @@ namespace ZoneEngine.Gameobject.Items
                     return it.ShallowCopy();
                 }
             }
+
             return null; // Should not ever happen
         }
 
         /// <summary>
         /// Returns a interpolated version of the items
         /// </summary>
-        /// <param name="lowID">low ID</param>
-        /// <param name="highID">high ID</param>
-        /// <param name="_QL">Quality level</param>
-        /// <returns>interpolated AOItem</returns>
+        /// <param name="lowID">
+        /// low ID
+        /// </param>
+        /// <param name="highID">
+        /// high ID
+        /// </param>
+        /// <param name="_QL">
+        /// Quality level
+        /// </param>
+        /// <returns>
+        /// interpolated AOItem
+        /// </returns>
         public static AOItem interpolate(int lowID, int highID, int _QL)
         {
             AOItem low = GetItemTemplate(lowID);
@@ -160,17 +215,19 @@ namespace ZoneEngine.Gameobject.Items
             {
                 interp = low.ShallowCopy();
             }
+
             interp.HighID = high.HighID;
             interp.Quality = _QL;
             if ((_QL == low.Quality) || (_QL == high.Quality))
             {
                 return interp;
             }
+
             int attnum = 0;
 
             // Effecting all attributes, even flags, it doesnt matter, High and low have always the same
-            Single ival;
-            Single factor = ((_QL - low.Quality) / (Single)(high.Quality - low.Quality));
+            float ival;
+            float factor = (_QL - low.Quality) / (Single)(high.Quality - low.Quality);
             while (attnum < low.Stats.Count)
             {
                 ival = (factor * (high.Stats[attnum].Value - low.Stats[attnum].Value)) + low.Stats[attnum].Value;
@@ -182,7 +239,7 @@ namespace ZoneEngine.Gameobject.Items
             int evnum = 0;
             int fnum;
             int anum;
-            Single fval;
+            float fval;
             while (evnum < interp.Events.Count)
             {
                 fnum = 0;
@@ -193,37 +250,45 @@ namespace ZoneEngine.Gameobject.Items
                     {
                         if (high.Events[evnum].Functions[fnum].Arguments.Values[anum] is int)
                         {
-                            ival = (factor *
-                                    ((int)high.Events[evnum].Functions[fnum].Arguments.Values[anum] -
-                                     (int)low.Events[evnum].Functions[fnum].Arguments.Values[anum])) +
-                                   (int)low.Events[evnum].Functions[fnum].Arguments.Values[anum];
+                            ival = (factor
+                                    * ((int)high.Events[evnum].Functions[fnum].Arguments.Values[anum]
+                                       - (int)low.Events[evnum].Functions[fnum].Arguments.Values[anum]))
+                                   + (int)low.Events[evnum].Functions[fnum].Arguments.Values[anum];
                             interp.Events[evnum].Functions[fnum].Arguments.Values[anum] = Convert.ToInt32(ival);
                         }
+
                         if (high.Events[evnum].Functions[fnum].Arguments.Values[anum] is Single)
                         {
-                            fval = (factor *
-                                    ((Single)high.Events[evnum].Functions[fnum].Arguments.Values[anum] -
-                                     (Single)low.Events[evnum].Functions[fnum].Arguments.Values[anum])) +
-                                   (Single)low.Events[evnum].Functions[fnum].Arguments.Values[anum];
+                            fval = (factor
+                                    * ((Single)high.Events[evnum].Functions[fnum].Arguments.Values[anum]
+                                       - (Single)low.Events[evnum].Functions[fnum].Arguments.Values[anum]))
+                                   + (Single)low.Events[evnum].Functions[fnum].Arguments.Values[anum];
                             interp.Events[evnum].Functions[fnum].Arguments.Values[anum] = fval;
                         }
+
                         anum++;
                     }
+
                     fnum++;
                 }
+
                 evnum++;
             }
+
             return interp;
         }
+
         #endregion
 
         #region Function handling
+
         /// <summary>
         /// Function Pack will be moved soon
         /// </summary>
         public class FunctionPack
         {
             #region Function handling (execute function arguments)
+
             /*
             public static bool func_do(Character ch, AOFunctions func, bool dolocalstats, bool tosocialtab, int placement)
             {
@@ -630,6 +695,7 @@ namespace ZoneEngine.Gameobject.Items
             #endregion
              */
         }
+
         #endregion
     }
 }

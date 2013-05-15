@@ -89,6 +89,7 @@ namespace ZoneEngine.Script
                                                         
                                                         
                                                         
+                                                        
                                                         // TODO: Figure out how to parse the file and return the usings, then load those.
                                                         ReferencedAssemblies =
                                                             {
@@ -310,6 +311,7 @@ namespace ZoneEngine.Script
                                 // It is not yet :)
                                 return;
                             }
+
                             if (commandArguments != null)
                             {
                                 // Check if only one argument has been passed for "help"
@@ -322,6 +324,7 @@ namespace ZoneEngine.Script
                                     }
                                 }
                             }
+
                             // Execute the command with the given command arguments, if CheckCommandArguments is true else print command help
                             if (aoc.CheckCommandArguments(commandArguments))
                             {
@@ -388,11 +391,11 @@ namespace ZoneEngine.Script
                             if (aoScript != null)
                             {
                                 kv.Value.InvokeMember(
-                                    functionName,
-                                    BindingFlags.Default | BindingFlags.InvokeMethod,
-                                    null,
-                                    aoScript,
-                                    new object[] { character },
+                                    functionName, 
+                                    BindingFlags.Default | BindingFlags.InvokeMethod, 
+                                    null, 
+                                    aoScript, 
+                                    new object[] { character }, 
                                     CultureInfo.InvariantCulture);
                             }
                         }
@@ -423,7 +426,11 @@ namespace ZoneEngine.Script
                     ConsoleColor.Magenta);
                 foreach (string scriptFile in this.ScriptsList)
                 {
-                    if (scriptFile == null) continue;
+                    if (scriptFile == null)
+                    {
+                        continue;
+                    }
+
                     this.p.OutputAssembly = string.Format(
                         CultureInfo.CurrentCulture, Path.Combine("tmp", DllName(scriptFile)));
 
@@ -568,6 +575,7 @@ namespace ZoneEngine.Script
         private static void RunScript(Assembly script)
         {
             Contract.Requires(script != null);
+
             // Now that we have a compiled script, lets run them
             foreach (Type type in script.GetExportedTypes())
             {

@@ -279,7 +279,11 @@ namespace ZoneEngine.CoreClient
         /// </param>
         public void SendToPlayfield(Message message, bool announceToPlayfield)
         {
-            if (message == null) return;
+            if (message == null)
+            {
+                return;
+            }
+
             foreach (Client client in this.server.Clients)
             {
                 if ((client.Character.Playfield != this.Character.Playfield)

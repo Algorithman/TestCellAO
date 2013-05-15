@@ -32,9 +32,9 @@ namespace ZoneEngine.CoreServer
     using System.ComponentModel.Composition;
     using System.Net;
 
-    using Cell.Core;
-
     using AO.Core.Logger;
+
+    using Cell.Core;
 
     using ZoneEngine.Component;
 
@@ -80,7 +80,6 @@ namespace ZoneEngine.CoreServer
         {
             this.clientFactory = clientfactory;
         }
-
 
         #endregion
 

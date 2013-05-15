@@ -127,6 +127,7 @@ namespace ZoneEngine.GameObject.Items
                 this.Content.Remove(Slot);
                 return item;
             }
+
             return null;
         }
 
@@ -144,6 +145,7 @@ namespace ZoneEngine.GameObject.Items
                 this.Content.Remove(Slot);
                 return true;
             }
+
             return false;
         }
     }

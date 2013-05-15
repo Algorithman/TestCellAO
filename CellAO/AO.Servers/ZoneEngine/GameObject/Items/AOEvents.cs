@@ -60,6 +60,7 @@ namespace ZoneEngine.GameObject.Items
             {
                 return this.functions;
             }
+
             set
             {
                 this.functions = value;
@@ -75,6 +76,7 @@ namespace ZoneEngine.GameObject.Items
             {
                 return this.eventType;
             }
+
             set
             {
                 this.eventType = value;

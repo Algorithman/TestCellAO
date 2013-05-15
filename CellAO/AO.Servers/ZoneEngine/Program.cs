@@ -43,14 +43,12 @@ namespace ZoneEngine
     using NBug.Properties;
 
     using NLog;
-    using NLog.Config;
-    using NLog.Targets;
 
     using ZoneEngine.Collision;
     using ZoneEngine.CoreClient;
     using ZoneEngine.CoreServer;
-    using ZoneEngine.GameObject.Nanos;
     using ZoneEngine.Gameobject.Items;
+    using ZoneEngine.GameObject.Nanos;
     using ZoneEngine.Script;
 
     using Config = AO.Core.Config.ConfigReadWrite;
@@ -116,6 +114,7 @@ namespace ZoneEngine
                  */
                 Console.WriteLine("Loaded {0} items", ItemHandler.CacheAllItems());
                 Console.WriteLine("Loaded {0} nanos", NanoHandler.CacheAllNanos());
+
                 /*
                 Console.WriteLine("Loaded {0} spawns", NonPlayerCharacterHandler.CacheAllFromDB());
                 Console.WriteLine("Loaded {0} vendors", VendorHandler.CacheAllFromDB());
@@ -159,20 +158,26 @@ namespace ZoneEngine
         {
             bool processedargs = false;
 
-            #region NLog Setup
+            
+
             LogUtil.SetupConsoleLogging(LogLevel.Debug);
-            LogUtil.SetupFileLogging("${basedir}/ZoneEngineLog.txt",LogLevel.Trace);
-            #endregion
+            LogUtil.SetupFileLogging("${basedir}/ZoneEngineLog.txt", LogLevel.Trace);
+
+            
 
             #region NBug Setup
+
             SettingsOverride.LoadCustomSettings("NBug.ZoneEngine.Config");
             Settings.WriteLogToDisk = true;
             AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
             TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
+
             #endregion
 
             #region Script Loading Code Area..
+
             csc = new ScriptCompiler();
+
             #endregion
 
             // TODO: ADD More Handlers.
