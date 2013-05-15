@@ -96,6 +96,7 @@
   <ItemGroup>
     <Compile Include="GameObject\Items\AOActions.cs" />
     <Compile Include="GameObject\Items\AOItemAttribute.cs" />
+    <Compile Include="GameObject\Items\ItemHandler.cs" />
     <Compile Include="GameObject\Stats\CharacterStats.cs" />
     <Compile Include="Component\ClientFactory.cs" />
     <Compile Include="GameObject\Items\AOEvents.cs" />
@@ -2207,6 +2208,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="GameObject\GameObjectDiagram.cd" />
+    <None Include="items.dat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="nanos.dat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="NBug.ZoneEngine.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
