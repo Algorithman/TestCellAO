@@ -49,6 +49,7 @@ namespace ZoneEngine
     using ZoneEngine.Collision;
     using ZoneEngine.CoreClient;
     using ZoneEngine.CoreServer;
+    using ZoneEngine.GameObject.Nanos;
     using ZoneEngine.Gameobject.Items;
     using ZoneEngine.Script;
 
@@ -114,8 +115,8 @@ namespace ZoneEngine
                 /* TODO: Readd when necessary classes are done again
                  */
                 Console.WriteLine("Loaded {0} items", ItemHandler.CacheAllItems());
-                /*
                 Console.WriteLine("Loaded {0} nanos", NanoHandler.CacheAllNanos());
+                /*
                 Console.WriteLine("Loaded {0} spawns", NonPlayerCharacterHandler.CacheAllFromDB());
                 Console.WriteLine("Loaded {0} vendors", VendorHandler.CacheAllFromDB());
                 Console.WriteLine("Loaded {0} teleports", DoorHandler.CacheAllFromDB());
