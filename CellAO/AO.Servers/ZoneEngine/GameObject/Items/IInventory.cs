@@ -23,120 +23,91 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject
+namespace ZoneEngine.GameObject.Items
 {
     #region Usings ...
 
-    using System;
     using System.Collections.Generic;
-
-    using Cell.Core;
-
-    using NiceHexOutput;
-
-    using SmokeLounge.AOtomation.Messaging.GameData;
-    using SmokeLounge.AOtomation.Messaging.Messages;
-
-    using ZoneEngine.GameObject.Enums;
-    using ZoneEngine.GameObject.Items;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    public sealed class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner, IAOEvents, IAOActions, IItemContainer
+    public interface IInventory
     {
-        #region Fields
+        /// <summary>
+        /// </summary>
+        Character owner { get; }
 
         /// <summary>
         /// </summary>
-        private IZoneClient client;
+        Dictionary<int, AOItem> Content { get; }
 
         /// <summary>
         /// </summary>
-        private  MoveModes moveMode = MoveModes.None;
+        int MaxSlots { get; }
 
         /// <summary>
         /// </summary>
-        private IList<Pet> pets = new List<Pet>();
-
-        #endregion
-
-        #region Public Properties
+        bool IsEmpty { get; }
 
         /// <summary>
         /// </summary>
-        public IClient Client
-        {
-            get
-            {
-                return this.client;
-            }
-        }
+        bool IsFull { get; }
 
         /// <summary>
         /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public MoveModes MoveMode
-        {
-            get
-            {
-                return this.moveMode;
-            }
+        /// <returns>
+        /// </returns>
+        int FindFreeSlot();
 
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
+        int InventoryOffset { get; }
 
         /// <summary>
         /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public string Name
-        {
-            get
-            {
-                // TODO: Implement this property getter
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                // TODO: Implement this property setter
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public IList<Pet> Pets
-        {
-            get
-            {
-                return this.pets;
-            }
-        }
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// </summary>
-        /// <param name="message">
+        /// <param name="Slot">
         /// </param>
-        /// <param name="announceToPlayfield">
+        /// <returns>
+        /// </returns>
+        bool IsValidSlot(int Slot);
+
+        /// <summary>
+        /// </summary>
+        /// <param name="Slot">
         /// </param>
-        internal void Send(MessageBody messageBody, bool announceToPlayfield)
-        {
-            this.client.SendCompressed(messageBody, this.Identity.Instance, announceToPlayfield);
-        }
+        /// <param name="Item">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        InventoryError TryAdd(int Slot, AOItem Item);
 
-        #endregion
+        /// <summary>
+        /// </summary>
+        /// <param name="Item">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        InventoryError TryAdd(AOItem Item);
 
-        public BaseInventory BaseInventory { get; private set; }
+        /// <summary>
+        /// </summary>
+        /// <param name="Slot">
+        /// </param>
+        /// <param name="ownerChange">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        AOItem Remove(int Slot, bool ownerChange);
+
+        /// <summary>
+        /// Destroys AOItem at slot <see cref="slot"/>
+        /// </summary>
+        /// <param name="Slot">
+        /// Slot number of the Item
+        /// </param>
+        /// <returns>
+        /// Item could be destroyed
+        /// </returns>
+        bool Destroy(int Slot);
     }
 }

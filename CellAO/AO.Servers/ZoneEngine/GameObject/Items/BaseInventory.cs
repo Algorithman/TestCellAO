@@ -23,120 +23,128 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject
+namespace ZoneEngine.GameObject.Items
 {
     #region Usings ...
 
     using System;
     using System.Collections.Generic;
 
-    using Cell.Core;
-
-    using NiceHexOutput;
-
-    using SmokeLounge.AOtomation.Messaging.GameData;
-    using SmokeLounge.AOtomation.Messaging.Messages;
-
-    using ZoneEngine.GameObject.Enums;
-    using ZoneEngine.GameObject.Items;
-
     #endregion
 
     /// <summary>
     /// </summary>
-    public sealed class Character : Dynel, IPacketReceivingEntity, INamedEntity, ISummoner, IAOEvents, IAOActions, IItemContainer
+    public class BaseInventory : IInventory
     {
-        #region Fields
+        /// <summary>
+        /// </summary>
+        public Character owner { get; private set; }
 
         /// <summary>
         /// </summary>
-        private IZoneClient client;
+        public Dictionary<int, AOItem> Content { get; private set; }
 
         /// <summary>
         /// </summary>
-        private  MoveModes moveMode = MoveModes.None;
+        public int MaxSlots { get; private set; }
 
         /// <summary>
         /// </summary>
-        private IList<Pet> pets = new List<Pet>();
-
-        #endregion
-
-        #region Public Properties
+        public bool IsEmpty { get; private set; }
 
         /// <summary>
         /// </summary>
-        public IClient Client
-        {
-            get
-            {
-                return this.client;
-            }
-        }
+        public bool IsFull { get; private set; }
 
         /// <summary>
         /// </summary>
+        /// <returns>
+        /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public MoveModes MoveMode
+        public int FindFreeSlot()
         {
-            get
-            {
-                return this.moveMode;
-            }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// </summary>
+        public int InventoryOffset { get; private set; }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="Slot">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public bool IsValidSlot(int Slot)
+        {
+            return (Slot < this.MaxSlots + this.InventoryOffset) && (Slot >= this.InventoryOffset);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="Slot">
+        /// </param>
+        /// <param name="Item">
+        /// </param>
+        /// <returns>
+        /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public string Name
+        public InventoryError TryAdd(int Slot, AOItem Item)
         {
-            get
-            {
-                // TODO: Implement this property getter
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                // TODO: Implement this property setter
-                throw new NotImplementedException();
-            }
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// </summary>
-        public IList<Pet> Pets
+        /// <param name="Item">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public InventoryError TryAdd(AOItem Item)
         {
-            get
-            {
-                return this.pets;
-            }
+            throw new NotImplementedException();
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// </summary>
-        /// <param name="message">
+        /// <param name="Slot">
         /// </param>
-        /// <param name="announceToPlayfield">
+        /// <param name="ownerChange">
         /// </param>
-        internal void Send(MessageBody messageBody, bool announceToPlayfield)
+        /// <returns>
+        /// </returns>
+        public AOItem Remove(int Slot, bool ownerChange)
         {
-            this.client.SendCompressed(messageBody, this.Identity.Instance, announceToPlayfield);
+            if (this.IsValidSlot(Slot))
+            {
+                // TODO: Add more checks (eg. is equipped)
+                AOItem item = this.Content[Slot];
+                this.Content.Remove(Slot);
+                return item;
+            }
+            return null;
         }
 
-        #endregion
-
-        public BaseInventory BaseInventory { get; private set; }
+        /// <summary>
+        /// </summary>
+        /// <param name="Slot">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public bool Destroy(int Slot)
+        {
+            if (this.IsValidSlot(Slot))
+            {
+                // TODO: Add more checks (eg. is equipped)
+                this.Content.Remove(Slot);
+                return true;
+            }
+            return false;
+        }
     }
 }

@@ -96,6 +96,10 @@
   <ItemGroup>
     <Compile Include="GameObject\Items\AOActions.cs" />
     <Compile Include="GameObject\Items\AOItemAttribute.cs" />
+    <Compile Include="GameObject\Items\BaseInventory.cs" />
+    <Compile Include="GameObject\Items\IItemContainer.cs" />
+    <Compile Include="GameObject\Items\IInventory.cs" />
+    <Compile Include="GameObject\Items\InventoryError.cs" />
     <Compile Include="GameObject\Items\ItemHandler.cs" />
     <Compile Include="GameObject\Nanos\NanoFormula.cs" />
     <Compile Include="GameObject\Nanos\NanoHandler.cs" />
