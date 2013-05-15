@@ -34,7 +34,7 @@ namespace ZoneEngine.CoreServer
 
     using Cell.Core;
 
-    using NLog;
+    using AO.Core.Logger;
 
     using ZoneEngine.Component;
 
@@ -50,10 +50,6 @@ namespace ZoneEngine.CoreServer
         /// <summary>
         /// </summary>
         public static readonly DateTime StartTime;
-
-        /// <summary>
-        /// </summary>
-        protected static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         #endregion
 
@@ -72,6 +68,7 @@ namespace ZoneEngine.CoreServer
         static ZoneServer()
         {
             StartTime = DateTime.Now;
+            LogUtil.Debug("Server is starting at " + StartTime.ToString());
         }
 
         /// <summary>
@@ -84,12 +81,6 @@ namespace ZoneEngine.CoreServer
             this.clientFactory = clientfactory;
         }
 
-        /// <summary>
-        /// </summary>
-        protected ZoneServer()
-        {
-            Log.Debug("Server is starting at " + StartTime.ToString());
-        }
 
         #endregion
 

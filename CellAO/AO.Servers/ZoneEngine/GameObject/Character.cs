@@ -49,15 +49,15 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        protected IZoneClient client;
+        private IZoneClient client;
 
         /// <summary>
         /// </summary>
-        protected MoveModes moveMode = MoveModes.None;
+        private  MoveModes moveMode = MoveModes.None;
 
         /// <summary>
         /// </summary>
-        protected IList<Pet> pets = new List<Pet>();
+        private IList<Pet> pets = new List<Pet>();
 
         #endregion
 

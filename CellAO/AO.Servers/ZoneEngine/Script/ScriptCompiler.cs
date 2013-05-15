@@ -310,17 +310,18 @@ namespace ZoneEngine.Script
                                 // It is not yet :)
                                 return;
                             }
-
-                            // Check if only one argument has been passed for "help"
-                            if (commandArguments.Length == 2)
+                            if (commandArguments != null)
                             {
-                                if (commandArguments[1].ToUpperInvariant() == "HELP")
+                                // Check if only one argument has been passed for "help"
+                                if (commandArguments.Length == 2)
                                 {
-                                    aoc.CommandHelp(client);
-                                    return;
+                                    if (commandArguments[1].ToUpperInvariant() == "HELP")
+                                    {
+                                        aoc.CommandHelp(client);
+                                        return;
+                                    }
                                 }
                             }
-
                             // Execute the command with the given command arguments, if CheckCommandArguments is true else print command help
                             if (aoc.CheckCommandArguments(commandArguments))
                             {
@@ -376,20 +377,24 @@ namespace ZoneEngine.Script
             {
                 foreach (KeyValuePair<string, Type> kv in this.scriptList)
                 {
-                    if (kv.Key.Substring(kv.Key.IndexOf(":", StringComparison.Ordinal)) == ":" + functionName)
+                    if (kv.Key.IndexOf(":") >= 0)
                     {
-                        IAOScript aoScript =
-                            (IAOScript)
-                            assembly.CreateInstance(kv.Key.Substring(0, kv.Key.IndexOf(":", StringComparison.Ordinal)));
-                        if (aoScript != null)
+                        if (kv.Key.Substring(kv.Key.IndexOf(":", StringComparison.Ordinal)) == ":" + functionName)
                         {
-                            kv.Value.InvokeMember(
-                                functionName, 
-                                BindingFlags.Default | BindingFlags.InvokeMethod, 
-                                null, 
-                                aoScript, 
-                                new object[] { character }, 
-                                CultureInfo.InvariantCulture);
+                            IAOScript aoScript =
+                                (IAOScript)
+                                assembly.CreateInstance(
+                                    kv.Key.Substring(0, kv.Key.IndexOf(":", StringComparison.Ordinal)));
+                            if (aoScript != null)
+                            {
+                                kv.Value.InvokeMember(
+                                    functionName,
+                                    BindingFlags.Default | BindingFlags.InvokeMethod,
+                                    null,
+                                    aoScript,
+                                    new object[] { character },
+                                    CultureInfo.InvariantCulture);
+                            }
                         }
                     }
                 }
@@ -418,6 +423,7 @@ namespace ZoneEngine.Script
                     ConsoleColor.Magenta);
                 foreach (string scriptFile in this.ScriptsList)
                 {
+                    if (scriptFile == null) continue;
                     this.p.OutputAssembly = string.Format(
                         CultureInfo.CurrentCulture, Path.Combine("tmp", DllName(scriptFile)));
 
