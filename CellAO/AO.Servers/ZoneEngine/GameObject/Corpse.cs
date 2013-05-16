@@ -83,7 +83,7 @@ namespace ZoneEngine.GameObject
             }
             catch (Exception)
             {
-                LogUtil.Debug("Could not create LootTable for Corpse "+this.identity.Type.ToString("X8")+":"+this.identity.Instance.ToString("X8")+" on Playfield "+this.playfield.Type.ToString("X8")+":"+this.playfield.Instance.ToString("X8")));
+                LogUtil.Debug("Could not create LootTable for Corpse "+this.identity.Type.ToString("X8")+":"+this.identity.Instance.ToString("X8")+" on Playfield "+this.playfield.Type.ToString("X8")+":"+this.playfield.Instance.ToString("X8"));
                 return false;
             }
         }
