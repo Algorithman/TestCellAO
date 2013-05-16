@@ -44,7 +44,7 @@ namespace ZoneEngine.GameObject
         /// </summary>
         Identity Playfield { get; set; }
 
-        Vector3 Coordinated { get; set; }
+        Vector3 Coordinates { get; set; }
         Quaternion Heading { get; set; }
 
         #endregion
@@ -85,7 +85,7 @@ namespace ZoneEngine.GameObject
             }
         }
 
-        public Vector3 Coordinated
+        public Vector3 Coordinates
         {
             get
             {
