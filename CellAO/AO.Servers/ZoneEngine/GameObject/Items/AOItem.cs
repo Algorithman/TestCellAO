@@ -68,7 +68,29 @@ namespace ZoneEngine.GameObject.Items
         /// <summary>
         /// Item Flags
         /// </summary>
-        public int CanFlags;
+        public int CanFlags()
+        {
+            return this.getItemAttribute(30);
+        }
+
+        /// <summary>
+        /// Get item attribute
+        /// </summary>
+        /// <param name="number">number of attribute</param>
+        /// <returns>Value of item attribute</returns>
+        public Int32 getItemAttribute(int number)
+        {
+            int c;
+            for (c = 0; c < Stats.Count; c++)
+            {
+                if (number == Stats[c].Stat)
+                {
+                    return Stats[c].Value;
+                }
+            }
+            return 0;
+        }
+
 
         /// <summary>
         /// Item high ID
@@ -125,7 +147,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanCarry()
         {
-            return (this.CanFlags & (1 << 0)) > 0;
+            return (this.CanFlags() & (1 << 0)) > 0;
         }
 
         /// <summary>
@@ -134,7 +156,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanSit()
         {
-            return (this.CanFlags & (1 << 1)) > 0;
+            return (this.CanFlags() & (1 << 1)) > 0;
         }
 
         /// <summary>
@@ -143,7 +165,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool Wearable()
         {
-            return (this.CanFlags & (1 << 2)) > 0;
+            return (this.CanFlags() & (1 << 2)) > 0;
         }
 
         /// <summary>
@@ -152,7 +174,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool Useable()
         {
-            return (this.CanFlags & (1 << 3)) > 0;
+            return (this.CanFlags() & (1 << 3)) > 0;
         }
 
         /// <summary>
@@ -161,7 +183,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool ConfirmOnUse()
         {
-            return (this.CanFlags & (1 << 4)) > 0;
+            return (this.CanFlags() & (1 << 4)) > 0;
         }
 
         /// <summary>
@@ -170,7 +192,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool IsConsumable()
         {
-            return (this.CanFlags & (1 << 5)) > 0;
+            return (this.CanFlags() & (1 << 5)) > 0;
         }
 
         /// <summary>
@@ -179,7 +201,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool IsTutorChip()
         {
-            return (this.CanFlags & (1 << 6)) > 0;
+            return (this.CanFlags() & (1 << 6)) > 0;
         }
 
         /// <summary>
@@ -188,7 +210,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool IsTutorDevie()
         {
-            return (this.CanFlags & (1 << 7)) > 0;
+            return (this.CanFlags() & (1 << 7)) > 0;
         }
 
         /// <summary>
@@ -197,7 +219,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool IsLockPicker()
         {
-            return (this.CanFlags & (1 << 8)) > 0;
+            return (this.CanFlags() & (1 << 8)) > 0;
         }
 
         /// <summary>
@@ -206,7 +228,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool IsStackable()
         {
-            return (this.CanFlags & (1 << 9)) > 0;
+            return (this.CanFlags() & (1 << 9)) > 0;
         }
 
         /// <summary>
@@ -215,7 +237,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool NeedsNoAmmo()
         {
-            return (this.CanFlags & (1 << 10)) > 0;
+            return (this.CanFlags() & (1 << 10)) > 0;
         }
 
         /// <summary>
@@ -224,7 +246,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanBurst()
         {
-            return (this.CanFlags & (1 << 11)) > 0;
+            return (this.CanFlags() & (1 << 11)) > 0;
         }
 
         /// <summary>
@@ -233,7 +255,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanFlingShot()
         {
-            return (this.CanFlags & (1 << 12)) > 0;
+            return (this.CanFlags() & (1 << 12)) > 0;
         }
 
         /// <summary>
@@ -242,7 +264,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanFullAuto()
         {
-            return (this.CanFlags & (1 << 13)) > 0;
+            return (this.CanFlags() & (1 << 13)) > 0;
         }
 
         /// <summary>
@@ -251,7 +273,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanAimedShot()
         {
-            return (this.CanFlags & (1 << 14)) > 0;
+            return (this.CanFlags() & (1 << 14)) > 0;
         }
 
         /// <summary>
@@ -260,7 +282,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanBow()
         {
-            return (this.CanFlags & (1 << 15)) > 0;
+            return (this.CanFlags() & (1 << 15)) > 0;
         }
 
         /// <summary>
@@ -269,7 +291,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanThrowAttack()
         {
-            return (this.CanFlags & (1 << 16)) > 0;
+            return (this.CanFlags() & (1 << 16)) > 0;
         }
 
         /// <summary>
@@ -278,7 +300,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanSneakAttack()
         {
-            return (this.CanFlags & (1 << 17)) > 0;
+            return (this.CanFlags() & (1 << 17)) > 0;
         }
 
         /// <summary>
@@ -287,7 +309,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanFastAttack()
         {
-            return (this.CanFlags & (1 << 18)) > 0;
+            return (this.CanFlags() & (1 << 18)) > 0;
         }
 
         /// <summary>
@@ -296,7 +318,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanDisarmTraps()
         {
-            return (this.CanFlags & (1 << 19)) > 0;
+            return (this.CanFlags() & (1 << 19)) > 0;
         }
 
         /// <summary>
@@ -305,7 +327,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool DoesAutoSelect()
         {
-            return (this.CanFlags & (1 << 20)) > 0;
+            return (this.CanFlags() & (1 << 20)) > 0;
         }
 
         /// <summary>
@@ -314,7 +336,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanBeAppliedOnFriendly()
         {
-            return (this.CanFlags & (1 << 21)) > 0;
+            return (this.CanFlags() & (1 << 21)) > 0;
         }
 
         /// <summary>
@@ -323,7 +345,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanBeAppliedOnHostile()
         {
-            return (this.CanFlags & (1 << 22)) > 0;
+            return (this.CanFlags() & (1 << 22)) > 0;
         }
 
         /// <summary>
@@ -332,7 +354,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanBeAppliedOnSelf()
         {
-            return (this.CanFlags & (1 << 23)) > 0;
+            return (this.CanFlags() & (1 << 23)) > 0;
         }
 
         /// <summary>
@@ -341,7 +363,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CantBeSplit()
         {
-            return (this.CanFlags & (1 << 24)) > 0;
+            return (this.CanFlags() & (1 << 24)) > 0;
         }
 
         /// <summary>
@@ -350,7 +372,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanBrawl()
         {
-            return (this.CanFlags & (1 << 25)) > 0;
+            return (this.CanFlags() & (1 << 25)) > 0;
         }
 
         /// <summary>
@@ -359,7 +381,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanDimach()
         {
-            return (this.CanFlags & (1 << 26)) > 0;
+            return (this.CanFlags() & (1 << 26)) > 0;
         }
 
         /// <summary>
@@ -368,7 +390,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool EnablesHandAttractors()
         {
-            return (this.CanFlags & (1 << 27)) > 0;
+            return (this.CanFlags() & (1 << 27)) > 0;
         }
 
         /// <summary>
@@ -377,7 +399,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanBeWornWithSocialArmor()
         {
-            return (this.CanFlags & (1 << 28)) > 0;
+            return (this.CanFlags() & (1 << 28)) > 0;
         }
 
         /// <summary>
@@ -386,7 +408,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanParryRiposte()
         {
-            return (this.CanFlags & (1 << 29)) > 0;
+            return (this.CanFlags() & (1 << 29)) > 0;
         }
 
         /// <summary>
@@ -395,7 +417,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanBeParriedRiposted()
         {
-            return (this.CanFlags & (1 << 30)) > 0;
+            return (this.CanFlags() & (1 << 30)) > 0;
         }
 
         /// <summary>
@@ -404,7 +426,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool CanBeAppliedOnFightingTarget()
         {
-            return (this.CanFlags & (1 << 31)) > 0;
+            return (this.CanFlags() & (1 << 31)) > 0;
         }
 
         /// <summary>
@@ -784,7 +806,6 @@ namespace ZoneEngine.GameObject.Items
             }
 
             itemCopy.Flags = this.Flags;
-            itemCopy.CanFlags = this.CanFlags;
             itemCopy.Instance = this.Instance;
             itemCopy.ItemType = this.ItemType;
             itemCopy.MultipleCount = this.MultipleCount;
