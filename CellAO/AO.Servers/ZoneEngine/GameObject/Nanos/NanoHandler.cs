@@ -140,6 +140,15 @@ namespace ZoneEngine.GameObject.Nanos
         /// </param>
         private static void CopyStream(Stream input, Stream output)
         {
+            if (input == null)
+            {
+                throw new ArgumentNullException("input", "Input Stream must not be null");
+            }
+            if (output == null)
+            {
+                throw new ArgumentNullException("output", "Output Stream must not be null");
+            }
+
             byte[] buffer = new byte[2097152];
             int len;
             while ((len = input.Read(buffer, 0, 2097152)) > 0)

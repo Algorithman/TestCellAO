@@ -25,13 +25,60 @@
 
 namespace ZoneEngine.GameObject.Items
 {
+    #region Usings ...
+
+    using System.Diagnostics.Contracts;
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
+    #endregion
+
     /// <summary>
     /// </summary>
+    [ContractClass(typeof(IItemContainerContract))]
     public interface IItemContainer : IEntity
     {
         /// <summary>
         /// The inventory of this Container
         /// </summary>
         BaseInventory BaseInventory { get; }
+    }
+
+    /// <summary>
+    /// </summary>
+    [ContractClassFor(typeof(IItemContainer))]
+    internal abstract class IItemContainerContract : IItemContainer
+    {
+        /// <summary>
+        /// </summary>
+        public Identity Identity
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<Identity>() != null);
+                return default(Identity);
+            }
+
+            private set
+            {
+                Contract.Requires(value != null);
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public BaseInventory BaseInventory
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<BaseInventory>() != null);
+                return default(BaseInventory);
+            }
+
+            private set
+            {
+                Contract.Requires(value != null);
+            }
+        }
     }
 }
