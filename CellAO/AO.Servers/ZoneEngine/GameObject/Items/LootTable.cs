@@ -43,7 +43,7 @@ namespace ZoneEngine.GameObject.Items
 
         /// <summary>
         /// </summary>
-        private readonly List<AOItem> Items;
+        private List<AOItem> Items;
 
         /// <summary>
         /// </summary>
@@ -63,19 +63,24 @@ namespace ZoneEngine.GameObject.Items
 
         public List<AOItem> GetLoot()
         {
-            Random probability = new Random((int)DateTime.Now.Ticks);
-            List<AOItem> temp = new List<AOItem>();
-            foreach (LootTableEntry lootTableEntry in LootTableEntries)
+            if (Items == null)
             {
-                if (probability.Next() < lootTableEntry.DropRate)
+                Random probability = new Random((int)DateTime.Now.Ticks);
+                List<AOItem> temp = new List<AOItem>();
+                foreach (LootTableEntry lootTableEntry in LootTableEntries)
                 {
-                    int QL =
-                        Convert.ToInt32(
-                            probability.Next() * (lootTableEntry.MaxQL - lootTableEntry.MinQL) + lootTableEntry.MinQL);
-                    temp.Add(ItemHandler.interpolate(lootTableEntry.LowID, lootTableEntry.HighID, QL)));
+                    if (probability.Next() < lootTableEntry.DropRate)
+                    {
+                        int QL =
+                            Convert.ToInt32(
+                                probability.Next() * (lootTableEntry.MaxQL - lootTableEntry.MinQL)
+                                + lootTableEntry.MinQL);
+                        temp.Add(ItemHandler.interpolate(lootTableEntry.LowID, lootTableEntry.HighID, QL));
+                    }
                 }
+                Items = temp;
             }
-            return temp;
+            return Items;
         }
 
         #endregion

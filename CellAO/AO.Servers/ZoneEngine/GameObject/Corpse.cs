@@ -30,6 +30,8 @@ namespace ZoneEngine.GameObject
     using System;
     using System.Collections.Generic;
 
+    using AO.Core.Logger;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.GameObject.Items;
@@ -74,7 +76,16 @@ namespace ZoneEngine.GameObject
 
         public bool FillInventory(LootTable lootTable)
         {
-            foreach (AOItem item in lootTable.)
+            try
+            {
+                Inventory = lootTable.GetLoot();
+                return true;
+            }
+            catch (Exception)
+            {
+                LogUtil.Debug("Could not create LootTable for Corpse "+this.identity.Type.ToString("X8")+":"+this.identity.Instance.ToString("X8")+" on Playfield "+this.playfield.Type.ToString("X8")+":"+this.playfield.Instance.ToString("X8")));
+                return false;
+            }
         }
     }
 
