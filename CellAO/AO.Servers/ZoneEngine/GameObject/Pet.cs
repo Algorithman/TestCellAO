@@ -52,7 +52,15 @@ namespace ZoneEngine.GameObject
     {
         protected ISummoner owner;
 
-        public ISummoner Owner { get; private set; }
+        public ISummoner Owner { get
+        {
+            return owner;
+        }
+            private set
+            {
+                owner = value;
+            }
+        }
 
         public Pet()
         {
