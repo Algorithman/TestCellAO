@@ -29,7 +29,7 @@ namespace ZoneEngine.GameObject.Items
 
     using System;
     using System.Collections.Generic;
-    using System.Runtime.Serialization;
+    using System.Diagnostics.Contracts;
 
     #endregion
 
@@ -80,6 +80,7 @@ namespace ZoneEngine.GameObject.Items
         /// <returns>Value of item attribute</returns>
         public Int32 getItemAttribute(int number)
         {
+            Contract.Assume(Stats!=null);
             int c;
             for (c = 0; c < Stats.Count; c++)
             {
