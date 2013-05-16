@@ -25,8 +25,19 @@
 
 namespace ZoneEngine.GameObject
 {
+    #region Usings ...
+
+    using System.Diagnostics.Contracts;
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
+    using ZoneEngine.GameObject.Stats;
+
+    #endregion
+
     /// <summary>
     /// </summary>
+    [ContractClass(typeof(INamedEntityContract))]
     public interface INamedEntity : IInstancedEntity, IStats
     {
         #region Public Properties
@@ -36,5 +47,41 @@ namespace ZoneEngine.GameObject
         string Name { get; set; }
 
         #endregion
+    }
+
+    /// <summary>
+    /// </summary>
+    [ContractClassFor(typeof(INamedEntity))]
+    internal abstract class INamedEntityContract : INamedEntity
+    {
+        /// <summary>
+        /// </summary>
+        public Identity Identity { get; private set; }
+
+        /// <summary>
+        /// </summary>
+        public Identity Playfield { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public DynelStats Stats { get; private set; }
+
+        /// <summary>
+        /// </summary>
+        public string Name
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<string>() != null);
+                Contract.Ensures(Contract.Result<string>() != "");
+                return default(string);
+            }
+
+            set
+            {
+                Contract.Requires(value != null);
+                Contract.Requires(value != "");
+            }
+        }
     }
 }

@@ -59,6 +59,7 @@ namespace ZoneEngine.GameObject
             get
             {
                 Contract.Ensures(this.Stats != null);
+                return default(DynelStats)
             }
 
             private set
