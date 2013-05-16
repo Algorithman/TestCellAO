@@ -27,12 +27,15 @@ namespace ZoneEngine.GameObject
 {
     #region Usings ...
 
+    using System.Diagnostics.Contracts;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     #endregion
 
     /// <summary>
     /// </summary>
+    [ContractClass(typeof(IInstancedEntityContract))]
     public interface IInstancedEntity : IEntity
     {
         #region Public Properties
@@ -42,5 +45,43 @@ namespace ZoneEngine.GameObject
         Identity Playfield { get; set; }
 
         #endregion
+    }
+
+    /// <summary>
+    /// </summary>
+    [ContractClassFor(typeof(IInstancedEntity))]
+    internal abstract class IInstancedEntityContract : IInstancedEntity
+    {
+        /// <summary>
+        /// </summary>
+        public Identity Identity
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<Identity>() != null);
+                return default(Identity);
+            }
+
+            private set
+            {
+                Contract.Requires(value != null);
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public Identity Playfield
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<Identity>() != null);
+                return default(Identity);
+            }
+
+            set
+            {
+                Contract.Requires(value != null);
+            }
+        }
     }
 }
