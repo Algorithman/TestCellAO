@@ -43,20 +43,16 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
         public string Name
         {
             get
             {
-                // TODO: Implement this property getter
-                throw new NotImplementedException();
+                return Name;
             }
 
             set
             {
-                // TODO: Implement this property setter
-                throw new NotImplementedException();
+                this.Name = value;
             }
         }
 
@@ -68,27 +64,22 @@ namespace ZoneEngine.GameObject
         {
             get
             {
-                // TODO: Implement this property getter
-                throw new NotImplementedException();
+                return Playfield;
             }
 
             set
             {
-                // TODO: Implement this property setter
-                throw new NotImplementedException();
+                Playfield = value;
             }
         }
 
         /// <summary>
         /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
         public DynelStats Stats
         {
             get
             {
-                // TODO: Implement this property getter
-                throw new NotImplementedException();
+                return Stats;
             }
         }
 

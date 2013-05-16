@@ -73,12 +73,22 @@ namespace ZoneEngine.GameObject.Nanos
 
             while (true)
             {
-                List<NanoFormula> templist = bf.Unpack(ms);
-                NanoList.AddRange(templist);
-                if (templist.Count != packaged)
+                List<NanoFormula> templist;
+                try
                 {
-                    break;
+                    templist = bf.Unpack(ms);
+                    NanoList.AddRange(templist);
+                    if (templist.Count != packaged)
+                    {
+                        break;
+                    }
                 }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+
 
                 Console.Write(
                     "Loaded {0} Nanos in {1}\r", 
@@ -118,12 +128,22 @@ namespace ZoneEngine.GameObject.Nanos
 
             while (true)
             {
-                List<NanoFormula> templist = bf.Unpack(ms);
-                NanoList.AddRange(templist);
-                if (templist.Count != packaged)
+                List<NanoFormula> templist;
+                try
                 {
-                    break;
+                    templist = bf.Unpack(ms);
+                    NanoList.AddRange(templist);
+                    if (templist.Count != packaged)
+                    {
+                        break;
+                    }
                 }
+                catch (Exception)
+                {
+                    
+                    throw;
+                }
+
 
                 Console.Write(
                     "Loaded {0} nanos in {1}\r", 

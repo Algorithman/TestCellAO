@@ -75,13 +75,22 @@ namespace ZoneEngine.Gameobject.Items
 
             while (true)
             {
-                List<AOItem> templist = bf2.Unpack(ms);
-                ItemList.AddRange(templist);
-                if (templist.Count != packaged)
+                List<AOItem> templist;
+                try
                 {
-                    break;
-                }
+                    templist = bf2.Unpack(ms);
+                    ItemList.AddRange(templist);
+                    if (templist.Count != packaged)
+                    {
+                        break;
+                    }
 
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                    
                 Console.Write(
                     "Loaded {0} items in {1}\r", 
                     new object[] { ItemList.Count, new DateTime((DateTime.Now - _now).Ticks).ToString("mm:ss.ff") });
@@ -120,11 +129,20 @@ namespace ZoneEngine.Gameobject.Items
 
             while (true)
             {
-                List<AOItem> templist = bf2.Unpack(ms);
-                ItemList.AddRange(templist);
-                if (templist.Count != packaged)
+                List<AOItem> templist;
+                try
                 {
-                    break;
+                    templist = bf2.Unpack(ms);
+                    ItemList.AddRange(templist);
+                    if (templist.Count != packaged)
+                    {
+                        break;
+                    }
+
+                }
+                catch (Exception)
+                {
+                    throw;
                 }
 
                 Console.Write(

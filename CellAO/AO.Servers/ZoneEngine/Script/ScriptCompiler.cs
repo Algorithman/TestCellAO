@@ -81,15 +81,16 @@ namespace ZoneEngine.Script
         /// </summary>
         private readonly CompilerParameters p = new CompilerParameters
                                                     {
-                                                        GenerateInMemory = false, 
-                                                        GenerateExecutable = false, 
-                                                        IncludeDebugInformation = true, 
-                                                        OutputAssembly = "Scripts.dll", 
-                                                        
-                                                        
-                                                        
-                                                        
-                                                        
+                                                        GenerateInMemory = false,
+                                                        GenerateExecutable = false,
+                                                        IncludeDebugInformation = true,
+                                                        OutputAssembly = "Scripts.dll",
+
+
+
+
+
+
                                                         // TODO: Figure out how to parse the file and return the usings, then load those.
                                                         ReferencedAssemblies =
                                                             {
@@ -101,9 +102,9 @@ namespace ZoneEngine.Script
                                                                 "ZoneEngine.exe", 
                                                                 "ChatEngine.exe", 
                                                                 "LoginEngine.exe"
-                                                            }, 
-                                                        TreatWarningsAsErrors = false, 
-                                                        WarningLevel = 3, 
+                                                            },
+                                                        TreatWarningsAsErrors = false,
+                                                        WarningLevel = 3,
                                                         CompilerOptions = "/optimize"
                                                     };
 
@@ -182,7 +183,7 @@ namespace ZoneEngine.Script
         /// </returns>
         public static string RemoveCharactersAfterChar(string hayStack, char needle)
         {
-            Contract.Requires(hayStack != null); 
+            Contract.Requires(hayStack != null);
             string input = hayStack;
             int index = input.IndexOf(needle);
             if (index > 0)
@@ -290,7 +291,7 @@ namespace ZoneEngine.Script
         /// </param>
         public void CallChatCommand(string commandName, Client client, Identity target, string[] commandArguments)
         {
-            Contract.Requires(commandName != null); 
+            Contract.Requires(commandName != null);
             Assembly assembly = Assembly.GetExecutingAssembly();
             if (commandName.ToUpperInvariant() != "LISTCOMMANDS")
             {
@@ -396,11 +397,11 @@ namespace ZoneEngine.Script
                             if (aoScript != null)
                             {
                                 kv.Value.InvokeMember(
-                                    functionName, 
-                                    BindingFlags.Default | BindingFlags.InvokeMethod, 
-                                    null, 
-                                    aoScript, 
-                                    new object[] { character }, 
+                                    functionName,
+                                    BindingFlags.Default | BindingFlags.InvokeMethod,
+                                    null,
+                                    aoScript,
+                                    new object[] { character },
                                     CultureInfo.InvariantCulture);
                             }
                         }
@@ -425,9 +426,9 @@ namespace ZoneEngine.Script
             if (multipleFiles)
             {
                 LogScriptAction(
-                    "ScriptCompiler:", 
-                    ConsoleColor.Yellow, 
-                    "multiple scripts configuration active.", 
+                    "ScriptCompiler:",
+                    ConsoleColor.Yellow,
+                    "multiple scripts configuration active.",
                     ConsoleColor.Magenta);
                 foreach (string scriptFile in this.ScriptsList)
                 {
@@ -458,9 +459,9 @@ namespace ZoneEngine.Script
                     }
 
                     LogScriptAction(
-                        "Script " + scriptFile, 
-                        ConsoleColor.Green, 
-                        "Compiled to: " + this.p.OutputAssembly, 
+                        "Script " + scriptFile,
+                        ConsoleColor.Green,
+                        "Compiled to: " + this.p.OutputAssembly,
                         ConsoleColor.Green);
 
                     // Add the compiled assembly to our list
@@ -477,6 +478,7 @@ namespace ZoneEngine.Script
             {
                 // Compile the full Scripts.dll
                 CompilerResults results = this.compiler.CompileAssemblyFromFile(this.p, this.ScriptsList);
+
 
                 // And check for errors
                 if (ErrorReporting(results).Length != 0)
@@ -550,7 +552,7 @@ namespace ZoneEngine.Script
         /// </returns>
         private static string ErrorReporting(CompilerResults results)
         {
-            Contract.Requires(results != null);
+            Contract.Assume(results != null);
             StringBuilder report = new StringBuilder();
             if (results.Errors.HasErrors)
             {
@@ -602,9 +604,9 @@ namespace ZoneEngine.Script
                             if (scriptObject != null)
                             {
                                 LogScriptAction(
-                                    "Script", 
-                                    ConsoleColor.Green, 
-                                    scriptObject.GetType().Name + " Loaded.", 
+                                    "Script",
+                                    ConsoleColor.Green,
+                                    scriptObject.GetType().Name + " Loaded.",
                                     ConsoleColor.Green);
 
                                 // Lets run our script and display its results
@@ -667,9 +669,9 @@ namespace ZoneEngine.Script
             catch (IOException)
             {
                 LogScriptAction(
-                    "Error", 
-                    ConsoleColor.Red, 
-                    "I/O Error occured. (Path is filename or network error)", 
+                    "Error",
+                    ConsoleColor.Red,
+                    "I/O Error occured. (Path is filename or network error)",
                     ConsoleColor.Red);
                 return false;
             }
