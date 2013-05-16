@@ -40,30 +40,26 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
         public string Name
         {
             get
             {
-                return Name;
+                return this.Name;
             }
 
             set
             {
-                Name = value;
+                this.Name = value;
             }
         }
 
         /// <summary>
         /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
         public IList<Pet> Pets
         {
             get
             {
-                return Pets;
+                return this.Pets;
             }
         }
 

@@ -58,32 +58,84 @@ namespace ZoneEngine.GameObject
             {
                 return this.playfield;
             }
+
             set
             {
                 this.playfield = value;
             }
         }
 
+        /// <summary>
+        /// </summary>
+        private Vector3 coordinates = new Vector3();
+
+        /// <summary>
+        /// </summary>
+        private Quaternion heading = new Quaternion();
+
+        /// <summary>
+        /// </summary>
+        public Vector3 Coordinates
+        {
+            get
+            {
+                return this.coordinates;
+            }
+
+            set
+            {
+                this.coordinates = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public Quaternion Heading
+        {
+            get
+            {
+                return this.heading;
+            }
+
+            set
+            {
+                this.heading = value;
+            }
+        }
+
         #endregion
 
+        /// <summary>
+        /// </summary>
         public Corpse()
         {
             this.playfield = new Identity();
             this.identity = new Identity();
         }
 
+        /// <summary>
+        /// </summary>
         public IList<AOItem> Inventory { get; private set; }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="lootTable">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public bool FillInventory(LootTable lootTable)
         {
             try
             {
-                Inventory = lootTable.GetLoot();
+                this.Inventory = lootTable.GetLoot();
                 return true;
             }
             catch (Exception)
             {
-                LogUtil.Debug("Could not create LootTable for Corpse "+this.identity.Type.ToString("X8")+":"+this.identity.Instance.ToString("X8")+" on Playfield "+this.playfield.Type.ToString("X8")+":"+this.playfield.Instance.ToString("X8"));
+                LogUtil.Debug(
+                    "Could not create LootTable for Corpse " + this.identity.Type.ToString("X8") + ":"
+                    + this.identity.Instance.ToString("X8") + " on Playfield " + this.playfield.Type.ToString("X8")
+                    + ":" + this.playfield.Instance.ToString("X8"));
                 return false;
             }
         }

@@ -93,6 +93,44 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
+        private Vector3 coordinates = new Vector3();
+
+        /// <summary>
+        /// </summary>
+        public Vector3 Coordinates
+        {
+            get
+            {
+                return this.coordinates;
+            }
+
+            set
+            {
+                this.coordinates = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        private Quaternion heading = new Quaternion();
+
+        /// <summary>
+        /// </summary>
+        public Quaternion Heading
+        {
+            get
+            {
+                return this.heading;
+            }
+
+            set
+            {
+                this.heading = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
         public DynelStats Stats
         {
             get

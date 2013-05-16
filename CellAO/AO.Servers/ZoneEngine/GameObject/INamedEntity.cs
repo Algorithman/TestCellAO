@@ -62,6 +62,24 @@ namespace ZoneEngine.GameObject
         /// </summary>
         public Identity Playfield { get; set; }
 
+        public Vector3 Coordinates
+        {
+            get
+            {
+                return default(Vector3);
+            }
+            set { }
+        }
+
+        public Quaternion Heading
+        {
+            get
+            {
+                return default(Quaternion);
+            }
+            set { }
+        }
+
         /// <summary>
         /// </summary>
         public DynelStats Stats { get; private set; }

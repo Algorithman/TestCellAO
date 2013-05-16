@@ -25,12 +25,56 @@
 
 namespace ZoneEngine.GameObject
 {
+    #region Usings ...
+
     using SmokeLounge.AOtomation.Messaging.GameData;
+
+    #endregion
 
     /// <summary>
     /// </summary>
     public class Statel : GameObject, IAOEvents, IAOActions, IInstancedEntity
     {
+        /// <summary>
+        /// </summary>
         public Identity Playfield { get; set; }
+
+        /// <summary>
+        /// </summary>
+        private Vector3 coordinates = new Vector3();
+
+        /// <summary>
+        /// </summary>
+        public Vector3 Coordinates
+        {
+            get
+            {
+                return this.coordinates;
+            }
+
+            set
+            {
+                this.coordinates = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        private Quaternion heading = new Quaternion();
+
+        /// <summary>
+        /// </summary>
+        public Quaternion Heading
+        {
+            get
+            {
+                return this.heading;
+            }
+
+            set
+            {
+                this.heading = value;
+            }
+        }
     }
 }

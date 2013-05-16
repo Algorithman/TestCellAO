@@ -47,7 +47,7 @@ namespace ZoneEngine.GameObject
         {
             get
             {
-                return Name;
+                return this.Name;
             }
 
             set
@@ -64,12 +64,50 @@ namespace ZoneEngine.GameObject
         {
             get
             {
-                return Playfield;
+                return this.Playfield;
             }
 
             set
             {
-                Playfield = value;
+                this.Playfield = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        private Vector3 coordinates = new Vector3();
+
+        /// <summary>
+        /// </summary>
+        public Vector3 Coordinates
+        {
+            get
+            {
+                return this.coordinates;
+            }
+
+            set
+            {
+                this.coordinates = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        private Quaternion heading = new Quaternion();
+
+        /// <summary>
+        /// </summary>
+        public Quaternion Heading
+        {
+            get
+            {
+                return this.heading;
+            }
+
+            set
+            {
+                this.heading = value;
             }
         }
 
@@ -79,7 +117,7 @@ namespace ZoneEngine.GameObject
         {
             get
             {
-                return Stats;
+                return this.Stats;
             }
         }
 
