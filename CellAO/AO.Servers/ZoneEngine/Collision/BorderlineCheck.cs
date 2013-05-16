@@ -29,6 +29,7 @@ namespace ZoneEngine.Collision
 
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
     using System.IO;
     using System.Xml.Serialization;
 
@@ -541,6 +542,8 @@ namespace ZoneEngine.Collision
             public LineSegment(
                 Point pointA, Point pointB, int destinationPlayfield, int destinationIndex, int destinationFlags)
             {
+                Contract.Assume(pointA != null);
+                Contract.Assume(pointB != null);
                 this.VectorA = new Vector2(pointA.X, pointA.Z);
                 this.VectorB = new Vector2(pointB.X, pointB.Z);
                 if (pointA.Y > pointB.Y)
@@ -569,6 +572,8 @@ namespace ZoneEngine.Collision
             /// </param>
             public LineSegment(Point pointA, Point pointB, int destinationPlayfield, int destinationIndex)
             {
+                Contract.Assume(pointA != null);
+                Contract.Assume(pointB != null);
                 this.VectorA = new Vector2(pointA.X, pointA.Z);
                 this.VectorB = new Vector2(pointB.X, pointB.Z);
                 if (pointA.Y > pointB.Y)
@@ -593,6 +598,8 @@ namespace ZoneEngine.Collision
             /// </param>
             public LineSegment(Point pointA, Point pointB)
             {
+                Contract.Assume(pointA != null);
+                Contract.Assume(pointB != null);
                 this.VectorA = new Vector2(pointA.X, pointA.Z);
                 this.VectorB = new Vector2(pointB.X, pointB.Z);
                 if (pointA.Y > pointB.Y)
@@ -617,6 +624,8 @@ namespace ZoneEngine.Collision
             /// </param>
             public LineSegment(Vector2 vectorA, Vector2 vectorB)
             {
+                Contract.Assume(vectorA != null);
+                Contract.Assume(vectorB != null);
                 this.VectorA = new Vector2(vectorA);
                 this.VectorB = new Vector2(vectorB);
                 this.Y = 0;
@@ -837,6 +846,7 @@ namespace ZoneEngine.Collision
             /// </param>
             public Vector2(Vector2 vector)
             {
+                Contract.Assume(vector != null);
                 this.X = vector.X;
                 this.Z = vector.Z;
             }
@@ -855,6 +865,8 @@ namespace ZoneEngine.Collision
             /// </returns>
             public static Vector2 Subtract(Vector2 vectorA, Vector2 vectorB)
             {
+                Contract.Assume(vectorA != null);
+                Contract.Assume(vectorB != null);
                 Vector2 vectorC = new Vector2 { X = vectorA.X - vectorB.X, Z = vectorA.Z - vectorB.Z };
                 return vectorC;
             }
