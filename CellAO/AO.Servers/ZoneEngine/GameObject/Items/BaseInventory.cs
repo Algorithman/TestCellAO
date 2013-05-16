@@ -30,6 +30,8 @@ namespace ZoneEngine.GameObject.Items
     using System;
     using System.Collections.Generic;
 
+    using ZoneEngine.GameObject.Enums;
+
     #endregion
 
     /// <summary>
