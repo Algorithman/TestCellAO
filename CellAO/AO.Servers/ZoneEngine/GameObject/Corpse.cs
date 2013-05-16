@@ -50,5 +50,14 @@ namespace ZoneEngine.GameObject
         public Identity Playfield { get; set; }
 
         #endregion
+
+        public Corpse()
+        {
+            this.playfield = new Identity();
+            this.identity = new Identity();
+        }
+
     }
+
+
 }

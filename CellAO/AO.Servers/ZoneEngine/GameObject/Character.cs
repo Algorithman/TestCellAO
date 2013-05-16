@@ -146,5 +146,12 @@ namespace ZoneEngine.GameObject
         /// <summary>
         /// </summary>
         public BaseInventory BaseInventory { get; private set; }
+
+        public Character()
+        {
+            BaseInventory = new BaseInventory(this);
+            this.pets=new List<Pet>();
+
+        }
     }
 }

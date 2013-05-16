@@ -39,7 +39,7 @@ namespace ZoneEngine.GameObject.Items
     {
         /// <summary>
         /// </summary>
-        Character owner { get; }
+        IItemContainer owner { get; }
 
         /// <summary>
         /// </summary>

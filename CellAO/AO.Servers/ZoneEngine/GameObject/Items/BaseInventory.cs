@@ -40,7 +40,7 @@ namespace ZoneEngine.GameObject.Items
     {
         /// <summary>
         /// </summary>
-        public Character owner { get; private set; }
+        public IItemContainer owner { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -57,6 +57,17 @@ namespace ZoneEngine.GameObject.Items
         /// <summary>
         /// </summary>
         public bool IsFull { get; private set; }
+
+        public BaseInventory()
+        {
+            this.Content=new Dictionary<int, AOItem>();
+            this.MaxSlots = 0;
+        }
+
+        public BaseInventory(IItemContainer owner)
+        {
+            this.owner = owner;
+        }
 
         /// <summary>
         /// </summary>

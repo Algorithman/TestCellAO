@@ -54,6 +54,10 @@ namespace ZoneEngine.GameObject
         /// </summary>
         protected DynelStats stats;
 
+        /// <summary>
+        /// </summary>
+        protected Identity playfield;
+
         #endregion
 
         #region Constructors and Destructors
@@ -63,6 +67,7 @@ namespace ZoneEngine.GameObject
         public Dynel()
         {
             this.stats = new DynelStats(this);
+            this.playfield = new Identity();
         }
 
         #endregion
@@ -77,14 +82,12 @@ namespace ZoneEngine.GameObject
         {
             get
             {
-                // TODO: Implement this property getter
-                throw new NotImplementedException();
+                return this.playfield;
             }
 
             set
             {
-                // TODO: Implement this property setter
-                throw new NotImplementedException();
+                this.playfield = value;
             }
         }
 

@@ -50,5 +50,17 @@ namespace ZoneEngine.GameObject
     /// </summary>
     public class Pet : NonPlayerCharacter
     {
+        protected ISummoner owner;
+
+        public ISummoner Owner { get; private set; }
+
+        public Pet()
+        {
+        }
+
+        public Pet(ISummoner owner)
+        {
+            this.owner = owner;
+        }
     }
 }

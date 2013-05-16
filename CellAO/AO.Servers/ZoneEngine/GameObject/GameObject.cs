@@ -55,6 +55,14 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        /// <summary>
+        /// </summary>
+        public GameObject()
+        {
+            this.identity = new Identity();
+        }
+
+
         #endregion
     }
 }
