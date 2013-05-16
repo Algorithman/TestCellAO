@@ -28,14 +28,17 @@ namespace ZoneEngine.GameObject
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+
+    using ZoneEngine.GameObject.Items;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    public class Corpse : GameObject, IInstancedEntity, IAOEvents
+    public class Corpse : GameObject, IInstancedEntity, IAOEvents, ILootInventory
     {
         #region Public Properties
 
@@ -47,7 +50,17 @@ namespace ZoneEngine.GameObject
         /// </summary>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public Identity Playfield { get; set; }
+        public Identity Playfield
+        {
+            get
+            {
+                return this.playfield;
+            }
+            set
+            {
+                this.playfield = value;
+            }
+        }
 
         #endregion
 
@@ -57,6 +70,12 @@ namespace ZoneEngine.GameObject
             this.identity = new Identity();
         }
 
+        public IList<AOItem> Inventory { get; private set; }
+
+        public bool FillInventory(LootTable lootTable)
+        {
+            foreach (AOItem item in lootTable.)
+        }
     }
 
 

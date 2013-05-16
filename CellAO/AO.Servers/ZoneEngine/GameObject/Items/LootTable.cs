@@ -31,6 +31,8 @@ namespace ZoneEngine.GameObject.Items
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
 
+    using ZoneEngine.Gameobject.Items;
+
     #endregion
 
     /// <summary>
@@ -57,6 +59,23 @@ namespace ZoneEngine.GameObject.Items
         {
             this.LootTableEntries = new List<LootTableEntry>();
             this.Items = new List<AOItem>();
+        }
+
+        public List<AOItem> GetLoot()
+        {
+            Random probability = new Random((int)DateTime.Now.Ticks);
+            List<AOItem> temp = new List<AOItem>();
+            foreach (LootTableEntry lootTableEntry in LootTableEntries)
+            {
+                if (probability.Next() < lootTableEntry.DropRate)
+                {
+                    int QL =
+                        Convert.ToInt32(
+                            probability.Next() * (lootTableEntry.MaxQL - lootTableEntry.MinQL) + lootTableEntry.MinQL);
+                    temp.Add(ItemHandler.interpolate(lootTableEntry.LowID, lootTableEntry.HighID, QL)));
+                }
+            }
+            return temp;
         }
 
         #endregion
@@ -89,23 +108,23 @@ namespace ZoneEngine.GameObject.Items
 
         /// <summary>
         /// </summary>
-        private readonly float DropRate = 1.0f;
+        public float DropRate = 1.0f;
 
         /// <summary>
         /// </summary>
-        private readonly int HighID = 0;
+        public int HighID = 0;
 
         /// <summary>
         /// </summary>
-        private readonly int LowID = 0;
+        public int LowID = 0;
 
         /// <summary>
         /// </summary>
-        private readonly int MaxQL = 1;
+        public int MaxQL = 1;
 
         /// <summary>
         /// </summary>
-        private readonly int MinQL = 1;
+        public int MinQL = 1;
 
         #endregion
     }
