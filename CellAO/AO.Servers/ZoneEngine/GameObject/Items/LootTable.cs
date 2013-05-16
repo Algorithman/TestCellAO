@@ -29,6 +29,7 @@ namespace ZoneEngine.GameObject.Items
 
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
 
     #endregion
 
@@ -72,6 +73,8 @@ namespace ZoneEngine.GameObject.Items
         {
             // Get access to DB/or file and read the appropriate stuff for the hash
             // Either a AOItem with QL Range (LootTableEntry), or a Hash Group (which lets AddByHash call itself again)
+            Contract.Requires(hash != null);
+            Contract.Requires(hash != "");
             throw new NotImplementedException("LootTable.AddByHash");
         }
 

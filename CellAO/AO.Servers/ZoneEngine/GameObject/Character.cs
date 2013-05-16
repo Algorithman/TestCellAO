@@ -29,6 +29,7 @@ namespace ZoneEngine.GameObject
 
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
 
     using Cell.Core;
 
@@ -135,6 +136,8 @@ namespace ZoneEngine.GameObject
         /// </param>
         internal void Send(MessageBody messageBody, bool announceToPlayfield)
         {
+            Contract.Requires(messageBody != null);
+            Contract.Requires(this.Identity.Instance != 0);
             this.client.SendCompressed(messageBody, this.Identity.Instance, announceToPlayfield);
         }
 
