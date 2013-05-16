@@ -25,9 +25,12 @@
 
 namespace ZoneEngine.GameObject
 {
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     /// <summary>
     /// </summary>
-    public class Statel : GameObject, IAOEvents, IAOActions
+    public class Statel : GameObject, IAOEvents, IAOActions, IInstancedEntity
     {
+        public Identity Playfield { get; set; }
     }
 }

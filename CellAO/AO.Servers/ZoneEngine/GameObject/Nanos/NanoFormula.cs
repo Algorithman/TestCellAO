@@ -204,55 +204,6 @@ namespace ZoneEngine.GameObject.Nanos
             return true;
         }
 
-        #region GetWeaponStyle
-
-        /// <summary>
-        /// Get WeaponStyle (Stat 274)
-        /// </summary>
-        /// <returns>Value of Stat 274 or 0</returns>
-        public int GetWeaponStyle()
-        {
-            foreach (AOItemAttribute at in this.Stats)
-            {
-                if (at.Stat != 274)
-                {
-                    continue;
-                }
-
-                return at.Value;
-            }
-
-            // Odd, no WeaponWieldFlags found...
-            return 0;
-        }
-
-        #endregion
-
-        #region Get Override Texture
-
-        /// <summary>
-        /// Get override texture number
-        /// </summary>
-        /// <returns>
-        /// </returns>
-        public int GetOverrideTexture()
-        {
-            foreach (AOItemAttribute attr in this.Stats)
-            {
-                if (attr.Stat != 336)
-                {
-                    continue;
-                }
-
-                return attr.Value;
-            }
-
-            // No Override OH NOES!
-            return 0;
-        }
-
-        #endregion
-
         /// <summary>
         /// Get item attribute
         /// </summary>
