@@ -55,14 +55,10 @@ namespace ZoneEngine.GameObject.Items
         {
             get
             {
-                Contract.Ensures(Contract.Result<Identity>() != null);
                 return default(Identity);
             }
 
-            private set
-            {
-                Contract.Requires(value != null);
-            }
+            private set{}
         }
 
         /// <summary>

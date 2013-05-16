@@ -29,6 +29,7 @@ namespace ZoneEngine.Gameobject.Items
 
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
     using System.IO;
 
     using ComponentAce.Compression.Libs.zlib;
@@ -100,6 +101,7 @@ namespace ZoneEngine.Gameobject.Items
         /// </returns>
         public static int CacheAllItems(string fname)
         {
+            Contract.Requires(!string.IsNullOrEmpty(fname));
             DateTime _now = DateTime.Now;
             ItemList = new List<AOItem>();
             Stream sf = new FileStream(fname, FileMode.Open);

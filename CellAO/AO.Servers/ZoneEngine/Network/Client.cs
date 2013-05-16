@@ -28,6 +28,7 @@ namespace ZoneEngine.CoreClient
     #region Usings ...
 
     using System;
+    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Net.Sockets;
 
@@ -180,6 +181,7 @@ namespace ZoneEngine.CoreClient
         public void Send(int receiver, MessageBody messageBody)
         {
             // TODO: Investigate if reciever is a timestamp
+            Contract.Requires(messageBody != null);
             var message = new Message
                               {
                                   Body = messageBody, 
@@ -218,6 +220,8 @@ namespace ZoneEngine.CoreClient
         /// </exception>
         public void SendCompressed(byte[] packet)
         {
+            Contract.Requires(packet != null);
+            Contract.Requires(1 < packet.Length);
             int tries = 0;
             bool done = false;
 
@@ -308,6 +312,8 @@ namespace ZoneEngine.CoreClient
         /// </returns>
         protected uint GetMessageNumber(BufferSegment segment)
         {
+            Contract.Requires(segment != null);
+            Contract.Requires(19 < ((Cell.Core.BufferSegment)segment).SegmentData.Length); 
             var messageNumberArray = new byte[4];
             messageNumberArray[3] = segment.SegmentData[16];
             messageNumberArray[2] = segment.SegmentData[17];
@@ -325,6 +331,8 @@ namespace ZoneEngine.CoreClient
         /// </returns>
         protected uint GetMessageNumber(byte[] segment)
         {
+            Contract.Requires(segment != null);
+            Contract.Requires(19 < segment.Length); 
             var messageNumberArray = new byte[4];
             messageNumberArray[3] = segment[16];
             messageNumberArray[2] = segment[17];

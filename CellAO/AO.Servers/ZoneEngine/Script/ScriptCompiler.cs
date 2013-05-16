@@ -134,6 +134,7 @@ namespace ZoneEngine.Script
         /// </returns>
         public static string DllName(string scriptName)
         {
+            Contract.Requires(scriptName != null);
             scriptName = RemoveCharactersAfterChar(scriptName, '.');
             scriptName = RemoveCharactersBeforeChar(scriptName, '\\');
             scriptName = RemoveCharactersBeforeChar(scriptName, '/');
@@ -181,6 +182,7 @@ namespace ZoneEngine.Script
         /// </returns>
         public static string RemoveCharactersAfterChar(string hayStack, char needle)
         {
+            Contract.Requires(hayStack != null); 
             string input = hayStack;
             int index = input.IndexOf(needle);
             if (index > 0)
@@ -288,6 +290,7 @@ namespace ZoneEngine.Script
         /// </param>
         public void CallChatCommand(string commandName, Client client, Identity target, string[] commandArguments)
         {
+            Contract.Requires(commandName != null); 
             Assembly assembly = Assembly.GetExecutingAssembly();
             if (commandName.ToUpperInvariant() != "LISTCOMMANDS")
             {
@@ -342,26 +345,28 @@ namespace ZoneEngine.Script
             {
                 client.SendChatText("Available Commands:");
                 string[] scriptNames = this.chatCommands.Keys.ToArray();
-                for (int i = 0; i < scriptNames.Length; i++)
+                if (scriptNames.Length >= 0)
                 {
-                    scriptNames[i] = scriptNames[i].Substring(scriptNames[i].IndexOf(":", StringComparison.Ordinal) + 1)
-                                     + ":"
-                                     + scriptNames[i].Substring(
-                                         0, scriptNames[i].IndexOf(":", StringComparison.Ordinal));
-                }
-
-                Array.Sort(scriptNames);
-
-                foreach (string scriptName in scriptNames)
-                {
-                    string typename = scriptName.Substring(scriptName.IndexOf(":", StringComparison.Ordinal) + 1);
-                    AOChatCommand aoc = (AOChatCommand)assembly.CreateInstance(typename);
-                    if (aoc != null)
+                    for (int i = 0; i < scriptNames.Length; i++)
                     {
-                        if (client.Character.Stats.GMLevel.Value >= aoc.GMLevelNeeded())
+                        scriptNames[i] =
+                            scriptNames[i].Substring(scriptNames[i].IndexOf(":", StringComparison.Ordinal) + 1) + ":"
+                            + scriptNames[i].Substring(0, scriptNames[i].IndexOf(":", StringComparison.Ordinal));
+                    }
+
+                    Array.Sort(scriptNames);
+
+                    foreach (string scriptName in scriptNames)
+                    {
+                        string typename = scriptName.Substring(scriptName.IndexOf(":", StringComparison.Ordinal) + 1);
+                        AOChatCommand aoc = (AOChatCommand)assembly.CreateInstance(typename);
+                        if (aoc != null)
                         {
-                            client.SendChatText(
-                                scriptName.Substring(0, scriptName.IndexOf(":", StringComparison.Ordinal)));
+                            if (client.Character.Stats.GMLevel.Value >= aoc.GMLevelNeeded())
+                            {
+                                client.SendChatText(
+                                    scriptName.Substring(0, scriptName.IndexOf(":", StringComparison.Ordinal)));
+                            }
                         }
                     }
                 }

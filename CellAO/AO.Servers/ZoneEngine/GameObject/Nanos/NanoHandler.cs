@@ -29,6 +29,7 @@ namespace ZoneEngine.GameObject.Nanos
 
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
     using System.IO;
 
     using ComponentAce.Compression.Libs.zlib;
@@ -98,6 +99,7 @@ namespace ZoneEngine.GameObject.Nanos
         /// </returns>
         public static int CacheAllNanos(string fname)
         {
+            Contract.Requires(!string.IsNullOrEmpty(fname));
             DateTime _now = DateTime.Now;
             NanoList = new List<NanoFormula>();
             Stream sf = new FileStream(fname, FileMode.Open);

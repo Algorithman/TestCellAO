@@ -10,6 +10,7 @@ namespace NiceHexOutput
     {
         public static string Output(byte[] packet)
         {
+            if (packet == null) return string.Empty;
             string outp = "";
             int counter = 0;
 

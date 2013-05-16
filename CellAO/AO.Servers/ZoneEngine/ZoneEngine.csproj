@@ -49,7 +49,7 @@
     <CodeContractsCustomRewriterAssembly />
     <CodeContractsCustomRewriterClass />
     <CodeContractsLibPaths />
-    <CodeContractsExtraRewriteOptions />
+    <CodeContractsExtraRewriteOptions>-timeout 400</CodeContractsExtraRewriteOptions>
     <CodeContractsExtraAnalysisOptions />
     <CodeContractsSQLServerOption />
     <CodeContractsBaseLineFile />

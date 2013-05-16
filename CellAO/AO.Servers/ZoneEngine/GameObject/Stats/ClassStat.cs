@@ -29,6 +29,7 @@ namespace ZoneEngine.GameObject.Stats
 
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
 
     using AO.Core;
 
@@ -12236,6 +12237,9 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         public void Send(object sender, StatChangedEventArgs e)
         {
+            Contract.Requires(sender != null);
+            Contract.Requires(((ClassStat)sender).Parent != null);
+
             if (!((ClassStat)sender).Parent.DoNotDoTimers)
             {
                 var messageBody = new SetStatMessage();
@@ -12446,6 +12450,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         public void SetStatValueByName(string statName, uint newValue)
         {
+            Contract.Requires(statName != null); 
             int statid = StatsList.GetStatId(statName.ToLower());
             foreach (ClassStat c in this.all)
             {
@@ -12496,6 +12501,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </exception>
         public int StatIdByName(string statName)
         {
+            Contract.Requires(statName != null); 
             int statid = StatsList.GetStatId(statName.ToLower());
             foreach (ClassStat c in this.all)
             {
@@ -12545,6 +12551,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </returns>
         public int StatValueByName(string name)
         {
+            Contract.Requires(name != null); 
             int statid = StatsList.GetStatId(name.ToLower());
             foreach (ClassStat c in this.all)
             {
