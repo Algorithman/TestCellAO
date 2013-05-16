@@ -27,7 +27,9 @@ namespace ZoneEngine.GameObject
 {
     #region Usings ...
 
+    using System;
     using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
 
     using ZoneEngine.GameObject.Items;
 
@@ -35,6 +37,7 @@ namespace ZoneEngine.GameObject
 
     /// <summary>
     /// </summary>
+    [ContractClass(typeof(ILootInventoryContract))]
     public interface ILootInventory
     {
         #region Public Properties
@@ -56,5 +59,40 @@ namespace ZoneEngine.GameObject
         bool FillInventory(LootTable lootTable);
 
         #endregion
+    }
+
+    /// <summary>
+    /// </summary>
+    [ContractClassFor(typeof(ILootInventory))]
+    internal abstract class ILootInventoryContract : ILootInventory
+    {
+        /// <summary>
+        /// </summary>
+        public IList<AOItem> Inventory
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IList<AOItem>>() != null);
+                return default(IList<AOItem>);
+            }
+
+            private set
+            {
+                Contract.Requires(value != null);
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="lootTable">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public bool FillInventory(LootTable lootTable)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
