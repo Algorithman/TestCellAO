@@ -27,12 +27,15 @@ namespace ZoneEngine.GameObject
 {
     #region Usings ...
 
+    using System.Diagnostics.Contracts;
+
     using ZoneEngine.GameObject.Stats;
 
     #endregion
 
     /// <summary>
     /// </summary>
+    [ContractClass(typeof(IStatsContract))]
     public interface IStats
     {
         #region Public Properties
@@ -42,5 +45,26 @@ namespace ZoneEngine.GameObject
         DynelStats Stats { get; }
 
         #endregion
+    }
+
+    /// <summary>
+    /// </summary>
+    [ContractClassFor(typeof(IStats))]
+    internal abstract class IStatsContract : IStats
+    {
+        /// <summary>
+        /// </summary>
+        public DynelStats Stats
+        {
+            get
+            {
+                Contract.Ensures(this.Stats != null);
+            }
+
+            private set
+            {
+                Contract.Requires(value != null);
+            }
+        }
     }
 }

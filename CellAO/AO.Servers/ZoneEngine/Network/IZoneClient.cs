@@ -69,8 +69,8 @@ namespace ZoneEngine
         /// </param>
         public void SendCompressed(MessageBody messageBody, int receiver, bool announceToPlayfield)
         {
-            Contract.Ensures(messageBody != null);
-            Contract.Ensures(receiver != 0);
+            Contract.Requires(messageBody != null);
+            Contract.Requires(receiver != 0);
         }
 
         /// <summary>

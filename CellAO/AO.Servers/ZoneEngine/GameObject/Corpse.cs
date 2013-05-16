@@ -28,6 +28,7 @@ namespace ZoneEngine.GameObject
     #region Usings ...
 
     using System;
+    using System.Diagnostics.Contracts;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
@@ -39,6 +40,8 @@ namespace ZoneEngine.GameObject
     {
         #region Public Properties
 
+        private Identity playfield;
+
         /// <summary>
         /// </summary>
         /// <exception cref="NotImplementedException">
@@ -47,14 +50,14 @@ namespace ZoneEngine.GameObject
         {
             get
             {
-                // TODO: Implement this property getter
-                throw new NotImplementedException();
+                Contract.Ensures(playfield != null);
+                return playfield;
             }
 
             set
             {
-                // TODO: Implement this property setter
-                throw new NotImplementedException();
+                Contract.Requires(value != null);
+                playfield = value;
             }
         }
 
