@@ -106,17 +106,55 @@ namespace ZoneEngine.GameObject.Playfields
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// </summary>
         public List<PlayfieldDistrict> Districts
         {
             get
             {
-                return districts;
+                return this.districts;
             }
+
             private set
             {
-                districts = value;
+                this.districts = value;
             }
         }
+
+        /// <summary>
+        /// </summary>
+        private float x;
+
+        /// <summary>
+        /// </summary>
+        public float X
+        {
+            get
+            {
+                return this.X;
+            }
+
+            set
+            {
+                this.x = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public float Z { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public float XScale { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public float ZScale { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public int Expansion { get; set; }
 
         /// <summary>
         /// </summary>
@@ -129,6 +167,8 @@ namespace ZoneEngine.GameObject.Playfields
         /// <param name="server">
         /// </param>
         /// <param name="bus">
+        /// </param>
+        /// <param name="playfieldIdentity">
         /// </param>
         public Playfield(ServerBase server, IBus bus, Identity playfieldIdentity)
         {

@@ -193,6 +193,11 @@ namespace ZoneEngine.CoreServer
                         playfield.Districts.Add(playfieldDistrict);
                     }
 
+                    playfield.X = playfieldInfo.x;
+                    playfield.Z = playfieldInfo.z;
+                    playfield.XScale = playfieldInfo.xscale;
+                    playfield.ZScale = playfieldInfo.zscale;
+                    playfield.Expansion = playfieldInfo.expansion;
                     playfields.Add(playfield);
                 }
             }
