@@ -184,14 +184,14 @@ namespace ZoneEngine.CoreClient
             Contract.Requires(messageBody != null);
             var message = new Message
                               {
-                                  Body = messageBody, 
+                                  Body = messageBody,
                                   Header =
                                       new Header
                                           {
-                                              MessageId = this.packetNumber, 
-                                              PacketType = messageBody.PacketType, 
-                                              Unknown = 0x0001, 
-                                              Sender = 0x00000001, 
+                                              MessageId = this.packetNumber,
+                                              PacketType = messageBody.PacketType,
+                                              Unknown = 0x0001,
+                                              Sender = 0x00000001,
                                               Receiver = receiver
                                           }
                               };
@@ -313,7 +313,7 @@ namespace ZoneEngine.CoreClient
         protected uint GetMessageNumber(BufferSegment segment)
         {
             Contract.Requires(segment != null);
-            Contract.Requires(19 < ((Cell.Core.BufferSegment)segment).SegmentData.Length); 
+            Contract.Requires(19 < ((Cell.Core.BufferSegment)segment).SegmentData.Length);
             var messageNumberArray = new byte[4];
             messageNumberArray[3] = segment.SegmentData[16];
             messageNumberArray[2] = segment.SegmentData[17];
@@ -332,7 +332,7 @@ namespace ZoneEngine.CoreClient
         protected uint GetMessageNumber(byte[] segment)
         {
             Contract.Requires(segment != null);
-            Contract.Requires(19 < segment.Length); 
+            Contract.Requires(19 < segment.Length);
             var messageNumberArray = new byte[4];
             messageNumberArray[3] = segment[16];
             messageNumberArray[2] = segment[17];
@@ -400,20 +400,23 @@ namespace ZoneEngine.CoreClient
         {
             var message = new Message
                               {
-                                  Body = messageBody, 
+                                  Body = messageBody,
                                   Header =
                                       new Header
                                           {
-                                              MessageId = this.packetNumber, 
-                                              PacketType = messageBody.PacketType, 
-                                              Unknown = 0x0001, 
-                                              Sender = 0x00000001, 
+                                              MessageId = this.packetNumber,
+                                              PacketType = messageBody.PacketType,
+                                              Unknown = 0x0001,
+                                              Sender = 0x00000001,
                                               Receiver = receiver
                                           }
                               };
             this.packetNumber++;
             byte[] buffer = this.messageSerializer.Serialize(message);
-
+            if ((buffer == null) || (buffer.Length < 1))
+            {
+                throw new NullReferenceException("Serializer failure? (" + typeof(MessageBody).FullName + ")");
+            }
             this.SendCompressed(buffer);
         }
     }

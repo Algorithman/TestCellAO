@@ -42,12 +42,12 @@ namespace ZoneEngine.GameObject
 
     /// <summary>
     /// </summary>
-    public sealed class Character : Dynel, 
-                                    IPacketReceivingEntity, 
-                                    INamedEntity, 
-                                    ISummoner, 
-                                    IAOEvents, 
-                                    IAOActions, 
+    public sealed class Character : Dynel,
+                                    IPacketReceivingEntity,
+                                    INamedEntity,
+                                    ISummoner,
+                                    IAOEvents,
+                                    IAOActions,
                                     IItemContainer
     {
         #region Fields
@@ -63,6 +63,8 @@ namespace ZoneEngine.GameObject
         /// <summary>
         /// </summary>
         private readonly IList<Pet> pets = new List<Pet>();
+
+        private string name = string.Empty;
 
         #endregion
 
@@ -97,20 +99,16 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
         public string Name
         {
             get
             {
-                // TODO: Implement this property getter
-                throw new NotImplementedException();
+                return this.name;
             }
 
             set
             {
-                // TODO: Implement this property setter
-                throw new NotImplementedException();
+                this.name = value;
             }
         }
 
@@ -150,7 +148,7 @@ namespace ZoneEngine.GameObject
         public Character()
         {
             BaseInventory = new BaseInventory(this);
-            this.pets=new List<Pet>();
+            this.pets = new List<Pet>();
 
         }
     }
