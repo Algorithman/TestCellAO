@@ -31,6 +31,6 @@ namespace ZoneEngine.GameObject.Playfields
 
         bool IsInstancedPlayfield();
 
-
+        List<PlayfieldDistrict> Districts { get; }
     }
 }

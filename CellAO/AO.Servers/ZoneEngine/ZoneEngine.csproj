@@ -106,6 +106,8 @@
     <Compile Include="GameObject\Nanos\NanoHandler.cs" />
     <Compile Include="GameObject\Playfields\IPlayfield.cs" />
     <Compile Include="GameObject\Playfields\Playfield.cs" />
+    <Compile Include="GameObject\Playfields\PlayfieldDistrict.cs" />
+    <Compile Include="GameObject\Playfields\Playfields.cs" />
     <Compile Include="GameObject\Stats\CharacterStats.cs" />
     <Compile Include="Component\ClientFactory.cs" />
     <Compile Include="GameObject\Items\AOEvents.cs" />

@@ -23,63 +23,26 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.Component
+namespace ZoneEngine.GameObject.Playfields
 {
-    #region Usings ...
-
-    using System.ComponentModel.Composition;
-
-    using AO.Core.Components;
-
-    using SmokeLounge.AOtomation.Messaging.GameData;
-
-    using ZoneEngine.CoreServer;
-    using ZoneEngine.GameObject.Playfields;
-
-    #endregion
-
     /// <summary>
     /// </summary>
-    [Export]
-    public class PlayfieldFactory
+    public class PlayfieldDistrict
     {
-        #region Fields
+        /// <summary>
+        /// </summary>
+        public string Name = "Nameless District";
 
         /// <summary>
         /// </summary>
-        private readonly IBus bus;
-
-        #endregion
-
-        #region Constructors and Destructors
+        public int MinLevel;
 
         /// <summary>
         /// </summary>
-        /// <param name="messageSerializer">
-        /// </param>
-        /// <param name="bus">
-        /// </param>
-        [ImportingConstructor]
-        public PlayfieldFactory(IBus bus)
-        {
-            this.bus = bus;
-        }
-
-        #endregion
-
-        #region Public Methods and Operators
+        public int MaxLevel;
 
         /// <summary>
         /// </summary>
-        /// <param name="ZoneServer">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        public Playfield Create(ZoneServer ZoneServer, Identity playfieldIdentity)
-        {
-            return new Playfield(ZoneServer, this.bus, playfieldIdentity);
-        }
-
-        #endregion
+        public int SuppressionGas = 100;
     }
 }

@@ -114,6 +114,7 @@ namespace ZoneEngine
                  */
                 Console.WriteLine("Loaded {0} items", ItemHandler.CacheAllItems());
                 Console.WriteLine("Loaded {0} nanos", NanoHandler.CacheAllNanos());
+                Console.WriteLine("Creaated {0} playfields", zoneServer.CreatePlayfields());
 
                 /*
                 Console.WriteLine("Loaded {0} spawns", NonPlayerCharacterHandler.CacheAllFromDB());

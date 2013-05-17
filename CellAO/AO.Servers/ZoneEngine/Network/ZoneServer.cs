@@ -36,6 +36,8 @@ namespace ZoneEngine.CoreServer
 
     using Cell.Core;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine.Component;
     using ZoneEngine.GameObject.Playfields;
 
@@ -63,6 +65,8 @@ namespace ZoneEngine.CoreServer
         /// <summary>
         /// </summary>
         private readonly PlayfieldFactory playfieldFactory;
+
+        private List<IPlayfield> playfields = new List<IPlayfield>();
 
         #endregion
 
@@ -140,9 +144,9 @@ namespace ZoneEngine.CoreServer
         /// </summary>
         /// <returns>
         /// </returns>
-        protected IPlayfield CreatePlayfield()
+        protected IPlayfield CreatePlayfield(Identity playfieldIdentity)
         {
-            return this.playfieldFactory.Create(this);
+            return this.playfieldFactory.Create(this, playfieldIdentity);
         }
 
         /// <summary>
@@ -166,6 +170,33 @@ namespace ZoneEngine.CoreServer
         protected override void OnSendTo(IPEndPoint clientIP, int num_bytes)
         {
             Console.WriteLine("Sending to " + clientIP.Address);
+        }
+
+        public int CreatePlayfields()
+        {
+            foreach (PlayfieldInfo playfieldInfo in Playfields.Instance.playfields)
+            {
+                if (!playfieldInfo.disabled)
+                {
+                    Identity identity = new Identity();
+                    identity.Type = IdentityType.Playfield;
+                    identity.Instance = playfieldInfo.id;
+                    IPlayfield playfield = this.CreatePlayfield(identity);
+
+                    foreach (DistrictInfo districtInfo in playfieldInfo.districts)
+                    {
+                        PlayfieldDistrict playfieldDistrict=new PlayfieldDistrict();
+                        playfieldDistrict.Name = districtInfo.districtName;
+                        playfieldDistrict.MinLevel = districtInfo.minLevel;
+                        playfieldDistrict.MaxLevel = districtInfo.maxLevel;
+                        playfieldDistrict.SuppressionGas = districtInfo.suppressionGas;
+                        playfield.Districts.Add(playfieldDistrict);
+                    }
+
+                    playfields.Add(playfield);
+                }
+            }
+            return playfields.Count;
         }
 
         #endregion
