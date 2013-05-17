@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Component\PlayfieldFactory.cs" />
+    <Compile Include="GameObject\Enums\Expansions.cs" />
     <Compile Include="GameObject\Items\AOActions.cs" />
     <Compile Include="GameObject\Items\AOItemAttribute.cs" />
     <Compile Include="GameObject\Items\BaseInventory.cs" />
