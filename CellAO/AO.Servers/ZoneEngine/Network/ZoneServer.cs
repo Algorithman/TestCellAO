@@ -39,6 +39,7 @@ namespace ZoneEngine.CoreServer
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.Component;
+    using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Playfields;
 
     #endregion
@@ -66,7 +67,9 @@ namespace ZoneEngine.CoreServer
         /// </summary>
         private readonly PlayfieldFactory playfieldFactory;
 
-        private List<IPlayfield> playfields = new List<IPlayfield>();
+        /// <summary>
+        /// </summary>
+        private readonly List<IPlayfield> playfields = new List<IPlayfield>();
 
         #endregion
 
@@ -142,6 +145,8 @@ namespace ZoneEngine.CoreServer
 
         /// <summary>
         /// </summary>
+        /// <param name="playfieldIdentity">
+        /// </param>
         /// <returns>
         /// </returns>
         protected IPlayfield CreatePlayfield(Identity playfieldIdentity)
@@ -172,6 +177,10 @@ namespace ZoneEngine.CoreServer
             Console.WriteLine("Sending to " + clientIP.Address);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public int CreatePlayfields()
         {
             foreach (PlayfieldInfo playfieldInfo in Playfields.Instance.playfields)
@@ -185,7 +194,7 @@ namespace ZoneEngine.CoreServer
 
                     foreach (DistrictInfo districtInfo in playfieldInfo.districts)
                     {
-                        PlayfieldDistrict playfieldDistrict=new PlayfieldDistrict();
+                        PlayfieldDistrict playfieldDistrict = new PlayfieldDistrict();
                         playfieldDistrict.Name = districtInfo.districtName;
                         playfieldDistrict.MinLevel = districtInfo.minLevel;
                         playfieldDistrict.MaxLevel = districtInfo.maxLevel;
@@ -197,11 +206,51 @@ namespace ZoneEngine.CoreServer
                     playfield.Z = playfieldInfo.z;
                     playfield.XScale = playfieldInfo.xscale;
                     playfield.ZScale = playfieldInfo.zscale;
-                    playfield.Expansion = playfieldInfo.expansion;
-                    playfields.Add(playfield);
+                    playfield.Expansion = (Expansions)playfieldInfo.expansion;
+                    this.playfields.Add(playfield);
                 }
             }
-            return playfields.Count;
+
+            return this.playfields.Count;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="playfieldNumber">
+        /// </param>
+        public void CreatePlayfield(int playfieldNumber)
+        {
+            foreach (PlayfieldInfo playfieldInfo in Playfields.Instance.playfields)
+            {
+                if (playfieldInfo.id != playfieldNumber)
+                {
+                    continue;
+                }
+
+                Identity identity = new Identity();
+                identity.Type = IdentityType.Playfield;
+                identity.Instance = playfieldNumber;
+                IPlayfield playfield = this.CreatePlayfield(identity);
+
+                foreach (DistrictInfo districtInfo in playfieldInfo.districts)
+                {
+                    PlayfieldDistrict playfieldDistrict = new PlayfieldDistrict();
+                    playfieldDistrict.Name = districtInfo.districtName;
+                    playfieldDistrict.MinLevel = districtInfo.minLevel;
+                    playfieldDistrict.MaxLevel = districtInfo.maxLevel;
+                    playfieldDistrict.SuppressionGas = districtInfo.suppressionGas;
+                    playfield.Districts.Add(playfieldDistrict);
+                }
+
+                playfield.X = playfieldInfo.x;
+                playfield.Z = playfieldInfo.z;
+                playfield.XScale = playfieldInfo.xscale;
+                playfield.ZScale = playfieldInfo.zscale;
+                playfield.Expansion = (Expansions)playfieldInfo.expansion;
+                this.playfields.Add(playfield);
+
+                break;
+            }
         }
 
         #endregion
