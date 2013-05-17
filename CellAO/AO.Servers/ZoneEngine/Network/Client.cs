@@ -46,6 +46,7 @@ namespace ZoneEngine.CoreClient
 
     using ZoneEngine.CoreServer;
     using ZoneEngine.GameObject;
+    using ZoneEngine.GameObject.Playfields;
 
     #endregion
 
@@ -153,6 +154,8 @@ namespace ZoneEngine.CoreClient
                 this.clientVersion = value;
             }
         }
+
+        public IPlayfield Playfield;
 
         #endregion
 

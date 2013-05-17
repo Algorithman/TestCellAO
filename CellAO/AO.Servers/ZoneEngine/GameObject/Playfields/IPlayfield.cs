@@ -99,5 +99,13 @@ namespace ZoneEngine.GameObject.Playfields
         /// <summary>
         /// </summary>
         Expansions Expansion { get; set; }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="identity">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        IInstancedEntity FindByIdentity(Identity identity);
     }
 }

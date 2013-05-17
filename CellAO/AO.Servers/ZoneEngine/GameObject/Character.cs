@@ -151,5 +151,10 @@ namespace ZoneEngine.GameObject
             this.pets = new List<Pet>();
 
         }
+
+        internal void SetTarget(SmokeLounge.AOtomation.Messaging.GameData.Identity identity)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

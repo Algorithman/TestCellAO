@@ -157,6 +157,17 @@ namespace ZoneEngine.GameObject.Playfields
         /// </summary>
         public Expansions Expansion { get; set; }
 
+        public IInstancedEntity FindByIdentity(Identity identity)
+        {
+            foreach (IInstancedEntity entity in Entities)
+            {
+                if ((Identity.Instance == identity.Instance) && (Identity.Type == identity.Type))
+                {
+                    return entity;
+                }
+            }
+        }
+
         /// <summary>
         /// </summary>
         public Playfield()
