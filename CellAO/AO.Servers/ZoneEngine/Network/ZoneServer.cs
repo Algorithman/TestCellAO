@@ -37,6 +37,7 @@ namespace ZoneEngine.CoreServer
     using Cell.Core;
 
     using ZoneEngine.Component;
+    using ZoneEngine.GameObject.Playfields;
 
     #endregion
 
@@ -59,6 +60,10 @@ namespace ZoneEngine.CoreServer
         /// </summary>
         private readonly ClientFactory clientFactory;
 
+        /// <summary>
+        /// </summary>
+        private readonly PlayfieldFactory playfieldFactory;
+
         #endregion
 
         #region Constructors and Destructors
@@ -75,10 +80,13 @@ namespace ZoneEngine.CoreServer
         /// </summary>
         /// <param name="clientfactory">
         /// </param>
+        /// <param name="playfieldFactory">
+        /// </param>
         [ImportingConstructor]
-        public ZoneServer(ClientFactory clientfactory)
+        public ZoneServer(ClientFactory clientfactory, PlayfieldFactory playfieldFactory)
         {
             this.clientFactory = clientfactory;
+            this.playfieldFactory = playfieldFactory;
         }
 
         #endregion
@@ -126,6 +134,15 @@ namespace ZoneEngine.CoreServer
         protected override IClient CreateClient()
         {
             return this.clientFactory.Create(this);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
+        protected IPlayfield CreatePlayfield()
+        {
+            return this.playfieldFactory.Create(this);
         }
 
         /// <summary>

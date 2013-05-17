@@ -94,6 +94,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Component\PlayfieldFactory.cs" />
     <Compile Include="GameObject\Items\AOActions.cs" />
     <Compile Include="GameObject\Items\AOItemAttribute.cs" />
     <Compile Include="GameObject\Items\BaseInventory.cs" />
@@ -103,6 +104,8 @@
     <Compile Include="GameObject\Items\ItemHandler.cs" />
     <Compile Include="GameObject\Nanos\NanoFormula.cs" />
     <Compile Include="GameObject\Nanos\NanoHandler.cs" />
+    <Compile Include="GameObject\Playfields\IPlayfield.cs" />
+    <Compile Include="GameObject\Playfields\Playfield.cs" />
     <Compile Include="GameObject\Stats\CharacterStats.cs" />
     <Compile Include="Component\ClientFactory.cs" />
     <Compile Include="GameObject\Items\AOEvents.cs" />
