@@ -33,6 +33,7 @@ namespace ZoneEngine.GameObject.Playfields
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Items;
 
     #endregion
@@ -97,6 +98,6 @@ namespace ZoneEngine.GameObject.Playfields
 
         /// <summary>
         /// </summary>
-        int Expansion { get; set; }
+        Expansions Expansion { get; set; }
     }
 }
