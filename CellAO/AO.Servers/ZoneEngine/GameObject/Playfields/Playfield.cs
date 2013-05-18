@@ -166,6 +166,7 @@ namespace ZoneEngine.GameObject.Playfields
                     return entity;
                 }
             }
+            return null;
         }
 
         /// <summary>
