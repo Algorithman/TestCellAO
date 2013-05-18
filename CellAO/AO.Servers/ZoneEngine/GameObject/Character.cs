@@ -31,6 +31,8 @@ namespace ZoneEngine.GameObject
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
 
+    using AO.Core;
+
     using Cell.Core;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -38,6 +40,7 @@ namespace ZoneEngine.GameObject
 
     using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Items;
+    using ZoneEngine.GameObject.Misc;
 
     #endregion
 
@@ -55,7 +58,7 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        private IZoneClient client;
+        private readonly IZoneClient client;
 
         /// <summary>
         /// </summary>
@@ -64,6 +67,10 @@ namespace ZoneEngine.GameObject
         /// <summary>
         /// </summary>
         private readonly IList<Pet> pets = new List<Pet>();
+
+        /// <summary>
+        /// </summary>
+        public Identity FightingTarget = new Identity();
 
         /// <summary>
         /// </summary>
@@ -101,6 +108,68 @@ namespace ZoneEngine.GameObject
         }
 
         /// <summary>
+        /// Active Nanos list
+        /// </summary>
+        private readonly List<AONano> activeNanos = new List<AONano>();
+
+        /// <summary>
+        /// Active Nanos list
+        /// </summary>
+        public List<AONano> ActiveNanos
+        {
+            get
+            {
+                return this.activeNanos;
+            }
+        }
+
+        /// <summary>
+        /// Textures
+        /// </summary>
+        public List<AOTextures> Textures;
+
+        /// <summary>
+        /// Social Tab structure. Mostly a 'cache', so we don't have to recalc the stuff all over again
+        /// </summary>
+        public Dictionary<int, int> SocialTab = new Dictionary<int, int>();
+
+        /// <summary>
+        /// Caching Mesh layer structure
+        /// </summary>
+        private readonly MeshLayers meshLayer = new MeshLayers();
+
+        /// <summary>
+        /// Caching Mesh layer for social tab items
+        /// </summary>
+        private readonly MeshLayers socialMeshLayer = new MeshLayers();
+
+        /// <summary>
+        /// Caching Mesh layer structure
+        /// </summary>
+        public MeshLayers MeshLayer
+        {
+            get
+            {
+                return this.meshLayer;
+            }
+        }
+
+        /// <summary>
+        /// Caching Mesh layer for social tab items
+        /// </summary>
+        public MeshLayers SocialMeshLayer
+        {
+            get
+            {
+                return this.socialMeshLayer;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public string OrganizationName = string.Empty;
+
+        /// <summary>
         /// </summary>
         public string Name
         {
@@ -114,6 +183,14 @@ namespace ZoneEngine.GameObject
                 this.name = value;
             }
         }
+
+        /// <summary>
+        /// </summary>
+        public string FirstName { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public string LastName { get; set; }
 
         /// <summary>
         /// </summary>
@@ -159,6 +236,22 @@ namespace ZoneEngine.GameObject
         #endregion
 
         /// <summary>
+        /// Uploaded Nanos list
+        /// </summary>
+        private readonly List<AOUploadedNanos> uploadedNanos = new List<AOUploadedNanos>();
+
+        /// <summary>
+        /// Uploaded Nanos list
+        /// </summary>
+        public List<AOUploadedNanos> UploadedNanos
+        {
+            get
+            {
+                return this.uploadedNanos;
+            }
+        }
+
+        /// <summary>
         /// </summary>
         public BaseInventory BaseInventory { get; private set; }
 
@@ -174,9 +267,34 @@ namespace ZoneEngine.GameObject
         /// </summary>
         /// <param name="identity">
         /// </param>
+        /// <param name="client">
+        /// </param>
+        public Character(Identity identity, IZoneClient client)
+        {
+            this.identity = identity;
+            this.BaseInventory = new BaseInventory(this);
+            this.pets = new List<Pet>();
+            this.client = client;
+
+            // TODO: Load names here?
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="identity">
+        /// </param>
         /// <exception cref="NotImplementedException">
         /// </exception>
         internal void SetTarget(Identity identity)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        internal void CalculateSkills()
         {
             throw new NotImplementedException();
         }

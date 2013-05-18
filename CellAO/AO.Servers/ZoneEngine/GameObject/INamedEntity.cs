@@ -46,6 +46,8 @@ namespace ZoneEngine.GameObject
         /// <summary>
         /// </summary>
         string Name { get; set; }
+        string FirstName { get; set; }
+        string LastName { get; set; }
 
         #endregion
     }
@@ -101,6 +103,24 @@ namespace ZoneEngine.GameObject
                 Contract.Requires(value != null);
                 Contract.Requires(value != "");
             }
+        }
+
+        public string FirstName
+        {
+            get
+            {
+                return default(string);
+            }
+            set { }
+        }
+
+        public string LastName
+        {
+            get
+            {
+                return default(string);
+            }
+            set { }
         }
     }
 }

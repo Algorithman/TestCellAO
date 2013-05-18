@@ -23,95 +23,42 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject.Items
+namespace ZoneEngine.Network.InternalBus
 {
     #region Usings ...
 
-    using System.Collections.Generic;
+    using System.ComponentModel.Composition;
 
-    using ZoneEngine.GameObject.Enums;
+    using AO.Core.Components;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    public interface IInventory
+    [Export(typeof(IHandle<InternalMessageReceivedEvent>))]
+    public class InternalMessageReceivedHandler : IHandle<InternalMessageReceivedEvent>
     {
         /// <summary>
         /// </summary>
-        IItemContainer owner { get; }
+        private readonly IInternalMessagePublisher messagePublisher;
 
         /// <summary>
         /// </summary>
-        SortedDictionary<int, AOItem> Content { get; }
-
-        /// <summary>
-        /// </summary>
-        int MaxSlots { get; }
-
-        /// <summary>
-        /// </summary>
-        bool IsEmpty { get; }
-
-        /// <summary>
-        /// </summary>
-        bool IsFull { get; }
-
-        /// <summary>
-        /// </summary>
-        /// <returns>
-        /// </returns>
-        int FindFreeSlot();
-
-        /// <summary>
-        /// </summary>
-        int InventoryOffset { get; }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="Slot">
+        /// <param name="messagePublisher">
         /// </param>
-        /// <returns>
-        /// </returns>
-        bool IsValidSlot(int Slot);
+        [ImportingConstructor]
+        public InternalMessageReceivedHandler(IInternalMessagePublisher messagePublisher)
+        {
+            this.messagePublisher = messagePublisher;
+        }
 
         /// <summary>
         /// </summary>
-        /// <param name="Slot">
+        /// <param name="obj">
         /// </param>
-        /// <param name="Item">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        InventoryError TryAdd(int Slot, AOItem Item);
-
-        /// <summary>
-        /// </summary>
-        /// <param name="Item">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        InventoryError TryAdd(AOItem Item);
-
-        /// <summary>
-        /// </summary>
-        /// <param name="Slot">
-        /// </param>
-        /// <param name="ownerChange">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        AOItem Remove(int Slot, bool ownerChange);
-
-        /// <summary>
-        /// Destroys AOItem at slot <see cref="slot"/>
-        /// </summary>
-        /// <param name="Slot">
-        /// Slot number of the Item
-        /// </param>
-        /// <returns>
-        /// Item could be destroyed
-        /// </returns>
-        bool Destroy(int Slot);
+        public void Handle(InternalMessageReceivedEvent obj)
+        {
+            this.messagePublisher.Publish(obj.Sender, obj.Message);
+        }
     }
 }

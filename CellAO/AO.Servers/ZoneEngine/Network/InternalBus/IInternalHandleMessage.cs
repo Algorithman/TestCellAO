@@ -23,66 +23,37 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.Component
+namespace ZoneEngine.Network.InternalBus
 {
     #region Usings ...
 
-    using System.ComponentModel.Composition;
-
-    using AO.Core.Components;
-
-    using ZoneEngine.CoreClient;
-    using ZoneEngine.Network;
+    using ZoneEngine.Network.InternalBus.InternalMessages;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    [Export]
-    public class ClientFactory
+    public interface IInternalHandleMessage
     {
-        #region Fields
-
-        /// <summary>
-        /// </summary>
-        private readonly IBus bus;
-
-        /// <summary>
-        /// </summary>
-        private readonly IMessageSerializer messageSerializer;
-
-        #endregion
-
-        #region Constructors and Destructors
-
-        /// <summary>
-        /// </summary>
-        /// <param name="messageSerializer">
-        /// </param>
-        /// <param name="bus">
-        /// </param>
-        [ImportingConstructor]
-        public ClientFactory(IMessageSerializer messageSerializer, IBus bus)
-        {
-            this.messageSerializer = messageSerializer;
-            this.bus = bus;
-        }
-
-        #endregion
-
         #region Public Methods and Operators
 
         /// <summary>
         /// </summary>
-        /// <param name="ZoneServer">
+        /// <param name="sender">
         /// </param>
-        /// <returns>
-        /// </returns>
-        public Client Create(ZoneServer ZoneServer)
-        {
-            return new Client(ZoneServer, this.messageSerializer, this.bus);
-        }
+        /// <param name="message">
+        /// </param>
+        void Handle(object sender, InternalMessage message);
 
         #endregion
+    }
+
+    /// <summary>
+    /// </summary>
+    /// <typeparam name="T">
+    /// </typeparam>
+    public interface IInternalHandleMessage<T> : IInternalHandleMessage
+        where T : InternalMessage
+    {
     }
 }

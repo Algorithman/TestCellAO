@@ -98,6 +98,10 @@
   <ItemGroup>
     <Compile Include="AOCoord.cs" />
     <Compile Include="AOExceptions.cs" />
+    <Compile Include="AOMeshs.cs" />
+    <Compile Include="AONano.cs" />
+    <Compile Include="AOTextures.cs" />
+    <Compile Include="AOUploadedNanos.cs" />
     <Compile Include="BigInteger.cs" />
     <Compile Include="Components\IBus.cs" />
     <Compile Include="Components\IContainer.cs" />

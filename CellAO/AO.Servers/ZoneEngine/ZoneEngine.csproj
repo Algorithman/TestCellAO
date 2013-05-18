@@ -69,6 +69,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MemBus, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\MemBus.2.0.2\lib\Net40-Client\MemBus.dll</HintPath>
+    </Reference>
     <Reference Include="MsgPack">
       <HintPath>..\..\packages\MsgPack.Cli.0.3.1\lib\net40-client\MsgPack.dll</HintPath>
     </Reference>
@@ -103,6 +107,7 @@
     <Compile Include="GameObject\Items\IInventory.cs" />
     <Compile Include="GameObject\Enums\InventoryError.cs" />
     <Compile Include="GameObject\Items\ItemHandler.cs" />
+    <Compile Include="GameObject\Misc\MeshLayers.cs" />
     <Compile Include="GameObject\Nanos\NanoFormula.cs" />
     <Compile Include="GameObject\Nanos\NanoHandler.cs" />
     <Compile Include="GameObject\Playfields\IPlayfield.cs" />
@@ -119,6 +124,14 @@
     <Compile Include="GameObject\Corpse.cs" />
     <Compile Include="GameObject\Character.cs" />
     <Compile Include="Collision\BorderlineCheck.cs" />
+    <Compile Include="Network\InternalBus\IInternalHandle.cs" />
+    <Compile Include="Network\InternalBus\IInternalHandleMessage.cs" />
+    <Compile Include="Network\InternalBus\IInternalMessagePublisher.cs" />
+    <Compile Include="Network\InternalBus\InternalBusAdapter.cs" />
+    <Compile Include="Network\InternalBus\InternalBusIoCAdapter.cs" />
+    <Compile Include="Network\InternalBus\InternalMessageReceivedEvent.cs" />
+    <Compile Include="Network\InternalBus\InternalMessageReceivedHandler.cs" />
+    <Compile Include="Network\InternalBus\InternalMessages\InternalMessage.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="GameObject\Dynel.cs" />
     <Compile Include="GameObject\GameObject.cs" />
@@ -157,7 +170,16 @@
     <Compile Include="GameObject\ILootInventory.cs" />
     <Compile Include="GameObject\IAOEvents.cs" />
     <Compile Include="GameObject\IAOActions.cs" />
+    <Compile Include="Network\InternalBus\InternalMessages\InternalMessageBody.cs" />
     <Compile Include="Network\IZoneClient.cs" />
+    <Compile Include="Network\PacketHandlers\CharacterInPlay.cs" />
+    <Compile Include="Network\PacketHandlers\ClientConnected.cs" />
+    <Compile Include="Network\Packets\AppearanceUpdate.cs" />
+    <Compile Include="Network\Packets\ChatServerInfo.cs" />
+    <Compile Include="Network\Packets\FullCharacter.cs" />
+    <Compile Include="Network\Packets\PlayfieldAnarchyF.cs" />
+    <Compile Include="Network\Packets\SimpleCharFullUpdate.cs" />
+    <Compile Include="Network\Packets\Stat.cs" />
     <Compile Include="Network\PlayfieldWorker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -2234,7 +2256,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MessageHandlers\" />
-    <Folder Include="Network\PacketHandlers\" />
     <Folder Include="Static Handlers\" />
   </ItemGroup>
   <ItemGroup>

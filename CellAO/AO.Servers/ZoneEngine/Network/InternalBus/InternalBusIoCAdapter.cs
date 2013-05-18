@@ -23,95 +23,60 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject.Items
+namespace ZoneEngine.Network.InternalBus
 {
     #region Usings ...
 
+    using System;
     using System.Collections.Generic;
+    using System.ComponentModel.Composition;
 
-    using ZoneEngine.GameObject.Enums;
+    using AO.Core.Components;
+
+    using MemBus;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    public interface IInventory
+    [Export(typeof(IocAdapter))]
+    public class InternalBusIoCAdapter : IocAdapter
     {
-        /// <summary>
-        /// </summary>
-        IItemContainer owner { get; }
+        #region Fields
 
         /// <summary>
         /// </summary>
-        SortedDictionary<int, AOItem> Content { get; }
+        private readonly IContainer container;
+
+        #endregion
+
+        #region Constructors and Destructors
 
         /// <summary>
         /// </summary>
-        int MaxSlots { get; }
+        /// <param name="container">
+        /// </param>
+        [ImportingConstructor]
+        public InternalBusIoCAdapter(IContainer container)
+        {
+            this.container = container;
+        }
+
+        #endregion
+
+        #region Public Methods and Operators
 
         /// <summary>
         /// </summary>
-        bool IsEmpty { get; }
-
-        /// <summary>
-        /// </summary>
-        bool IsFull { get; }
-
-        /// <summary>
-        /// </summary>
-        /// <returns>
-        /// </returns>
-        int FindFreeSlot();
-
-        /// <summary>
-        /// </summary>
-        int InventoryOffset { get; }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="Slot">
+        /// <param name="desiredType">
         /// </param>
         /// <returns>
         /// </returns>
-        bool IsValidSlot(int Slot);
+        public IEnumerable<object> GetAllInstances(Type desiredType)
+        {
+            return this.container.GetAllInstances(desiredType);
+        }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="Slot">
-        /// </param>
-        /// <param name="Item">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        InventoryError TryAdd(int Slot, AOItem Item);
-
-        /// <summary>
-        /// </summary>
-        /// <param name="Item">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        InventoryError TryAdd(AOItem Item);
-
-        /// <summary>
-        /// </summary>
-        /// <param name="Slot">
-        /// </param>
-        /// <param name="ownerChange">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        AOItem Remove(int Slot, bool ownerChange);
-
-        /// <summary>
-        /// Destroys AOItem at slot <see cref="slot"/>
-        /// </summary>
-        /// <param name="Slot">
-        /// Slot number of the Item
-        /// </param>
-        /// <returns>
-        /// Item could be destroyed
-        /// </returns>
-        bool Destroy(int Slot);
+        #endregion
     }
 }

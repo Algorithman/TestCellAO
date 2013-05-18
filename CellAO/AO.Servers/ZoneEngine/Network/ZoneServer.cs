@@ -23,7 +23,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.CoreServer
+namespace ZoneEngine.Network
 {
     #region Usings ...
 
@@ -42,7 +42,6 @@ namespace ZoneEngine.CoreServer
     using ZoneEngine.Component;
     using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Playfields;
-    using ZoneEngine.Network;
 
     #endregion
 
@@ -61,7 +60,10 @@ namespace ZoneEngine.CoreServer
 
         #region Fields
 
-        private List<PlayfieldWorkerHolder> workers;
+        /// <summary>
+        /// </summary>
+        private readonly List<PlayfieldWorkerHolder> workers;
+
         /// <summary>
         /// </summary>
         private readonly ClientFactory clientFactory;
@@ -90,15 +92,14 @@ namespace ZoneEngine.CoreServer
         /// </summary>
         /// <param name="clientfactory">
         /// </param>
-        /// <param name="playfieldFactory">
-        /// </param>
         [ImportingConstructor]
         public ZoneServer(ClientFactory clientfactory, PlayfieldFactory playfieldFactory)
         {
             this.clientFactory = clientfactory;
             this.playfieldFactory = playfieldFactory;
-            workers = new List<PlayfieldWorkerHolder>();
+            this.workers = new List<PlayfieldWorkerHolder>();
         }
+
 
         #endregion
 
@@ -120,7 +121,7 @@ namespace ZoneEngine.CoreServer
         {
             get
             {
-                return base._clients;
+                return this._clients;
             }
         }
 
@@ -218,8 +219,11 @@ namespace ZoneEngine.CoreServer
                     thread.Name = "PF" + playfield.Identity.Instance.ToString();
                     playfieldWorkerHolder.thread = thread;
                     thread.Start();
-                    workers.Add(playfieldWorkerHolder);
-                    while (!thread.IsAlive) ;
+                    this.workers.Add(playfieldWorkerHolder);
+                    while (!thread.IsAlive)
+                    {
+                        ;
+                    }
                 }
             }
 
@@ -265,21 +269,26 @@ namespace ZoneEngine.CoreServer
                 Thread thread = new Thread(playfieldWorkerHolder.PlayfieldWorker.DoWork);
                 playfieldWorkerHolder.thread = thread;
                 thread.Start();
-                workers.Add(playfieldWorkerHolder);
-                while (!thread.IsAlive) ;
+                this.workers.Add(playfieldWorkerHolder);
+                while (!thread.IsAlive)
+                {
+                    ;
+                }
 
                 break;
             }
         }
 
+        /// <summary>
+        /// </summary>
         public override void Stop()
         {
-            foreach (PlayfieldWorkerHolder worker in workers)
+            foreach (PlayfieldWorkerHolder worker in this.workers)
             {
                 worker.PlayfieldWorker.RequestStop();
                 worker.thread.Join();
             }
-            
+
             base.Stop();
         }
 

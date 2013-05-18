@@ -53,6 +53,10 @@ namespace ZoneEngine.GameObject
             {
                 return this.identity;
             }
+            set
+            {
+                this.identity = value;
+            }
         }
 
         /// <summary>

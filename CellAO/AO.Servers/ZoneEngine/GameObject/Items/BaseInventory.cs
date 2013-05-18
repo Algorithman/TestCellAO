@@ -44,7 +44,7 @@ namespace ZoneEngine.GameObject.Items
 
         /// <summary>
         /// </summary>
-        public Dictionary<int, AOItem> Content { get; private set; }
+        public SortedDictionary<int, AOItem> Content { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -60,7 +60,7 @@ namespace ZoneEngine.GameObject.Items
 
         public BaseInventory()
         {
-            this.Content=new Dictionary<int, AOItem>();
+            this.Content=new SortedDictionary<int, AOItem>();
             this.MaxSlots = 0;
         }
 

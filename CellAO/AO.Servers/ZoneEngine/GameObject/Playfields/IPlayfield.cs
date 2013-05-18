@@ -123,6 +123,14 @@ namespace ZoneEngine.GameObject.Playfields
 
         /// <summary>
         /// </summary>
+        /// <param name="messageBody">
+        /// </param>
+        /// <param name="dontSend">
+        /// </param>
+        void AnnounceOthers(MessageBody messageBody, Identity dontSend);
+
+        /// <summary>
+        /// </summary>
         void DisconnectAllClients();
     }
 }

@@ -205,6 +205,21 @@ namespace ZoneEngine.GameObject.Playfields
             }
         }
 
+        public void AnnounceOthers(MessageBody messageBody, Identity dontSend)
+        {
+            foreach (IInstancedEntity entity in Entities)
+            {
+                var character = entity as Character;
+                if (character != null)
+                {
+                    if (character.Identity != dontSend)
+                    {
+                        character.Send(messageBody);
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// </summary>
         public void DisconnectAllClients()

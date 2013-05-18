@@ -23,108 +23,59 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject
+namespace ZoneEngine.Network.Packets
 {
     #region Usings ...
 
     using System;
+    using System.Net;
+    using System.Net.Sockets;
 
-    using SmokeLounge.AOtomation.Messaging.GameData;
+    using AO.Core.Config;
 
-    using ZoneEngine.GameObject.Playfields;
-    using ZoneEngine.GameObject.Stats;
+    using SmokeLounge.AOtomation.Messaging.Messages.SystemMessages;
 
     #endregion
 
     /// <summary>
+    ///     Chat server info packet writer
     /// </summary>
-    public class VendorShop : GameObject, INamedEntity, IInventory, IAOEvents
+    public static class ChatServerInfo
     {
-        #region Public Properties
+        #region Public Methods and Operators
 
         /// <summary>
+        /// Sends chat server info to client
         /// </summary>
-        public string Name
+        /// <param name="client">
+        /// Client that gets the info
+        /// </param>
+        public static void Send(IZoneClient client)
         {
-            get
+            /* get chat settings from config */
+            string chatServerIp = string.Empty;
+            IPAddress tempIp;
+            if (IPAddress.TryParse(ConfigReadWrite.Instance.CurrentConfig.ChatIP, out tempIp))
             {
-                return this.Name;
+                chatServerIp = ConfigReadWrite.Instance.CurrentConfig.ChatIP;
+            }
+            else
+            {
+                IPHostEntry chatHost = Dns.GetHostEntry(ConfigReadWrite.Instance.CurrentConfig.ChatIP);
+                foreach (IPAddress ip in chatHost.AddressList)
+                {
+                    if (ip.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        chatServerIp = ip.ToString();
+                        break;
+                    }
+                }
             }
 
-            set
-            {
-                this.Name = value;
-            }
-        }
+            int chatPort = Convert.ToInt32(ConfigReadWrite.Instance.CurrentConfig.ChatPort);
 
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
-
-        private IPlayfield playfield;
-        /// <summary>
-        /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public IPlayfield Playfield
-        {
-            get
-            {
-                return this.playfield;
-            }
-
-            set
-            {
-                this.playfield = value;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        private Vector3 coordinates = new Vector3();
-
-        /// <summary>
-        /// </summary>
-        public Vector3 Coordinates
-        {
-            get
-            {
-                return this.coordinates;
-            }
-
-            set
-            {
-                this.coordinates = value;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        private Quaternion heading = new Quaternion();
-
-        /// <summary>
-        /// </summary>
-        public Quaternion Heading
-        {
-            get
-            {
-                return this.heading;
-            }
-
-            set
-            {
-                this.heading = value;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public DynelStats Stats
-        {
-            get
-            {
-                return this.Stats;
-            }
+            var chatServerInfoMessage = new ChatServerInfoMessage { HostName = chatServerIp, Port = chatPort };
+            client.SendCompressed(chatServerInfoMessage);
         }
 
         #endregion

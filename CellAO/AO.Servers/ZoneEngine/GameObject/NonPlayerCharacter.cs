@@ -55,6 +55,10 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
         private IList<Pet> pets;
         /// <summary>
         /// </summary>

@@ -41,12 +41,13 @@ namespace ZoneEngine.CoreClient
 
     using NiceHexOutput;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine.CoreServer;
     using ZoneEngine.GameObject;
     using ZoneEngine.GameObject.Playfields;
+    using ZoneEngine.Network;
 
     #endregion
 
@@ -62,7 +63,7 @@ namespace ZoneEngine.CoreClient
 
         /// <summary>
         /// </summary>
-        private readonly Character character = new Character();
+        private Character character = new Character();
 
         /// <summary>
         /// </summary>
@@ -138,6 +139,10 @@ namespace ZoneEngine.CoreClient
             {
                 return this.character;
             }
+            set
+            {
+                this.character = value;
+            }
         }
 
         /// <summary>
@@ -187,14 +192,14 @@ namespace ZoneEngine.CoreClient
             Contract.Requires(messageBody != null);
             var message = new Message
                               {
-                                  Body = messageBody, 
+                                  Body = messageBody,
                                   Header =
                                       new Header
                                           {
-                                              MessageId = this.packetNumber, 
-                                              PacketType = messageBody.PacketType, 
-                                              Unknown = 0x0001, 
-                                              Sender = 0x00000001, 
+                                              MessageId = this.packetNumber,
+                                              PacketType = messageBody.PacketType,
+                                              Unknown = 0x0001,
+                                              Sender = 0x00000001,
                                               Receiver = this.character.Identity.Instance
                                           }
                               };
@@ -370,14 +375,14 @@ namespace ZoneEngine.CoreClient
         {
             var message = new Message
                               {
-                                  Body = messageBody, 
+                                  Body = messageBody,
                                   Header =
                                       new Header
                                           {
-                                              MessageId = this.packetNumber, 
-                                              PacketType = messageBody.PacketType, 
-                                              Unknown = 0x0001, 
-                                              Sender = 0x00000001, 
+                                              MessageId = this.packetNumber,
+                                              PacketType = messageBody.PacketType,
+                                              Unknown = 0x0001,
+                                              Sender = 0x00000001,
                                               Receiver = this.character.Identity.Instance
                                           }
                               };
@@ -389,6 +394,12 @@ namespace ZoneEngine.CoreClient
             }
 
             this.SendCompressed(buffer);
+        }
+
+        public void CreateCharacter(int charId)
+        {
+            this.character = new Character(new Identity { Type = IdentityType.CanbeAffected, Instance = charId }, this);
+
         }
     }
 }

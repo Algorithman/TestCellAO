@@ -23,95 +23,76 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject.Items
+namespace ZoneEngine.Network.InternalBus
 {
     #region Usings ...
 
-    using System.Collections.Generic;
+    using System;
+    using System.ComponentModel.Composition;
 
-    using ZoneEngine.GameObject.Enums;
+    using AO.Core.Components;
+
+    using MemBus;
+    using MemBus.Configurators;
+
+    using IBus = AO.Core.Components.IBus;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    public interface IInventory
+    [Export(typeof(IBus))]
+    public class InternalBusAdapter : IBus
     {
-        /// <summary>
-        /// </summary>
-        IItemContainer owner { get; }
+        #region Fields
 
         /// <summary>
         /// </summary>
-        SortedDictionary<int, AOItem> Content { get; }
+        private readonly MemBus.IBus internalBus;
+
+        #endregion
+
+        #region Constructors and Destructors
 
         /// <summary>
         /// </summary>
-        int MaxSlots { get; }
+        /// <param name="iocAdapter">
+        /// </param>
+        [ImportingConstructor]
+        public InternalBusAdapter(IocAdapter iocAdapter)
+        {
+            this.internalBus =
+                BusSetup.StartWith<Conservative>()
+                        .Apply<IoCSupport>(s => s.SetAdapter(iocAdapter).SetHandlerInterface(typeof(IHandle<>)))
+                        .Construct();
+        }
+
+        #endregion
+
+        #region Public Methods and Operators
 
         /// <summary>
         /// </summary>
-        bool IsEmpty { get; }
+        /// <param name="message">
+        /// </param>
+        public void Publish(object message)
+        {
+            this.internalBus.Publish(message);
+        }
 
         /// <summary>
         /// </summary>
-        bool IsFull { get; }
-
-        /// <summary>
-        /// </summary>
+        /// <param name="action">
+        /// </param>
+        /// <typeparam name="T">
+        /// </typeparam>
         /// <returns>
         /// </returns>
-        int FindFreeSlot();
+        public IDisposable Subscribe<T>(Action<T> action)
+        {
+            return this.internalBus.Subscribe(action);
+        }
 
-        /// <summary>
-        /// </summary>
-        int InventoryOffset { get; }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="Slot">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        bool IsValidSlot(int Slot);
-
-        /// <summary>
-        /// </summary>
-        /// <param name="Slot">
-        /// </param>
-        /// <param name="Item">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        InventoryError TryAdd(int Slot, AOItem Item);
-
-        /// <summary>
-        /// </summary>
-        /// <param name="Item">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        InventoryError TryAdd(AOItem Item);
-
-        /// <summary>
-        /// </summary>
-        /// <param name="Slot">
-        /// </param>
-        /// <param name="ownerChange">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        AOItem Remove(int Slot, bool ownerChange);
-
-        /// <summary>
-        /// Destroys AOItem at slot <see cref="slot"/>
-        /// </summary>
-        /// <param name="Slot">
-        /// Slot number of the Item
-        /// </param>
-        /// <returns>
-        /// Item could be destroyed
-        /// </returns>
-        bool Destroy(int Slot);
+        #endregion
     }
 }

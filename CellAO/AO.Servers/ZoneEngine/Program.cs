@@ -46,9 +46,9 @@ namespace ZoneEngine
 
     using ZoneEngine.Collision;
     using ZoneEngine.CoreClient;
-    using ZoneEngine.CoreServer;
     using ZoneEngine.Gameobject.Items;
     using ZoneEngine.GameObject.Nanos;
+    using ZoneEngine.Network;
     using ZoneEngine.Script;
 
     using Config = AO.Core.Config.ConfigReadWrite;
