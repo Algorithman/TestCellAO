@@ -49,10 +49,11 @@ namespace ZoneEngine.Network
         /// </summary>
         public void DoWork()
         {
-
+            // TODO: Load Mobs/Characters/Statels HERE
             LogUtil.Debug("Created playfield " + this.playfield.Identity.Instance.ToString());
             while (!this._shouldStop)
             {
+                // TODO: Add message processing here
                 Thread.Sleep(10);
             }
             playfield.DisconnectAllClients();

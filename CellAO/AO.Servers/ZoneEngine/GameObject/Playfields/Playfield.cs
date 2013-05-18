@@ -188,9 +188,13 @@ namespace ZoneEngine.GameObject.Playfields
             Announce(message.Body);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="messageBody">
+        /// </param>
         public void Announce(MessageBody messageBody)
         {
-            foreach (IInstancedEntity entity in Entities)
+            foreach (IInstancedEntity entity in this.Entities)
             {
                 var character = entity as Character;
 
@@ -201,9 +205,11 @@ namespace ZoneEngine.GameObject.Playfields
             }
         }
 
+        /// <summary>
+        /// </summary>
         public void DisconnectAllClients()
         {
-            foreach (IInstancedEntity entity in Entities)
+            foreach (IInstancedEntity entity in this.Entities)
             {
                 if ((entity as Character) != null)
                 {
