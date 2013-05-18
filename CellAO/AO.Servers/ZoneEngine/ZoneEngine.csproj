@@ -158,6 +158,7 @@
     <Compile Include="GameObject\IAOEvents.cs" />
     <Compile Include="GameObject\IAOActions.cs" />
     <Compile Include="Network\IZoneClient.cs" />
+    <Compile Include="Network\PlayfieldWorker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Script\AOChatCommand.cs" />

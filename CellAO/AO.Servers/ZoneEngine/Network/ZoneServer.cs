@@ -31,6 +31,7 @@ namespace ZoneEngine.CoreServer
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.Net;
+    using System.Threading;
 
     using AO.Core.Logger;
 
@@ -41,6 +42,7 @@ namespace ZoneEngine.CoreServer
     using ZoneEngine.Component;
     using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Playfields;
+    using ZoneEngine.Network;
 
     #endregion
 
@@ -59,6 +61,7 @@ namespace ZoneEngine.CoreServer
 
         #region Fields
 
+        private List<PlayfieldWorkerHolder> workers;
         /// <summary>
         /// </summary>
         private readonly ClientFactory clientFactory;
@@ -94,6 +97,7 @@ namespace ZoneEngine.CoreServer
         {
             this.clientFactory = clientfactory;
             this.playfieldFactory = playfieldFactory;
+            workers = new List<PlayfieldWorkerHolder>();
         }
 
         #endregion
@@ -208,6 +212,14 @@ namespace ZoneEngine.CoreServer
                     playfield.ZScale = playfieldInfo.zscale;
                     playfield.Expansion = (Expansions)playfieldInfo.expansion;
                     this.playfields.Add(playfield);
+                    PlayfieldWorkerHolder playfieldWorkerHolder = new PlayfieldWorkerHolder();
+                    playfieldWorkerHolder.PlayfieldWorker.SetPlayfield(playfield);
+                    Thread thread = new Thread(playfieldWorkerHolder.PlayfieldWorker.DoWork);
+                    thread.Name = "PF" + playfield.Identity.Instance.ToString();
+                    playfieldWorkerHolder.thread = thread;
+                    thread.Start();
+                    workers.Add(playfieldWorkerHolder);
+                    while (!thread.IsAlive) ;
                 }
             }
 
@@ -248,9 +260,27 @@ namespace ZoneEngine.CoreServer
                 playfield.ZScale = playfieldInfo.zscale;
                 playfield.Expansion = (Expansions)playfieldInfo.expansion;
                 this.playfields.Add(playfield);
+                PlayfieldWorkerHolder playfieldWorkerHolder = new PlayfieldWorkerHolder();
+                playfieldWorkerHolder.PlayfieldWorker.SetPlayfield(playfield);
+                Thread thread = new Thread(playfieldWorkerHolder.PlayfieldWorker.DoWork);
+                playfieldWorkerHolder.thread = thread;
+                thread.Start();
+                workers.Add(playfieldWorkerHolder);
+                while (!thread.IsAlive) ;
 
                 break;
             }
+        }
+
+        public override void Stop()
+        {
+            foreach (PlayfieldWorkerHolder worker in workers)
+            {
+                worker.PlayfieldWorker.RequestStop();
+                worker.thread.Join();
+            }
+            
+            base.Stop();
         }
 
         #endregion

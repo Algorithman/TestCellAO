@@ -35,6 +35,7 @@ namespace ZoneEngine.GameObject.Playfields
     using Cell.Core;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
 
     using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Items;
@@ -157,16 +158,58 @@ namespace ZoneEngine.GameObject.Playfields
         /// </summary>
         public Expansions Expansion { get; set; }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="identity">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public IInstancedEntity FindByIdentity(Identity identity)
         {
-            foreach (IInstancedEntity entity in Entities)
+            foreach (IInstancedEntity entity in this.Entities)
             {
-                if ((Identity.Instance == identity.Instance) && (Identity.Type == identity.Type))
+                if ((this.Identity.Instance == identity.Instance) && (this.Identity.Type == identity.Type))
                 {
                     return entity;
                 }
             }
+
             return null;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="message">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public bool Send(Message message)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="message">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public void Announce(Message message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DisconnectAllClients()
+        {
+            foreach (IInstancedEntity entity in Entities)
+            {
+                if ((entity as Character) != null)
+                {
+                    (entity as Character).Client.Server.DisconnectClient((entity as Character).Client);
+                }
+            }
         }
 
         /// <summary>
@@ -189,6 +232,7 @@ namespace ZoneEngine.GameObject.Playfields
             this.server = server;
             this.Identity = playfieldIdentity;
             this.districts = new List<PlayfieldDistrict>();
+            this.Entities = new HashSet<IInstancedEntity>();
         }
     }
 }

@@ -31,8 +31,6 @@ namespace ZoneEngine.GameObject.Playfields
 
     using AO.Core.Components;
 
-    using Cell.Core;
-
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
 
@@ -124,5 +122,9 @@ namespace ZoneEngine.GameObject.Playfields
         /// <param name="message">
         /// </param>
         void Announce(Message message);
+
+        /// <summary>
+        /// </summary>
+        void DisconnectAllClients();
     }
 }
