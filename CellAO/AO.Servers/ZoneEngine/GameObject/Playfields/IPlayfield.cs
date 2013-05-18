@@ -113,15 +113,13 @@ namespace ZoneEngine.GameObject.Playfields
         /// </summary>
         /// <param name="message">
         /// </param>
-        /// <returns>
-        /// </returns>
-        bool Send(Message message);
+        void Announce(Message message);
 
         /// <summary>
         /// </summary>
-        /// <param name="message">
+        /// <param name="messageBody">
         /// </param>
-        void Announce(Message message);
+        void Announce(MessageBody messageBody);
 
         /// <summary>
         /// </summary>

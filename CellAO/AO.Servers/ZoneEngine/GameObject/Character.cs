@@ -33,6 +33,7 @@ namespace ZoneEngine.GameObject
 
     using Cell.Core;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
 
     using ZoneEngine.GameObject.Enums;
@@ -42,12 +43,12 @@ namespace ZoneEngine.GameObject
 
     /// <summary>
     /// </summary>
-    public sealed class Character : Dynel,
-                                    IPacketReceivingEntity,
-                                    INamedEntity,
-                                    ISummoner,
-                                    IAOEvents,
-                                    IAOActions,
+    public sealed class Character : Dynel, 
+                                    IPacketReceivingEntity, 
+                                    INamedEntity, 
+                                    ISummoner, 
+                                    IAOEvents, 
+                                    IAOActions, 
                                     IItemContainer
     {
         #region Fields
@@ -64,6 +65,8 @@ namespace ZoneEngine.GameObject
         /// </summary>
         private readonly IList<Pet> pets = new List<Pet>();
 
+        /// <summary>
+        /// </summary>
         private string name = string.Empty;
 
         #endregion
@@ -130,13 +133,27 @@ namespace ZoneEngine.GameObject
         /// </summary>
         /// <param name="messageBody">
         /// </param>
-        /// <param name="announceToPlayfield">
-        /// </param>
-        internal void Send(MessageBody messageBody, bool announceToPlayfield)
+        internal void Send(MessageBody messageBody)
         {
             Contract.Requires(messageBody != null);
-            Contract.Requires(this.Identity.Instance != 0);
-            this.client.SendCompressed(messageBody, this.Identity.Instance, announceToPlayfield);
+            this.client.SendCompressed(messageBody);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="messageBody">
+        /// </param>
+        /// <param name="announceToPlayfield">
+        /// </param>
+        public void Send(MessageBody messageBody, bool announceToPlayfield)
+        {
+            if (!announceToPlayfield)
+            {
+                this.Send(messageBody);
+                return;
+            }
+
+            this.playfield.Announce(messageBody);
         }
 
         #endregion
@@ -145,14 +162,21 @@ namespace ZoneEngine.GameObject
         /// </summary>
         public BaseInventory BaseInventory { get; private set; }
 
+        /// <summary>
+        /// </summary>
         public Character()
         {
-            BaseInventory = new BaseInventory(this);
+            this.BaseInventory = new BaseInventory(this);
             this.pets = new List<Pet>();
-
         }
 
-        internal void SetTarget(SmokeLounge.AOtomation.Messaging.GameData.Identity identity)
+        /// <summary>
+        /// </summary>
+        /// <param name="identity">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        internal void SetTarget(Identity identity)
         {
             throw new NotImplementedException();
         }

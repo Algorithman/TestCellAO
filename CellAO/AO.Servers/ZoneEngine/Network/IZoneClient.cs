@@ -51,7 +51,7 @@ namespace ZoneEngine
         /// </param>
         /// <param name="announceToPlayfield">
         /// </param>
-        void SendCompressed(MessageBody messageBody, int receiver, bool announceToPlayfield);
+        void SendCompressed(MessageBody messageBody);
     }
 
     /// <summary>
@@ -67,10 +67,9 @@ namespace ZoneEngine
         /// </param>
         /// <param name="announceToPlayfield">
         /// </param>
-        public void SendCompressed(MessageBody messageBody, int receiver, bool announceToPlayfield)
+        public void SendCompressed(MessageBody messageBody)
         {
             Contract.Requires(messageBody != null);
-            Contract.Requires(receiver != 0);
         }
 
         /// <summary>

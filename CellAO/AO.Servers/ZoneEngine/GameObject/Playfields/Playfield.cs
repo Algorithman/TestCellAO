@@ -181,24 +181,24 @@ namespace ZoneEngine.GameObject.Playfields
         /// </summary>
         /// <param name="message">
         /// </param>
-        /// <returns>
-        /// </returns>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public bool Send(Message message)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="message">
-        /// </param>
         /// <exception cref="NotImplementedException">
         /// </exception>
         public void Announce(Message message)
         {
-            throw new NotImplementedException();
+            Announce(message.Body);
+        }
+
+        public void Announce(MessageBody messageBody)
+        {
+            foreach (IInstancedEntity entity in Entities)
+            {
+                var character = entity as Character;
+
+                if (character != null)
+                {
+                    character.Send(messageBody);
+                }
+            }
         }
 
         public void DisconnectAllClients()

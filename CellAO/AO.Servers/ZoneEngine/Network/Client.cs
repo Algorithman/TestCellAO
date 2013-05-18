@@ -155,6 +155,8 @@ namespace ZoneEngine.CoreClient
             }
         }
 
+        /// <summary>
+        /// </summary>
         public IPlayfield Playfield;
 
         #endregion
@@ -177,25 +179,23 @@ namespace ZoneEngine.CoreClient
 
         /// <summary>
         /// </summary>
-        /// <param name="receiver">
-        /// </param>
         /// <param name="messageBody">
         /// </param>
-        public void Send(int receiver, MessageBody messageBody)
+        public void Send(MessageBody messageBody)
         {
             // TODO: Investigate if reciever is a timestamp
             Contract.Requires(messageBody != null);
             var message = new Message
                               {
-                                  Body = messageBody,
+                                  Body = messageBody, 
                                   Header =
                                       new Header
                                           {
-                                              MessageId = this.packetNumber,
-                                              PacketType = messageBody.PacketType,
-                                              Unknown = 0x0001,
-                                              Sender = 0x00000001,
-                                              Receiver = receiver
+                                              MessageId = this.packetNumber, 
+                                              PacketType = messageBody.PacketType, 
+                                              Unknown = 0x0001, 
+                                              Sender = 0x00000001, 
+                                              Receiver = this.character.Identity.Instance
                                           }
                               };
             this.packetNumber++;
@@ -271,38 +271,9 @@ namespace ZoneEngine.CoreClient
         {
             ChatTextMessage chatTextMessage = new ChatTextMessage();
             chatTextMessage.Text = text;
-            this.Send(this.character.Identity.Instance, chatTextMessage);
+            this.Send(chatTextMessage);
 
             throw new NotImplementedException("SendChatText not implemented yet");
-        }
-
-        // <summary>
-        // </summary>
-        /// <summary>
-        /// </summary>
-        /// <param name="message">
-        /// </param>
-        /// <param name="announceToPlayfield">
-        /// </param>
-        public void SendToPlayfield(Message message, bool announceToPlayfield)
-        {
-            if (message == null)
-            {
-                return;
-            }
-
-            foreach (Client client in this.server.Clients)
-            {
-                if ((client.Character.Playfield != this.Character.Playfield)
-                    || (client.Character.Identity.Instance == this.Character.Identity.Instance))
-                {
-                    continue;
-                }
-
-                message.Header.Receiver = client.character.Identity.Instance;
-                byte[] packet = this.messageSerializer.Serialize(message);
-                client.SendCompressed(packet);
-            }
         }
 
         #endregion
@@ -316,7 +287,7 @@ namespace ZoneEngine.CoreClient
         protected uint GetMessageNumber(BufferSegment segment)
         {
             Contract.Requires(segment != null);
-            Contract.Requires(19 < ((Cell.Core.BufferSegment)segment).SegmentData.Length);
+            Contract.Requires(19 < ((BufferSegment)segment).SegmentData.Length);
             var messageNumberArray = new byte[4];
             messageNumberArray[3] = segment.SegmentData[16];
             messageNumberArray[2] = segment.SegmentData[17];
@@ -395,23 +366,19 @@ namespace ZoneEngine.CoreClient
         /// </summary>
         /// <param name="messageBody">
         /// </param>
-        /// <param name="receiver">
-        /// </param>
-        /// <param name="announceToPlayfield">
-        /// </param>
-        public void SendCompressed(MessageBody messageBody, int receiver, bool announceToPlayfield)
+        public void SendCompressed(MessageBody messageBody)
         {
             var message = new Message
                               {
-                                  Body = messageBody,
+                                  Body = messageBody, 
                                   Header =
                                       new Header
                                           {
-                                              MessageId = this.packetNumber,
-                                              PacketType = messageBody.PacketType,
-                                              Unknown = 0x0001,
-                                              Sender = 0x00000001,
-                                              Receiver = receiver
+                                              MessageId = this.packetNumber, 
+                                              PacketType = messageBody.PacketType, 
+                                              Unknown = 0x0001, 
+                                              Sender = 0x00000001, 
+                                              Receiver = this.character.Identity.Instance
                                           }
                               };
             this.packetNumber++;
@@ -420,6 +387,7 @@ namespace ZoneEngine.CoreClient
             {
                 throw new NullReferenceException("Serializer failure? (" + typeof(MessageBody).FullName + ")");
             }
+
             this.SendCompressed(buffer);
         }
     }
