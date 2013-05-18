@@ -1,36 +1,33 @@
 ﻿#region License
-/*
-Copyright (c) 2005-2012, CellAO Team
 
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-    * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-#endregion
-
-#region Usings...
+// Copyright (c) 2005-2013, CellAO Team
+// 
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// 
+//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
 namespace AO.Core.Config
 {
 
     #region enum
+
     /// <summary>
     /// This is the Enums for the Config File..
     /// </summary>
@@ -39,201 +36,204 @@ namespace AO.Core.Config
         /// <summary>
         /// IP to listen
         /// </summary>
-        ListenIP,
+        ListenIP, 
 
         /// <summary>
         /// Chat Server IP
         /// </summary>
-        ChatIP,
+        ChatIP, 
 
         /// <summary>
         /// Zone Server IP
         /// </summary>
-        ZoneIP,
+        ZoneIP, 
 
         /// <summary>
         /// Communication Port between Zone and Chat Engines..
         /// </summary>
-        CommPort,
+        CommPort, 
 
         /// <summary>
         /// Login Port Number
         /// </summary>
-        LoginPort,
+        LoginPort, 
 
         /// <summary>
         /// Zone Port Number
         /// </summary>
-        ZonePort,
+        ZonePort, 
 
         /// <summary>
         /// Chat Port Number
         /// </summary>
-        ChatPort,
+        ChatPort, 
 
         /// <summary>
         /// Chat Server's Motd
         /// </summary>
-        Motd,
+        Motd, 
 
         /// <summary>
         /// This is for the LoginEncryption to turn it on and off
         /// </summary>
-        UsePassword,
+        UsePassword, 
 
         /// <summary>
         /// This enables or Disables SQL Logging
         /// </summary>
-        SqlLog,
+        SqlLog, 
 
         /// <summary>
         /// This is for turning the chat logging on and off
         /// </summary>
-        LogChat,
+        LogChat, 
 
         /// <summary>
         /// This is the Sql Connection String
         /// </summary>
-        connectionString,
+        connectionString, 
+
         // This is for Grid Skill Checks
         /// <summary>
         /// Comp. Lit. Check to access the West Athen Grid
         /// </summary>
-        WestAthen,
+        WestAthen, 
 
         /// <summary>
         /// Comp. Lit. check to access the Old Athen Grid
         /// </summary>
-        OldAthen,
+        OldAthen, 
 
         /// <summary>
         /// Comp. Lit. check to access the Tir Grid
         /// </summary>
-        Tir_Inside,
+        Tir_Inside, 
 
         /// <summary>
         /// 
         /// </summary>
-        Tir_Outside,
+        Tir_Outside, 
 
         /// <summary>
         /// 
         /// </summary>
-        Borealis,
+        Borealis, 
 
         /// <summary>
         /// 
         /// </summary>
-        Meetmedeere,
+        Meetmedeere, 
 
         /// <summary>
         /// 
         /// </summary>
-        Newland,
+        Newland, 
 
         /// <summary>
         /// 
         /// </summary>
-        Omni_One_Trade,
+        Omni_One_Trade, 
 
         /// <summary>
         /// 
         /// </summary>
-        Rome_Red,
+        Rome_Red, 
 
         /// <summary>
         /// 
         /// </summary>
-        Omni_One_Entertainment_North,
+        Omni_One_Entertainment_North, 
 
         /// <summary>
         /// 
         /// </summary>
-        Omni_One_Entertainment_South,
+        Omni_One_Entertainment_South, 
 
         /// <summary>
         /// 
         /// </summary>
-        Lush_Hills,
+        Lush_Hills, 
 
         /// <summary>
         /// 
         /// </summary>
-        Clondyke,
+        Clondyke, 
 
         /// <summary>
         /// 
         /// </summary>
-        Galway_County,
+        Galway_County, 
 
         /// <summary>
         /// 
         /// </summary>
-        Broken_Shores,
+        Broken_Shores, 
 
         /// <summary>
         /// 
         /// </summary>
-        four_holes,
+        four_holes, 
 
         /// <summary>
         /// 
         /// </summary>
-        twoho,
+        twoho, 
 
         /// <summary>
         /// 
         /// </summary>
-        Harrys,
+        Harrys, 
 
         /// <summary>
         /// 
         /// </summary>
-        Omni_One_HQ,
+        Omni_One_HQ, 
 
         /// <summary>
         /// 
         /// </summary>
-        Camelot,
+        Camelot, 
 
         /// <summary>
         /// 
         /// </summary>
-        Sentinels,
+        Sentinels, 
 
         /// <summary>
         /// 
         /// </summary>
-        Teleport_Tower_noob_right,
+        Teleport_Tower_noob_right, 
 
         /// <summary>
         /// 
         /// </summary>
-        Teleport_Tower_noob_middle,
+        Teleport_Tower_noob_middle, 
 
         /// <summary>
         /// 
         /// </summary>
-        Teleport_Tower_noob_left,
+        Teleport_Tower_noob_left, 
 
         /// <summary>
         /// 
         /// </summary>
-        ISCommLocalIP,
+        ISCommLocalIP, 
 
         /// <summary>
         /// This is for the SQL Choices
         /// </summary>
-        SQLType,
+        SQLType, 
 
         /// <summary>
         /// Locale language selection for you, en = english , gr = german, more languages as we go
         /// </summary>
-        Locale,
+        Locale, 
     }
+
     #endregion
 
     #region Config
+
     /// <summary>
     /// This here Sets up the Gets and Sets for the Config System.
     /// </summary>
@@ -244,11 +244,15 @@ namespace AO.Core.Config
         /// </summary>
         public string MysqlConnection { get; set; }
 
+        /// <summary>
+        /// </summary>
         /// <summery>
         /// Gets or sets the MsSQL Connection String...
         /// </summery>
         public string MsSqlConnection { get; set; }
 
+        /// <summary>
+        /// </summary>
         /// <summery>
         /// Gets or sets the  PostgreSQL Connection String..
         /// </summery>
@@ -309,7 +313,7 @@ namespace AO.Core.Config
         /// </summary>
         public bool UsePassword { get; set; }
 
-        //Grid use checks
+        // Grid use checks
         /// <summary>
         /// Gets or Sets the West Athen Comp. Lit. Check Number
         /// </summary>
@@ -430,5 +434,6 @@ namespace AO.Core.Config
         /// </summary>
         public string Locale { get; set; }
     }
+
     #endregion
 }

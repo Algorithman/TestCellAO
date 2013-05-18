@@ -1,36 +1,71 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NLog;
+﻿#region License
+
+// Copyright (c) 2005-2013, CellAO Team
+// 
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// 
+//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
 
 namespace AO.Core.Logger
 {
+    #region Usings ...
+
+    using System;
     using System.Diagnostics;
     using System.Threading;
 
+    using NLog;
     using NLog.Config;
     using NLog.Targets;
 
-    using Logger = NLog.Logger;
+    #endregion
 
+    /// <summary>
+    /// </summary>
     public static class LogUtil
     {
-        private static Logger log = LogManager.GetCurrentClassLogger();
+        /// <summary>
+        /// </summary>
+        private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
+        /// <summary>
+        /// </summary>
         public static Action<Action<string>> SystemInfoLogger;
 
+        /// <summary>
+        /// </summary>
         public static event Action<string, Exception> ExceptionRaised;
 
-
+        /// <summary>
+        /// </summary>
+        /// <param name="logLevel">
+        /// </param>
         public static void SetupConsoleLogging(LogLevel logLevel)
         {
-            var config = LogManager.Configuration ?? new LoggingConfiguration();
+            LoggingConfiguration config = LogManager.Configuration ?? new LoggingConfiguration();
 
             var consoleTarget = new ColoredConsoleTarget
-            {
-                Layout = "${processtime} [${level}] ${message} ${exception:format=tostring}"
-            };
+                                    {
+                                        Layout =
+                                            "${processtime} [${level}] ${message} ${exception:format=tostring}"
+                                    };
             config.AddTarget("console", consoleTarget);
 
             config.LoggingRules.Add(new LoggingRule("*", logLevel, consoleTarget));
@@ -39,9 +74,15 @@ namespace AO.Core.Logger
             LogManager.EnableLogging();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="fileName">
+        /// </param>
+        /// <param name="logLevel">
+        /// </param>
         public static void SetupFileLogging(string fileName, LogLevel logLevel)
         {
-            var config = LogManager.Configuration ?? new LoggingConfiguration();
+            LoggingConfiguration config = LogManager.Configuration ?? new LoggingConfiguration();
             var fileTarget = new FileTarget();
             fileTarget.FileName = fileName;
             config.AddTarget("logfile", fileTarget);
@@ -50,88 +91,214 @@ namespace AO.Core.Logger
             LogManager.EnableLogging();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="msg">
+        /// </param>
         public static void Debug(string msg)
         {
             log.Debug(msg);
         }
 
         #region Exceptions
+
+        /// <summary>
+        /// </summary>
+        /// <param name="e">
+        /// </param>
         public static void ErrorException(Exception e)
         {
             ErrorException(e, false);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="e">
+        /// </param>
+        /// <param name="addSystemInfo">
+        /// </param>
         public static void ErrorException(Exception e, bool addSystemInfo)
         {
-            ErrorException(e, addSystemInfo, "");
+            ErrorException(e, addSystemInfo, string.Empty);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="msg">
+        /// </param>
+        /// <param name="format">
+        /// </param>
         public static void ErrorException(string msg, params object[] format)
         {
             ErrorException(false, msg, format);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="addSystemInfo">
+        /// </param>
+        /// <param name="msg">
+        /// </param>
+        /// <param name="format">
+        /// </param>
         public static void ErrorException(bool addSystemInfo, string msg, params object[] format)
         {
             LogException(log.Error, null, addSystemInfo, msg, format);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="e">
+        /// </param>
+        /// <param name="msg">
+        /// </param>
+        /// <param name="format">
+        /// </param>
         public static void ErrorException(Exception e, string msg, params object[] format)
         {
             ErrorException(e, true, msg, format);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="e">
+        /// </param>
+        /// <param name="addSystemInfo">
+        /// </param>
+        /// <param name="msg">
+        /// </param>
+        /// <param name="format">
+        /// </param>
         public static void ErrorException(Exception e, bool addSystemInfo, string msg, params object[] format)
         {
             LogException(log.Error, e, addSystemInfo, msg, format);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="e">
+        /// </param>
         public static void WarnException(Exception e)
         {
             WarnException(e, false);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="e">
+        /// </param>
+        /// <param name="addSystemInfo">
+        /// </param>
         public static void WarnException(Exception e, bool addSystemInfo)
         {
-            WarnException(e, addSystemInfo, "");
+            WarnException(e, addSystemInfo, string.Empty);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="msg">
+        /// </param>
+        /// <param name="format">
+        /// </param>
         public static void WarnException(string msg, params object[] format)
         {
             WarnException(false, msg, format);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="addSystemInfo">
+        /// </param>
+        /// <param name="msg">
+        /// </param>
+        /// <param name="format">
+        /// </param>
         public static void WarnException(bool addSystemInfo, string msg, params object[] format)
         {
             LogException(log.Warn, null, addSystemInfo, msg, format);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="e">
+        /// </param>
+        /// <param name="msg">
+        /// </param>
+        /// <param name="format">
+        /// </param>
         public static void WarnException(Exception e, string msg, params object[] format)
         {
             WarnException(e, true, msg, format);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="e">
+        /// </param>
+        /// <param name="addSystemInfo">
+        /// </param>
+        /// <param name="msg">
+        /// </param>
+        /// <param name="format">
+        /// </param>
         public static void WarnException(Exception e, bool addSystemInfo, string msg, params object[] format)
         {
             LogException(log.Warn, e, addSystemInfo, msg, format);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="e">
+        /// </param>
+        /// <param name="msg">
+        /// </param>
+        /// <param name="format">
+        /// </param>
         public static void FatalException(Exception e, string msg, params object[] format)
         {
             FatalException(e, true, msg, format);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="e">
+        /// </param>
+        /// <param name="addSystemInfo">
+        /// </param>
         public static void FatalException(Exception e, bool addSystemInfo)
         {
-            FatalException(e, addSystemInfo, "");
+            FatalException(e, addSystemInfo, string.Empty);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="e">
+        /// </param>
+        /// <param name="addSystemInfo">
+        /// </param>
+        /// <param name="msg">
+        /// </param>
+        /// <param name="format">
+        /// </param>
         public static void FatalException(Exception e, bool addSystemInfo, string msg, params object[] format)
         {
             LogException(log.Fatal, e, addSystemInfo, msg, format);
         }
 
-        public static void LogException(Action<string> logger, Exception e, bool addSystemInfo, string msg, params object[] format)
+        /// <summary>
+        /// </summary>
+        /// <param name="logger">
+        /// </param>
+        /// <param name="e">
+        /// </param>
+        /// <param name="addSystemInfo">
+        /// </param>
+        /// <param name="msg">
+        /// </param>
+        /// <param name="format">
+        /// </param>
+        public static void LogException(
+            Action<string> logger, Exception e, bool addSystemInfo, string msg, params object[] format)
         {
             if (!string.IsNullOrEmpty(msg))
             {
@@ -142,14 +309,15 @@ namespace AO.Core.Logger
             if (e != null)
             {
                 LogStacktrace(logger);
-                logger("");
+                logger(string.Empty);
                 logger(e.ToString());
-                //logger(new StackTrace(e, true));
+
+                // logger(new StackTrace(e, true));
             }
 
             if (addSystemInfo)
             {
-                logger("");
+                logger(string.Empty);
                 if (SystemInfoLogger != null)
                 {
                     SystemInfoLogger(logger);
@@ -160,32 +328,42 @@ namespace AO.Core.Logger
                 }
             }
 
-            var evt = ExceptionRaised;
+            Action<string, Exception> evt = ExceptionRaised;
             if (evt != null)
             {
                 evt(msg, e);
             }
         }
+
         #endregion
 
+        /// <summary>
+        /// </summary>
+        /// <param name="logger">
+        /// </param>
         public static void LogStacktrace(Action<string> logger)
         {
             StackTrace stackTrace = new StackTrace(Thread.CurrentThread, true);
-            string temp = "";
+            string temp = string.Empty;
             foreach (StackFrame stackFrame in stackTrace.GetFrames())
             {
                 temp += stackFrame.ToString().Trim() + "\r\n\t";
             }
+
             logger(temp);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="logger">
+        /// </param>
         private static void LogSystemInfo(Action<string> logger)
         {
-            var title = "WCell component";
+            string title = "WCell component";
 #if DEBUG
             title += " - Debug";
 #else
-			title += " - Release";
+            title += " - Release";
 #endif
             logger(title);
             logger(string.Format("OS: {0} - CLR: {1}", Environment.OSVersion, Environment.Version));
