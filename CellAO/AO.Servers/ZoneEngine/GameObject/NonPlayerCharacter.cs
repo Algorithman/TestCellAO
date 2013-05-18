@@ -38,28 +38,31 @@ namespace ZoneEngine.GameObject
     {
         #region Public Properties
 
+        private string name;
+
         /// <summary>
         /// </summary>
         public string Name
         {
             get
             {
-                return this.Name;
+                return this.name;
             }
 
             set
             {
-                this.Name = value;
+                this.name = value;
             }
         }
 
+        private IList<Pet> pets;
         /// <summary>
         /// </summary>
         public IList<Pet> Pets
         {
             get
             {
-                return this.Pets;
+                return this.pets;
             }
         }
 

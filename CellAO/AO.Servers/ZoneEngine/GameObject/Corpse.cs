@@ -35,6 +35,7 @@ namespace ZoneEngine.GameObject
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.GameObject.Items;
+    using ZoneEngine.GameObject.Playfields;
 
     #endregion
 
@@ -46,13 +47,13 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        private Identity playfield;
+        private IPlayfield playfield;
 
         /// <summary>
         /// </summary>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public Identity Playfield
+        public IPlayfield Playfield
         {
             get
             {
@@ -109,7 +110,8 @@ namespace ZoneEngine.GameObject
         /// </summary>
         public Corpse()
         {
-            this.playfield = new Identity();
+            // TODO: get correct Iplayfield and set it
+            // this.playfield = new Identity();
             this.identity = new Identity();
         }
 
@@ -134,8 +136,8 @@ namespace ZoneEngine.GameObject
             {
                 LogUtil.Debug(
                     "Could not create LootTable for Corpse " + this.identity.Type.ToString("X8") + ":"
-                    + this.identity.Instance.ToString("X8") + " on Playfield " + this.playfield.Type.ToString("X8")
-                    + ":" + this.playfield.Instance.ToString("X8"));
+                    + this.identity.Instance.ToString("X8") + " on Playfield " + this.playfield.Identity.Type.ToString("X8")
+                    + ":" + this.playfield.Identity.Instance.ToString("X8"));
                 return false;
             }
         }

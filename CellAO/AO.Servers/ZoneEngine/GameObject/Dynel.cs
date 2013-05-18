@@ -32,6 +32,7 @@ namespace ZoneEngine.GameObject
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
 
     #endregion
@@ -56,7 +57,7 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        protected Identity playfield;
+        protected IPlayfield playfield;
 
         #endregion
 
@@ -67,7 +68,8 @@ namespace ZoneEngine.GameObject
         public Dynel()
         {
             this.stats = new DynelStats(this);
-            this.playfield = new Identity();
+            // TODO: get correct playfield and set it
+            // this.playfield = new Identity();
         }
 
         #endregion
@@ -78,7 +80,7 @@ namespace ZoneEngine.GameObject
         /// </summary>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public Identity Playfield
+        public IPlayfield Playfield
         {
             get
             {

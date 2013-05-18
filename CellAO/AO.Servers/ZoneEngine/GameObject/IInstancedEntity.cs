@@ -31,6 +31,8 @@ namespace ZoneEngine.GameObject
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.GameObject.Playfields;
+
     #endregion
 
     /// <summary>
@@ -42,7 +44,7 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        Identity Playfield { get; set; }
+        IPlayfield Playfield { get; set; }
 
         Vector3 Coordinates { get; set; }
         Quaternion Heading { get; set; }
@@ -71,12 +73,12 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        public Identity Playfield
+        public IPlayfield Playfield
         {
             get
             {
-                Contract.Ensures(Contract.Result<Identity>() != null);
-                return default(Identity);
+                Contract.Ensures(Contract.Result<IPlayfield>() != null);
+                return default(IPlayfield);
             }
 
             set

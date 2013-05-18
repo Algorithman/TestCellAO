@@ -31,6 +31,7 @@ namespace ZoneEngine.GameObject
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
 
     #endregion
@@ -60,7 +61,7 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        public Identity Playfield { get; set; }
+        public IPlayfield Playfield { get; set; }
 
         public Vector3 Coordinates
         {

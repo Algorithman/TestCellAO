@@ -31,6 +31,7 @@ namespace ZoneEngine.GameObject
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
 
     #endregion
@@ -56,20 +57,21 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        private IPlayfield playfield;
         /// <summary>
         /// </summary>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public Identity Playfield
+        public IPlayfield Playfield
         {
             get
             {
-                return this.Playfield;
+                return this.playfield;
             }
 
             set
             {
-                this.Playfield = value;
+                this.playfield = value;
             }
         }
 
