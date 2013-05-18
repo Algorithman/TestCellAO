@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Access" MembersFormat="NameAndType">
   <Class Name="ZoneEngine.GameObject.GameObject">
-    <Position X="6.25" Y="0.5" Width="1.5" />
+    <Position X="7.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAA=</HashCode>
       <FileName>GameObject\GameObject.cs</FileName>
@@ -9,46 +9,46 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ZoneEngine.GameObject.Character">
-    <Position X="3" Y="5.5" Width="1.5" />
+    <Position X="3.25" Y="7.5" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAACAEAAAgEAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAACAQAAAgEAEAAAAQAAAAEAAAAAAAABAAAABY=</HashCode>
       <FileName>GameObject\Character.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ZoneEngine.GameObject.NonPlayerCharacter">
-    <Position X="0.75" Y="5.5" Width="1.5" />
+    <Position X="0.75" Y="7.5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAEAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAQAAAAEAAAAAAQAAAAEAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\NonPlayerCharacter.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ZoneEngine.GameObject.Pet">
-    <Position X="0.75" Y="7.75" Width="1.5" />
+    <Position X="0.75" Y="10.25" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAACAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\Pet.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ZoneEngine.GameObject.Dynel">
-    <Position X="3" Y="2.75" Width="1.5" />
+    <Position X="3.25" Y="3" Width="2" />
     <TypeIdentifier>
-      <HashCode>ABAAAAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>IBAAAQAQEAEAAAAAAAAgAAAAIAAABAAAAAAAACAAAAA=</HashCode>
       <FileName>GameObject\Dynel.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ZoneEngine.GameObject.Statel">
-    <Position X="12" Y="2.75" Width="1.5" />
+    <Position X="13.75" Y="3" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>IAAAAAAAAAEAAAAAAAAgAAAAIAAAAAAAAAAAACAAAAA=</HashCode>
       <FileName>GameObject\Statel.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ZoneEngine.GameObject.Items.InstancedItem">
-    <Position X="5.25" Y="5.5" Width="1.5" />
+    <Position X="6.25" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\Items\InstancedItem.cs</FileName>
@@ -56,93 +56,93 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ZoneEngine.GameObject.VendorShop">
-    <Position X="9.75" Y="2.75" Width="1.5" />
+    <Position X="11.25" Y="3" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>ABAAAAAAAAEAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>IBAAAQAAAAEAAAAAAAAgAAQAIAAAAAAAAAAAACAAAAA=</HashCode>
       <FileName>GameObject\VendorShop.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ZoneEngine.GameObject.Corpse">
-    <Position X="7.5" Y="2.75" Width="1.5" />
+    <Position X="8.5" Y="3" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>IgAAAQAAAAEAAAAAAAAgAAAAIAAAAAAAAAAAAiAAAAA=</HashCode>
       <FileName>GameObject\Corpse.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ZoneEngine.GameObject.Items.AOItem" Collapsed="true">
-    <Position X="14.5" Y="0.5" Width="1.5" />
+    <Position X="16.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>ZDGADQyKokSAFEhBxAAEABAAHoAQJUF6R+gk6BmEYig=</HashCode>
       <FileName>GameObject\Items\AOItem.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Interface Name="ZoneEngine.GameObject.IEntity">
-    <Position X="6.25" Y="7.5" Width="1.5" />
+    <Position X="9.25" Y="6.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
       <FileName>GameObject\IEntity.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.GameObject.IInstancedEntity">
-    <Position X="6.25" Y="9.25" Width="1.5" />
+    <Position X="9.25" Y="8.25" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAEAAAAAAAAAAAAAIAAAAAAAAAAAACAAAAA=</HashCode>
       <FileName>GameObject\IInstancedEntity.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.GameObject.INamedEntity">
-    <Position X="6.25" Y="11.25" Width="1.5" />
+    <Position X="9.25" Y="10.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\INamedEntity.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.GameObject.IPacketReceivingEntity" Collapsed="true">
-    <Position X="16.25" Y="2.5" Width="1.5" />
+    <Position X="18.25" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\IPacketReceivingEntity.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.GameObject.ISummoner" Collapsed="true">
-    <Position X="18" Y="2.5" Width="1.5" />
+    <Position X="20" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\ISummoner.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.GameObject.IStats">
-    <Position X="9.25" Y="9.5" Width="1.5" />
+    <Position X="12.25" Y="8.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>ABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\IStats.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.IInventory" Collapsed="true">
-    <Position X="18" Y="1.75" Width="1.5" />
+    <Position X="20" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\IInventory.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.GameObject.ILootInventory" Collapsed="true">
-    <Position X="14.5" Y="2.5" Width="1.5" />
+    <Position X="16.5" Y="2.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAA=</HashCode>
       <FileName>GameObject\ILootInventory.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.IAOEvents" Collapsed="true">
-    <Position X="16.25" Y="1.75" Width="1.5" />
+    <Position X="18.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\IAOEvents.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ZoneEngine.GameObject.IAOActions" Collapsed="true">
-    <Position X="14.5" Y="1.75" Width="1.5" />
+    <Position X="16.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>GameObject\IAOActions.cs</FileName>
