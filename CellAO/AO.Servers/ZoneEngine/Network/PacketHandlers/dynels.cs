@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CharacterActionHandler.cs" company="CellAO Team">
+// <copyright file="dynels.cs" company="CellAO Team">
 //   Copyright © 2005-2013 CellAO Team.
 //   
 //   All rights reserved.
@@ -23,32 +23,39 @@
 //   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // </copyright>
 // <summary>
-//   Defines the CharacterActionHandler type.
+//   Defines the Dynels type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ZoneEngine.MessageHandlers
+namespace ZoneEngine.Network.PacketHandlers
 {
-    using System.ComponentModel.Composition;
-
-    using AO.Core.Components;
-
-    using SmokeLounge.AOtomation.Messaging.Messages;
+    using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.CoreClient;
-    using ZoneEngine.Network.PacketHandlers;
+    using ZoneEngine.GameObject;
 
-    [Export(typeof(IHandleMessage))]
-    public class CharacterActionHandler : IHandleMessage<CharacterActionMessage>
+    public static class Dynels
     {
         #region Public Methods and Operators
 
-        public void Handle(object sender, Message message)
+        public static void GetDynels(Client client)
         {
-            var client = (Client)sender;
-            var characterActionMessage = (CharacterActionMessage)message.Body;
-            CharacterAction.Read(characterActionMessage, client);
+            foreach (IInstancedEntity clients in client.Playfield.Entities)
+            {
+                IPacketReceivingEntity ipr = clients as IPacketReceivingEntity;
+                if (ipr != null)
+                {
+                    if (clients.Identity.Instance != client.Character.Identity.Instance)
+                    {
+                        ipr.SimpleCharFullUpdate(clients, client);
+
+                        // Send CharacterInPlay packet 
+                        var message = new CharInPlayMessage { Identity = clients.Character.Id, Unknown = 0x00 };
+                        client.SendCompressed(message);
+                    }
+                }
+            }
         }
 
         #endregion

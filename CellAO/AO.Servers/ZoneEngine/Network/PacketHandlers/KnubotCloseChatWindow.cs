@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CharacterActionHandler.cs" company="CellAO Team">
+// <copyright file="KnubotCloseChatWindow.cs" company="CellAO Team">
 //   Copyright © 2005-2013 CellAO Team.
 //   
 //   All rights reserved.
@@ -23,32 +23,37 @@
 //   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // </copyright>
 // <summary>
-//   Defines the CharacterActionHandler type.
+//   Defines the KnuBotCloseChatWindow type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ZoneEngine.MessageHandlers
+namespace ZoneEngine.Network.PacketHandlers
 {
-    using System.ComponentModel.Composition;
-
-    using AO.Core.Components;
-
-    using SmokeLounge.AOtomation.Messaging.Messages;
+    using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine.CoreClient;
-    using ZoneEngine.Network.PacketHandlers;
+    using ZoneEngine.GameObject;
 
-    [Export(typeof(IHandleMessage))]
-    public class CharacterActionHandler : IHandleMessage<CharacterActionMessage>
+    public static class KnuBotCloseChatWindow
     {
         #region Public Methods and Operators
 
-        public void Handle(object sender, Message message)
+        public static void Send(Character talkingTo, NonPlayerCharacter talker)
         {
-            var client = (Client)sender;
-            var characterActionMessage = (CharacterActionMessage)message.Body;
-            CharacterAction.Read(characterActionMessage, client);
+            var client = talkingTo.Client;
+            var message = new KnuBotCloseChatWindowMessage
+                              {
+                                  Identity = talkingTo.Identity, 
+                                  Unknown = 0x00, 
+                                  Unknown1 = 2,
+                                  Target = talker.Identity, 
+                                  Unknown2 = 5, 
+                                  Unknown3 = 0
+                              };
+            client.SendCompressed(message);
+
+            // Closing KnuBot window from server side needs to clear KnuBot's variables
+            talker.KnuBot.KnuBotCloseChatWindow(talkingTo);
         }
 
         #endregion

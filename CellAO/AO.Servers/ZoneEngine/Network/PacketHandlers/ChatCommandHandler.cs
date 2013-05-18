@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CharacterActionHandler.cs" company="CellAO Team">
+// <copyright file="ChatCommandHandler.cs" company="CellAO Team">
 //   Copyright © 2005-2013 CellAO Team.
 //   
 //   All rights reserved.
@@ -23,32 +23,57 @@
 //   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // </copyright>
 // <summary>
-//   Defines the CharacterActionHandler type.
+//   Defines the ChatCommandHandler type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ZoneEngine.MessageHandlers
+namespace ZoneEngine.Network.PacketHandlers
 {
-    using System.ComponentModel.Composition;
+    using AO.Core;
 
-    using AO.Core.Components;
-
-    using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine.CoreClient;
-    using ZoneEngine.Network.PacketHandlers;
-
-    [Export(typeof(IHandleMessage))]
-    public class CharacterActionHandler : IHandleMessage<CharacterActionMessage>
+    public static class ChatCommandHandler
     {
+        // TODO: Move this to character class
         #region Public Methods and Operators
 
-        public void Handle(object sender, Message message)
+        public static bool HasNano(int nanoId, Client client)
         {
-            var client = (Client)sender;
-            var characterActionMessage = (CharacterActionMessage)message.Body;
-            CharacterAction.Read(characterActionMessage, client);
+            var found = false;
+            foreach (var uploadedNanos in client.Character.UploadedNanos)
+            {
+                if (uploadedNanos.Nano != nanoId)
+                {
+                    continue;
+                }
+
+                found = true;
+                break;
+            }
+
+            return found;
+        }
+
+        public static bool ItemExists(int placement, Client client)
+        {
+            return client.Character.GetInventoryAt(placement) != null;
+        }
+
+        public static void Read(ChatCmdMessage message, Client client)
+        {
+            var fullArgs = message.Command.TrimEnd(char.MinValue);
+            var temp = string.Empty;
+            do
+            {
+                temp = fullArgs;
+                fullArgs = fullArgs.Replace("  ", " ");
+            }
+            while (temp != fullArgs);
+
+            var cmdArgs = fullArgs.Trim().Split(' ');
+
+            Program.csc.CallChatCommand(cmdArgs[0].ToLower(), client, message.Target, cmdArgs);
         }
 
         #endregion
