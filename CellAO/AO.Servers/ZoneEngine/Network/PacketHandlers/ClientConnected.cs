@@ -30,9 +30,12 @@
 namespace ZoneEngine.PacketHandlers
 {
     using System;
+    using System.ComponentModel.Composition;
     using System.IO;
     using System.Net;
     using System.Text;
+
+    using AO.Core.Components;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -55,16 +58,14 @@ namespace ZoneEngine.PacketHandlers
         {
             // Don't edit anything in this region
             // unless you are 300% sure you know what you're doing
-            client.CreateCharacter(charID);
 
-            // TODO: Read name(s) from database or in CreateCharacter
-            client.Character.Name = "TESTER";
-            // client.Character.ReadNames();
+            // Character is created and read when Client connects in Client.cs->CreateCharacter
+            //client.CreateCharacter(charID);
 
             client.Server.Info(
                 client,
                 "Client connected. ID: {0} IP: {1} Character name: {2}",
-                client.Character.Identity,
+                client.Character.Identity.Instance,
                 client.ClientAddress, client.Character.Name);
 
             // now we have to start sending packets like 

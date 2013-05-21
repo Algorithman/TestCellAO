@@ -275,6 +275,11 @@ namespace ZoneEngine.GameObject
             this.BaseInventory = new BaseInventory(this);
             this.pets = new List<Pet>();
             this.client = client;
+            this.Textures=new List<AOTextures>();
+            this.uploadedNanos=new List<AOUploadedNanos>();
+            this.meshLayer=new MeshLayers();
+            this.socialMeshLayer=new MeshLayers();
+            this.SocialTab=new Dictionary<int, int>();
 
             // TODO: Load names here?
         }
@@ -296,7 +301,7 @@ namespace ZoneEngine.GameObject
         /// </exception>
         internal void CalculateSkills()
         {
-            throw new NotImplementedException();
+            // TODO: Calculate Skills
         }
     }
 }

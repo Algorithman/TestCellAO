@@ -8,12 +8,10 @@ namespace ZoneEngine.Network.InternalBus.InternalMessages
     using ZoneEngine.GameObject;
     using ZoneEngine.GameObject.Items;
 
-    public interface IIMItemNanoEvent
+    interface IIMItemNanoAction
     {
-        Dynel Target { get; set; }
+        Dynel User { get; set; }
 
-        Dynel Self { get; set; }
-
-        AOEvents Event { get; set; }
+        AOActions Action { get; set; }
     }
 }

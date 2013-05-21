@@ -60,11 +60,12 @@ namespace ZoneEngine.GameObject.Items
 
         public BaseInventory()
         {
-            this.Content=new SortedDictionary<int, AOItem>();
+            this.Content = new SortedDictionary<int, AOItem>();
             this.MaxSlots = 0;
         }
 
         public BaseInventory(IItemContainer owner)
+            : this()
         {
             this.owner = owner;
         }

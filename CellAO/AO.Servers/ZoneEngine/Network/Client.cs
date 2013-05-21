@@ -30,10 +30,13 @@ namespace ZoneEngine.CoreClient
     using System;
     using System.Diagnostics.Contracts;
     using System.Globalization;
+    using System.Linq;
     using System.Net.Sockets;
 
     using AO.Core.Components;
+    using AO.Core.Database;
     using AO.Core.Events;
+    using AO.Core.Logger;
 
     using Cell.Core;
 
@@ -228,6 +231,13 @@ namespace ZoneEngine.CoreClient
         /// </exception>
         public void SendCompressed(byte[] packet)
         {
+#if DEBUG
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(NiceHexOutput.Output(packet));
+            Console.ResetColor();
+            LogUtil.Debug(NiceHexOutput.Output(packet));
+            LogUtil.Debug("");
+#endif
             Contract.Requires(packet != null);
             Contract.Requires(1 < packet.Length);
             int tries = 0;
@@ -336,6 +346,7 @@ namespace ZoneEngine.CoreClient
 
             /* Uncomment for Incoming Messages
                 */
+            Console.WriteLine("Receiving");
             Console.WriteLine("Offset: " + buffer.Offset.ToString() + " -- RemainingLength: " + this._remainingLength);
             Console.WriteLine(NiceHexOutput.Output(packet));
 
@@ -373,6 +384,9 @@ namespace ZoneEngine.CoreClient
         /// </param>
         public void SendCompressed(MessageBody messageBody)
         {
+#if DEBUG
+            Console.WriteLine("Sending Message: " + messageBody.GetType().ToString());
+#endif
             var message = new Message
                               {
                                   Body = messageBody,
@@ -399,7 +413,31 @@ namespace ZoneEngine.CoreClient
         public void CreateCharacter(int charId)
         {
             this.character = new Character(new Identity { Type = IdentityType.CanbeAffected, Instance = charId }, this);
-
+            var daochar = new CharacterDao().GetById(charId);
+            if (daochar.Count() == 0)
+            {
+                throw new Exception("Character " + charId.ToString() + " not found.");
+            }
+            if (daochar.Count() > 1)
+            {
+                throw new Exception(daochar.Count().ToString() + " Characters with id " + charId.ToString() + " found??? Check Database setup!");
+            }
+            DBCharacter character = daochar.First();
+            this.character.Name = character.Name;
+            this.character.LastName = character.LastName;
+            this.character.FirstName = character.FirstName;
+            this.character.Coordinates = new Vector3();
+            this.character.Coordinates.X = character.X;
+            this.character.Coordinates.Y = character.Y;
+            this.character.Coordinates.Z = character.Z;
+            this.character.Heading=new Quaternion();
+            this.character.Heading.X = character.HeadingX;
+            this.character.Heading.Y = character.HeadingY;
+            this.character.Heading.Z = character.HeadingZ;
+            this.character.Heading.W = character.HeadingW;
+            this.character.Playfield = server.PlayfieldById(character.Playfield);
+            this.Playfield = this.character.Playfield;
+            this.Playfield.Entities.Add(this.character);
         }
     }
 }

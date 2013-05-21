@@ -159,12 +159,10 @@ namespace ZoneEngine
         {
             bool processedargs = false;
 
-            
-
+            #region Logger setup
             LogUtil.SetupConsoleLogging(LogLevel.Debug);
             LogUtil.SetupFileLogging("${basedir}/ZoneEngineLog.txt", LogLevel.Trace);
-
-            
+            #endregion
 
             #region NBug Setup
 

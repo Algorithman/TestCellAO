@@ -125,6 +125,8 @@
     <Compile Include="GameObject\Corpse.cs" />
     <Compile Include="GameObject\Character.cs" />
     <Compile Include="Collision\BorderlineCheck.cs" />
+    <Compile Include="MessageHandlers\CharInPlayHandler.cs" />
+    <Compile Include="MessageHandlers\ZoneLoginMessage.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="GameObject\Dynel.cs" />
     <Compile Include="GameObject\GameObject.cs" />
@@ -165,6 +167,7 @@
     <Compile Include="GameObject\IAOActions.cs" />
     <Compile Include="Network\InternalBus\Events\PFMessageReceivedEvent.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IIMAction.cs" />
+    <Compile Include="Network\InternalBus\InternalMessages\IIMItemNanoAction.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IIMItemNanoEvent.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\InternalMessage.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\InternalMessageBody.cs" />
@@ -2254,7 +2257,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="MessageHandlers\" />
     <Folder Include="Network\InternalBus\MessageHandler\" />
     <Folder Include="Static Handlers\" />
   </ItemGroup>

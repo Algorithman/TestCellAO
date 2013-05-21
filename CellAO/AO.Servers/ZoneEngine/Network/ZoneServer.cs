@@ -229,6 +229,7 @@ namespace ZoneEngine.Network
         /// </summary>
         /// <param name="playfieldNumber">
         /// </param>
+        // TODO: Needs to be changed to full Identity for Playfield number for instanced Playfields
         public void CreatePlayfield(int playfieldNumber)
         {
             foreach (PlayfieldInfo playfieldInfo in Playfields.Instance.playfields)
@@ -272,6 +273,20 @@ namespace ZoneEngine.Network
 
                 break;
             }
+        }
+
+        public IPlayfield PlayfieldById(int id)
+        {
+            // TODO: This needs to be changed to check for whole Identity
+            foreach (IPlayfield pf in this.playfields)
+            {
+                if (pf.Identity.Instance == id)
+                {
+                    return pf;
+                }
+            }
+            this.CreatePlayfield(id);
+            return this.PlayfieldById(id);
         }
 
         /// <summary>
