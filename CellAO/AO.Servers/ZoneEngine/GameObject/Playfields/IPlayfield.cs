@@ -29,7 +29,7 @@ namespace ZoneEngine.GameObject.Playfields
 
     using System.Collections.Generic;
 
-    using AO.Core.Components;
+    using MemBus;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;

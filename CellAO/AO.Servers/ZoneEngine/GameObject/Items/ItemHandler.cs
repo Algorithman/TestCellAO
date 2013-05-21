@@ -56,7 +56,7 @@ namespace ZoneEngine.Gameobject.Items
         /// <returns>number of cached items</returns>
         public static int CacheAllItems()
         {
-            DateTime _now = DateTime.Now;
+            DateTime _now = DateTime.UtcNow;
             ItemList = new List<AOItem>();
             Stream sf = new FileStream("items.dat", FileMode.Open);
             MemoryStream ms = new MemoryStream();
@@ -93,7 +93,7 @@ namespace ZoneEngine.Gameobject.Items
                     
                 Console.Write(
                     "Loaded {0} items in {1}\r", 
-                    new object[] { ItemList.Count, new DateTime((DateTime.Now - _now).Ticks).ToString("mm:ss.ff") });
+                    new object[] { ItemList.Count, new DateTime((DateTime.UtcNow - _now).Ticks).ToString("mm:ss.ff") });
             }
 
             GC.Collect();
@@ -111,7 +111,7 @@ namespace ZoneEngine.Gameobject.Items
         public static int CacheAllItems(string fname)
         {
             Contract.Requires(!string.IsNullOrEmpty(fname));
-            DateTime _now = DateTime.Now;
+            DateTime _now = DateTime.UtcNow;
             ItemList = new List<AOItem>();
             Stream sf = new FileStream(fname, FileMode.Open);
             MemoryStream ms = new MemoryStream();
@@ -147,7 +147,7 @@ namespace ZoneEngine.Gameobject.Items
 
                 Console.Write(
                     "Loaded {0} items in {1}\r", 
-                    new object[] { ItemList.Count, new DateTime((DateTime.Now - _now).Ticks).ToString("mm:ss.ff") });
+                    new object[] { ItemList.Count, new DateTime((DateTime.UtcNow - _now).Ticks).ToString("mm:ss.ff") });
             }
 
             GC.Collect();

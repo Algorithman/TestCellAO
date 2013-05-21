@@ -70,10 +70,6 @@ namespace ZoneEngine.Network
 
         /// <summary>
         /// </summary>
-        private readonly PlayfieldFactory playfieldFactory;
-
-        /// <summary>
-        /// </summary>
         private readonly List<IPlayfield> playfields = new List<IPlayfield>();
 
         #endregion
@@ -93,10 +89,9 @@ namespace ZoneEngine.Network
         /// <param name="clientfactory">
         /// </param>
         [ImportingConstructor]
-        public ZoneServer(ClientFactory clientfactory, PlayfieldFactory playfieldFactory)
+        public ZoneServer(ClientFactory clientfactory)
         {
             this.clientFactory = clientfactory;
-            this.playfieldFactory = playfieldFactory;
             this.workers = new List<PlayfieldWorkerHolder>();
         }
 
@@ -156,7 +151,7 @@ namespace ZoneEngine.Network
         /// </returns>
         protected IPlayfield CreatePlayfield(Identity playfieldIdentity)
         {
-            return this.playfieldFactory.Create(this, playfieldIdentity);
+            return new Playfield(playfieldIdentity);
         }
 
         /// <summary>

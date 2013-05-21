@@ -27,12 +27,12 @@ namespace ZoneEngine.Network
 {
     #region Usings ...
 
-    using System;
     using System.Threading;
 
     using AO.Core.Logger;
 
     using ZoneEngine.GameObject.Playfields;
+    using ZoneEngine.Network.InternalBus;
 
     #endregion
 
@@ -40,23 +40,25 @@ namespace ZoneEngine.Network
     /// </summary>
     public class PlayfieldWorker
     {
-
         /// <summary>
         /// </summary>
         public IPlayfield playfield;
+
+        private PlayfieldTimedList TimedList;
 
         /// <summary>
         /// </summary>
         public void DoWork()
         {
             // TODO: Load Mobs/Characters/Statels HERE
+
+            TimedList=new PlayfieldTimedList(playfield.PlayfieldBus);
             LogUtil.Debug("Created playfield " + this.playfield.Identity.Instance.ToString());
             while (!this._shouldStop)
             {
-                // TODO: Add message processing here
-                Thread.Sleep(10);
             }
-            playfield.DisconnectAllClients();
+
+            this.playfield.DisconnectAllClients();
             LogUtil.Debug("Stopped playfield " + this.playfield.Identity.Instance.ToString());
         }
 
@@ -80,12 +82,21 @@ namespace ZoneEngine.Network
         /// </summary>
         private volatile bool _shouldStop;
     }
+
+    /// <summary>
+    /// </summary>
     public class PlayfieldWorkerHolder
     {
+        /// <summary>
+        /// </summary>
         public Thread thread;
 
+        /// <summary>
+        /// </summary>
         public PlayfieldWorker PlayfieldWorker;
 
+        /// <summary>
+        /// </summary>
         public PlayfieldWorkerHolder()
         {
             this.PlayfieldWorker = new PlayfieldWorker();

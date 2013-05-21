@@ -30,15 +30,19 @@ namespace ZoneEngine.GameObject.Playfields
     using System;
     using System.Collections.Generic;
 
-    using AO.Core.Components;
-
     using Cell.Core;
+
+    using MemBus;
+    using MemBus.Configurators;
+    using MemBus.Support;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
 
     using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Items;
+    using ZoneEngine.Network.InternalBus.Events;
+    using ZoneEngine.Network.InternalBus.InternalMessages;
 
     #endregion
 
@@ -233,10 +237,17 @@ namespace ZoneEngine.GameObject.Playfields
             }
         }
 
+        private MemBus.IBus playfieldBus;
+
+        private DisposeContainer memBusDisposeContainer = new DisposeContainer();
+
+
         /// <summary>
         /// </summary>
         public Playfield()
         {
+            playfieldBus = BusSetup.StartWith<Conservative>().Construct();
+            memBusDisposeContainer.Add(playfieldBus.Subscribe<InternalMessage>(this.HandlePlayfieldMessage));
         }
 
         /// <summary>
@@ -247,13 +258,14 @@ namespace ZoneEngine.GameObject.Playfields
         /// </param>
         /// <param name="playfieldIdentity">
         /// </param>
-        public Playfield(ServerBase server, IBus bus, Identity playfieldIdentity)
+        public Playfield(Identity playfieldIdentity)
         {
-            this.PlayfieldBus = bus;
-            this.server = server;
             this.Identity = playfieldIdentity;
-            this.districts = new List<PlayfieldDistrict>();
-            this.Entities = new HashSet<IInstancedEntity>();
+        }
+
+        public void HandlePlayfieldMessage(InternalMessage message)
+        {
+            
         }
     }
 }

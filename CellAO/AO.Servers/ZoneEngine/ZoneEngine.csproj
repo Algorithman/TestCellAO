@@ -98,7 +98,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Component\PlayfieldFactory.cs" />
     <Compile Include="GameObject\Enums\Expansions.cs" />
     <Compile Include="GameObject\Items\AOActions.cs" />
     <Compile Include="GameObject\Items\AOItemAttribute.cs" />
@@ -124,14 +123,6 @@
     <Compile Include="GameObject\Corpse.cs" />
     <Compile Include="GameObject\Character.cs" />
     <Compile Include="Collision\BorderlineCheck.cs" />
-    <Compile Include="Network\InternalBus\IInternalHandle.cs" />
-    <Compile Include="Network\InternalBus\IInternalHandleMessage.cs" />
-    <Compile Include="Network\InternalBus\IInternalMessagePublisher.cs" />
-    <Compile Include="Network\InternalBus\InternalBusAdapter.cs" />
-    <Compile Include="Network\InternalBus\InternalBusIoCAdapter.cs" />
-    <Compile Include="Network\InternalBus\InternalMessageReceivedEvent.cs" />
-    <Compile Include="Network\InternalBus\InternalMessageReceivedHandler.cs" />
-    <Compile Include="Network\InternalBus\InternalMessages\InternalMessage.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="GameObject\Dynel.cs" />
     <Compile Include="GameObject\GameObject.cs" />
@@ -170,7 +161,11 @@
     <Compile Include="GameObject\ILootInventory.cs" />
     <Compile Include="GameObject\IAOEvents.cs" />
     <Compile Include="GameObject\IAOActions.cs" />
+    <Compile Include="Network\InternalBus\Events\PFMessageReceivedEvent.cs" />
+    <Compile Include="Network\InternalBus\InternalMessages\InternalMessage.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\InternalMessageBody.cs" />
+    <Compile Include="Network\InternalBus\PlayfieldTimedList.cs" />
+    <Compile Include="Network\InternalBus\PlayfieldTimedListEntry.cs" />
     <Compile Include="Network\IZoneClient.cs" />
     <Compile Include="Network\PacketHandlers\CharacterInPlay.cs" />
     <Compile Include="Network\PacketHandlers\ClientConnected.cs" />
@@ -2256,6 +2251,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MessageHandlers\" />
+    <Folder Include="Network\InternalBus\MessageHandler\" />
     <Folder Include="Static Handlers\" />
   </ItemGroup>
   <ItemGroup>

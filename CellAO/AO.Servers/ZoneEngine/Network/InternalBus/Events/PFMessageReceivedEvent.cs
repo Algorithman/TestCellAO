@@ -23,42 +23,64 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.Network.InternalBus
+namespace ZoneEngine.Network.InternalBus.Events
 {
-    #region Usings ...
-
-    using System.ComponentModel.Composition;
-
-    using AO.Core.Components;
-
-    #endregion
+    using ZoneEngine.Network.InternalBus.InternalMessages;
 
     /// <summary>
     /// </summary>
-    [Export(typeof(IHandle<InternalMessageReceivedEvent>))]
-    public class InternalMessageReceivedHandler : IHandle<InternalMessageReceivedEvent>
+    public class PFMessageReceivedEvent
     {
-        /// <summary>
-        /// </summary>
-        private readonly IInternalMessagePublisher messagePublisher;
+        #region Fields
 
         /// <summary>
         /// </summary>
-        /// <param name="messagePublisher">
+        private readonly InternalMessage message;
+
+        /// <summary>
+        /// </summary>
+        private readonly object sender;
+
+        #endregion
+
+        #region Constructors and Destructors
+
+        /// <summary>
+        /// </summary>
+        /// <param name="sender">
         /// </param>
-        [ImportingConstructor]
-        public InternalMessageReceivedHandler(IInternalMessagePublisher messagePublisher)
+        /// <param name="message">
+        /// </param>
+        public PFMessageReceivedEvent(object sender, InternalMessage message)
         {
-            this.messagePublisher = messagePublisher;
+            this.sender = sender;
+            this.message = message;
+        }
+
+        #endregion
+
+        #region Public Properties
+
+        /// <summary>
+        /// </summary>
+        public InternalMessage Message
+        {
+            get
+            {
+                return this.message;
+            }
         }
 
         /// <summary>
         /// </summary>
-        /// <param name="obj">
-        /// </param>
-        public void Handle(InternalMessageReceivedEvent obj)
+        public object Sender
         {
-            this.messagePublisher.Publish(obj.Sender, obj.Message);
+            get
+            {
+                return this.sender;
+            }
         }
+
+        #endregion
     }
 }
