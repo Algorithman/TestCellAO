@@ -8,7 +8,7 @@ namespace ZoneEngine.Network.InternalBus.InternalMessages
     using ZoneEngine.GameObject;
     using ZoneEngine.GameObject.Items;
 
-    interface IIMEvent
+    interface IIMItemNanoEvent
     {
         Dynel Target { get; set; }
 
