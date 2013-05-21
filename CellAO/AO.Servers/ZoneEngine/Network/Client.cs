@@ -206,7 +206,6 @@ namespace ZoneEngine.CoreClient
                                               Receiver = this.character.Identity.Instance
                                           }
                               };
-            this.packetNumber++;
             byte[] buffer = this.messageSerializer.Serialize(message);
 
             /* Uncomment for Debug outgoing Messages
@@ -236,7 +235,6 @@ namespace ZoneEngine.CoreClient
             Console.WriteLine(NiceHexOutput.Output(packet));
             Console.ResetColor();
             LogUtil.Debug(NiceHexOutput.Output(packet));
-            LogUtil.Debug("");
 #endif
             Contract.Requires(packet != null);
             Contract.Requires(1 < packet.Length);
@@ -244,7 +242,8 @@ namespace ZoneEngine.CoreClient
             bool done = false;
 
             // 18.1 Fix
-            byte[] pn = BitConverter.GetBytes(this.packetNumber++);
+            this.packetNumber++;
+            byte[] pn = BitConverter.GetBytes(this.packetNumber);
             packet[0] = pn[1];
             packet[1] = pn[0];
             while ((!done) && (tries < 3))
@@ -400,7 +399,6 @@ namespace ZoneEngine.CoreClient
                                               Receiver = this.character.Identity.Instance
                                           }
                               };
-            this.packetNumber++;
             byte[] buffer = this.messageSerializer.Serialize(message);
             if ((buffer == null) || (buffer.Length < 1))
             {

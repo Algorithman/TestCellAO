@@ -237,8 +237,8 @@ namespace LoginEngine.CoreClient
                               };
             byte[] buffer = this.messageSerializer.Serialize(message);
 
-            buffer[0] = BitConverter.GetBytes(this.packetNumber)[1];
-            buffer[1] = BitConverter.GetBytes(this.packetNumber)[0];
+            buffer[0] = BitConverter.GetBytes(this.packetNumber)[0];
+            buffer[1] = BitConverter.GetBytes(this.packetNumber)[1];
             this.packetNumber++;
 
             /* Uncomment for Debug outgoing Messages
