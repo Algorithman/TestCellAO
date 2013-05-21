@@ -248,6 +248,7 @@ namespace ZoneEngine.GameObject.Playfields
         {
             playfieldBus = BusSetup.StartWith<Conservative>().Construct();
             memBusDisposeContainer.Add(playfieldBus.Subscribe<InternalMessage>(this.HandlePlayfieldMessage));
+            Entities = new HashSet<IInstancedEntity>();
         }
 
         /// <summary>
@@ -258,14 +259,15 @@ namespace ZoneEngine.GameObject.Playfields
         /// </param>
         /// <param name="playfieldIdentity">
         /// </param>
-        public Playfield(Identity playfieldIdentity)
+        public Playfield(Identity playfieldIdentity) : this()
         {
             this.Identity = playfieldIdentity;
         }
 
         public void HandlePlayfieldMessage(InternalMessage message)
         {
-            
+        
+        
         }
     }
 }

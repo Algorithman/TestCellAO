@@ -125,6 +125,11 @@ namespace ZoneEngine.Network.InternalBus
             }
         }
 
+        public int Count()
+        {
+            return TimerList.Count;
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="bus">

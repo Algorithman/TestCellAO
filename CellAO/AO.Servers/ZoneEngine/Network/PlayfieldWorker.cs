@@ -56,6 +56,11 @@ namespace ZoneEngine.Network
             LogUtil.Debug("Created playfield " + this.playfield.Identity.Instance.ToString());
             while (!this._shouldStop)
             {
+
+                if (TimedList.Count() == 0)
+                {
+                    Thread.Sleep(1);
+                }
             }
 
             this.playfield.DisconnectAllClients();

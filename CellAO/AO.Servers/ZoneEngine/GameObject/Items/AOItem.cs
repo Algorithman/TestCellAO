@@ -36,14 +36,9 @@ namespace ZoneEngine.GameObject.Items
     /// <summary>
     /// </summary>
     [Serializable]
-    public class AOItem
+    public class AOItem : IItemNanoEvents, IItemNanoActions
     {
         #region Fields
-
-        /// <summary>
-        /// List of Item Actions (requirement checks)
-        /// </summary>
-        public List<AOActions> Actions = new List<AOActions>();
 
         /// <summary>
         /// List of Attack attributes
@@ -56,11 +51,6 @@ namespace ZoneEngine.GameObject.Items
         public List<AOItemAttribute> Defend = new List<AOItemAttribute>();
 
         /// <summary>
-        /// List of Item events
-        /// </summary>
-        public List<AOEvents> Events = new List<AOEvents>();
-
-        /// <summary>
         /// Item Flags
         /// </summary>
         public int Flags;
@@ -68,6 +58,8 @@ namespace ZoneEngine.GameObject.Items
         /// <summary>
         /// Item Flags
         /// </summary>
+        /// <returns>
+        /// </returns>
         public int CanFlags()
         {
             return this.getItemAttribute(30);
@@ -76,22 +68,26 @@ namespace ZoneEngine.GameObject.Items
         /// <summary>
         /// Get item attribute
         /// </summary>
-        /// <param name="number">number of attribute</param>
-        /// <returns>Value of item attribute</returns>
-        public Int32 getItemAttribute(int number)
+        /// <param name="number">
+        /// number of attribute
+        /// </param>
+        /// <returns>
+        /// Value of item attribute
+        /// </returns>
+        public int getItemAttribute(int number)
         {
-            Contract.Assume(Stats!=null);
+            Contract.Assume(this.Stats != null);
             int c;
-            for (c = 0; c < Stats.Count; c++)
+            for (c = 0; c < this.Stats.Count; c++)
             {
-                if (number == Stats[c].Stat)
+                if (number == this.Stats[c].Stat)
                 {
-                    return Stats[c].Value;
+                    return this.Stats[c].Value;
                 }
             }
+
             return 0;
         }
-
 
         /// <summary>
         /// Item high ID
@@ -817,5 +813,13 @@ namespace ZoneEngine.GameObject.Items
         }
 
         #endregion
+
+        /// <summary>
+        /// </summary>
+        public List<AOEvents> Events { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public List<AOActions> Actions { get; set; }
     }
 }
