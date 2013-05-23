@@ -93,6 +93,8 @@ namespace ZoneEngine
 
                 // Log off all characters
                 // TODO: make it playfield dependent
+                Misc.CheckDatabase();
+
                 Misc.LogOffAll();
 
                 /* TODO: Readd the things, Algorithman
@@ -195,11 +197,6 @@ namespace ZoneEngine
             ConsoleText ct = new ConsoleText();
             ct.TextRead("main.txt");
             Console.WriteLine("Loading " + AssemblyInfoclass.Title + "...");
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Using ISComm v1.0");
-            Console.WriteLine("[OK]");
-            Console.ResetColor();
 
             zoneServer = Container.GetInstance<ZoneServer>();
             int Port = Convert.ToInt32(Config.Instance.CurrentConfig.ZonePort);
