@@ -1,4 +1,6 @@
-##CellAO ![](https://raw.github.com/Algorithman/TestCellAO/master/CellAO%20Logo%20small.png)
+![](https://raw.github.com/Algorithman/TestCellAO/master/CellAO%20Logo%20small.png)
+
+##CellAO
 
 We are using **Cell Framework** to create an open sourced emulator for Anarchy Online using Csharp as our code base... 
 
