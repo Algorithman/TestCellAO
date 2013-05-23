@@ -341,21 +341,9 @@ namespace ZoneEngine.GameObject.Stats
                 return;
             }
 
-            SqlWrapper sql = new SqlWrapper();
             int id = this.Parent.Identity.Instance;
 
-            this.Value = (int)DBStats.GetById(id, this.StatNumber).First().Value;
-
-            /* TODO: REDO
-            DataTable dt =
-            sql.ReadDatatable(
-            "SELECT Value FROM " + this.Parent.GetSqlTablefromDynelType() + " WHERE ID=" + id + " AND Stat=" +
-            this.StatNumber + ";");
-            if (dt.Rows.Count > 0)
-            {
-            this.Value = (Int32)dt.Rows[0][0];
-            }
-            */
+            this.StatBaseValue = DBStats.GetById(id, this.StatNumber).First().Value;
         }
 
         /// <summary>
@@ -12220,22 +12208,10 @@ namespace ZoneEngine.GameObject.Stats
         /// </summary>
         public void ReadStatsfromSql()
         {
-
             foreach (StatDao statDao in DBStats.GetById(this.flags.Parent.Identity.Instance))
             {
                 this.SetBaseValue(statDao.Stat, statDao.Value);
             }
-            /* TODO: Redo
-            SqlWrapper sql = new SqlWrapper();
-            DataTable dt =
-                sql.ReadDatatable(
-                                  "SELECT Stat,Value FROM " + this.flags.Parent.GetSqlTablefromDynelType() + "_stats WHERE ID=" +
-                                  this.flags.Parent.Identity.Instance); // Using Flags to address parent object
-            foreach (DataRow row in dt.Rows)
-            {
-                this.SetBaseValue((Int32)row[0], (UInt32)((Int32)row[1]));
-            }
-             */
         }
 
         /// <summary>
