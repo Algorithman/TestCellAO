@@ -209,12 +209,11 @@ namespace ZoneEngine.CoreClient
                               };
             byte[] buffer = this.messageSerializer.Serialize(message);
 
-            /* Uncomment for Debug outgoing Messages
-            */
+#if DEBUG
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(NiceHexOutput.Output(buffer));
             Console.ResetColor();
-
+#endif
 
             this.Send(buffer);
         }
@@ -231,7 +230,7 @@ namespace ZoneEngine.CoreClient
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(NiceHexOutput.Output(packet));
             Console.ResetColor();
-            LogUtil.Debug(NiceHexOutput.Output(packet));
+            LogUtil.Debug("Sending Compressed:\r\n" + NiceHexOutput.Output(packet));
 #endif
             Contract.Requires(packet != null);
             Contract.Requires(1 < packet.Length);
@@ -340,13 +339,12 @@ namespace ZoneEngine.CoreClient
             var packet = new byte[this._remainingLength];
             Array.Copy(buffer.SegmentData, packet, this._remainingLength);
 
-            /* Uncomment for Incoming Messages
-                */
+#if DEBUG
             Console.WriteLine("Receiving");
             Console.WriteLine("Offset: " + buffer.Offset.ToString() + " -- RemainingLength: " + this._remainingLength);
             Console.WriteLine(NiceHexOutput.Output(packet));
-            LogUtil.Debug("\r\nReceived: \r\n"+NiceHexOutput.Output(packet));
-
+            LogUtil.Debug("\r\nReceived: \r\n" + NiceHexOutput.Output(packet));
+#endif
             this._remainingLength = 0;
             try
             {
@@ -426,7 +424,7 @@ namespace ZoneEngine.CoreClient
             this.character.Coordinates.X = character.X;
             this.character.Coordinates.Y = character.Y;
             this.character.Coordinates.Z = character.Z;
-            this.character.Heading=new Quaternion();
+            this.character.Heading = new Quaternion();
             this.character.Heading.X = character.HeadingX;
             this.character.Heading.Y = character.HeadingY;
             this.character.Heading.Z = character.HeadingZ;
@@ -458,12 +456,12 @@ namespace ZoneEngine.CoreClient
             };
             byte[] buffer = this.messageSerializer.Serialize(message);
 
-            /* Uncomment for Debug outgoing Messages
-            */
+#if DEBUG
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(NiceHexOutput.Output(buffer));
             Console.ResetColor();
             LogUtil.Debug(NiceHexOutput.Output(buffer));
+#endif
             this.packetNumber = 1;
 
             this.Send(buffer);

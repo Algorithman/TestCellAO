@@ -32,6 +32,7 @@ namespace LoginEngine.CoreClient
 
     using AO.Core.Components;
     using AO.Core.Events;
+    using AO.Core.Logger;
 
     using Cell.Core;
 
@@ -180,10 +181,12 @@ namespace LoginEngine.CoreClient
             var packet = new byte[this._remainingLength];
             Array.Copy(buffer.SegmentData, packet, this._remainingLength);
 
-            /* Uncomment for Incoming Messages
-             */
+#if DEBUG
             Console.WriteLine("Offset: " + buffer.Offset.ToString() + " -- RemainingLength: " + this._remainingLength);
             Console.WriteLine(NiceHexOutput.Output(packet));
+            LogUtil.Debug("Offset: " + buffer.Offset.ToString() + " -- RemainingLength: " + this._remainingLength);
+            LogUtil.Debug(NiceHexOutput.Output(packet));
+#endif
 
             this._remainingLength = 0;
             try
@@ -224,14 +227,14 @@ namespace LoginEngine.CoreClient
             // TODO: Investigate if reciever is a timestamp
             var message = new Message
                               {
-                                  Body = messageBody, 
+                                  Body = messageBody,
                                   Header =
                                       new Header
                                           {
-                                              MessageId = BitConverter.ToUInt16(new byte[] { 0xDF, 0xDF }, 0), 
-                                              PacketType = messageBody.PacketType, 
-                                              Unknown = 0x0001, 
-                                              Sender = 0x00000001, 
+                                              MessageId = BitConverter.ToUInt16(new byte[] { 0xDF, 0xDF }, 0),
+                                              PacketType = messageBody.PacketType,
+                                              Unknown = 0x0001,
+                                              Sender = 0x00000001,
                                               Receiver = receiver
                                           }
                               };
@@ -241,12 +244,12 @@ namespace LoginEngine.CoreClient
             buffer[1] = BitConverter.GetBytes(this.packetNumber)[1];
             this.packetNumber++;
 
-            /* Uncomment for Debug outgoing Messages
-             */
+#if DEBUG
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(NiceHexOutput.Output(buffer));
             Console.ResetColor();
-
+            LogUtil.Debug("Sent:\r\n" + NiceHexOutput.Output(buffer));
+#endif
             if (buffer.Length % 4 > 0)
             {
                 Array.Resize(ref buffer, buffer.Length + (4 - (buffer.Length % 4)));
