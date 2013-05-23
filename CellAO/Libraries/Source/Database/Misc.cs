@@ -150,44 +150,44 @@ namespace Database
                             if (fileSize > 10000)
                             {
                                 string[] queries = File.ReadAllLines(sqlFile);
-                                int c = 0;
+                                int counter = 0;
                                 sqlQuery = string.Empty;
                                 string lastpercent = "0";
-                                while (c < queries.Length)
+                                while (counter < queries.Length)
                                 {
-                                    if (queries[c].IndexOf("INSERT INTO") == -1)
+                                    if (queries[counter].IndexOf("INSERT INTO") == -1)
                                     {
-                                        sqlQuery += queries[c] + "\n";
+                                        sqlQuery += queries[counter] + "\n";
                                     }
                                     else
                                     {
-                                        c--;
+                                        counter--;
                                         break;
                                     }
 
-                                    c++;
+                                    counter++;
                                 }
 
                                 conn.Execute(sqlQuery);
 
-                                c++;
+                                counter++;
                                 string buf1 = string.Empty;
-                                while (c < queries.Length)
+                                while (counter < queries.Length)
                                 {
-                                    if (queries[c].ToLower().Substring(0, 11) == "insert into")
+                                    if (queries[counter].ToLower().Substring(0, 11) == "insert into")
                                     {
                                         break;
                                     }
 
-                                    c++;
+                                    counter++;
                                 }
 
-                                if (c < queries.Length)
+                                if (counter < queries.Length)
                                 {
-                                    buf1 = queries[c].Substring(0, queries[c].ToLower().IndexOf("values"));
+                                    buf1 = queries[counter].Substring(0, queries[counter].ToLower().IndexOf("values"));
                                     buf1 = buf1 + "VALUES ";
                                     StringBuilder Buffer = new StringBuilder(0, 1 * 1024 * 1024);
-                                    while (c < queries.Length)
+                                    while (counter < queries.Length)
                                     {
                                         if (Buffer.Length == 0)
                                         {
@@ -195,11 +195,11 @@ namespace Database
                                         }
 
                                         string part = string.Empty;
-                                        while (c < queries.Length)
+                                        while (counter < queries.Length)
                                         {
-                                            if (queries[c].Trim() != string.Empty)
+                                            if (queries[counter].Trim() != string.Empty)
                                             {
-                                                part = queries[c].Substring(queries[c].ToLower().IndexOf("values"));
+                                                part = queries[counter].Substring(queries[counter].ToLower().IndexOf("values"));
                                                 part = part.Substring(part.IndexOf("(")); // from '(' to end
                                                 part = part.Substring(0, part.Length - 1); // Remove ';'
                                                 if (Buffer.Length + 1 + part.Length > 1024 * 1000)
@@ -210,7 +210,7 @@ namespace Database
                                                     Buffer.Clear();
                                                     Buffer.Append(buf1);
                                                     string lp2 =
-                                                        Convert.ToInt32(Math.Floor((double)c / queries.Length * 100))
+                                                        Convert.ToInt32(Math.Floor((double)counter / queries.Length * 100))
                                                                .ToString();
                                                     if (lp2 != lastpercent)
                                                     {
@@ -224,7 +224,7 @@ namespace Database
                                                 Buffer.Append(part + ", ");
                                             }
 
-                                            c++;
+                                            counter++;
                                         }
 
                                         Buffer.Remove(Buffer.Length - 2, 2);
@@ -232,7 +232,7 @@ namespace Database
                                         conn.Execute(Buffer.ToString());
                                         Buffer.Clear();
                                         string lp =
-                                            Convert.ToInt32(Math.Floor((double)c / queries.Length * 100)).ToString();
+                                            Convert.ToInt32(Math.Floor((double)counter / queries.Length * 100)).ToString();
                                         if (lp != lastpercent)
                                         {
                                             Console.Write("\rTable " + fName.PadRight(67) + "[" + lp.PadLeft(3) + "%]");
