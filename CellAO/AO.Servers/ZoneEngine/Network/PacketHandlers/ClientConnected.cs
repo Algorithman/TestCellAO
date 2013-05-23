@@ -1,72 +1,79 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClientConnected.cs" company="CellAO Team">
-//   Copyright © 2005-2013 CellAO Team.
-//   
-//   All rights reserved.
-//   
-//   Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-//   
-//       * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//       * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-//       * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-//   
-//   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-//   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-//   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-//   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-//   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-//   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-//   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-//   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// </copyright>
-// <summary>
-//   Defines the ClientConnected type.
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿#region License
+
+// Copyright (c) 2005-2013, CellAO Team
+// 
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// 
+//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
 
 namespace ZoneEngine.PacketHandlers
 {
-    using System;
-    using System.ComponentModel.Composition;
-    using System.IO;
-    using System.Net;
-    using System.Text;
+    #region Usings ...
 
-    using AO.Core.Components;
+    using System.Text;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.CoreClient;
-    using ZoneEngine.GameObject;
     using ZoneEngine.Network.Packets;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public class ClientConnected
     {
         #region Public Methods and Operators
 
+        /// <summary>
+        /// </summary>
+        /// <param name="str">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static byte[] StrToByteArray(string str)
         {
             var encoding = new ASCIIEncoding();
             return encoding.GetBytes(str);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="charID">
+        /// </param>
+        /// <param name="client">
+        /// </param>
         public void Read(int charID, Client client)
         {
             // Don't edit anything in this region
             // unless you are 300% sure you know what you're doing
 
             // Character is created and read when Client connects in Client.cs->CreateCharacter
-            //client.CreateCharacter(charID);
-
+            // client.CreateCharacter(charID);
             client.Server.Info(
-                client,
-                "Client connected. ID: {0} IP: {1} Character name: {2}",
-                client.Character.Identity.Instance,
-                client.ClientAddress, client.Character.Name);
+                client, 
+                "Client connected. ID: {0} IP: {1} Character name: {2}", 
+                client.Character.Identity.Instance, 
+                client.ClientAddress, 
+                client.Character.Name);
 
             // now we have to start sending packets like 
             // character stats, inventory, playfield info
@@ -91,19 +98,19 @@ namespace ZoneEngine.PacketHandlers
             /* Action 167 Animation and Stance Data maybe? */
             var message = new CharacterActionMessage
                               {
-                                  Identity = identity,
-                                  Action = CharacterActionType.ChangeAnimationAndStance,
-                                  Target = Identity.None,
-                                  Parameter1 = 0x00000000,
+                                  Identity = identity, 
+                                  Action = CharacterActionType.ChangeAnimationAndStance, 
+                                  Target = Identity.None, 
+                                  Parameter1 = 0x00000000, 
                                   Parameter2 = 0x00000001
                               };
             client.SendCompressed(message);
 
             var gameTimeMessage = new GameTimeMessage
                                       {
-                                          Identity = identity,
-                                          Unknown1 = 30024.0f,
-                                          Unknown3 = 185408,
+                                          Identity = identity, 
+                                          Unknown1 = 30024.0f, 
+                                          Unknown3 = 185408, 
                                           Unknown4 = 80183.3125f
                                       };
             client.SendCompressed(gameTimeMessage);
@@ -160,16 +167,15 @@ namespace ZoneEngine.PacketHandlers
             // TODO: Implement VendorHandler
             // if (VendorHandler.GetNumberofVendorsinPlayfield(client.Character.PlayField) > 0)
             // {
-            //     Shops 
-            //     VendorHandler.GetVendorsInPF(client);
+            // Shops 
+            // VendorHandler.GetVendorsInPF(client);
             // }
 
             // WeaponItemFullCharUpdate  Maybe the right location , First Check if weapons present usually in equipment
             // Packets.WeaponItemFullUpdate.Send(client, client.Character);
-            
+
             // TODO: create a better alternative to ProcessTimers
             // client.Character.ProcessTimers(DateTime.Now + TimeSpan.FromMilliseconds(200));
-
             client.Character.CalculateSkills();
 
             AppearanceUpdate.AnnounceAppearanceUpdate(client.Character);

@@ -28,6 +28,7 @@ namespace ZoneEngine.CoreClient
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
@@ -143,6 +144,7 @@ namespace ZoneEngine.CoreClient
             {
                 return this.character;
             }
+
             set
             {
                 this.character = value;
@@ -196,14 +198,14 @@ namespace ZoneEngine.CoreClient
             Contract.Requires(messageBody != null);
             var message = new Message
                               {
-                                  Body = messageBody,
+                                  Body = messageBody, 
                                   Header =
                                       new Header
                                           {
-                                              MessageId = this.packetNumber,
-                                              PacketType = messageBody.PacketType,
-                                              Unknown = 0x0001,
-                                              Sender = 0x00000001,
+                                              MessageId = this.packetNumber, 
+                                              PacketType = messageBody.PacketType, 
+                                              Unknown = 0x0001, 
+                                              Sender = 0x00000001, 
                                               Receiver = this.character.Identity.Instance
                                           }
                               };
@@ -380,18 +382,18 @@ namespace ZoneEngine.CoreClient
         public void SendCompressed(MessageBody messageBody)
         {
 #if DEBUG
-            Console.WriteLine("Sending Message: " + messageBody.GetType().ToString());
+            Console.WriteLine("Sending Message: " + messageBody.GetType());
 #endif
             var message = new Message
                               {
-                                  Body = messageBody,
+                                  Body = messageBody, 
                                   Header =
                                       new Header
                                           {
-                                              MessageId = this.packetNumber,
-                                              PacketType = messageBody.PacketType,
-                                              Unknown = 0x0001,
-                                              Sender = 0x00000001,
+                                              MessageId = this.packetNumber, 
+                                              PacketType = messageBody.PacketType, 
+                                              Unknown = 0x0001, 
+                                              Sender = 0x00000001, 
                                               Receiver = this.character.Identity.Instance
                                           }
                               };
@@ -404,18 +406,28 @@ namespace ZoneEngine.CoreClient
             this.SendCompressed(buffer);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="charId">
+        /// </param>
+        /// <exception cref="Exception">
+        /// </exception>
         public void CreateCharacter(int charId)
         {
             this.character = new Character(new Identity { Type = IdentityType.CanbeAffected, Instance = charId }, this);
-            var daochar = new CharacterDao().GetById(charId);
+            IEnumerable<DBCharacter> daochar = new CharacterDao().GetById(charId);
             if (daochar.Count() == 0)
             {
                 throw new Exception("Character " + charId.ToString() + " not found.");
             }
+
             if (daochar.Count() > 1)
             {
-                throw new Exception(daochar.Count().ToString() + " Characters with id " + charId.ToString() + " found??? Check Database setup!");
+                throw new Exception(
+                    daochar.Count().ToString() + " Characters with id " + charId.ToString()
+                    + " found??? Check Database setup!");
             }
+
             DBCharacter character = daochar.First();
             this.character.Name = character.Name;
             this.character.LastName = character.LastName;
@@ -429,31 +441,33 @@ namespace ZoneEngine.CoreClient
             this.character.Heading.Y = character.HeadingY;
             this.character.Heading.Z = character.HeadingZ;
             this.character.Heading.W = character.HeadingW;
-            this.character.Playfield = server.PlayfieldById(character.Playfield);
+            this.character.Playfield = this.server.PlayfieldById(character.Playfield);
             this.Playfield = this.character.Playfield;
             this.Playfield.Entities.Add(this.character);
             this.character.Stats.ReadStatsfromSql();
-
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="messageBody">
+        /// </param>
         public void SendInitiateCompressionMessage(MessageBody messageBody)
         {
-
             // TODO: Investigate if reciever is a timestamp
             Contract.Requires(messageBody != null);
             var message = new Message
-            {
-                Body = messageBody,
-                Header =
-                    new Header
-                    {
-                        MessageId = 0xdfdf,
-                        PacketType = messageBody.PacketType,
-                        Unknown = 0x0001,
-                        Sender = 0x03000000,
-                        Receiver = this.character.Identity.Instance
-                    }
-            };
+                              {
+                                  Body = messageBody, 
+                                  Header =
+                                      new Header
+                                          {
+                                              MessageId = 0xdfdf, 
+                                              PacketType = messageBody.PacketType, 
+                                              Unknown = 0x0001, 
+                                              Sender = 0x03000000, 
+                                              Receiver = this.character.Identity.Instance
+                                          }
+                              };
             byte[] buffer = this.messageSerializer.Serialize(message);
 
 #if DEBUG

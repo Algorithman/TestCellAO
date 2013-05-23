@@ -47,10 +47,6 @@ namespace ZoneEngine
         /// </summary>
         /// <param name="messageBody">
         /// </param>
-        /// <param name="receiver">
-        /// </param>
-        /// <param name="announceToPlayfield">
-        /// </param>
         void SendCompressed(MessageBody messageBody);
     }
 
@@ -62,10 +58,6 @@ namespace ZoneEngine
         /// <summary>
         /// </summary>
         /// <param name="messageBody">
-        /// </param>
-        /// <param name="receiver">
-        /// </param>
-        /// <param name="announceToPlayfield">
         /// </param>
         public void SendCompressed(MessageBody messageBody)
         {

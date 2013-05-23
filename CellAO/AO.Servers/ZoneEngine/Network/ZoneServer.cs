@@ -37,6 +37,8 @@ namespace ZoneEngine.Network
 
     using Cell.Core;
 
+    using Database;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.Component;
@@ -94,15 +96,20 @@ namespace ZoneEngine.Network
         {
             this.clientFactory = clientfactory;
             this.workers = new List<PlayfieldWorkerHolder>();
-            this.ClientDisconnected +=ZoneServer_ClientDisconnected;
+            this.ClientDisconnected += this.ZoneServer_ClientDisconnected;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
+        /// <param name="forced">
+        /// </param>
         private void ZoneServer_ClientDisconnected(IClient client, bool forced)
         {
             var cl = (Client)client;
-            Database.Misc.LogOffCharacter(cl.Character.Identity.Instance);
+            Misc.LogOffCharacter(cl.Character.Identity.Instance);
         }
-
 
         #endregion
 
@@ -237,7 +244,6 @@ namespace ZoneEngine.Network
         /// </summary>
         /// <param name="playfieldNumber">
         /// </param>
-        // TODO: Needs to be changed to full Identity for Playfield number for instanced Playfields
         public void CreatePlayfield(int playfieldNumber)
         {
             foreach (PlayfieldInfo playfieldInfo in Playfields.Instance.playfields)
@@ -283,6 +289,12 @@ namespace ZoneEngine.Network
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="id">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public IPlayfield PlayfieldById(int id)
         {
             // TODO: This needs to be changed to check for whole Identity
@@ -293,6 +305,7 @@ namespace ZoneEngine.Network
                     return pf;
                 }
             }
+
             this.CreatePlayfield(id);
             return this.PlayfieldById(id);
         }

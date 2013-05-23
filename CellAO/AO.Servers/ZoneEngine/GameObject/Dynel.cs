@@ -68,6 +68,7 @@ namespace ZoneEngine.GameObject
         public Dynel()
         {
             this.stats = new DynelStats(this);
+
             // TODO: get correct playfield and set it
             // this.playfield = new Identity();
         }

@@ -62,10 +62,11 @@ namespace ZoneEngine.Script
         public static bool CheckArgumentHelper(List<Type> typeList, string[] args)
         {
             // Return false if number of args dont match (first argument is Command, so it doesnt count)
-            if ((args==null) || (typeList==null))
+            if ((args == null) || (typeList == null))
             {
                 return false;
             }
+
             if (args.Length - 1 != typeList.Count)
             {
                 return false;

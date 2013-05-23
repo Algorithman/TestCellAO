@@ -61,13 +61,17 @@ namespace ZoneEngine.GameObject.Items
             this.Items = new List<AOItem>();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public List<AOItem> GetLoot()
         {
-            if (Items == null)
+            if (this.Items == null)
             {
                 Random probability = new Random((int)DateTime.Now.Ticks);
                 List<AOItem> temp = new List<AOItem>();
-                foreach (LootTableEntry lootTableEntry in LootTableEntries)
+                foreach (LootTableEntry lootTableEntry in this.LootTableEntries)
                 {
                     if (probability.Next() < lootTableEntry.DropRate)
                     {
@@ -78,9 +82,11 @@ namespace ZoneEngine.GameObject.Items
                         temp.Add(ItemHandler.interpolate(lootTableEntry.LowID, lootTableEntry.HighID, QL));
                     }
                 }
-                Items = temp;
+
+                this.Items = temp;
             }
-            return Items;
+
+            return this.Items;
         }
 
         #endregion
@@ -98,7 +104,7 @@ namespace ZoneEngine.GameObject.Items
             // Get access to DB/or file and read the appropriate stuff for the hash
             // Either a AOItem with QL Range (LootTableEntry), or a Hash Group (which lets AddByHash call itself again)
             Contract.Requires(hash != null);
-            Contract.Requires(hash != "");
+            Contract.Requires(hash != string.Empty);
             throw new NotImplementedException("LootTable.AddByHash");
         }
 

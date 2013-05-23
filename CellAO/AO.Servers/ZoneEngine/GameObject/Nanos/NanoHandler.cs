@@ -85,10 +85,8 @@ namespace ZoneEngine.GameObject.Nanos
                 }
                 catch (Exception)
                 {
-
                     throw;
                 }
-
 
                 Console.Write(
                     "Loaded {0} Nanos in {1}\r", 
@@ -140,10 +138,8 @@ namespace ZoneEngine.GameObject.Nanos
                 }
                 catch (Exception)
                 {
-                    
                     throw;
                 }
-
 
                 Console.Write(
                     "Loaded {0} nanos in {1}\r", 
@@ -166,6 +162,7 @@ namespace ZoneEngine.GameObject.Nanos
             {
                 throw new ArgumentNullException("input", "Input Stream must not be null");
             }
+
             if (output == null)
             {
                 throw new ArgumentNullException("output", "Output Stream must not be null");

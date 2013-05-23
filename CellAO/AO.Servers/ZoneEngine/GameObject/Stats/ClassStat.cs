@@ -33,6 +33,7 @@ namespace ZoneEngine.GameObject.Stats
     using System.Linq;
 
     using AO.Core;
+
     using Database;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -12438,7 +12439,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         public void SetStatValueByName(string statName, uint newValue)
         {
-            Contract.Requires(statName != null); 
+            Contract.Requires(statName != null);
             int statid = StatsList.GetStatId(statName.ToLower());
             foreach (ClassStat c in this.all)
             {
@@ -12489,7 +12490,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </exception>
         public int StatIdByName(string statName)
         {
-            Contract.Requires(statName != null); 
+            Contract.Requires(statName != null);
             int statid = StatsList.GetStatId(statName.ToLower());
             foreach (ClassStat c in this.all)
             {
@@ -12539,7 +12540,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </returns>
         public int StatValueByName(string name)
         {
-            Contract.Requires(name != null); 
+            Contract.Requires(name != null);
             int statid = StatsList.GetStatId(name.ToLower());
             foreach (ClassStat c in this.all)
             {

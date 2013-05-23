@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -22,11 +23,10 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-#region Using
-#endregion
-
 namespace ZoneEngine.GameObject.Playfields
 {
+    #region Usings ...
+
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -34,14 +34,27 @@ namespace ZoneEngine.GameObject.Playfields
     using System.Xml;
     using System.Xml.Serialization;
 
+    #endregion
+
     #region DistrictInfo Class
+
+    /// <summary>
+    /// </summary>
     public class DistrictInfo
     {
         #region Constructor
+
         #endregion
 
         #region XML
+
         // Generally this shouldn't be used outside of the static constructor
+        /// <summary>
+        /// </summary>
+        /// <param name="fileName">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static List<DistrictInfo> LoadXML(string fileName)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(List<DistrictInfo>), new XmlRootAttribute("Districts"));
@@ -52,11 +65,17 @@ namespace ZoneEngine.GameObject.Playfields
         }
 
         // This really should only be used for development. Included for completeness.
+        /// <summary>
+        /// </summary>
+        /// <param name="fileName">
+        /// </param>
+        /// <param name="pfInfo">
+        /// </param>
         public static void DumpXML(string fileName, PlayfieldInfo pfInfo)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(List<DistrictInfo>), new XmlRootAttribute("Districts"));
             XmlSerializerNamespaces xsn = new XmlSerializerNamespaces();
-            xsn.Add(String.Empty, String.Empty);
+            xsn.Add(string.Empty, string.Empty);
             MemoryStream stream = new MemoryStream();
             serializer.Serialize(stream, pfInfo.districts, xsn);
             XmlDocument xmlDoc = new XmlDocument();
@@ -66,6 +85,12 @@ namespace ZoneEngine.GameObject.Playfields
             xmlDoc.Save(fileName);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="pf">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static List<DistrictInfo> LoadDistricts(int pf)
         {
             string fileName = Path.Combine("XML Data", "Districts");
@@ -79,23 +104,34 @@ namespace ZoneEngine.GameObject.Playfields
                 return new List<DistrictInfo>();
             }
         }
+
         #endregion
 
+        /// <summary>
+        /// </summary>
         [XmlElement("Name")]
         public string districtName = "Nameless District";
 
+        /// <summary>
+        /// </summary>
         [XmlAttribute("MinLevel")]
         public int minLevel;
 
+        /// <summary>
+        /// </summary>
         [XmlAttribute("MaxLevel")]
         public int maxLevel;
 
+        /// <summary>
+        /// </summary>
         [XmlAttribute("SuppressionGas")]
         public int suppressionGas = 100;
     }
+
     #endregion
 
     #region PlayfieldInfo Class
+
     /// <summary>
     /// Class to hold information about Playfields
     /// </summary>
@@ -107,8 +143,8 @@ namespace ZoneEngine.GameObject.Playfields
          * playfield, currently spawned monsters and their locations, etc
          * 
          */
-
         #region Constructor
+
         #endregion
 
         /// <summary>
@@ -121,6 +157,7 @@ namespace ZoneEngine.GameObject.Playfields
             {
                 return this._id;
             }
+
             set
             {
                 this._id = value;
@@ -129,6 +166,8 @@ namespace ZoneEngine.GameObject.Playfields
             }
         }
 
+        /// <summary>
+        /// </summary>
         private int _id;
 
         /// <summary>
@@ -160,7 +199,7 @@ namespace ZoneEngine.GameObject.Playfields
         /// Scale X
         /// </summary>
         [XmlAttribute("xscale")]
-        public Single xscale = 1.0f;
+        public float xscale = 1.0f;
 
         /// <summary>
         /// Playfield Z coordinate
@@ -172,40 +211,57 @@ namespace ZoneEngine.GameObject.Playfields
         /// Scale Z
         /// </summary>
         [XmlAttribute("zscale")]
-        public Single zscale = 1.0f;
+        public float zscale = 1.0f;
 
         /// <summary>
         /// DistrictInfo
         /// </summary>
-        //[XmlElement("District")]
+        // [XmlElement("District")]
         [XmlIgnore]
         public List<DistrictInfo> districts;
     }
+
     #endregion
 
     #region Playfields Class
+
     /// <summary>
     /// 
     /// </summary>
     [XmlRoot("Playfields")]
     public class Playfields
     {
+        /// <summary>
+        /// </summary>
         [XmlIgnore]
         public static readonly Playfields Instance;
 
         #region Constructors
+
+        /// <summary>
+        /// </summary>
         private Playfields()
         {
         }
 
+        /// <summary>
+        /// </summary>
         static Playfields()
         {
             Instance = LoadXml(Path.Combine("XML Data", "Playfields.xml"));
         }
+
         #endregion
 
         #region XML
+
         // Generally this shouldn't be used outside of the static constructor
+        /// <summary>
+        /// </summary>
+        /// <param name="fileName">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static Playfields LoadXml(string fileName)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(Playfields));
@@ -216,15 +272,20 @@ namespace ZoneEngine.GameObject.Playfields
         }
 
         // This really should only be used for development. Included for completeness.
+        /// <summary>
+        /// </summary>
+        /// <param name="fileName">
+        /// </param>
         public static void DumpXml(string fileName)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(Playfields));
             XmlSerializerNamespaces xsn = new XmlSerializerNamespaces();
-            xsn.Add(String.Empty, String.Empty);
+            xsn.Add(string.Empty, string.Empty);
             TextWriter writer = new StreamWriter(fileName);
             serializer.Serialize(writer, Instance, xsn);
             writer.Close();
         }
+
         #endregion
 
         /// <summary>
@@ -234,10 +295,11 @@ namespace ZoneEngine.GameObject.Playfields
         public List<PlayfieldInfo> playfields;
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="playfieldName"></param>
-        /// <returns></returns>
+        /// <param name="playfieldName">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static int PlayfieldNameToPlayfieldId(string playfieldName)
         {
             foreach (PlayfieldInfo pfInfo in Instance.playfields)
@@ -252,10 +314,11 @@ namespace ZoneEngine.GameObject.Playfields
         }
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="playfieldId"></param>
-        /// <returns></returns>
+        /// <param name="playfieldId">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static string PlayfieldIdToPlayfieldName(int playfieldId)
         {
             foreach (PlayfieldInfo pfInfo in Instance.playfields)
@@ -270,10 +333,11 @@ namespace ZoneEngine.GameObject.Playfields
         }
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="playfieldId"></param>
-        /// <returns></returns>
+        /// <param name="playfieldId">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static bool ValidPlayfield(int playfieldId)
         {
             foreach (PlayfieldInfo pfInfo in Instance.playfields)
@@ -288,10 +352,11 @@ namespace ZoneEngine.GameObject.Playfields
         }
 
         /// <summary>
-        /// 
         /// </summary>
-        /// <param name="playfieldName"></param>
-        /// <returns></returns>
+        /// <param name="playfieldName">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static bool ValidPlayfield(string playfieldName)
         {
             foreach (PlayfieldInfo pfInfo in Instance.playfields)
@@ -306,6 +371,13 @@ namespace ZoneEngine.GameObject.Playfields
         }
 
         #region GetPlayfield Coords (needed for playfieldanarchyf packet)
+
+        /// <summary>
+        /// </summary>
+        /// <param name="playfieldNumber">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static int GetPlayfieldX(int playfieldNumber)
         {
             foreach (PlayfieldInfo pfInfo in Instance.playfields)
@@ -319,6 +391,12 @@ namespace ZoneEngine.GameObject.Playfields
             return 100000;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="playfieldNumber">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static int GetPlayfieldZ(int playfieldNumber)
         {
             foreach (PlayfieldInfo pfInfo in Instance.playfields)
@@ -331,7 +409,9 @@ namespace ZoneEngine.GameObject.Playfields
 
             return 100000;
         }
+
         #endregion
     }
+
     #endregion
 }

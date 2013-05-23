@@ -32,7 +32,6 @@ namespace ZoneEngine.GameObject.Misc
 
     using AO.Core;
 
-    using ZoneEngine.GameObject;
     #endregion
 
     /// <summary>
@@ -67,10 +66,12 @@ namespace ZoneEngine.GameObject.Misc
             }
         }
 
+        /// <summary>
+        /// </summary>
         public void Clear()
         {
-            mesh.Clear();
-            meshOverride.Clear();
+            this.mesh.Clear();
+            this.meshOverride.Clear();
         }
 
         /// <summary>

@@ -46,7 +46,12 @@ namespace ZoneEngine.GameObject
         /// </summary>
         IPlayfield Playfield { get; set; }
 
+        /// <summary>
+        /// </summary>
         Vector3 Coordinates { get; set; }
+
+        /// <summary>
+        /// </summary>
         Quaternion Heading { get; set; }
 
         #endregion
@@ -87,6 +92,8 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        /// <summary>
+        /// </summary>
         public Vector3 Coordinates
         {
             get
@@ -94,12 +101,15 @@ namespace ZoneEngine.GameObject
                 Contract.Ensures(Contract.Result<Vector3>() != null);
                 return default(Vector3);
             }
+
             set
             {
                 Contract.Requires(value != null);
             }
         }
 
+        /// <summary>
+        /// </summary>
         public Quaternion Heading
         {
             get
@@ -107,6 +117,7 @@ namespace ZoneEngine.GameObject
                 Contract.Ensures(Contract.Result<Quaternion>() != null);
                 return default(Quaternion);
             }
+
             set
             {
                 Contract.Requires(value != null);

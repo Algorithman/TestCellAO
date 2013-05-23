@@ -1,34 +1,32 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Stat.cs" company="CellAO Team">
-//   Copyright © 2005-2013 CellAO Team.
-//   
-//   All rights reserved.
-//   
-//   Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-//   
-//       * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//       * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-//       * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-//   
-//   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-//   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-//   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-//   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-//   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-//   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-//   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-//   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// </copyright>
-// <summary>
-//   Set/Get clients stat
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿#region License
+
+// Copyright (c) 2005-2013, CellAO Team
+// 
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// 
+//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
 
 namespace ZoneEngine.Network.Packets
 {
+    #region Usings ...
+
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -39,6 +37,8 @@ namespace ZoneEngine.Network.Packets
     using ZoneEngine.CoreClient;
     using ZoneEngine.GameObject;
 
+    #endregion
+
     /// <summary>
     ///     Set/Get clients stat
     /// </summary>
@@ -46,16 +46,36 @@ namespace ZoneEngine.Network.Packets
     {
         #region Public Methods and Operators
 
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
+        /// <param name="stat">
+        /// </param>
+        /// <param name="value">
+        /// </param>
+        /// <param name="announce">
+        /// </param>
         public static void Send(Client client, int stat, int value, bool announce)
         {
             Send(client, stat, (UInt32)value, announce);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
+        /// <param name="stat">
+        /// </param>
+        /// <param name="value">
+        /// </param>
+        /// <param name="announce">
+        /// </param>
         public static void Send(Client client, int stat, uint value, bool announce)
         {
             var message = new StatMessage
                               {
-                                  Identity = client.Character.Identity,
+                                  Identity = client.Character.Identity, 
                                   Stats =
                                       new[]
                                           {
@@ -77,6 +97,12 @@ namespace ZoneEngine.Network.Packets
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="ch">
+        /// </param>
+        /// <param name="statsToUpdate">
+        /// </param>
         public static void SendBulk(Character ch, Dictionary<int, uint> statsToUpdate)
         {
             if (statsToUpdate.Count == 0)
@@ -85,7 +111,7 @@ namespace ZoneEngine.Network.Packets
             }
 
             var toPlayfield = new List<int>();
-            foreach (var keyValuePair in statsToUpdate)
+            foreach (KeyValuePair<int, uint> keyValuePair in statsToUpdate)
             {
                 if (ch.Stats.GetStatbyNumber(keyValuePair.Key).AnnounceToPlayfield)
                 {
@@ -94,14 +120,14 @@ namespace ZoneEngine.Network.Packets
             }
 
             var stats = new List<GameTuple<CharacterStat, uint>>();
-            foreach (var keyValuePair in statsToUpdate)
+            foreach (KeyValuePair<int, uint> keyValuePair in statsToUpdate)
             {
                 if (toPlayfield.Contains(keyValuePair.Key))
                 {
                     stats.Add(
                         new GameTuple<CharacterStat, uint>
                             {
-                                Value1 = (CharacterStat)keyValuePair.Key,
+                                Value1 = (CharacterStat)keyValuePair.Key, 
                                 Value2 = keyValuePair.Value
                             });
                 }
@@ -113,15 +139,17 @@ namespace ZoneEngine.Network.Packets
                 return;
             }
 
-            var message = new StatMessage
-                              {
-                                  Identity = ch.Identity,
-                                  Stats = stats.ToArray()
-                              };
+            var message = new StatMessage { Identity = ch.Identity, Stats = stats.ToArray() };
 
             ch.Playfield.AnnounceOthers(message, ch.Identity);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
+        /// <param name="statsToUpdate">
+        /// </param>
         public static void SendBulk(Client client, Dictionary<int, uint> statsToUpdate)
         {
             if (statsToUpdate.Count == 0)
@@ -130,7 +158,7 @@ namespace ZoneEngine.Network.Packets
             }
 
             var toPlayfieldIds = new List<int>();
-            foreach (var keyValuePair in statsToUpdate)
+            foreach (KeyValuePair<int, uint> keyValuePair in statsToUpdate)
             {
                 if (client.Character.Stats.GetStatbyNumber(keyValuePair.Key).AnnounceToPlayfield)
                 {
@@ -141,11 +169,11 @@ namespace ZoneEngine.Network.Packets
             var toPlayfield = new List<GameTuple<CharacterStat, uint>>();
             var toClient = new List<GameTuple<CharacterStat, uint>>();
 
-            foreach (var keyValuePair in statsToUpdate)
+            foreach (KeyValuePair<int, uint> keyValuePair in statsToUpdate)
             {
                 var statValue = new GameTuple<CharacterStat, uint>
                                     {
-                                        Value1 = (CharacterStat)keyValuePair.Key,
+                                        Value1 = (CharacterStat)keyValuePair.Key, 
                                         Value2 = keyValuePair.Value
                                     };
                 toClient.Add(statValue);
@@ -156,11 +184,7 @@ namespace ZoneEngine.Network.Packets
                 }
             }
 
-            var message = new StatMessage
-                              {
-                                  Identity = client.Character.Identity,
-                                  Stats = toClient.ToArray()
-                              };
+            var message = new StatMessage { Identity = client.Character.Identity, Stats = toClient.ToArray() };
 
             client.SendCompressed(message);
 

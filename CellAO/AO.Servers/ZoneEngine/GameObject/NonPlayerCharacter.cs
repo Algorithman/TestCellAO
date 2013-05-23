@@ -27,7 +27,6 @@ namespace ZoneEngine.GameObject
 {
     #region Usings ...
 
-    using System;
     using System.Collections.Generic;
 
     #endregion
@@ -38,28 +37,22 @@ namespace ZoneEngine.GameObject
     {
         #region Public Properties
 
-        private string name;
+        /// <summary>
+        /// </summary>
+        public string Name { get; set; }
 
         /// <summary>
         /// </summary>
-        public string Name
-        {
-            get
-            {
-                return this.name;
-            }
-
-            set
-            {
-                this.name = value;
-            }
-        }
-
         public string FirstName { get; set; }
 
+        /// <summary>
+        /// </summary>
         public string LastName { get; set; }
 
+        /// <summary>
+        /// </summary>
         private IList<Pet> pets;
+
         /// <summary>
         /// </summary>
         public IList<Pet> Pets

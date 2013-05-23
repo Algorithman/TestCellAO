@@ -57,27 +57,19 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        /// <summary>
+        /// </summary>
         public string FirstName { get; set; }
 
+        /// <summary>
+        /// </summary>
         public string LastName { get; set; }
 
-        private IPlayfield playfield;
         /// <summary>
         /// </summary>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public IPlayfield Playfield
-        {
-            get
-            {
-                return this.playfield;
-            }
-
-            set
-            {
-                this.playfield = value;
-            }
-        }
+        public IPlayfield Playfield { get; set; }
 
         /// <summary>
         /// </summary>

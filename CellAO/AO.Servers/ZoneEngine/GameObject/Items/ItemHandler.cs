@@ -84,13 +84,12 @@ namespace ZoneEngine.Gameobject.Items
                     {
                         break;
                     }
-
                 }
                 catch (Exception)
                 {
                     throw;
                 }
-                    
+
                 Console.Write(
                     "Loaded {0} items in {1}\r", 
                     new object[] { ItemList.Count, new DateTime((DateTime.UtcNow - _now).Ticks).ToString("mm:ss.ff") });
@@ -138,7 +137,6 @@ namespace ZoneEngine.Gameobject.Items
                     {
                         break;
                     }
-
                 }
                 catch (Exception)
                 {
@@ -166,10 +164,12 @@ namespace ZoneEngine.Gameobject.Items
             {
                 throw new ArgumentNullException("input", "Input Stream must not be null");
             }
+
             if (output == null)
             {
                 throw new ArgumentNullException("output", "Output Stream must not be null");
             }
+
             byte[] buffer = new byte[2097152];
             int len;
             while ((len = input.Read(buffer, 0, 2097152)) > 0)

@@ -92,7 +92,8 @@ namespace ZoneEngine.Network.InternalBus
         /// </param>
         public void Add(int milliseconds, object obj)
         {
-            this.TimerList.Add(new PlayfieldTimedListEntry(DateTime.UtcNow + TimeSpan.FromMilliseconds(milliseconds), obj));
+            this.TimerList.Add(
+                new PlayfieldTimedListEntry(DateTime.UtcNow + TimeSpan.FromMilliseconds(milliseconds), obj));
         }
 
         /// <summary>
@@ -125,9 +126,13 @@ namespace ZoneEngine.Network.InternalBus
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public int Count()
         {
-            return TimerList.Count;
+            return this.TimerList.Count;
         }
 
         /// <summary>

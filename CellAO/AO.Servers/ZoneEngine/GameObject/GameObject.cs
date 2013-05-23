@@ -53,6 +53,7 @@ namespace ZoneEngine.GameObject
             {
                 return this.identity;
             }
+
             set
             {
                 this.identity = value;
@@ -65,7 +66,6 @@ namespace ZoneEngine.GameObject
         {
             this.identity = new Identity();
         }
-
 
         #endregion
     }

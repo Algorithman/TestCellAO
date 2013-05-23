@@ -117,21 +117,17 @@ namespace LoginEngine
         /// </exception>
         private static void Main(string[] args)
         {
-            
-
             LogUtil.SetupConsoleLogging(LogLevel.Debug);
             LogUtil.SetupFileLogging("${basedir}/LoginEngineLog.txt", LogLevel.Trace);
 
             
-
-            #region NBug Setup
 
             SettingsOverride.LoadCustomSettings("NBug.LoginEngine.Config");
             Settings.WriteLogToDisk = true;
             AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
             TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
 
-            #endregion
+            
 
             Console.Title = "CellAO " + AssemblyInfoclass.Title + " Console. Version: " + AssemblyInfoclass.Description
                             + " " + AssemblyInfoclass.AssemblyVersion + " " + AssemblyInfoclass.Trademark;
@@ -461,6 +457,7 @@ namespace LoginEngine
                             {
                                 updt.SqlUpdate(sql);
                             }
+                                
                                 
                                 // yeah this part here, some kind of exception handling for mysql errors
                             catch

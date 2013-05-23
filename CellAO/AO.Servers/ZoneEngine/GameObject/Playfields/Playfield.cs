@@ -41,7 +41,6 @@ namespace ZoneEngine.GameObject.Playfields
 
     using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Items;
-    using ZoneEngine.Network.InternalBus.Events;
     using ZoneEngine.Network.InternalBus.InternalMessages;
 
     #endregion
@@ -209,9 +208,15 @@ namespace ZoneEngine.GameObject.Playfields
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="messageBody">
+        /// </param>
+        /// <param name="dontSend">
+        /// </param>
         public void AnnounceOthers(MessageBody messageBody, Identity dontSend)
         {
-            foreach (IInstancedEntity entity in Entities)
+            foreach (IInstancedEntity entity in this.Entities)
             {
                 var character = entity as Character;
                 if (character != null)
@@ -237,37 +242,39 @@ namespace ZoneEngine.GameObject.Playfields
             }
         }
 
-        private MemBus.IBus playfieldBus;
+        /// <summary>
+        /// </summary>
+        private readonly IBus playfieldBus;
 
-        private DisposeContainer memBusDisposeContainer = new DisposeContainer();
-
+        /// <summary>
+        /// </summary>
+        private readonly DisposeContainer memBusDisposeContainer = new DisposeContainer();
 
         /// <summary>
         /// </summary>
         public Playfield()
         {
-            playfieldBus = BusSetup.StartWith<Conservative>().Construct();
-            memBusDisposeContainer.Add(playfieldBus.Subscribe<InternalMessage>(this.HandlePlayfieldMessage));
-            Entities = new HashSet<IInstancedEntity>();
+            this.playfieldBus = BusSetup.StartWith<Conservative>().Construct();
+            this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<InternalMessage>(this.HandlePlayfieldMessage));
+            this.Entities = new HashSet<IInstancedEntity>();
         }
 
         /// <summary>
         /// </summary>
-        /// <param name="server">
-        /// </param>
-        /// <param name="bus">
-        /// </param>
         /// <param name="playfieldIdentity">
         /// </param>
-        public Playfield(Identity playfieldIdentity) : this()
+        public Playfield(Identity playfieldIdentity)
+            : this()
         {
             this.Identity = playfieldIdentity;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="message">
+        /// </param>
         public void HandlePlayfieldMessage(InternalMessage message)
         {
-        
-        
         }
     }
 }

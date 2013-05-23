@@ -37,6 +37,8 @@ namespace ZoneEngine
     using AO.Core.Components;
     using AO.Core.Logger;
 
+    using Database;
+
     using MySql.Data.MySqlClient;
 
     using NBug;
@@ -91,8 +93,7 @@ namespace ZoneEngine
 
                 // Log off all characters
                 // TODO: make it playfield dependent
-
-                Database.Misc.LogOffAll();
+                Misc.LogOffAll();
 
                 /* TODO: Readd the things, Algorithman
                 zoneServer.Monsters = new List<NonPlayerCharacterClass>();
@@ -119,7 +120,8 @@ namespace ZoneEngine
                  */
                 Console.WriteLine("Loaded {0} items", ItemHandler.CacheAllItems());
                 Console.WriteLine("Loaded {0} nanos", NanoHandler.CacheAllNanos());
-                //Console.WriteLine("Creaated {0} playfields", zoneServer.CreatePlayfields());
+
+                // Console.WriteLine("Creaated {0} playfields", zoneServer.CreatePlayfields());
 
                 /*
                 Console.WriteLine("Loaded {0} spawns", NonPlayerCharacterHandler.CacheAllFromDB());
@@ -164,10 +166,12 @@ namespace ZoneEngine
         {
             bool processedargs = false;
 
-            #region Logger setup
+            
+
             LogUtil.SetupConsoleLogging(LogLevel.Debug);
             LogUtil.SetupFileLogging("${basedir}/ZoneEngineLog.txt", LogLevel.Trace);
-            #endregion
+
+            
 
             #region NBug Setup
 

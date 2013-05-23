@@ -58,12 +58,18 @@ namespace ZoneEngine.GameObject.Items
         /// </summary>
         public bool IsFull { get; private set; }
 
+        /// <summary>
+        /// </summary>
         public BaseInventory()
         {
             this.Content = new SortedDictionary<int, AOItem>();
             this.MaxSlots = 0;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="owner">
+        /// </param>
         public BaseInventory(IItemContainer owner)
             : this()
         {

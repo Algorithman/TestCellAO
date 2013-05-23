@@ -46,7 +46,13 @@ namespace ZoneEngine.GameObject
         /// <summary>
         /// </summary>
         string Name { get; set; }
+
+        /// <summary>
+        /// </summary>
         string FirstName { get; set; }
+
+        /// <summary>
+        /// </summary>
         string LastName { get; set; }
 
         #endregion
@@ -65,22 +71,32 @@ namespace ZoneEngine.GameObject
         /// </summary>
         public IPlayfield Playfield { get; set; }
 
+        /// <summary>
+        /// </summary>
         public Vector3 Coordinates
         {
             get
             {
                 return default(Vector3);
             }
-            set { }
+
+            set
+            {
+            }
         }
 
+        /// <summary>
+        /// </summary>
         public Quaternion Heading
         {
             get
             {
                 return default(Quaternion);
             }
-            set { }
+
+            set
+            {
+            }
         }
 
         /// <summary>
@@ -94,33 +110,43 @@ namespace ZoneEngine.GameObject
             get
             {
                 Contract.Ensures(Contract.Result<string>() != null);
-                Contract.Ensures(Contract.Result<string>() != "");
+                Contract.Ensures(Contract.Result<string>() != string.Empty);
                 return default(string);
             }
 
             set
             {
                 Contract.Requires(value != null);
-                Contract.Requires(value != "");
+                Contract.Requires(value != string.Empty);
             }
         }
 
+        /// <summary>
+        /// </summary>
         public string FirstName
         {
             get
             {
                 return default(string);
             }
-            set { }
+
+            set
+            {
+            }
         }
 
+        /// <summary>
+        /// </summary>
         public string LastName
         {
             get
             {
                 return default(string);
             }
-            set { }
+
+            set
+            {
+            }
         }
     }
 }

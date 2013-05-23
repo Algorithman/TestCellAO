@@ -1,34 +1,32 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FullCharacter.cs" company="CellAO Team">
-//   Copyright © 2005-2013 CellAO Team.
-//   
-//   All rights reserved.
-//   
-//   Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-//   
-//       * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//       * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-//       * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-//   
-//   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-//   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-//   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-//   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-//   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-//   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-//   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-//   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// </copyright>
-// <summary>
-//   Defines the FullCharacter type.
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿#region License
+
+// Copyright (c) 2005-2013, CellAO Team
+// 
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// 
+//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
 
 namespace ZoneEngine.Network.Packets
 {
+    #region Usings ...
+
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -38,34 +36,44 @@ namespace ZoneEngine.Network.Packets
 
     using ZoneEngine.CoreClient;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public static class FullCharacter
     {
         #region Public Methods and Operators
 
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
         public static void Send(Client client)
         {
             var fc = new FullCharacterMessage { Identity = client.Character.Identity, Unknown1 = 25 };
 
             /* part 1 of data */
-            var inventory = from ie in client.Character.BaseInventory.Content
-                            let item = ie.Value
-                            select
-                                new InventorySlot
-                                    {
-                                        Placement = ie.Key, 
-                                        Flags = (short)item.Flags, 
-                                        Count = (short)item.MultipleCount, 
-                                        Identity = 
-                                            new Identity
-                                                {
-                                                    Type = (IdentityType)item.Type, 
-                                                    Instance = item.Instance
-                                                }, 
-                                        ItemLowId = item.LowID, 
-                                        ItemHighId = item.HighID, 
-                                        Quality = item.Quality, 
-                                        Unknown = item.Nothing
-                                    };
+            IEnumerable<InventorySlot> inventory = from ie in client.Character.BaseInventory.Content
+                                                   let item = ie.Value
+                                                   select
+                                                       new InventorySlot
+                                                           {
+                                                               Placement = ie.Key, 
+                                                               Flags = (short)item.Flags, 
+                                                               Count = (short)item.MultipleCount, 
+                                                               Identity =
+                                                                   new Identity
+                                                                       {
+                                                                           Type =
+                                                                               (IdentityType)
+                                                                               item.Type, 
+                                                                           Instance = item.Instance
+                                                                       }, 
+                                                               ItemLowId = item.LowID, 
+                                                               ItemHighId = item.HighID, 
+                                                               Quality = item.Quality, 
+                                                               Unknown = item.Nothing
+                                                           };
             fc.InventorySlots = inventory.ToArray();
 
             /* part 2 of data */
@@ -75,8 +83,6 @@ namespace ZoneEngine.Network.Packets
             /* part 3 of data */
             /* number of entries */
             fc.Unknown2 = new object[0];
-
-            
 
             /* No idea what these are */
             /* used to be skill locks + some unknown data */
@@ -90,8 +96,6 @@ namespace ZoneEngine.Network.Packets
             fc.Unknown8 = 0;
 
             
-
-            #region Data06 (Stats 1) (32bit - 32bit)
 
             /* part 6 of data (1-st stats block) */
 
@@ -296,7 +300,7 @@ namespace ZoneEngine.Network.Packets
 
             fc.Stats1 = stats1.ToArray();
 
-            #endregion
+            
 
             #region Data07 (Stats 2) (32bit - 32bit)
 
@@ -863,6 +867,14 @@ namespace ZoneEngine.Network.Packets
 
         #region Methods
 
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
+        /// <param name="list">
+        /// </param>
+        /// <param name="statId">
+        /// </param>
         private static void AddStat3232(Client client, IList<GameTuple<int, uint>> list, int statId)
         {
             var tuple = new GameTuple<int, uint>
@@ -874,6 +886,14 @@ namespace ZoneEngine.Network.Packets
             list.Add(tuple);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
+        /// <param name="list">
+        /// </param>
+        /// <param name="statId">
+        /// </param>
         private static void AddStat816(Client client, IList<GameTuple<byte, short>> list, int statId)
         {
             if (statId > 255)
@@ -890,6 +910,14 @@ namespace ZoneEngine.Network.Packets
             list.Add(tuple);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
+        /// <param name="list">
+        /// </param>
+        /// <param name="statId">
+        /// </param>
         private static void AddStat88(Client client, IList<GameTuple<byte, byte>> list, int statId)
         {
             if (statId > 255)

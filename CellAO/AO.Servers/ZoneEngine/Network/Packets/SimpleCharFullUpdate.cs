@@ -1,38 +1,35 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SimpleCharFullUpdate.cs" company="CellAO Team">
-//   Copyright © 2005-2013 CellAO Team.
-//   
-//   All rights reserved.
-//   
-//   Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-//   
-//       * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//       * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-//       * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-//   
-//   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-//   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-//   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-//   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-//   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-//   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-//   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-//   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// </copyright>
-// <summary>
-//   Defines the SimpleCharFullUpdate type.
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿#region License
+
+// Copyright (c) 2005-2013, CellAO Team
+// 
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// 
+//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
 
 namespace ZoneEngine.Network.Packets
 {
+    #region Usings ...
+
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
 
     using AO.Core;
 
@@ -42,16 +39,24 @@ namespace ZoneEngine.Network.Packets
     using ZoneEngine.CoreClient;
     using ZoneEngine.GameObject;
     using ZoneEngine.GameObject.Misc;
-    using ZoneEngine.GameObject.Nanos;
 
-    using Identity = SmokeLounge.AOtomation.Messaging.GameData.Identity;
     using Quaternion = AO.Core.Quaternion;
     using Vector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public static class SimpleCharFullUpdate
     {
         #region Public Methods and Operators
 
+        /// <summary>
+        /// </summary>
+        /// <param name="character">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static SimpleCharFullUpdateMessage ConstructMessage(Character character)
         {
             // Character Variables
@@ -120,7 +125,7 @@ namespace ZoneEngine.Network.Packets
                 showsocial = (character.Stats.VisualFlags.Value & 0x20) > 0;
 
                 charPlayfield = character.Playfield.Identity.Instance;
-                charCoord = new AOCoord(character.Coordinates.X,character.Coordinates.Y,character.Coordinates.Z);
+                charCoord = new AOCoord(character.Coordinates.X, character.Coordinates.Y, character.Coordinates.Z);
                 charId = character.Identity;
                 charHeading = new Quaternion(
                     character.Heading.X, character.Heading.Y, character.Heading.Z, character.Heading.W);
@@ -163,19 +168,19 @@ namespace ZoneEngine.Network.Packets
 
                 headMeshValue = character.Stats.HeadMesh.Value;
 
-                foreach (var num in character.SocialTab.Keys)
+                foreach (int num in character.SocialTab.Keys)
                 {
                     socialTab.Add(num, character.SocialTab[num]);
                 }
 
-                foreach (var at in character.Textures)
+                foreach (AOTextures at in character.Textures)
                 {
                     textures.Add(new AOTextures(at.place, at.Texture));
                 }
 
                 meshs = MeshLayers.GetMeshs(character, showsocial, socialonly);
 
-                foreach (var nano in character.ActiveNanos)
+                foreach (AONano nano in character.ActiveNanos)
                 {
                     var tempNano = new AONano();
                     tempNano.ID = nano.ID;
@@ -209,7 +214,7 @@ namespace ZoneEngine.Network.Packets
                 scfu.Flags |= SimpleCharFullUpdateFlags.HasFightingTarget;
                 scfu.FightingTarget = new Identity
                                           {
-                                              Type = (IdentityType)character.FightingTarget.Type, 
+                                              Type = character.FightingTarget.Type, 
                                               Instance = character.FightingTarget.Instance
                                           };
             }
@@ -244,7 +249,7 @@ namespace ZoneEngine.Network.Packets
             scfu.AccountFlags = (short)accFlagsValue;
             scfu.Expansions = (short)expansionValue;
 
-            var isNpc = character is NonPlayerCharacter;
+            bool isNpc = character is NonPlayerCharacter;
 
             if (isNpc)
             {
@@ -358,11 +363,11 @@ namespace ZoneEngine.Network.Packets
             var scfuTextures = new List<Texture>();
 
             var aotemp = new AOTextures(0, 0);
-            for (var c = 0; c < 5; c++)
+            for (int c = 0; c < 5; c++)
             {
                 aotemp.Texture = 0;
                 aotemp.place = c;
-                for (var c2 = 0; c2 < texturesCount; c2++)
+                for (int c2 = 0; c2 < texturesCount; c2++)
                 {
                     if (textures[c2].place != c)
                     {
@@ -415,20 +420,36 @@ namespace ZoneEngine.Network.Packets
             return scfu;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static SimpleCharFullUpdateMessage ConstructMessage(Client client)
         {
             return ConstructMessage(client.Character);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="character">
+        /// </param>
+        /// <param name="receiver">
+        /// </param>
         public static void SendToOne(Character character, Client receiver)
         {
-            var message = ConstructMessage(character);
+            SimpleCharFullUpdateMessage message = ConstructMessage(character);
             receiver.SendCompressed(message);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
         public static void SendToPlayfield(Client client)
         {
-            var message = ConstructMessage(client);
+            SimpleCharFullUpdateMessage message = ConstructMessage(client);
             client.Character.Playfield.Announce(message);
         }
 

@@ -44,6 +44,8 @@ namespace ZoneEngine.Network
         /// </summary>
         public IPlayfield playfield;
 
+        /// <summary>
+        /// </summary>
         private PlayfieldTimedList TimedList;
 
         /// <summary>
@@ -51,13 +53,11 @@ namespace ZoneEngine.Network
         public void DoWork()
         {
             // TODO: Load Mobs/Characters/Statels HERE
-
-            TimedList=new PlayfieldTimedList(playfield.PlayfieldBus);
+            this.TimedList = new PlayfieldTimedList(this.playfield.PlayfieldBus);
             LogUtil.Debug("Created playfield " + this.playfield.Identity.Instance.ToString());
             while (!this._shouldStop)
             {
-
-                if (TimedList.Count() == 0)
+                if (this.TimedList.Count() == 0)
                 {
                     Thread.Sleep(1);
                 }

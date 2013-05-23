@@ -275,11 +275,11 @@ namespace ZoneEngine.GameObject
             this.BaseInventory = new BaseInventory(this);
             this.pets = new List<Pet>();
             this.client = client;
-            this.Textures=new List<AOTextures>();
-            this.uploadedNanos=new List<AOUploadedNanos>();
-            this.meshLayer=new MeshLayers();
-            this.socialMeshLayer=new MeshLayers();
-            this.SocialTab=new Dictionary<int, int>();
+            this.Textures = new List<AOTextures>();
+            this.uploadedNanos = new List<AOUploadedNanos>();
+            this.meshLayer = new MeshLayers();
+            this.socialMeshLayer = new MeshLayers();
+            this.SocialTab = new Dictionary<int, int>();
 
             // TODO: Load names here?
         }
@@ -336,6 +336,7 @@ namespace ZoneEngine.GameObject
                 this.stats.ClearModifiers();
                 this.meshLayer.AddMesh(0, this.stats.HeadMesh.Value, 0, 4);
                 this.socialMeshLayer.AddMesh(0, this.stats.HeadMesh.Value, 0, 4);
+
                 /*
                 // Apply all modifying item functions to localstats
                 for (c = 0; c < this.inventory.Count; c++)
@@ -394,6 +395,5 @@ namespace ZoneEngine.GameObject
                 this.stats.CurrentNano.StatBaseValue = this.stats.CurrentNano.GetMaxValue((uint)oldnano);
             }
         }
-
     }
 }

@@ -227,14 +227,14 @@ namespace LoginEngine.CoreClient
             // TODO: Investigate if reciever is a timestamp
             var message = new Message
                               {
-                                  Body = messageBody,
+                                  Body = messageBody, 
                                   Header =
                                       new Header
                                           {
-                                              MessageId = BitConverter.ToUInt16(new byte[] { 0xDF, 0xDF }, 0),
-                                              PacketType = messageBody.PacketType,
-                                              Unknown = 0x0001,
-                                              Sender = 0x00000001,
+                                              MessageId = BitConverter.ToUInt16(new byte[] { 0xDF, 0xDF }, 0), 
+                                              PacketType = messageBody.PacketType, 
+                                              Unknown = 0x0001, 
+                                              Sender = 0x00000001, 
                                               Receiver = receiver
                                           }
                               };

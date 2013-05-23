@@ -58,7 +58,9 @@ namespace ZoneEngine.GameObject.Items
                 return default(Identity);
             }
 
-            private set{}
+            private set
+            {
+            }
         }
 
         /// <summary>

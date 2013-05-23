@@ -25,7 +25,11 @@
 
 namespace ZoneEngine.Network.InternalBus.Events
 {
+    #region Usings ...
+
     using ZoneEngine.Network.InternalBus.InternalMessages;
+
+    #endregion
 
     /// <summary>
     /// </summary>

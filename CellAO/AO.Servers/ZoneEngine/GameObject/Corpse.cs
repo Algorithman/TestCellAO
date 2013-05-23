@@ -136,8 +136,9 @@ namespace ZoneEngine.GameObject
             {
                 LogUtil.Debug(
                     "Could not create LootTable for Corpse " + this.identity.Type.ToString("X8") + ":"
-                    + this.identity.Instance.ToString("X8") + " on Playfield " + this.playfield.Identity.Type.ToString("X8")
-                    + ":" + this.playfield.Identity.Instance.ToString("X8"));
+                    + this.identity.Instance.ToString("X8") + " on Playfield "
+                    + this.playfield.Identity.Type.ToString("X8") + ":"
+                    + this.playfield.Identity.Instance.ToString("X8"));
                 return false;
             }
         }
