@@ -344,7 +344,7 @@ namespace ZoneEngine.GameObject.Stats
             SqlWrapper sql = new SqlWrapper();
             int id = this.Parent.Identity.Instance;
 
-            this.StatBaseValue = DBStats.GetById(id, this.StatNumber).First().Value;
+            this.Value = (int)DBStats.GetById(id, this.StatNumber).First().Value;
 
             /* TODO: REDO
             DataTable dt =

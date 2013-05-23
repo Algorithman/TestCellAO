@@ -434,6 +434,8 @@ namespace ZoneEngine.CoreClient
             this.character.Playfield = server.PlayfieldById(character.Playfield);
             this.Playfield = this.character.Playfield;
             this.Playfield.Entities.Add(this.character);
+            this.character.Stats.ReadStatsfromSql();
+
         }
 
         public void SendInitiateCompressionMessage(MessageBody messageBody)
