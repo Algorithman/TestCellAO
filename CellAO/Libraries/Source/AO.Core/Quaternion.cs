@@ -25,8 +25,7 @@
 
 #region Using
 
- // Needs Checking might be .Single i dunno.
-
+// Needs Checking might be .Single i dunno.
 #endregion
 
 namespace AO.Core

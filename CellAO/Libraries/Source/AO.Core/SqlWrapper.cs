@@ -25,7 +25,7 @@
 
 #region Using...
 
- //SQL Using Area...
+//SQL Using Area...
 //end SQL Using Area...
 #endregion
 
@@ -208,8 +208,6 @@ namespace AO.Core
         /// </param>
         public void SqlRead(string SqlQuery)
         {
-            
-
             // MysqlRead: Create a SqlQuery to send to this wrapper for Reading the DB
             if (this.ismysql)
             {
@@ -311,8 +309,6 @@ namespace AO.Core
         /// </returns>
         public int SqlUpdate(string SqlQuery)
         {
-            
-
             if (this.ismysql)
             {
                 try
@@ -418,8 +414,6 @@ namespace AO.Core
         /// </param>
         public void SqlInsert(string SqlQuery)
         {
-            
-
             if (this.ismysql)
             {
                 try
@@ -524,8 +518,6 @@ namespace AO.Core
         /// </param>
         public void SqlDelete(string SqlQuery)
         {
-            
-
             if (this.ismysql)
             {
                 try

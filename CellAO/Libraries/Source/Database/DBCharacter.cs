@@ -92,6 +92,5 @@ namespace Database
         /// <summary>
         /// </summary>
         public float HeadingW { get; set; }
-
     }
 }

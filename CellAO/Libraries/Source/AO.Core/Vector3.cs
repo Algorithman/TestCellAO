@@ -419,8 +419,8 @@ namespace AO.Core
             Vector3 v2 = (Vector3)o;
 
             return (Math.Abs(v1.x - v2.x) <= this.floatingPointTolerance)
-                    && (Math.Abs(v1.y - v2.y) <= this.floatingPointTolerance)
-                    && (Math.Abs(v1.z - v2.z) <= this.floatingPointTolerance);
+                   && (Math.Abs(v1.y - v2.y) <= this.floatingPointTolerance)
+                   && (Math.Abs(v1.z - v2.z) <= this.floatingPointTolerance);
         }
 
         /// <summary>

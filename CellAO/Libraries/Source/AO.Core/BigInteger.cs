@@ -1047,7 +1047,7 @@ public class BigInteger
 
         for (int i = 0; i < maxLength; i++)
         {
-            result.data[i] = ~(bi1.data[i]);
+            result.data[i] = ~bi1.data[i];
         }
 
         result.dataLength = maxLength;
@@ -1086,7 +1086,7 @@ public class BigInteger
         // 1's complement
         for (int i = 0; i < maxLength; i++)
         {
-            result.data[i] = ~(bi1.data[i]);
+            result.data[i] = ~bi1.data[i];
         }
 
         // add one to result of 1's complement
