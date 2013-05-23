@@ -2273,6 +2273,10 @@
       <Project>{71ab07ad-4d94-4693-8560-47862e5b6e61}</Project>
       <Name>Cell.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\Database\Database.csproj">
+      <Project>{e4c49ea3-504e-4efb-96d6-3d2217553b14}</Project>
+      <Name>Database</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Libraries\Source\zlib\source\zlib.net.csproj">
       <Project>{0c89b7a2-a218-49e4-b545-5b044a45f977}</Project>
       <Name>zlib.net</Name>

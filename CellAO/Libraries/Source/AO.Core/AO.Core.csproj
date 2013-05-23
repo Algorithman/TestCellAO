@@ -67,9 +67,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapper">
-      <HintPath>..\..\..\packages\Dapper.1.12.1\lib\net40\Dapper.dll</HintPath>
-    </Reference>
     <Reference Include="MathNet.Numerics">
       <HintPath>..\..\..\packages\MathNet.Numerics.2.5.0\lib\net40\MathNet.Numerics.dll</HintPath>
     </Reference>
@@ -120,9 +117,6 @@
     <Compile Include="Config\Config.cs" />
     <Compile Include="Config\ConfigReadWrite.cs" />
     <Compile Include="ConsoleText.cs" />
-    <Compile Include="Database\CharacterDao.cs" />
-    <Compile Include="Database\Connector.cs" />
-    <Compile Include="Database\DBCharacter.cs" />
     <Compile Include="EventHandlers\MessageReceivedHandler.cs" />
     <Compile Include="Events\MessageReceivedEvent.cs" />
     <Compile Include="Logger\LogUtil.cs" />

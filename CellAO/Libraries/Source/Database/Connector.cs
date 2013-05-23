@@ -23,75 +23,77 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace AO.Core.Database
+namespace Database
 {
+    #region Usings ...
+
+    using System;
+    using System.Data;
+    using System.Data.SqlClient;
+
+    using AO.Core.Config;
+
+    using MySql.Data.MySqlClient;
+
+    using Npgsql;
+
+    #endregion
+
     /// <summary>
     /// </summary>
-    public class DBCharacter
+    public static class Connector
     {
         /// <summary>
         /// </summary>
-        public string Name { get; set; }
+        public static string Sqltype = ConfigReadWrite.Instance.CurrentConfig.SQLType;
+
+        /// <summary>
+        /// only needed once to read this
+        /// </summary>
+        private static readonly string ConnectionString_MySQL = ConfigReadWrite.Instance.CurrentConfig.MysqlConnection;
 
         /// <summary>
         /// </summary>
-        public string FirstName { get; set; }
+        private static readonly string ConnectionString_MSSQL = ConfigReadWrite.Instance.CurrentConfig.MsSqlConnection;
 
         /// <summary>
         /// </summary>
-        public string LastName { get; set; }
+        private static readonly string ConnectionString_PostGreSQL =
+            ConfigReadWrite.Instance.CurrentConfig.PostgreConnection;
 
+        // CONNECTION POOLING IS A MUST!!!
+        // TODO: Rewrite needed for config.xml, only providing username, password and database. Create connection string via stringbuilders
         /// <summary>
         /// </summary>
-        public int Textures0 { get; set; }
+        /// <returns>
+        /// </returns>
+        /// <exception cref="Exception">
+        /// </exception>
+        public static IDbConnection GetConnection()
+        {
+            IDbConnection conn = null;
+            if (Sqltype == "MySql")
+            {
+                conn = new MySqlConnection(ConnectionString_MySQL);
+            }
 
-        /// <summary>
-        /// </summary>
-        public int Textures1 { get; set; }
+            if (Sqltype == "MsSql")
+            {
+                conn = new SqlConnection(ConnectionString_MSSQL);
+            }
 
-        /// <summary>
-        /// </summary>
-        public int Textures2 { get; set; }
+            if (Sqltype == "PostgreSQL")
+            {
+                conn = new NpgsqlConnection(ConnectionString_PostGreSQL);
+            }
 
-        /// <summary>
-        /// </summary>
-        public int Textures3 { get; set; }
+            if (conn == null)
+            {
+                throw new Exception("ConnectionString error");
+            }
 
-        /// <summary>
-        /// </summary>
-        public int Textures4 { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int Playfield { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float X { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float Y { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float Z { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float HeadingX { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float HeadingY { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float HeadingZ { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float HeadingW { get; set; }
-
+            conn.Open();
+            return conn;
+        }
     }
 }

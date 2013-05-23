@@ -34,13 +34,14 @@ namespace ZoneEngine.CoreClient
     using System.Net.Sockets;
 
     using AO.Core.Components;
-    using AO.Core.Database;
     using AO.Core.Events;
     using AO.Core.Logger;
 
     using Cell.Core;
 
     using ComponentAce.Compression.Libs.zlib;
+
+    using Database;
 
     using NiceHexOutput;
 
@@ -214,10 +215,6 @@ namespace ZoneEngine.CoreClient
             Console.WriteLine(NiceHexOutput.Output(buffer));
             Console.ResetColor();
 
-            if (buffer.Length % 4 > 0)
-            {
-                Array.Resize(ref buffer, buffer.Length + (4 - (buffer.Length % 4)));
-            }
 
             this.Send(buffer);
         }
@@ -242,10 +239,10 @@ namespace ZoneEngine.CoreClient
             bool done = false;
 
             // 18.1 Fix
-            this.packetNumber++;
             byte[] pn = BitConverter.GetBytes(this.packetNumber);
             packet[0] = pn[1];
             packet[1] = pn[0];
+            this.packetNumber++;
             while ((!done) && (tries < 3))
             {
                 try
@@ -348,6 +345,7 @@ namespace ZoneEngine.CoreClient
             Console.WriteLine("Receiving");
             Console.WriteLine("Offset: " + buffer.Offset.ToString() + " -- RemainingLength: " + this._remainingLength);
             Console.WriteLine(NiceHexOutput.Output(packet));
+            LogUtil.Debug("\r\nReceived: \r\n"+NiceHexOutput.Output(packet));
 
             this._remainingLength = 0;
             try
@@ -436,6 +434,37 @@ namespace ZoneEngine.CoreClient
             this.character.Playfield = server.PlayfieldById(character.Playfield);
             this.Playfield = this.character.Playfield;
             this.Playfield.Entities.Add(this.character);
+        }
+
+        public void SendInitiateCompressionMessage(MessageBody messageBody)
+        {
+
+            // TODO: Investigate if reciever is a timestamp
+            Contract.Requires(messageBody != null);
+            var message = new Message
+            {
+                Body = messageBody,
+                Header =
+                    new Header
+                    {
+                        MessageId = 0xdfdf,
+                        PacketType = messageBody.PacketType,
+                        Unknown = 0x0001,
+                        Sender = 0x03000000,
+                        Receiver = this.character.Identity.Instance
+                    }
+            };
+            byte[] buffer = this.messageSerializer.Serialize(message);
+
+            /* Uncomment for Debug outgoing Messages
+            */
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(NiceHexOutput.Output(buffer));
+            Console.ResetColor();
+            LogUtil.Debug(NiceHexOutput.Output(buffer));
+            this.packetNumber = 1;
+
+            this.Send(buffer);
         }
     }
 }

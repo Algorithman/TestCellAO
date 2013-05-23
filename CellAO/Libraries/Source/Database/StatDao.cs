@@ -23,75 +23,18 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace AO.Core.Database
+namespace Database
 {
     /// <summary>
     /// </summary>
-    public class DBCharacter
+    public class StatDao
     {
         /// <summary>
         /// </summary>
-        public string Name { get; set; }
+        public int Stat { get; set; }
 
         /// <summary>
         /// </summary>
-        public string FirstName { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public string LastName { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int Textures0 { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int Textures1 { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int Textures2 { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int Textures3 { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int Textures4 { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int Playfield { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float X { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float Y { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float Z { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float HeadingX { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float HeadingY { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float HeadingZ { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float HeadingW { get; set; }
-
+        public uint Value { get; set; }
     }
 }

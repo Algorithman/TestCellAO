@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Dapper;
 
-namespace AO.Core.Database
+namespace Database
 {
     public class CharacterDao
     {

@@ -23,77 +23,40 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace AO.Core.Database
+namespace Database
 {
     #region Usings ...
 
-    using System;
     using System.Data;
-    using System.Data.SqlClient;
 
-    using AO.Core.Config;
-
-    using MySql.Data.MySqlClient;
-
-    using Npgsql;
+    using Dapper;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    public static class Connector
+    public static class Misc
     {
         /// <summary>
         /// </summary>
-        public static string Sqltype = ConfigReadWrite.Instance.CurrentConfig.SQLType;
-
-        /// <summary>
-        /// only needed once to read this
-        /// </summary>
-        private static readonly string ConnectionString_MySQL = ConfigReadWrite.Instance.CurrentConfig.MysqlConnection;
-
-        /// <summary>
-        /// </summary>
-        private static readonly string ConnectionString_MSSQL = ConfigReadWrite.Instance.CurrentConfig.MsSqlConnection;
-
-        /// <summary>
-        /// </summary>
-        private static readonly string ConnectionString_PostGreSQL =
-            ConfigReadWrite.Instance.CurrentConfig.PostgreConnection;
-
-        // CONNECTION POOLING IS A MUST!!!
-        // TODO: Rewrite needed for config.xml, only providing username, password and database. Create connection string via stringbuilders
-        /// <summary>
-        /// </summary>
-        /// <returns>
-        /// </returns>
-        /// <exception cref="Exception">
-        /// </exception>
-        public static IDbConnection GetConnection()
+        public static void LogOffAll()
         {
-            IDbConnection conn = null;
-            if (Sqltype == "MySql")
+            using (IDbConnection conn = Connector.GetConnection())
             {
-                conn = new MySqlConnection(ConnectionString_MySQL);
+                conn.Execute("UPDATE characters set Online=0");
             }
+        }
 
-            if (Sqltype == "MsSql")
+        /// <summary>
+        /// </summary>
+        /// <param name="characterId">
+        /// </param>
+        public static void LogOffCharacter(int characterId)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
             {
-                conn = new SqlConnection(ConnectionString_MSSQL);
+                conn.Execute("UPDATE characters set Online=0 where id=@charid", new { charid = characterId });
             }
-
-            if (Sqltype == "PostgreSQL")
-            {
-                conn = new NpgsqlConnection(ConnectionString_PostGreSQL);
-            }
-
-            if (conn == null)
-            {
-                throw new Exception("ConnectionString error");
-            }
-
-            conn.Open();
-            return conn;
         }
     }
 }

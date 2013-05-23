@@ -6,6 +6,7 @@ using System.Text;
 namespace ZoneEngine.MessageHandlers
 {
     using System.ComponentModel.Composition;
+    using System.Threading;
 
     using AO.Core.Components;
 
@@ -23,12 +24,13 @@ namespace ZoneEngine.MessageHandlers
         public void Handle(object sender, Message message)
         {
             var client = (Client)sender;
+            client.SendInitiateCompressionMessage(new InitiateCompressionMessage());
+
             var zoneLoginMessage = (ZoneLoginMessage)message.Body;
             client.CreateCharacter(zoneLoginMessage.CharacterId);
             client.Character.Playfield = client.Playfield;
 
-            client.Send(new InitiateCompressionMessage());
-
+            Thread.Sleep(1000);
             ClientConnected tmpClientConnected = new ClientConnected();
             tmpClientConnected.Read(zoneLoginMessage.CharacterId, client);
         }

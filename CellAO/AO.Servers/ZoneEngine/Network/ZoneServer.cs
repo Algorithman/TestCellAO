@@ -40,6 +40,7 @@ namespace ZoneEngine.Network
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.Component;
+    using ZoneEngine.CoreClient;
     using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Playfields;
 
@@ -93,6 +94,13 @@ namespace ZoneEngine.Network
         {
             this.clientFactory = clientfactory;
             this.workers = new List<PlayfieldWorkerHolder>();
+            this.ClientDisconnected +=ZoneServer_ClientDisconnected;
+        }
+
+        private void ZoneServer_ClientDisconnected(IClient client, bool forced)
+        {
+            var cl = (Client)client;
+            Database.Misc.LogOffCharacter(cl.Character.Identity.Instance);
         }
 
 

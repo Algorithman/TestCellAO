@@ -89,6 +89,11 @@ namespace ZoneEngine
             {
                 Console.ForegroundColor = ConsoleColor.Green;
 
+                // Log off all characters
+                // TODO: make it playfield dependent
+
+                Database.Misc.LogOffAll();
+
                 /* TODO: Readd the things, Algorithman
                 zoneServer.Monsters = new List<NonPlayerCharacterClass>();
                 zoneServer.Vendors = new List<VendingMachine>();

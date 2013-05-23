@@ -30,8 +30,10 @@ namespace ZoneEngine.GameObject.Stats
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
+    using System.Linq;
 
     using AO.Core;
+    using Database;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -341,6 +343,8 @@ namespace ZoneEngine.GameObject.Stats
 
             SqlWrapper sql = new SqlWrapper();
             int id = this.Parent.Identity.Instance;
+
+            this.StatBaseValue = DBStats.GetById(id, this.StatNumber).First().Value;
 
             /* TODO: REDO
             DataTable dt =
@@ -12216,6 +12220,11 @@ namespace ZoneEngine.GameObject.Stats
         /// </summary>
         public void ReadStatsfromSql()
         {
+
+            foreach (StatDao statDao in DBStats.GetById(this.flags.Parent.Identity.Instance))
+            {
+                this.SetBaseValue(statDao.Stat, statDao.Value);
+            }
             /* TODO: Redo
             SqlWrapper sql = new SqlWrapper();
             DataTable dt =
