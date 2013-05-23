@@ -337,7 +337,7 @@
       <Project>{3ceac898-bfca-45ea-bf34-c4bbb85d2da4}</Project>
       <Name>SmokeLounge.AOtomation.Messaging</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\NiceHexOutput\NiceHexOutput.csproj">
+    <ProjectReference Include="..\..\..\Helpers\NiceHexOutput\NiceHexOutput.csproj">
       <Project>{6079cb15-9d05-4142-ab50-00db492dd871}</Project>
       <Name>NiceHexOutput</Name>
     </ProjectReference>
