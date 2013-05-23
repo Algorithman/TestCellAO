@@ -67,6 +67,12 @@ namespace ZoneEngine.GameObject.Misc
             }
         }
 
+        public void Clear()
+        {
+            mesh.Clear();
+            meshOverride.Clear();
+        }
+
         /// <summary>
         /// </summary>
         /// <returns>

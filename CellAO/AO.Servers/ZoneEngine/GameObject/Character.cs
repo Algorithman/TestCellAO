@@ -299,9 +299,101 @@ namespace ZoneEngine.GameObject
         /// </summary>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        internal void CalculateSkills()
+        public void CalculateSkills()
         {
-            // TODO: Calculate Skills
+            lock (this)
+            {
+                // Todo: process all item modifiers
+                /*
+                this.PurgeTimer(0);
+                this.PurgeTimer(1);
+                 */
+                int c;
+                int c2;
+                int c3;
+                int oldhealth = this.stats.Health.Value;
+                int oldnano = this.stats.CurrentNano.Value;
+                AOItem m_item;
+
+                this.socialMeshLayer.Clear();
+                this.Textures = new List<AOTextures>();
+                this.meshLayer.Clear();
+                this.SocialTab = new Dictionary<int, int>();
+                this.SocialTab.Add(0, 0);
+                this.SocialTab.Add(1, 0);
+                this.SocialTab.Add(2, 0);
+                this.SocialTab.Add(3, 0);
+                this.SocialTab.Add(4, 0);
+                this.SocialTab.Add(38, 0);
+                this.SocialTab.Add(1004, 0);
+                this.SocialTab.Add(1005, 0);
+                this.SocialTab.Add(64, 0);
+                this.SocialTab.Add(32, 0);
+                this.SocialTab.Add(1006, 0);
+                this.SocialTab.Add(1007, 0);
+
+                // Clear Modifiers (adds and percentages)
+                this.stats.ClearModifiers();
+                this.meshLayer.AddMesh(0, this.stats.HeadMesh.Value, 0, 4);
+                this.socialMeshLayer.AddMesh(0, this.stats.HeadMesh.Value, 0, 4);
+                /*
+                // Apply all modifying item functions to localstats
+                for (c = 0; c < this.inventory.Count; c++)
+                {
+                    // only process items in the equipment pages (<64)
+                    if (this.inventory[c].Placement < 64)
+                    {
+                        m_item = ItemHandler.interpolate(
+                            this.inventory[c].Item.LowID, this.inventory[c].Item.HighID, this.inventory[c].Item.Quality);
+                        for (c2 = 0; c2 < m_item.Events.Count; c2++)
+                        {
+                            if (m_item.Events[c2].EventType == Constants.EventtypeOnWear)
+                            {
+                                for (c3 = 0; c3 < m_item.Events[c2].Functions.Count; c3++)
+                                {
+                                    if (this.CheckRequirements(this, m_item.Events[c2].Functions[c3], false))
+                                    {
+                                        AOFunctions aof_withparams = m_item.Events[c2].Functions[c3].ShallowCopy();
+                                        aof_withparams.Arguments.Values.Add(this.inventory[c].Placement);
+                                        Program.FunctionC.CallFunction(
+                                            aof_withparams.FunctionType,
+                                            this,
+                                            this,
+                                            this,
+                                            aof_withparams.Arguments.Values.ToArray());
+                                    }
+                                    if ((m_item.Events[c2].Functions[c3].FunctionType == Constants.FunctiontypeModify)
+                                        ||
+                                        (m_item.Events[c2].Functions[c3].FunctionType
+                                         == Constants.FunctiontypeModifyPercentage))
+                                    {
+                                        // TODO ItemHandler.FunctionPack.func_do(this, m_item.ItemEvents[c2].Functions[c3], true, Inventory[c].Placement >= 49, Inventory[c].Placement);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                */
+                // Adding nano skill effects
+                for (c = 0; c < this.activeNanos.Count; c++)
+                {
+                    // TODO: Nanohandler, similar to Itemhandler
+                    // and calling the skill/attribute modifying functions
+                }
+
+                // Calculating the trickledown
+                this.stats.Strength.AffectStats();
+                this.stats.Agility.AffectStats();
+                this.stats.Stamina.AffectStats();
+                this.stats.Intelligence.AffectStats();
+                this.stats.Sense.AffectStats();
+                this.stats.Psychic.AffectStats();
+
+                this.stats.Health.StatBaseValue = this.stats.Health.GetMaxValue((uint)oldhealth);
+                this.stats.CurrentNano.StatBaseValue = this.stats.CurrentNano.GetMaxValue((uint)oldnano);
+            }
         }
+
     }
 }

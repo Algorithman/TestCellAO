@@ -12272,9 +12272,12 @@ namespace ZoneEngine.GameObject.Stats
                     val = c.Value;
                 }
 
-                /* TODO: Redo
-                Stat.Send(client, statId, val, c.AnnounceToPlayfield);
-                 */
+                var messageBody = new SetStatMessage();
+                messageBody.Stat = (CharacterStat)statId;
+
+                messageBody.Value = val;
+                messageBody.Identity = this.GetStatbyNumber(statId).Parent.Identity;
+                client.SendCompressed(messageBody);
                 return;
             }
 
