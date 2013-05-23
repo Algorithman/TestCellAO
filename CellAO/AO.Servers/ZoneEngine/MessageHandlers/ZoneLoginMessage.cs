@@ -29,6 +29,7 @@ namespace ZoneEngine.MessageHandlers
             var zoneLoginMessage = (ZoneLoginMessage)message.Body;
             client.CreateCharacter(zoneLoginMessage.CharacterId);
             client.Character.Playfield = client.Playfield;
+            client.Character.Stats.ReadStatsfromSql();
 
             Thread.Sleep(1000);
             ClientConnected tmpClientConnected = new ClientConnected();
