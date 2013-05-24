@@ -32,6 +32,8 @@ namespace ZoneEngine.Network.InternalBus
 
     using MemBus;
 
+    using ZoneEngine.Network.InternalBus.InternalMessages;
+
     #endregion
 
     /// <summary>
@@ -72,7 +74,7 @@ namespace ZoneEngine.Network.InternalBus
         /// </param>
         /// <param name="obj">
         /// </param>
-        public void Add(DateTime triggerTime, object obj)
+        public void Add(DateTime triggerTime, InternalMessage obj)
         {
             if (triggerTime <= DateTime.UtcNow)
             {
@@ -90,7 +92,7 @@ namespace ZoneEngine.Network.InternalBus
         /// </param>
         /// <param name="obj">
         /// </param>
-        public void Add(int milliseconds, object obj)
+        public void Add(int milliseconds, InternalMessage obj)
         {
             this.TimerList.Add(
                 new PlayfieldTimedListEntry(DateTime.UtcNow + TimeSpan.FromMilliseconds(milliseconds), obj));

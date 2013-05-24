@@ -29,6 +29,8 @@ namespace ZoneEngine.Network.InternalBus
 
     using System;
 
+    using ZoneEngine.Network.InternalBus.InternalMessages;
+
     #endregion
 
     /// <summary>
@@ -41,7 +43,7 @@ namespace ZoneEngine.Network.InternalBus
 
         /// <summary>
         /// </summary>
-        public object obj;
+        public InternalMessage obj;
 
         /// <summary>
         /// </summary>
@@ -49,7 +51,7 @@ namespace ZoneEngine.Network.InternalBus
         /// </param>
         /// <param name="obj">
         /// </param>
-        public PlayfieldTimedListEntry(DateTime trigger, object obj)
+        public PlayfieldTimedListEntry(DateTime trigger, InternalMessage obj)
         {
             this.obj = obj;
             this.Trigger = trigger;
@@ -61,7 +63,7 @@ namespace ZoneEngine.Network.InternalBus
         /// </param>
         /// <returns>
         /// </returns>
-        public int CompareTo(PlayfieldTimedListEntry other)
+        public virtual int CompareTo(PlayfieldTimedListEntry other)
         {
             return this.Trigger.CompareTo(other.Trigger);
         }

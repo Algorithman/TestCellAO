@@ -254,7 +254,7 @@ namespace ZoneEngine.GameObject.Playfields
         /// </summary>
         public Playfield()
         {
-            this.playfieldBus = BusSetup.StartWith<Conservative>().Construct();
+            this.playfieldBus = BusSetup.StartWith<AsyncConfiguration>().Construct();
             this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<InternalMessage>(this.HandlePlayfieldMessage));
             this.Entities = new HashSet<IInstancedEntity>();
         }
