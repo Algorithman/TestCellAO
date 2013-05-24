@@ -63,7 +63,7 @@ namespace ZoneEngine.Network.InternalBus
         /// </param>
         /// <returns>
         /// </returns>
-        public virtual int CompareTo(PlayfieldTimedListEntry other)
+        public int CompareTo(PlayfieldTimedListEntry other)
         {
             return this.Trigger.CompareTo(other.Trigger);
         }

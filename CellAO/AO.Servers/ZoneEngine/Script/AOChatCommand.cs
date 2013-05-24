@@ -36,7 +36,7 @@ namespace ZoneEngine.Script
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
-    using ZoneEngine.CoreClient;
+    using ZoneEngine.Network;
 
     #endregion
 

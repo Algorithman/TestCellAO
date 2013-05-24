@@ -42,7 +42,6 @@ namespace ZoneEngine.Network
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.Component;
-    using ZoneEngine.CoreClient;
     using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Playfields;
 

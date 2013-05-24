@@ -23,7 +23,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.CoreClient
+namespace ZoneEngine.Network
 {
     #region Usings ...
 

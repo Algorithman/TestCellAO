@@ -34,12 +34,16 @@ namespace ZoneEngine.GameObject.Stats
 
     using AO.Core;
 
+    using Cell.Core;
+
     using Database;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine.CoreClient;
+    using ZoneEngine.Network;
+    using ZoneEngine.Network.InternalBus.InternalMessages;
+    using ZoneEngine.Network.Packets;
 
     #endregion
 
@@ -237,9 +241,25 @@ namespace ZoneEngine.GameObject.Stats
             }
         }
 
+        private uint statBaseValue;
         /// <summary>
         /// </summary>
-        public uint StatBaseValue { get; set; }
+        public uint StatBaseValue
+        {
+            get
+            {
+                return statBaseValue;
+            }
+            set
+            {
+                bool sendit = value != statBaseValue;
+                statBaseValue = value;
+                if (sendit)
+                {
+                    Stat.Send(this.Parent, this.StatNumber, value, this.announceToPlayfield);
+                }
+            }
+        }
 
         /// <summary>
         /// </summary>
@@ -12228,63 +12248,10 @@ namespace ZoneEngine.GameObject.Stats
 
             if (!((ClassStat)sender).Parent.DoNotDoTimers)
             {
-                var messageBody = new SetStatMessage();
-                messageBody.Stat = (CharacterStat)e.Stat.StatNumber;
-
-                messageBody.Value = (int)e.NewValue;
-                messageBody.Identity = e.Stat.Parent.Identity;
-                if (e.Stat.SendBaseValue)
-                {
-                    ((Character)e.Stat.Parent).Send(messageBody, e.AnnounceToPlayfield);
-                }
-                else
-                {
-                    ((Character)e.Stat.Parent).Send(messageBody, e.AnnounceToPlayfield);
-                }
+                Stat.Send(e.Stat.Parent, e.Stat.StatNumber, e.NewValue, e.Stat.AnnounceToPlayfield);
 
                 e.Stat.Changed = false;
             }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="client">
-        /// </param>
-        /// <param name="statId">
-        /// </param>
-        /// <exception cref="StatDoesNotExistException">
-        /// </exception>
-        public void Send(Client client, int statId)
-        {
-            foreach (ClassStat c in this.all)
-            {
-                if (c.StatNumber != statId)
-                {
-                    continue;
-                }
-
-                int val;
-                if (c.SendBaseValue)
-                {
-                    val = (Int32)c.StatBaseValue;
-                }
-                else
-                {
-                    val = c.Value;
-                }
-
-                var messageBody = new SetStatMessage();
-                messageBody.Stat = (CharacterStat)statId;
-
-                messageBody.Value = val;
-                messageBody.Identity = this.GetStatbyNumber(statId).Parent.Identity;
-                client.SendCompressed(messageBody);
-                return;
-            }
-
-            throw new StatDoesNotExistException(
-                "Stat " + statId + " does not exist.\r\nClient: " + client.Character.Identity.Instance
-                + "\r\nMethod: Send");
         }
 
         /// <summary>

@@ -82,7 +82,7 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        public IClient Client
+        public IZoneClient Client
         {
             get
             {

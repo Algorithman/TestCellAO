@@ -31,7 +31,6 @@ namespace ZoneEngine.Component
 
     using AO.Core.Components;
 
-    using ZoneEngine.CoreClient;
     using ZoneEngine.Network;
 
     #endregion

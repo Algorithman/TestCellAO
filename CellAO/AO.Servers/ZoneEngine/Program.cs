@@ -47,7 +47,6 @@ namespace ZoneEngine
     using NLog;
 
     using ZoneEngine.Collision;
-    using ZoneEngine.CoreClient;
     using ZoneEngine.Gameobject.Items;
     using ZoneEngine.GameObject.Nanos;
     using ZoneEngine.Network;

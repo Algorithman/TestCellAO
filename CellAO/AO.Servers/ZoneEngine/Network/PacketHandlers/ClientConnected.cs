@@ -32,7 +32,7 @@ namespace ZoneEngine.PacketHandlers
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine.CoreClient;
+    using ZoneEngine.Network;
     using ZoneEngine.Network.Packets;
 
     #endregion

@@ -175,6 +175,7 @@
     <Compile Include="Network\InternalBus\InternalMessages\IIMAction.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IIMItemNanoAction.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IIMItemNanoEvent.cs" />
+    <Compile Include="Network\InternalBus\InternalMessages\IMSendAOtMessageToClient.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\InternalMessage.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\InternalMessageBody.cs" />
     <Compile Include="Network\InternalBus\PlayfieldTimedList.cs" />

@@ -34,7 +34,7 @@ namespace ZoneEngine.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine.CoreClient;
+    using ZoneEngine.Network;
     using ZoneEngine.PacketHandlers;
 
     #endregion

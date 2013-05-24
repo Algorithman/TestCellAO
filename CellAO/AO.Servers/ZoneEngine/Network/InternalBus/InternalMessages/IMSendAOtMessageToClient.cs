@@ -23,49 +23,28 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.MessageHandlers
+namespace ZoneEngine.Network.InternalBus.InternalMessages
 {
     #region Usings ...
 
-    using System.ComponentModel.Composition;
-    using System.Threading;
-
-    using AO.Core.Components;
+    using Cell.Core;
 
     using SmokeLounge.AOtomation.Messaging.Messages;
-    using SmokeLounge.AOtomation.Messaging.Messages.SystemMessages;
 
     using ZoneEngine.Network;
-    using ZoneEngine.PacketHandlers;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    [Export(typeof(IHandleMessage))]
-    public class ZoneLoginHandler : IHandleMessage<ZoneLoginMessage>
+    public class IMSendAOtMessageToClient : InternalMessageBody
     {
-        #region Public Methods and Operators
+        /// <summary>
+        /// </summary>
+        public IZoneClient client;
 
         /// <summary>
         /// </summary>
-        /// <param name="sender">
-        /// </param>
-        /// <param name="message">
-        /// </param>
-        public void Handle(object sender, Message message)
-        {
-            var client = (Client)sender;
-            client.SendInitiateCompressionMessage(new InitiateCompressionMessage());
-
-            var zoneLoginMessage = (ZoneLoginMessage)message.Body;
-            client.CreateCharacter(zoneLoginMessage.CharacterId);
-            client.Character.Playfield = client.Playfield;
-
-            ClientConnected tmpClientConnected = new ClientConnected();
-            tmpClientConnected.Read(zoneLoginMessage.CharacterId, client);
-        }
-
-        #endregion
+        public Message message;
     }
 }

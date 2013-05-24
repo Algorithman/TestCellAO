@@ -36,7 +36,6 @@ namespace ZoneEngine.Network.Packets
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine.CoreClient;
     using ZoneEngine.GameObject;
     using ZoneEngine.GameObject.Misc;
 

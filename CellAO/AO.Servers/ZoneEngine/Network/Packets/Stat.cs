@@ -34,7 +34,6 @@ namespace ZoneEngine.Network.Packets
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine.CoreClient;
     using ZoneEngine.GameObject;
 
     #endregion
@@ -59,6 +58,40 @@ namespace ZoneEngine.Network.Packets
         public static void Send(Client client, int stat, int value, bool announce)
         {
             Send(client, stat, (UInt32)value, announce);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="dynel">
+        /// </param>
+        /// <param name="stat">
+        /// </param>
+        /// <param name="value">
+        /// </param>
+        /// <param name="announce">
+        /// </param>
+        public static void Send(Dynel dynel, int stat, uint value, bool announce)
+        {
+            Send(dynel, stat, (int)value, announce);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="dynel">
+        /// </param>
+        /// <param name="stat">
+        /// </param>
+        /// <param name="value">
+        /// </param>
+        /// <param name="announce">
+        /// </param>
+        public static void Send(Dynel dynel, int stat, int value, bool announce)
+        {
+            Character character = dynel as Character;
+            if (character != null)
+            {
+                Send(character, stat, value, announce);
+            }
         }
 
         /// <summary>
@@ -95,6 +128,36 @@ namespace ZoneEngine.Network.Packets
             {
                 client.Character.Playfield.AnnounceOthers(message, client.Character.Identity);
             }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="character">
+        /// </param>
+        /// <param name="stat">
+        /// </param>
+        /// <param name="value">
+        /// </param>
+        /// <param name="announce">
+        /// </param>
+        public static void Send(Character character, int stat, uint value, bool announce)
+        {
+            Send((Client)character.Client, stat, value, announce);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="character">
+        /// </param>
+        /// <param name="stat">
+        /// </param>
+        /// <param name="value">
+        /// </param>
+        /// <param name="announce">
+        /// </param>
+        public static void Send(Character character, int stat, int value, bool announce)
+        {
+            Send((Client)character.Client, stat, value, announce);
         }
 
         /// <summary>
