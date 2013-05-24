@@ -132,5 +132,7 @@ namespace ZoneEngine.GameObject.Playfields
         /// <summary>
         /// </summary>
         void DisconnectAllClients();
+
+        void Publish(object obj);
     }
 }

@@ -99,6 +99,10 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        public Identity FightingTarget { get; set; }
+
+        public Identity SelectedTarget { get; set; }
+
         /// <summary>
         /// </summary>
         public DynelStats Stats { get; private set; }

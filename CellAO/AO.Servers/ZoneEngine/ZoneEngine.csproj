@@ -104,6 +104,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChatCommands\Get.cs" />
+    <Compile Include="ChatCommands\Set.cs" />
+    <Compile Include="Functions\FunctionPrototype.cs" />
+    <Compile Include="Functions\set.cs" />
     <Compile Include="GameObject\Enums\Expansions.cs" />
     <Compile Include="GameObject\Items\AOActions.cs" />
     <Compile Include="GameObject\Items\AOItemAttribute.cs" />
@@ -132,6 +136,8 @@
     <Compile Include="GameObject\Character.cs" />
     <Compile Include="Collision\BorderlineCheck.cs" />
     <Compile Include="MessageHandlers\CharInPlayHandler.cs" />
+    <Compile Include="MessageHandlers\ChatCmdHandler.cs" />
+    <Compile Include="MessageHandlers\LookAtHandler.cs" />
     <Compile Include="MessageHandlers\ZoneLoginMessage.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="GameObject\Dynel.cs" />
@@ -175,6 +181,7 @@
     <Compile Include="Network\InternalBus\InternalMessages\IIMAction.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IIMItemNanoAction.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IIMItemNanoEvent.cs" />
+    <Compile Include="Network\InternalBus\InternalMessages\IMExecuteFunction.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IMSendAOtMessageToClient.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\InternalMessage.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\InternalMessageBody.cs" />
@@ -182,6 +189,7 @@
     <Compile Include="Network\InternalBus\PlayfieldTimedListEntry.cs" />
     <Compile Include="Network\IZoneClient.cs" />
     <Compile Include="Network\PacketHandlers\CharacterInPlay.cs" />
+    <Compile Include="Network\PacketHandlers\ChatCommandHandler.cs" />
     <Compile Include="Network\PacketHandlers\ClientConnected.cs" />
     <Compile Include="Network\Packets\AppearanceUpdate.cs" />
     <Compile Include="Network\Packets\ChatServerInfo.cs" />
@@ -2252,6 +2260,7 @@
     <Content Include="zone.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="SequenceDiagrams\DynelAction.sequencediagram" />
     <None Include="GameObject\GameObjectDiagram.cd" />
     <None Include="items.dat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -2266,6 +2275,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Network\InternalBus\MessageHandler\" />
+    <Folder Include="Scripts\" />
     <Folder Include="Static Handlers\" />
   </ItemGroup>
   <ItemGroup>
@@ -2293,6 +2303,11 @@
       <Project>{6079cb15-9d05-4142-ab50-00db492dd871}</Project>
       <Name>NiceHexOutput</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SequenceDiagrams\DynelAction.sequencediagram.layout">
+      <DependentUpon>DynelAction.sequencediagram</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

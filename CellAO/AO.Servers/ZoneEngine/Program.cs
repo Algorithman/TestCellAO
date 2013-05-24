@@ -47,6 +47,7 @@ namespace ZoneEngine
     using NLog;
 
     using ZoneEngine.Collision;
+    using ZoneEngine.Functions;
     using ZoneEngine.Gameobject.Items;
     using ZoneEngine.GameObject.Nanos;
     using ZoneEngine.Network;
@@ -77,6 +78,8 @@ namespace ZoneEngine
         /// <summary>
         /// </summary>
         private static ZoneServer zoneServer;
+
+        public static FunctionCollection FunctionC = new FunctionCollection();
 
         #endregion
 

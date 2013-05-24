@@ -78,5 +78,9 @@ namespace ZoneEngine.GameObject
                 this.heading = value;
             }
         }
+
+        public Identity FightingTarget { get; set; }
+
+        public Identity SelectedTarget { get; set; }
     }
 }

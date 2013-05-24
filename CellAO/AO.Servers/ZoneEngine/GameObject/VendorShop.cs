@@ -38,32 +38,9 @@ namespace ZoneEngine.GameObject
 
     /// <summary>
     /// </summary>
-    public class VendorShop : GameObject, INamedEntity, IInventory, IAOEvents
+    public class VendorShop : GameObject, IInstancedEntity, IInventory, IAOEvents
     {
         #region Public Properties
-
-        /// <summary>
-        /// </summary>
-        public string Name
-        {
-            get
-            {
-                return this.Name;
-            }
-
-            set
-            {
-                this.Name = value;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public string FirstName { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public string LastName { get; set; }
 
         /// <summary>
         /// </summary>
@@ -108,6 +85,15 @@ namespace ZoneEngine.GameObject
                 this.heading = value;
             }
         }
+
+        // TODO: Get FightingTarget and SelectedTarget into another interface, doesnt really belong here
+        /// <summary>
+        /// </summary>
+        public Identity FightingTarget { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public Identity SelectedTarget { get; set; }
 
         /// <summary>
         /// </summary>

@@ -32,9 +32,11 @@ namespace ZoneEngine.Network.Packets
     using System.Linq;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.GameObject;
+    using ZoneEngine.Network.InternalBus.InternalMessages;
 
     #endregion
 
@@ -106,9 +108,9 @@ namespace ZoneEngine.Network.Packets
         /// </param>
         public static void Send(Client client, int stat, uint value, bool announce)
         {
-            var message = new StatMessage
+            var statMessage = new StatMessage
                               {
-                                  Identity = client.Character.Identity, 
+                                  Identity = client.Character.Identity,
                                   Stats =
                                       new[]
                                           {
@@ -120,13 +122,15 @@ namespace ZoneEngine.Network.Packets
                                                   }
                                           }
                               };
-
-            client.SendCompressed(message);
-
+            var statM = new Message() { Body = statMessage };
+            if (!client.Character.DoNotDoTimers)
+            {
+                client.Character.Playfield.Publish(new IMSendAOtMessageToClient() { client = client, message = statM });
+            }
             /* announce to playfield? */
             if (announce)
             {
-                client.Character.Playfield.AnnounceOthers(message, client.Character.Identity);
+                client.Character.Playfield.AnnounceOthers(statMessage, client.Character.Identity);
             }
         }
 
@@ -190,7 +194,7 @@ namespace ZoneEngine.Network.Packets
                     stats.Add(
                         new GameTuple<CharacterStat, uint>
                             {
-                                Value1 = (CharacterStat)keyValuePair.Key, 
+                                Value1 = (CharacterStat)keyValuePair.Key,
                                 Value2 = keyValuePair.Value
                             });
                 }
@@ -236,7 +240,7 @@ namespace ZoneEngine.Network.Packets
             {
                 var statValue = new GameTuple<CharacterStat, uint>
                                     {
-                                        Value1 = (CharacterStat)keyValuePair.Key, 
+                                        Value1 = (CharacterStat)keyValuePair.Key,
                                         Value2 = keyValuePair.Value
                                     };
                 toClient.Add(statValue);

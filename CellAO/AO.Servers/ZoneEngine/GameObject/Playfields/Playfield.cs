@@ -30,6 +30,8 @@ namespace ZoneEngine.GameObject.Playfields
     using System;
     using System.Collections.Generic;
 
+    using AO.Core.Logger;
+
     using Cell.Core;
 
     using MemBus;
@@ -171,9 +173,29 @@ namespace ZoneEngine.GameObject.Playfields
         {
             foreach (IInstancedEntity entity in this.Entities)
             {
-                if ((this.Identity.Instance == identity.Instance) && (this.Identity.Type == identity.Type))
+                if ((entity.Identity.Instance == identity.Instance) && (entity.Identity.Type == identity.Type))
                 {
                     return entity;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="identity">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public INamedEntity FindNamedEntityByIdentity(Identity identity)
+        {
+            foreach (IInstancedEntity entity in this.Entities)
+            {
+                if ((entity.Identity.Instance == identity.Instance) && (entity.Identity.Type == identity.Type))
+                {
+                    INamedEntity temp = entity as INamedEntity;
+                    return temp;
                 }
             }
 
@@ -255,7 +277,9 @@ namespace ZoneEngine.GameObject.Playfields
         public Playfield()
         {
             this.playfieldBus = BusSetup.StartWith<AsyncConfiguration>().Construct();
-            this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<IMSendAOtMessageToClient>(this.SendAOtMessageToClient));
+            this.memBusDisposeContainer.Add(
+                this.playfieldBus.Subscribe<IMSendAOtMessageToClient>(SendAOtMessageToClient));
+            this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<IMExecuteFunction>(this.ExecuteFunction));
             this.Entities = new HashSet<IInstancedEntity>();
         }
 
@@ -277,9 +301,70 @@ namespace ZoneEngine.GameObject.Playfields
         {
         }
 
-        public void SendAOtMessageToClient(IMSendAOtMessageToClient clientMessage)
+        /// <summary>
+        /// </summary>
+        /// <param name="clientMessage">
+        /// </param>
+        public static void SendAOtMessageToClient(IMSendAOtMessageToClient clientMessage)
         {
+            LogUtil.Debug(clientMessage.message.Body.GetType().ToString());
             clientMessage.client.SendCompressed(clientMessage.message.Body);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="imExecuteFunction">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public void ExecuteFunction(IMExecuteFunction imExecuteFunction)
+        {
+            INamedEntity user = this.FindNamedEntityByIdentity(imExecuteFunction.User);
+            INamedEntity target;
+
+            // TODO: Go over the targets, they can return item templates, inventory entries etc too
+            switch (imExecuteFunction.Function.Target)
+            {
+                case 1:
+                    target = user;
+                    break;
+                case 2:
+                    throw new NotImplementedException("Target Wearer not implemented yet");
+                    break;
+                case 3:
+                    target = this.FindNamedEntityByIdentity(user.SelectedTarget);
+                    break;
+                case 14:
+                    target = this.FindNamedEntityByIdentity(user.FightingTarget);
+                    break;
+                case 19: // Perhaps (if issued from a item) its the item itself
+                    target = user;
+                    break;
+                case 23:
+                    target = this.FindNamedEntityByIdentity(user.SelectedTarget);
+                    break;
+                case 26:
+                    target = user;
+                    break;
+                case 100:
+                    target = user;
+                    break;
+                default:
+                    throw new NotImplementedException(
+                        "Unknown target encountered: Target#:" + imExecuteFunction.Function.Target);
+            }
+
+            Program.FunctionC.CallFunction(
+                imExecuteFunction.Function.FunctionType, 
+                user, 
+                user, 
+                target, 
+                imExecuteFunction.Function.Arguments.Values.ToArray());
+        }
+
+        public void Publish(object obj)
+        {
+            playfieldBus.Publish(obj);
         }
     }
 }

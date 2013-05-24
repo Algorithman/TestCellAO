@@ -104,6 +104,10 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        public Identity FightingTarget { get; set; }
+
+        public Identity SelectedTarget { get; set; }
+
         #endregion
 
         /// <summary>

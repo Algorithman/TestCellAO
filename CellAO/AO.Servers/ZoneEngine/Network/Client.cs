@@ -283,9 +283,7 @@ namespace ZoneEngine.Network
         {
             ChatTextMessage chatTextMessage = new ChatTextMessage();
             chatTextMessage.Text = text;
-            this.Send(chatTextMessage);
-
-            throw new NotImplementedException("SendChatText not implemented yet");
+            this.SendCompressed(chatTextMessage);
         }
 
         #endregion

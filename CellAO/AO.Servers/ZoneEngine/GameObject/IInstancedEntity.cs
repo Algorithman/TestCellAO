@@ -54,6 +54,14 @@ namespace ZoneEngine.GameObject
         /// </summary>
         Quaternion Heading { get; set; }
 
+        /// <summary>
+        /// </summary>
+        Identity FightingTarget { get; set; }
+
+        /// <summary>
+        /// </summary>
+        Identity SelectedTarget { get; set; }
+
         #endregion
     }
 
@@ -123,5 +131,13 @@ namespace ZoneEngine.GameObject
                 Contract.Requires(value != null);
             }
         }
+
+        /// <summary>
+        /// </summary>
+        public Identity FightingTarget { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public Identity SelectedTarget { get; set; }
     }
 }

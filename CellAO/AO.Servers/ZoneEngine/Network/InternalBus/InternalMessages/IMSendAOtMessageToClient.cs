@@ -27,11 +27,7 @@ namespace ZoneEngine.Network.InternalBus.InternalMessages
 {
     #region Usings ...
 
-    using Cell.Core;
-
     using SmokeLounge.AOtomation.Messaging.Messages;
-
-    using ZoneEngine.Network;
 
     #endregion
 

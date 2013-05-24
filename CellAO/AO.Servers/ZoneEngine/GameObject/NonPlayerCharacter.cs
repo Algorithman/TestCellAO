@@ -29,9 +29,12 @@ namespace ZoneEngine.GameObject
 
     using System.Collections.Generic;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     #endregion
 
     /// <summary>
+    /// Main NonPlayerCharacter Class
     /// </summary>
     public class NonPlayerCharacter : Dynel, INamedEntity, ISummoner, IAOEvents, IAOActions
     {
