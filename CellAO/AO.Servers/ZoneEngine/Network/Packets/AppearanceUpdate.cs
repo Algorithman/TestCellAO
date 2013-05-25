@@ -55,7 +55,7 @@ namespace ZoneEngine.Network.Packets
             var message = new AppearanceUpdateMessage { Identity = character.Identity, Unknown = 0x00, };
 
             List<AOMeshs> meshs;
-            int c;
+            int counter;
 
             bool socialonly;
             bool showsocial;
@@ -149,14 +149,14 @@ namespace ZoneEngine.Network.Packets
             var texturesToSend = new List<Texture>();
 
             var aotemp = new AOTextures(0, 0);
-            for (c = 0; c < 5; c++)
+            for (counter = 0; counter < 5; counter++)
             {
                 aotemp.Texture = 0;
-                aotemp.place = c;
+                aotemp.place = counter;
                 int c2;
                 for (c2 = 0; c2 < textures.Count; c2++)
                 {
-                    if (textures[c2].place == c)
+                    if (textures[c2].place == counter)
                     {
                         aotemp.Texture = textures[c2].Texture;
                         break;
@@ -167,13 +167,13 @@ namespace ZoneEngine.Network.Packets
                 {
                     if (socialonly)
                     {
-                        aotemp.Texture = socialTab[c];
+                        aotemp.Texture = socialTab[counter];
                     }
                     else
                     {
-                        if (socialTab[c] != 0)
+                        if (socialTab[counter] != 0)
                         {
-                            aotemp.Texture = socialTab[c];
+                            aotemp.Texture = socialTab[counter];
                         }
                     }
                 }

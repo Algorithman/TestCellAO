@@ -98,10 +98,10 @@ namespace ZoneEngine.Functions
         {
             int statNumber = (int)Arguments[0];
             int statValue = (int)Arguments[1];
-            IStats temp = Target;
-            if (temp != null)
+            IStats tempTarget = Target;
+            if (tempTarget != null)
             {
-                temp.Stats.GetStatbyNumber(statNumber).Set(statValue);
+                tempTarget.Stats.GetStatbyNumber(statNumber).Set(statValue);
                 return true;
             }
 

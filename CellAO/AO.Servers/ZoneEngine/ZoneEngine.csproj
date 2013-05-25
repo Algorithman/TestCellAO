@@ -143,6 +143,7 @@
     <Compile Include="MessageHandlers\FollowTargeHandler.cs" />
     <Compile Include="MessageHandlers\LookAtHandler.cs" />
     <Compile Include="MessageHandlers\SkillHandler.cs" />
+    <Compile Include="MessageHandlers\SocialActionCmdHandler.cs" />
     <Compile Include="MessageHandlers\ZoneLoginMessage.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="GameObject\Dynel.cs" />
