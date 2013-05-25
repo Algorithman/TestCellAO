@@ -858,6 +858,8 @@ namespace ZoneEngine.GameObject
             // Console.WriteLine((moveDirection != 0 ? moveMode.ToString() : "Stand") + "ing in the direction " + moveDirection.ToString() + (spinDirection != 0 ? " while spinning " + spinDirection.ToString() : "") + (strafeDirection != 0 ? " and strafing " + strafeDirection.ToString() : ""));
         }
 
+        /// <summary>
+        /// </summary>
         public void WriteStats()
         {
             // TODO: Implement it

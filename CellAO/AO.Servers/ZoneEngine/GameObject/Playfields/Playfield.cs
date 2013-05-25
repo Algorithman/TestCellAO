@@ -424,16 +424,17 @@ namespace ZoneEngine.GameObject.Playfields
                 var temp = user as Character;
                 if (temp != null)
                 {
-                    temp.Client.SendCompressed(new ChatTextMessage() { Identity = temp.Identity, Text = "No valid target found" });
+                    temp.Client.SendCompressed(
+                        new ChatTextMessage { Identity = temp.Identity, Text = "No valid target found" });
                     return;
                 }
             }
 
             Program.FunctionC.CallFunction(
-                imExecuteFunction.Function.FunctionType,
-                (INamedEntity)user,
-                (INamedEntity)user,
-                target,
+                imExecuteFunction.Function.FunctionType, 
+                (INamedEntity)user, 
+                (INamedEntity)user, 
+                target, 
                 imExecuteFunction.Function.Arguments.Values.ToArray());
         }
 

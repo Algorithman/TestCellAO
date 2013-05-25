@@ -40,6 +40,8 @@ namespace ZoneEngine.Network.InternalBus.InternalMessages
         /// </summary>
         public MessageBody Body;
 
+        /// <summary>
+        /// </summary>
         public Identity Identity;
     }
 }

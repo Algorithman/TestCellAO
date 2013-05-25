@@ -127,7 +127,6 @@ namespace ZoneEngine.Network.Packets
                 charCoord = character.Coordinates;
                 charId = character.Identity;
                 charHeading = character.Heading;
-                    
 
                 sideValue = character.Stats.Side.StatBaseValue;
                 fatValue = character.Stats.Fatness.StatBaseValue;
@@ -213,7 +212,7 @@ namespace ZoneEngine.Network.Packets
                 scfu.Flags |= SimpleCharFullUpdateFlags.HasFightingTarget;
                 scfu.FightingTarget = new Identity
                                           {
-                                              Type = character.FightingTarget.Type,
+                                              Type = character.FightingTarget.Type, 
                                               Instance = character.FightingTarget.Instance
                                           };
             }
@@ -225,19 +224,19 @@ namespace ZoneEngine.Network.Packets
             scfu.Flags |= SimpleCharFullUpdateFlags.HasHeading;
             scfu.Heading = new SmokeLounge.AOtomation.Messaging.GameData.Quaternion
                                {
-                                   W = charHeading.wf,
-                                   X = charHeading.xf,
-                                   Y = charHeading.yf,
+                                   W = charHeading.wf, 
+                                   X = charHeading.xf, 
+                                   Y = charHeading.yf, 
                                    Z = charHeading.zf
                                };
 
             // Race
             scfu.Appearance = new Appearance
                                   {
-                                      Side = (Side)sideValue,
-                                      Fatness = (Fatness)fatValue,
-                                      Breed = (Breed)breedValue,
-                                      Gender = (Gender)sexValue,
+                                      Side = (Side)sideValue, 
+                                      Fatness = (Fatness)fatValue, 
+                                      Breed = (Breed)breedValue, 
+                                      Gender = (Gender)sexValue, 
                                       Race = raceValue
                                   }; // appearance
 
@@ -352,9 +351,9 @@ namespace ZoneEngine.Network.Packets
                                 select
                                     new ActiveNano
                                         {
-                                            NanoId = nano.ID,
-                                            NanoInstance = nano.Instance,
-                                            Time1 = nano.Time1,
+                                            NanoId = nano.ID, 
+                                            NanoInstance = nano.Instance, 
+                                            Time1 = nano.Time1, 
                                             Time2 = nano.Time2
                                         }).ToArray();
 
@@ -406,9 +405,9 @@ namespace ZoneEngine.Network.Packets
                            select
                                new Mesh
                                    {
-                                       Position = (byte)aoMesh.Position,
-                                       Id = (uint)aoMesh.Mesh,
-                                       OverrideTextureId = aoMesh.OverrideTexture,
+                                       Position = (byte)aoMesh.Position, 
+                                       Id = (uint)aoMesh.Mesh, 
+                                       OverrideTextureId = aoMesh.OverrideTexture, 
                                        Layer = (byte)aoMesh.Layer
                                    }).ToArray();
 

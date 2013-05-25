@@ -809,11 +809,13 @@ namespace ZoneEngine.GameObject.Items
         }
 
         #endregion
+
+        /// <summary>
+        /// </summary>
         public AOItem()
         {
-            Events = new List<AOEvents>();
-            Actions = new List<AOActions>();
-
+            this.Events = new List<AOEvents>();
+            this.Actions = new List<AOActions>();
         }
 
         /// <summary>

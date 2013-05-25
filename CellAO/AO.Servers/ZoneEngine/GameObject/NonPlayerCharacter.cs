@@ -38,7 +38,13 @@ namespace ZoneEngine.GameObject
     /// <summary>
     /// Main NonPlayerCharacter Class
     /// </summary>
-    public class NonPlayerCharacter : Dynel, INamedEntity, ISummoner, IAOEvents, IAOActions, ITargetingEntity, IItemContainer
+    public class NonPlayerCharacter : Dynel, 
+                                      INamedEntity, 
+                                      ISummoner, 
+                                      IAOEvents, 
+                                      IAOActions, 
+                                      ITargetingEntity, 
+                                      IItemContainer
     {
         #region Public Properties
 
@@ -102,6 +108,8 @@ namespace ZoneEngine.GameObject
             return true;
         }
 
+        /// <summary>
+        /// </summary>
         public BaseInventory BaseInventory { get; private set; }
     }
 }

@@ -1,34 +1,32 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SkillHandler.cs" company="CellAO Team">
-//   Copyright © 2005-2013 CellAO Team.
-//   
-//   All rights reserved.
-//   
-//   Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-//   
-//       * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//       * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-//       * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-//   
-//   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-//   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-//   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-//   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-//   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-//   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-//   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-//   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// </copyright>
-// <summary>
-//   Defines the SkillHandler type.
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿#region License
+
+// Copyright (c) 2005-2013, CellAO Team
+// 
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// 
+//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
 
 namespace ZoneEngine.MessageHandlers
 {
+    #region Usings ...
+
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
@@ -42,13 +40,22 @@ namespace ZoneEngine.MessageHandlers
     using ZoneEngine.Network;
     using ZoneEngine.Network.InternalBus.InternalMessages;
     using ZoneEngine.Network.PacketHandlers;
-    using ZoneEngine.PacketHandlers;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     [Export(typeof(IHandleMessage))]
     public class SkillHandler : IHandleMessage<SkillMessage>
     {
         #region Public Methods and Operators
 
+        /// <summary>
+        /// </summary>
+        /// <param name="sender">
+        /// </param>
+        /// <param name="message">
+        /// </param>
         public void Handle(object sender, Message message)
         {
             var client = (Client)sender;
@@ -56,7 +63,7 @@ namespace ZoneEngine.MessageHandlers
 
             uint baseIp = 0;
 
-            var characterLevel = client.Character.Stats.Level.StatBaseValue;
+            uint characterLevel = client.Character.Stats.Level.StatBaseValue;
 
             // Calculate base IP value for character level
             if (characterLevel > 204)
@@ -97,18 +104,18 @@ namespace ZoneEngine.MessageHandlers
 
             baseIp += 1500 + ((characterLevel - 1) * 4000);
 
-            var count = skillMessage.Skills.Length;
+            int count = skillMessage.Skills.Length;
             var statlist = new List<int>();
             while (count > 0)
             {
                 count--;
-                var stat = skillMessage.Skills[count];
+                GameTuple<CharacterStat, uint> stat = skillMessage.Skills[count];
                 client.Character.Stats.SetBaseValue((int)stat.Value1, stat.Value2);
                 statlist.Add((int)stat.Value1);
             }
 
             statlist.Add(53); // IP
-            var usedIp = baseIp - (uint)Math.Floor(SkillUpdate.CalculateIP(client.Character));
+            uint usedIp = baseIp - (uint)Math.Floor(SkillUpdate.CalculateIP(client.Character));
             client.Character.Stats.IP.StatBaseValue = usedIp;
 
             // Send the changed stats back to the client
@@ -116,18 +123,18 @@ namespace ZoneEngine.MessageHandlers
             var newStats = new List<GameTuple<CharacterStat, uint>>();
             while (count < statlist.Count)
             {
-                var stat = statlist[count];
-                var statval = client.Character.Stats.GetBaseValue(stat);
+                int stat = statlist[count];
+                uint statval = client.Character.Stats.GetBaseValue(stat);
                 newStats.Add(new GameTuple<CharacterStat, uint> { Value1 = (CharacterStat)stat, Value2 = statval });
                 count++;
             }
 
             var reply = new SkillMessage
-            {
-                Identity = skillMessage.Identity,
-                Unknown = 0x00,
-                Skills = newStats.ToArray()
-            };
+                            {
+                                Identity = skillMessage.Identity, 
+                                Unknown = 0x00, 
+                                Skills = newStats.ToArray()
+                            };
 
             client.Playfield.Publish(new IMSendAOtMessageBodyToClient { client = client, Body = reply });
 

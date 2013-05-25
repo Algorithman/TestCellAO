@@ -1,58 +1,64 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SkillUpdate.cs" company="CellAO Team">
-//   Copyright © 2005-2013 CellAO Team.
-//   
-//   All rights reserved.
-//   
-//   Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-//   
-//       * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-//       * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-//       * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-//   
-//   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-//   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-//   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-//   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-//   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-//   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-//   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-//   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-//   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-//   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-//   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// </copyright>
-// <summary>
-//   Defines the SkillUpdate type.
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿#region License
+
+// Copyright (c) 2005-2013, CellAO Team
+// 
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// 
+//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
 
 namespace ZoneEngine.Network.PacketHandlers
 {
-    using System;
+    #region Usings ...
 
-    using SmokeLounge.AOtomation.Messaging.GameData;
-    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+    using System;
 
     using ZoneEngine.GameObject;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public static class SkillUpdate
     {
         #region Public Methods and Operators
 
+        /// <summary>
+        /// </summary>
+        /// <param name="dynel">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static uint CalculateHitPoints(Dynel dynel)
         {
             int[,] tableProfessionHitPoints =
                 {
                     { 6, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6 }, 
                     { 7, 7, 6, 7, 7, 7, 6, 7, 8, 6, 6, 6, 7, 7 }, 
+                    { 8, 7, 6, 7, 7, 8, 7, 7, 9, 6, 6, 6, 8, 8 }, 
                     
-                    // TitleLevel 2
-                    { 8, 7, 6, 7, 7, 8, 7, 7, 9, 6, 6, 6, 8, 8 }, // TitleLevel 3
+                    // TitleLevel 3
                     { 9, 8, 6, 8, 8, 8, 7, 7, 10, 6, 6, 6, 9, 9 }, // TitleLevel 4
                     { 10, 9, 6, 9, 8, 9, 8, 8, 11, 6, 6, 6, 10, 9 }, // TitleLevel 5
                     { 11, 12, 6, 10, 9, 9, 9, 9, 12, 6, 6, 6, 11, 10 }, // TitleLevel 6
                     { 12, 13, 7, 11, 10, 10, 9, 9, 13, 6, 6, 6, 11, 10 }, // TitleLevel 7
+                    // TitleLevel 2
                     // TitleLevel 1
                     // Sol| MA|ENG|FIX|AGE|ADV|TRA|CRA|ENF|DOC| NT| MP| KEP|SHA   // geprüfte Prof & TL = Soldier, Martial Artist, Engineer, Fixer
                 };
@@ -62,10 +68,10 @@ namespace ZoneEngine.Network.PacketHandlers
             int[] breedMultiplicatorHitPoints = { 3, 3, 2, 4 };
             int[] breedModificatorHitPoints = { 0, -1, -1, 0 };
 
-            var breed = dynel.Stats.Breed.StatBaseValue;
-            var profession = dynel.Stats.Profession.StatBaseValue;
-            var titlelevel = dynel.Stats.TitleLevel.StatBaseValue;
-            var level = dynel.Stats.Level.StatBaseValue;
+            uint breed = dynel.Stats.Breed.StatBaseValue;
+            uint profession = dynel.Stats.Profession.StatBaseValue;
+            uint titlelevel = dynel.Stats.TitleLevel.StatBaseValue;
+            uint level = dynel.Stats.Level.StatBaseValue;
 
             // BreedBaseHP+(Level*(TableProfHP+BreedModiHP))+(BodyDevelopment*BreedMultiHP))
             return
@@ -76,11 +82,17 @@ namespace ZoneEngine.Network.PacketHandlers
                  + (dynel.Stats.BodyDevelopment.Value * breedMultiplicatorHitPoints[breed - 1]));
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="dynel">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static double CalculateIP(Dynel dynel)
         {
             double calc = 0;
-            var breed = dynel.Stats.Breed.StatBaseValue; // 4 = Breed
-            var profession = dynel.Stats.Profession.StatBaseValue - 1; // 60 = Profession
+            uint breed = dynel.Stats.Breed.StatBaseValue; // 4 = Breed
+            uint profession = dynel.Stats.Profession.StatBaseValue - 1; // 60 = Profession
 
             double[,] skillCosts =
                 {
@@ -168,9 +180,9 @@ namespace ZoneEngine.Network.PacketHandlers
                     { 15, 6, 10, 3, 3, 3 }
                 };
 
-            var counter = 0;
+            int counter = 0;
             int c2;
-            var stat = 0;
+            int stat = 0;
 
             // start with attributes...
             for (counter = 0; counter < 6; counter++)
@@ -194,19 +206,26 @@ namespace ZoneEngine.Network.PacketHandlers
             return calc;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="dynel">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static uint CalculateNanoPoints(Dynel dynel)
         {
             int[,] tableProfNanoPoints =
                 {
                     { 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4 }, 
                     { 4, 4, 5, 4, 5, 5, 5, 5, 4, 5, 5, 5, 4, 4 }, 
+                    { 4, 4, 6, 4, 6, 5, 5, 5, 4, 6, 6, 6, 4, 4 }, 
                     
-                    // TitleLevel 2
-                    { 4, 4, 6, 4, 6, 5, 5, 5, 4, 6, 6, 6, 4, 4 }, // TitleLevel 3
+                    // TitleLevel 3
                     { 4, 4, 7, 4, 6, 6, 5, 5, 4, 7, 7, 7, 4, 4 }, // TitleLevel 4
                     { 4, 4, 8, 4, 7, 6, 6, 6, 4, 8, 8, 8, 4, 4 }, // TitleLevel 5
                     { 4, 4, 9, 4, 7, 7, 7, 7, 4, 10, 10, 10, 4, 4 }, // TitleLevel 6
                     { 5, 5, 10, 5, 8, 8, 7, 7, 5, 10, 10, 10, 4, 4 }, // TitleLevel 7
+                    // TitleLevel 2
                     // TitleLevel 1
                     // Sol|MA|ENG|FIX|AGE|ADV|TRA|CRA|ENF|DOC| NT| MP|KEP|SHA  // geprüfte Prof & TL = Soldier, Martial Artist, Engineer, Fixer
                 };
@@ -216,10 +235,10 @@ namespace ZoneEngine.Network.PacketHandlers
             int[] breedMultiplicatorNanoPoints = { 3, 3, 4, 2 };
             int[] breedModificatorNanoPoints = { 0, -1, 1, -2 };
 
-            var breed = dynel.Stats.Breed.StatBaseValue;
-            var profession = dynel.Stats.Profession.StatBaseValue;
-            var titleLevel = dynel.Stats.TitleLevel.StatBaseValue;
-            var level = dynel.Stats.Level.StatBaseValue;
+            uint breed = dynel.Stats.Breed.StatBaseValue;
+            uint profession = dynel.Stats.Profession.StatBaseValue;
+            uint titleLevel = dynel.Stats.TitleLevel.StatBaseValue;
+            uint level = dynel.Stats.Level.StatBaseValue;
 
             // BreedBaseNP+(Level*(TableProfNP+BreedModiNP))+(NanoEnergyPool*BreedMultiNP))
             return
@@ -229,6 +248,7 @@ namespace ZoneEngine.Network.PacketHandlers
                     * (tableProfNanoPoints[titleLevel - 1, profession - 1] + breedModificatorNanoPoints[breed - 1]))
                  + (dynel.Stats.NanoEnergyPool.Value * breedMultiplicatorNanoPoints[breed - 1]));
         }
+
         #endregion
     }
 }

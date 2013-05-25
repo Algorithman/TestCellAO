@@ -27,14 +27,9 @@ namespace ZoneEngine.PacketHandlers
 {
     #region Usings ...
 
-    using System.Threading;
-
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine.GameObject;
     using ZoneEngine.Network;
-    using ZoneEngine.Network.InternalBus.InternalMessages;
-    using ZoneEngine.Network.Packets;
 
     #endregion
 
@@ -53,10 +48,8 @@ namespace ZoneEngine.PacketHandlers
             // client got all the needed data and
             // wants to enter the world. After we
             // reply to this, the character will really be in game
-
             var announce = new CharInPlayMessage { Identity = client.Character.Identity, Unknown = 0x00 };
             client.Playfield.Announce(announce);
-
 
             // Player is in game now, starting is over, set stats normally now
             client.Character.Starting = false;

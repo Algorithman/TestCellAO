@@ -175,8 +175,6 @@ namespace ZoneEngine
             LogUtil.SetupConsoleLogging(LogLevel.Debug);
             LogUtil.SetupFileLogging("${basedir}/ZoneEngineLog.txt", LogLevel.Trace);
 
-            
-
             SettingsOverride.LoadCustomSettings("NBug.ZoneEngine.Config");
             Settings.WriteLogToDisk = true;
             AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
@@ -184,11 +182,9 @@ namespace ZoneEngine
 
             
 
-            #region Script Loading Code Area..
-
             csc = new ScriptCompiler();
 
-            #endregion
+            
 
             // TODO: ADD More Handlers.
             Console.Title = "CellAO " + AssemblyInfoclass.Title + " Console. Version: " + AssemblyInfoclass.Description

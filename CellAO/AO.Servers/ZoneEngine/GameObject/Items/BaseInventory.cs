@@ -52,10 +52,12 @@ namespace ZoneEngine.GameObject.Items
         /// </summary>
         public int MaxSlots { get; private set; }
 
-        private int firstSlotNumber;
-
+        /// <summary>
+        /// </summary>
         public Dynel Owner { get; private set; }
 
+        /// <summary>
+        /// </summary>
         public int MaxCount { get; private set; }
 
         /// <summary>
@@ -74,6 +76,14 @@ namespace ZoneEngine.GameObject.Items
             this.FirstSlotNumber = 0;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="owner">
+        /// </param>
+        /// <param name="items">
+        /// </param>
+        /// <param name="firstSlotNumber">
+        /// </param>
         protected BaseInventory(IItemContainer owner, AOItem[] items, int firstSlotNumber)
             : this()
         {
@@ -87,6 +97,10 @@ namespace ZoneEngine.GameObject.Items
         /// Create a EMPTY base inventory
         /// </summary>
         /// <param name="owner">
+        /// </param>
+        /// <param name="maxSlots">
+        /// </param>
+        /// <param name="firstSlotNumber">
         /// </param>
         public BaseInventory(IItemContainer owner, int maxSlots, int firstSlotNumber)
             : this()
@@ -105,36 +119,31 @@ namespace ZoneEngine.GameObject.Items
         /// </exception>
         public int FindFreeSlot()
         {
-            int slot = FirstSlotNumber;
+            int slot = this.FirstSlotNumber;
             bool foundFreeSlot = false;
-            foreach (AOItem item in Content)
+            foreach (AOItem item in this.Content)
             {
                 if (item == null)
                 {
                     foundFreeSlot = true;
                     break;
                 }
+
                 slot++;
             }
+
             if (!foundFreeSlot)
             {
                 // no free slot found
                 return -1;
             }
+
             return slot;
         }
 
-        public virtual int FirstSlotNumber
-        {
-            get
-            {
-                return this.firstSlotNumber;
-            }
-            set
-            {
-                firstSlotNumber = value;
-            }
-        }
+        /// <summary>
+        /// </summary>
+        public virtual int FirstSlotNumber { get; set; }
 
         /// <summary>
         /// </summary>
@@ -147,11 +156,37 @@ namespace ZoneEngine.GameObject.Items
             return (Slot < this.MaxSlots + this.FirstSlotNumber) && (Slot >= this.FirstSlotNumber);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="slot">
+        /// </param>
+        /// <param name="item">
+        /// </param>
+        /// <param name="isNew">
+        /// </param>
+        /// <param name="reception">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public InventoryError TryAdd(int slot, AOItem item, bool isNew, ItemReceptionType reception)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="item">
+        /// </param>
+        /// <param name="isNew">
+        /// </param>
+        /// <param name="reception">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public InventoryError TryAdd(AOItem item, bool isNew, ItemReceptionType reception)
         {
             throw new NotImplementedException();
@@ -170,11 +205,12 @@ namespace ZoneEngine.GameObject.Items
         public InventoryError TryAdd(int Slot, AOItem Item)
         {
             // TODO: Check for Hotswapping
-            if (Content[Slot] == null)
+            if (this.Content[Slot] == null)
             {
-                Content[Slot] = Item;
+                this.Content[Slot] = Item;
                 return InventoryError.OK;
             }
+
             return InventoryError.Invalid;
         }
 
@@ -193,7 +229,8 @@ namespace ZoneEngine.GameObject.Items
             {
                 return InventoryError.InventoryIsFull;
             }
-            Content[nextFreeSlot] = Item;
+
+            this.Content[nextFreeSlot] = Item;
             return InventoryError.OK;
         }
 
@@ -236,11 +273,15 @@ namespace ZoneEngine.GameObject.Items
             return false;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public IEnumerator<AOItem> GetEnumerator()
         {
-            for (var i = 0; i < Content.Length; i++)
+            for (int i = 0; i < this.Content.Length; i++)
             {
-                var item = Content[i];
+                AOItem item = this.Content[i];
                 if (item != null)
                 {
                     yield return item;
@@ -248,61 +289,134 @@ namespace ZoneEngine.GameObject.Items
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="item">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public void Add(AOItem item)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public void Clear()
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="item">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public bool Contains(AOItem item)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="array">
+        /// </param>
+        /// <param name="arrayIndex">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public void CopyTo(AOItem[] array, int arrayIndex)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="item">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public bool Remove(AOItem item)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// </summary>
         public int Count { get; private set; }
 
+        /// <summary>
+        /// </summary>
         public bool IsReadOnly { get; private set; }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="item">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public int IndexOf(AOItem item)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="index">
+        /// </param>
+        /// <param name="item">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public void Insert(int index, AOItem item)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="index">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public void RemoveAt(int index)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="index">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        /// <returns>
+        /// </returns>
         public AOItem this[int index]
         {
             get
             {
                 throw new NotImplementedException();
             }
+
             set
             {
                 throw new NotImplementedException();

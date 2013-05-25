@@ -31,15 +31,9 @@ namespace ZoneEngine.GameObject
 
     using AO.Core;
 
-    using SmokeLounge.AOtomation.Messaging.GameData;
-
     using ZoneEngine.GameObject.Items;
-    using ZoneEngine.GameObject.Items.Inventory;
     using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
-
-    using Quaternion = AO.Core.Quaternion;
-    using Vector3 = AO.Core.Vector3;
 
     #endregion
 
@@ -55,32 +49,42 @@ namespace ZoneEngine.GameObject
         /// </exception>
         public IPlayfield Playfield { get; set; }
 
+        /// <summary>
+        /// </summary>
         public AOCoord Coordinates
         {
             get
             {
                 return new AOCoord(this.RawCoordinates);
             }
+
             set
             {
-                RawCoordinates = value.coordinate;
+                this.RawCoordinates = value.coordinate;
             }
         }
 
+        /// <summary>
+        /// </summary>
         public Quaternion Heading
         {
             get
             {
                 return this.RawHeading;
             }
+
             set
             {
                 this.RawHeading = value;
             }
         }
 
+        /// <summary>
+        /// </summary>
         public Vector3 RawCoordinates { get; set; }
 
+        /// <summary>
+        /// </summary>
         public Quaternion RawHeading { get; set; }
 
         /// <summary>
@@ -110,6 +114,8 @@ namespace ZoneEngine.GameObject
 
         #endregion
 
+        /// <summary>
+        /// </summary>
         public BaseInventory BaseInventory { get; private set; }
     }
 }

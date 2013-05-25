@@ -75,6 +75,7 @@ namespace ZoneEngine.GameObject.Stats
                     { 4, 4, 9, 4, 7, 7, 7, 7, 4, 10, 10, 10, 4, 5 }, 
                     { 5, 5, 10, 5, 8, 8, 8, 8, 5, 11, 11, 11, 5, 7 }, 
                     
+                    
                     // TitleLevel 7
                     // TitleLevel 6
                     // TitleLevel 5

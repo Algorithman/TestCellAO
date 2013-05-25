@@ -61,17 +61,18 @@ namespace ZoneEngine.Network.Packets
                 {
                     var temp = new InventorySlot
                                    {
-                                       Placement = slot,
-                                       Flags = (short)item.Flags,
-                                       Count = (short)item.MultipleCount,
-                                       Identity = item.Identity,
-                                       ItemLowId = item.LowID,
-                                       ItemHighId = item.HighID,
-                                       Quality = item.Quality,
+                                       Placement = slot, 
+                                       Flags = (short)item.Flags, 
+                                       Count = (short)item.MultipleCount, 
+                                       Identity = item.Identity, 
+                                       ItemLowId = item.LowID, 
+                                       ItemHighId = item.HighID, 
+                                       Quality = item.Quality, 
                                        Unknown = item.Nothing
                                    };
                     inventory.Add(temp);
                 }
+
                 slot++;
             }
 
@@ -767,7 +768,7 @@ namespace ZoneEngine.Network.Packets
 
             fc.Stats3 = stats3.ToArray();
 
-            #region Data09 (Stats 4) (8bit - 16bit)
+            
 
             /* Byte stat number
                Int16 (short) stat value */
@@ -823,7 +824,7 @@ namespace ZoneEngine.Network.Packets
 
             fc.Stats4 = stats4.ToArray();
 
-            #endregion
+            
 
             /* ? */
             fc.Unknown9 = 0;

@@ -71,32 +71,42 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        /// <summary>
+        /// </summary>
         public AOCoord Coordinates
         {
             get
             {
                 return new AOCoord(this.RawCoordinates);
             }
+
             set
             {
-                RawCoordinates = value.coordinate;
+                this.RawCoordinates = value.coordinate;
             }
         }
 
+        /// <summary>
+        /// </summary>
         public Quaternion Heading
         {
             get
             {
-                return RawHeading;
+                return this.RawHeading;
             }
+
             set
             {
-                RawHeading = value;
+                this.RawHeading = value;
             }
         }
 
+        /// <summary>
+        /// </summary>
         public Vector3 RawCoordinates { get; set; }
 
+        /// <summary>
+        /// </summary>
         public Quaternion RawHeading { get; set; }
 
         #endregion

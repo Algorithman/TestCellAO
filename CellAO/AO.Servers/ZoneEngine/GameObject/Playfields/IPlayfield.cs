@@ -140,6 +140,10 @@ namespace ZoneEngine.GameObject.Playfields
         /// </param>
         void Publish(object obj);
 
+        /// <summary>
+        /// </summary>
+        /// <param name="sendSCFUs">
+        /// </param>
         void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs);
     }
 }

@@ -44,9 +44,16 @@ namespace ZoneEngine.GameObject.Enums
         /// </summary>
         HaveUniqueAlready, 
 
-        InventoryIsFull,
-        CannotBeEquipped,
-        RequirementsNotMet,
+        /// <summary>
+        /// </summary>
+        InventoryIsFull, 
 
+        /// <summary>
+        /// </summary>
+        CannotBeEquipped, 
+
+        /// <summary>
+        /// </summary>
+        RequirementsNotMet, 
     }
 }

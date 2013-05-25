@@ -45,13 +45,13 @@ namespace ZoneEngine.GameObject
 
     /// <summary>
     /// </summary>
-    public sealed class Character : Dynel,
-                                    IPacketReceivingEntity,
-                                    INamedEntity,
-                                    ISummoner,
-                                    IAOEvents,
-                                    IAOActions,
-                                    IItemContainer,
+    public sealed class Character : Dynel, 
+                                    IPacketReceivingEntity, 
+                                    INamedEntity, 
+                                    ISummoner, 
+                                    IAOEvents, 
+                                    IAOActions, 
+                                    IItemContainer, 
                                     ITargetingEntity
     {
         #region Fields
@@ -422,12 +422,17 @@ namespace ZoneEngine.GameObject
             return true;
         }
 
+        /// <summary>
+        /// </summary>
         public BaseInventory BaseInventory { get; private set; }
+
+        /// <summary>
+        /// </summary>
         public EntityInventory MainInventory
         {
             get
             {
-                return (EntityInventory)BaseInventory;
+                return (EntityInventory)this.BaseInventory;
             }
         }
     }

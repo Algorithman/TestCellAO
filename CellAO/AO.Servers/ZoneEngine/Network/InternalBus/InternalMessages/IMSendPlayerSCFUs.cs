@@ -25,16 +25,9 @@
 
 namespace ZoneEngine.Network.InternalBus.InternalMessages
 {
-    #region Usings ...
-
-    using SmokeLounge.AOtomation.Messaging.GameData;
-    using SmokeLounge.AOtomation.Messaging.Messages;
-
-    #endregion
-
     /// <summary>
     /// </summary>
-    public class IMSendPlayerSCFUs: InternalMessageBody
+    public class IMSendPlayerSCFUs : InternalMessageBody
     {
         /// <summary>
         /// </summary>
