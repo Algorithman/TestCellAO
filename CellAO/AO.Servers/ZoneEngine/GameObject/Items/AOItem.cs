@@ -31,12 +31,14 @@ namespace ZoneEngine.GameObject.Items
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     #endregion
 
     /// <summary>
     /// </summary>
     [Serializable]
-    public class AOItem : IItemNanoEvents, IItemNanoActions
+    public class AOItem : Dynel, IItemNanoEvents, IItemNanoActions
     {
         #region Fields
 
@@ -97,7 +99,7 @@ namespace ZoneEngine.GameObject.Items
         /// <summary>
         /// Instance of instanced item
         /// </summary>
-        public int Instance;
+        public Identity Identity;
 
         /// <summary>
         /// Item type
@@ -128,11 +130,6 @@ namespace ZoneEngine.GameObject.Items
         /// Item attributes
         /// </summary>
         public List<AOItemAttribute> Stats = new List<AOItemAttribute>();
-
-        /// <summary>
-        /// Type of instanced item
-        /// </summary>
-        public int Type;
 
         #endregion
 

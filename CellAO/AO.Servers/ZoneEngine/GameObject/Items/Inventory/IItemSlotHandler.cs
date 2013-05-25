@@ -23,85 +23,55 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject
+namespace ZoneEngine.GameObject.Items.Inventory
 {
     #region Usings ...
 
-    using System.Collections.Generic;
-
-    using SmokeLounge.AOtomation.Messaging.GameData;
-
-    using ZoneEngine.GameObject.Items;
+    using ZoneEngine.GameObject.Enums;
 
     #endregion
 
     /// <summary>
-    /// Main NonPlayerCharacter Class
     /// </summary>
-    public class NonPlayerCharacter : Dynel, INamedEntity, ISummoner, IAOEvents, IAOActions, ITargetingEntity, IItemContainer
+    public interface IItemSlotHandler
     {
-        #region Public Properties
-
         /// <summary>
+        /// Is called before adding to check whether the item may be added to the corresponding slot 
+        /// (given the case that the corresponding slot is valid and unoccupied)
         /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public string FirstName { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public string LastName { get; set; }
-
-        /// <summary>
-        /// </summary>
-        private IList<Pet> pets;
-
-        /// <summary>
-        /// </summary>
-        public IList<Pet> Pets
-        {
-            get
-            {
-                return this.pets;
-            }
-        }
-
-        #endregion
-
-        /// <summary>
-        /// </summary>
-        public Identity FightingTarget { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public Identity SelectedTarget { get; set; }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="identity">
+        /// <param name="slot">
         /// </param>
-        /// <returns>
-        /// </returns>
-        public bool SetTarget(Identity identity)
-        {
-            this.SelectedTarget = identity;
-            return true;
-        }
+        /// <param name="item">
+        /// </param>
+        /// <param name="err">
+        /// </param>
+        void CheckAdd(int slot, AOItem item, ref InventoryError err);
 
         /// <summary>
+        /// Is called before removing the given item to check whether it may actually be removed
         /// </summary>
-        /// <param name="identity">
+        /// <param name="slot">
         /// </param>
-        /// <returns>
-        /// </returns>
-        public bool SetFightingTarget(Identity identity)
-        {
-            this.FightingTarget = identity;
-            return true;
-        }
+        /// <param name="templ">
+        /// </param>
+        /// <param name="err">
+        /// </param>
+        void CheckRemove(int slot, AOItem templ, ref InventoryError err);
 
-        public BaseInventory BaseInventory { get; private set; }
+        /// <summary>
+        /// Is called after the given item is added to the given slot
+        /// </summary>
+        /// <param name="item">
+        /// </param>
+        void Added(AOItem item);
+
+        /// <summary>
+        /// Is called after the given item is removed from the given slot
+        /// </summary>
+        /// <param name="slot">
+        /// </param>
+        /// <param name="item">
+        /// </param>
+        void Removed(int slot, AOItem item);
     }
 }

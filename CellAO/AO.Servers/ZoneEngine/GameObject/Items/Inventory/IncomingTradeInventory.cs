@@ -23,27 +23,19 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject.Enums
+namespace ZoneEngine.GameObject.Items.Inventory
 {
     /// <summary>
     /// </summary>
-    public enum InventoryError
+    public class IncomingTradeInventory : PartialInventory
     {
         /// <summary>
-        /// Slot Invalid/everything what is not covered
         /// </summary>
-        Invalid = -1, 
-
-        /// <summary>
-        /// No Error
-        /// </summary>
-        OK, 
-
-        /// <summary>
-        /// Character has Unique Item already
-        /// </summary>
-        HaveUniqueAlready, 
-
-        Full,
+        /// <param name="baseInventory">
+        /// </param>
+        public IncomingTradeInventory(EntityInventory baseInventory)
+            : base(baseInventory)
+        {
+        }
     }
 }

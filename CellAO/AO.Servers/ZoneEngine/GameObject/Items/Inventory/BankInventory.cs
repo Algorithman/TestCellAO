@@ -23,11 +23,29 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine
+namespace ZoneEngine.GameObject.Items.Inventory
 {
     /// <summary>
     /// </summary>
-    public interface IInventory
+    public class BankInventory : PartialInventory
     {
+        /// <summary>
+        /// </summary>
+        /// <param name="baseInventory">
+        /// </param>
+        public BankInventory(EntityInventory baseInventory)
+            : base(baseInventory)
+        {
+        }
+
+        /// <summary>
+        /// </summary>
+        public override int FirstSlotNumber
+        {
+            get
+            {
+                return 64;
+            }
+        }
     }
 }

@@ -23,85 +23,81 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject
+namespace ZoneEngine.GameObject.Items.Inventory
 {
     #region Usings ...
 
-    using System.Collections.Generic;
+    using System;
 
-    using SmokeLounge.AOtomation.Messaging.GameData;
-
-    using ZoneEngine.GameObject.Items;
+    using ZoneEngine.GameObject.Enums;
 
     #endregion
 
     /// <summary>
-    /// Main NonPlayerCharacter Class
     /// </summary>
-    public class NonPlayerCharacter : Dynel, INamedEntity, ISummoner, IAOEvents, IAOActions, ITargetingEntity, IItemContainer
+    public class PlayerInventory : PartialInventory, IItemSlotHandler
     {
-        #region Public Properties
-
         /// <summary>
         /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public string FirstName { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public string LastName { get; set; }
-
-        /// <summary>
-        /// </summary>
-        private IList<Pet> pets;
-
-        /// <summary>
-        /// </summary>
-        public IList<Pet> Pets
-        {
-            get
-            {
-                return this.pets;
-            }
-        }
-
-        #endregion
-
-        /// <summary>
-        /// </summary>
-        public Identity FightingTarget { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public Identity SelectedTarget { get; set; }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="identity">
+        /// <param name="baseInventory">
         /// </param>
-        /// <returns>
-        /// </returns>
-        public bool SetTarget(Identity identity)
+        public PlayerInventory(EntityInventory baseInventory)
+            : base(baseInventory)
         {
-            this.SelectedTarget = identity;
-            return true;
         }
 
         /// <summary>
         /// </summary>
-        /// <param name="identity">
+        /// <param name="slot">
         /// </param>
-        /// <returns>
-        /// </returns>
-        public bool SetFightingTarget(Identity identity)
+        /// <param name="item">
+        /// </param>
+        /// <param name="err">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public void CheckAdd(int slot, AOItem item, ref InventoryError err)
         {
-            this.FightingTarget = identity;
-            return true;
+            throw new NotImplementedException();
         }
 
-        public BaseInventory BaseInventory { get; private set; }
+        /// <summary>
+        /// </summary>
+        /// <param name="slot">
+        /// </param>
+        /// <param name="templ">
+        /// </param>
+        /// <param name="err">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public void CheckRemove(int slot, AOItem templ, ref InventoryError err)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="item">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public void Added(AOItem item)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="slot">
+        /// </param>
+        /// <param name="item">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public void Removed(int slot, AOItem item)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

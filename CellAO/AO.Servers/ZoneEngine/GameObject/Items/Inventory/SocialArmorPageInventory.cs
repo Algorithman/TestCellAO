@@ -23,11 +23,11 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject.Items
+namespace ZoneEngine.GameObject.Items.Inventory
 {
     #region Usings ...
 
-    using System.Collections.Generic;
+    using System;
 
     using ZoneEngine.GameObject.Enums;
 
@@ -35,83 +35,69 @@ namespace ZoneEngine.GameObject.Items
 
     /// <summary>
     /// </summary>
-    public interface IInventory
+    public class SocialArmorPageInventory : PartialInventory, IItemSlotHandler
     {
         /// <summary>
         /// </summary>
-        IItemContainer owner { get; }
-
-        /// <summary>
-        /// </summary>
-        SortedDictionary<int, AOItem> Content { get; }
-
-        /// <summary>
-        /// </summary>
-        int MaxSlots { get; }
-
-        /// <summary>
-        /// </summary>
-        bool IsEmpty { get; }
-
-        /// <summary>
-        /// </summary>
-        bool IsFull { get; }
-
-        /// <summary>
-        /// </summary>
-        /// <returns>
-        /// </returns>
-        int FindFreeSlot();
-
-        /// <summary>
-        /// </summary>
-        int InventoryOffset { get; }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="Slot">
+        /// <param name="baseInventory">
         /// </param>
-        /// <returns>
-        /// </returns>
-        bool IsValidSlot(int Slot);
+        public SocialArmorPageInventory(EntityInventory baseInventory)
+            : base(baseInventory)
+        {
+        }
 
         /// <summary>
         /// </summary>
-        /// <param name="Slot">
+        /// <param name="slot">
         /// </param>
-        /// <param name="Item">
+        /// <param name="item">
         /// </param>
-        /// <returns>
-        /// </returns>
-        InventoryError TryAdd(int Slot, AOItem Item);
+        /// <param name="err">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public void CheckAdd(int slot, AOItem item, ref InventoryError err)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// </summary>
-        /// <param name="Item">
+        /// <param name="slot">
         /// </param>
-        /// <returns>
-        /// </returns>
-        InventoryError TryAdd(AOItem Item);
+        /// <param name="templ">
+        /// </param>
+        /// <param name="err">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public void CheckRemove(int slot, AOItem templ, ref InventoryError err)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// </summary>
-        /// <param name="Slot">
+        /// <param name="item">
         /// </param>
-        /// <param name="ownerChange">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        AOItem Remove(int Slot, bool ownerChange);
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public void Added(AOItem item)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
-        /// Destroys AOItem at slot <see cref="slot"/>
         /// </summary>
-        /// <param name="Slot">
-        /// Slot number of the Item
+        /// <param name="slot">
         /// </param>
-        /// <returns>
-        /// Item could be destroyed
-        /// </returns>
-        bool Destroy(int Slot);
+        /// <param name="item">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public void Removed(int slot, AOItem item)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

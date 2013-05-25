@@ -34,6 +34,8 @@ namespace ZoneEngine.Network.Packets
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.GameObject.Items;
+
     #endregion
 
     /// <summary>
@@ -51,27 +53,28 @@ namespace ZoneEngine.Network.Packets
             var fc = new FullCharacterMessage { Identity = client.Character.Identity, Unknown1 = 25 };
 
             /* part 1 of data */
-            IEnumerable<InventorySlot> inventory = from ie in client.Character.BaseInventory.Content
-                                                   let item = ie.Value
-                                                   select
-                                                       new InventorySlot
-                                                           {
-                                                               Placement = ie.Key, 
-                                                               Flags = (short)item.Flags, 
-                                                               Count = (short)item.MultipleCount, 
-                                                               Identity =
-                                                                   new Identity
-                                                                       {
-                                                                           Type =
-                                                                               (IdentityType)
-                                                                               item.Type, 
-                                                                           Instance = item.Instance
-                                                                       }, 
-                                                               ItemLowId = item.LowID, 
-                                                               ItemHighId = item.HighID, 
-                                                               Quality = item.Quality, 
-                                                               Unknown = item.Nothing
-                                                           };
+            List<InventorySlot> inventory = new List<InventorySlot>();
+            int slot = client.Character.MainInventory.InventoryPage.FirstSlotNumber;
+            foreach (AOItem item in client.Character.MainInventory.InventoryPage)
+            {
+                if (item != null)
+                {
+                    var temp = new InventorySlot
+                                   {
+                                       Placement = slot,
+                                       Flags = (short)item.Flags,
+                                       Count = (short)item.MultipleCount,
+                                       Identity = item.Identity,
+                                       ItemLowId = item.LowID,
+                                       ItemHighId = item.HighID,
+                                       Quality = item.Quality,
+                                       Unknown = item.Nothing
+                                   };
+                    inventory.Add(temp);
+                }
+                slot++;
+            }
+
             fc.InventorySlots = inventory.ToArray();
 
             /* part 2 of data */
@@ -295,8 +298,6 @@ namespace ZoneEngine.Network.Packets
             AddStat3232(client, stats1, 300);
 
             fc.Stats1 = stats1.ToArray();
-
-            
 
             /* Int32 stat number
                Int32 stat value */
@@ -736,10 +737,6 @@ namespace ZoneEngine.Network.Packets
 
             fc.Stats2 = stats2.ToArray();
 
-            
-
-            #region Data08 (Stats 3) (8bit - 8bit)
-
             /* Byte stat number
                Byte stat value */
             var stats3 = new List<GameTuple<byte, byte>>();
@@ -769,8 +766,6 @@ namespace ZoneEngine.Network.Packets
             AddStat88(client, stats3, 45);
 
             fc.Stats3 = stats3.ToArray();
-
-            #endregion
 
             #region Data09 (Stats 4) (8bit - 16bit)
 

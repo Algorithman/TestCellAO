@@ -28,9 +28,11 @@ namespace ZoneEngine.GameObject.Items
     #region Usings ...
 
     using System;
+    using System.Collections;
     using System.Collections.Generic;
 
     using ZoneEngine.GameObject.Enums;
+    using ZoneEngine.GameObject.Items.Inventory;
 
     #endregion
 
@@ -44,11 +46,17 @@ namespace ZoneEngine.GameObject.Items
 
         /// <summary>
         /// </summary>
-        public SortedDictionary<int, AOItem> Content { get; private set; }
+        public AOItem[] Content { get; private set; }
 
         /// <summary>
         /// </summary>
         public int MaxSlots { get; private set; }
+
+        private int firstSlotNumber;
+
+        public Dynel Owner { get; private set; }
+
+        public int MaxCount { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -62,18 +70,31 @@ namespace ZoneEngine.GameObject.Items
         /// </summary>
         public BaseInventory()
         {
-            this.Content = new SortedDictionary<int, AOItem>();
             this.MaxSlots = 0;
+            this.FirstSlotNumber = 0;
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="owner">
-        /// </param>
-        public BaseInventory(IItemContainer owner)
+        protected BaseInventory(IItemContainer owner, AOItem[] items, int firstSlotNumber)
             : this()
         {
             this.owner = owner;
+            this.Content = items;
+            this.MaxSlots = items.Length;
+            this.FirstSlotNumber = firstSlotNumber;
+        }
+
+        /// <summary>
+        /// Create a EMPTY base inventory
+        /// </summary>
+        /// <param name="owner">
+        /// </param>
+        public BaseInventory(IItemContainer owner, int maxSlots, int firstSlotNumber)
+            : this()
+        {
+            this.owner = owner;
+            this.MaxSlots = maxSlots;
+            this.Content = new AOItem[maxSlots];
+            this.FirstSlotNumber = firstSlotNumber;
         }
 
         /// <summary>
@@ -84,12 +105,36 @@ namespace ZoneEngine.GameObject.Items
         /// </exception>
         public int FindFreeSlot()
         {
-            throw new NotImplementedException();
+            int slot = FirstSlotNumber;
+            bool foundFreeSlot = false;
+            foreach (AOItem item in Content)
+            {
+                if (item == null)
+                {
+                    foundFreeSlot = true;
+                    break;
+                }
+                slot++;
+            }
+            if (!foundFreeSlot)
+            {
+                // no free slot found
+                return -1;
+            }
+            return slot;
         }
 
-        /// <summary>
-        /// </summary>
-        public int InventoryOffset { get; private set; }
+        public virtual int FirstSlotNumber
+        {
+            get
+            {
+                return this.firstSlotNumber;
+            }
+            set
+            {
+                firstSlotNumber = value;
+            }
+        }
 
         /// <summary>
         /// </summary>
@@ -99,7 +144,17 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public bool IsValidSlot(int Slot)
         {
-            return (Slot < this.MaxSlots + this.InventoryOffset) && (Slot >= this.InventoryOffset);
+            return (Slot < this.MaxSlots + this.FirstSlotNumber) && (Slot >= this.FirstSlotNumber);
+        }
+
+        public InventoryError TryAdd(int slot, AOItem item, bool isNew, ItemReceptionType reception)
+        {
+            throw new NotImplementedException();
+        }
+
+        public InventoryError TryAdd(AOItem item, bool isNew, ItemReceptionType reception)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -114,7 +169,13 @@ namespace ZoneEngine.GameObject.Items
         /// </exception>
         public InventoryError TryAdd(int Slot, AOItem Item)
         {
-            throw new NotImplementedException();
+            // TODO: Check for Hotswapping
+            if (Content[Slot] == null)
+            {
+                Content[Slot] = Item;
+                return InventoryError.OK;
+            }
+            return InventoryError.Invalid;
         }
 
         /// <summary>
@@ -127,7 +188,13 @@ namespace ZoneEngine.GameObject.Items
         /// </exception>
         public InventoryError TryAdd(AOItem Item)
         {
-            throw new NotImplementedException();
+            int nextFreeSlot = this.FindFreeSlot();
+            if (nextFreeSlot == -1)
+            {
+                return InventoryError.Full;
+            }
+            Content[nextFreeSlot] = Item;
+            return InventoryError.OK;
         }
 
         /// <summary>
@@ -144,7 +211,7 @@ namespace ZoneEngine.GameObject.Items
             {
                 // TODO: Add more checks (eg. is equipped)
                 AOItem item = this.Content[Slot];
-                this.Content.Remove(Slot);
+                this.Content[Slot] = null;
                 return item;
             }
 
@@ -162,11 +229,84 @@ namespace ZoneEngine.GameObject.Items
             if (this.IsValidSlot(Slot))
             {
                 // TODO: Add more checks (eg. is equipped)
-                this.Content.Remove(Slot);
+                this.Content[Slot] = null;
                 return true;
             }
 
             return false;
+        }
+
+        public IEnumerator<AOItem> GetEnumerator()
+        {
+            for (var i = 0; i < Content.Length; i++)
+            {
+                var item = Content[i];
+                if (item != null)
+                {
+                    yield return item;
+                }
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+
+        public void Add(AOItem item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Clear()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Contains(AOItem item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void CopyTo(AOItem[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Remove(AOItem item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Count { get; private set; }
+
+        public bool IsReadOnly { get; private set; }
+
+        public int IndexOf(AOItem item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Insert(int index, AOItem item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveAt(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public AOItem this[int index]
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

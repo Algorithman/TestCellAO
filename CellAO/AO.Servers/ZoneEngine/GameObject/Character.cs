@@ -38,19 +38,20 @@ namespace ZoneEngine.GameObject
 
     using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Items;
+    using ZoneEngine.GameObject.Items.Inventory;
     using ZoneEngine.GameObject.Misc;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    public sealed class Character : Dynel, 
-                                    IPacketReceivingEntity, 
-                                    INamedEntity, 
-                                    ISummoner, 
-                                    IAOEvents, 
-                                    IAOActions, 
-                                    IItemContainer, 
+    public sealed class Character : Dynel,
+                                    IPacketReceivingEntity,
+                                    INamedEntity,
+                                    ISummoner,
+                                    IAOEvents,
+                                    IAOActions,
+                                    IItemContainer,
                                     ITargetingEntity
     {
         #region Fields
@@ -248,13 +249,9 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        public BaseInventory BaseInventory { get; private set; }
-
-        /// <summary>
-        /// </summary>
         public Character()
         {
-            this.BaseInventory = new BaseInventory(this);
+            this.BaseInventory = new EntityInventory(this);
             this.pets = new List<Pet>();
         }
 
@@ -423,6 +420,15 @@ namespace ZoneEngine.GameObject
             // TODO: Check if target still exists in playfield
             this.SelectedTarget = identity;
             return true;
+        }
+
+        public BaseInventory BaseInventory { get; private set; }
+        public EntityInventory MainInventory
+        {
+            get
+            {
+                return (EntityInventory)BaseInventory;
+            }
         }
     }
 }

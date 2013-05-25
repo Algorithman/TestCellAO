@@ -23,85 +23,100 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject
+namespace ZoneEngine.GameObject.Items.Inventory
 {
     #region Usings ...
 
     using System.Collections.Generic;
 
-    using SmokeLounge.AOtomation.Messaging.GameData;
-
-    using ZoneEngine.GameObject.Items;
+    using ZoneEngine.GameObject.Enums;
 
     #endregion
 
     /// <summary>
-    /// Main NonPlayerCharacter Class
     /// </summary>
-    public class NonPlayerCharacter : Dynel, INamedEntity, ISummoner, IAOEvents, IAOActions, ITargetingEntity, IItemContainer
+    public interface IInventory : IList<AOItem>
     {
-        #region Public Properties
+        /// <summary>
+        /// </summary>
+        Dynel Owner { get; }
 
         /// <summary>
         /// </summary>
-        public string Name { get; set; }
+        AOItem[] Content { get; }
 
         /// <summary>
         /// </summary>
-        public string FirstName { get; set; }
+        int MaxCount { get; }
 
         /// <summary>
         /// </summary>
-        public string LastName { get; set; }
+        bool IsEmpty { get; }
 
         /// <summary>
         /// </summary>
-        private IList<Pet> pets;
+        bool IsFull { get; }
 
         /// <summary>
         /// </summary>
-        public IList<Pet> Pets
-        {
-            get
-            {
-                return this.pets;
-            }
-        }
-
-        #endregion
+        /// <returns>
+        /// </returns>
+        int FindFreeSlot();
 
         /// <summary>
         /// </summary>
-        public Identity FightingTarget { get; set; }
+        int FirstSlotNumber { get; set; }
 
         /// <summary>
         /// </summary>
-        public Identity SelectedTarget { get; set; }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="identity">
+        /// <param name="Slot">
         /// </param>
         /// <returns>
         /// </returns>
-        public bool SetTarget(Identity identity)
-        {
-            this.SelectedTarget = identity;
-            return true;
-        }
+        bool IsValidSlot(int Slot);
 
         /// <summary>
         /// </summary>
-        /// <param name="identity">
+        /// <param name="slot">
+        /// </param>
+        /// <param name="item">
+        /// </param>
+        /// <param name="isNew">
+        /// </param>
+        /// <param name="reception">
         /// </param>
         /// <returns>
         /// </returns>
-        public bool SetFightingTarget(Identity identity)
-        {
-            this.FightingTarget = identity;
-            return true;
-        }
+        InventoryError TryAdd(int slot, AOItem item, bool isNew, ItemReceptionType reception);
 
-        public BaseInventory BaseInventory { get; private set; }
+        /// <summary>
+        /// </summary>
+        /// <param name="item">
+        /// </param>
+        /// <param name="isNew">
+        /// </param>
+        /// <param name="reception">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        InventoryError TryAdd(AOItem item, bool isNew, ItemReceptionType reception);
+
+        /// <summary>
+        /// </summary>
+        /// <param name="slot">
+        /// </param>
+        /// <param name="ownerChange">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        AOItem Remove(int slot, bool ownerChange);
+
+        /// <summary>
+        /// </summary>
+        /// <param name="slot">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        bool Destroy(int slot);
     }
 }

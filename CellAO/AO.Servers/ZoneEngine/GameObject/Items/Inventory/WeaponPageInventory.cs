@@ -23,93 +23,96 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject
+namespace ZoneEngine.GameObject.Items.Inventory
 {
     #region Usings ...
 
     using System;
 
-    using AO.Core;
-
-    using SmokeLounge.AOtomation.Messaging.GameData;
-
-    using ZoneEngine.GameObject.Items;
-    using ZoneEngine.GameObject.Items.Inventory;
-    using ZoneEngine.GameObject.Playfields;
-    using ZoneEngine.GameObject.Stats;
-
-    using Quaternion = AO.Core.Quaternion;
-    using Vector3 = AO.Core.Vector3;
+    using ZoneEngine.GameObject.Enums;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    public class VendorShop : GameObject, IInstancedEntity, IItemContainer, IAOEvents
+    public class WeaponPageInventory : PartialInventory, IItemSlotHandler, IItemHotSwapHandler
     {
-        #region Public Properties
+        /// <summary>
+        /// </summary>
+        /// <param name="baseInventory">
+        /// </param>
+        public WeaponPageInventory(EntityInventory baseInventory)
+            : base(baseInventory)
+        {
+        }
 
         /// <summary>
         /// </summary>
+        /// <param name="slot">
+        /// </param>
+        /// <param name="item">
+        /// </param>
+        /// <param name="err">
+        /// </param>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public IPlayfield Playfield { get; set; }
-
-        public AOCoord Coordinates
-        {
-            get
-            {
-                return new AOCoord(this.RawCoordinates);
-            }
-            set
-            {
-                RawCoordinates = value.coordinate;
-            }
-        }
-
-        public Quaternion Heading
-        {
-            get
-            {
-                return this.RawHeading;
-            }
-            set
-            {
-                this.RawHeading = value;
-            }
-        }
-
-        public Vector3 RawCoordinates { get; set; }
-
-        public Quaternion RawHeading { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public DynelStats Stats
-        {
-            get
-            {
-                return this.Stats;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="aof">
-        /// </param>
-        /// <param name="checkAll">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public bool CheckRequirements(AOFunctions aof, bool checkAll)
+        public void CheckAdd(int slot, AOItem item, ref InventoryError err)
         {
             throw new NotImplementedException();
         }
 
-        #endregion
+        /// <summary>
+        /// </summary>
+        /// <param name="slot">
+        /// </param>
+        /// <param name="templ">
+        /// </param>
+        /// <param name="err">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public void CheckRemove(int slot, AOItem templ, ref InventoryError err)
+        {
+            throw new NotImplementedException();
+        }
 
-        public BaseInventory BaseInventory { get; private set; }
+        /// <summary>
+        /// </summary>
+        /// <param name="item">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public void Added(AOItem item)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="slot">
+        /// </param>
+        /// <param name="item">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public void Removed(int slot, AOItem item)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="slotFrom">
+        /// </param>
+        /// <param name="slotTo">
+        /// </param>
+        /// <param name="err">
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public void TryHotSwap(int slotFrom, int slotTo, ref InventoryError err)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

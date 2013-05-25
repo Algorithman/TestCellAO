@@ -23,85 +23,26 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject
+namespace ZoneEngine.GameObject.Items.Inventory
 {
     #region Usings ...
 
-    using System.Collections.Generic;
-
-    using SmokeLounge.AOtomation.Messaging.GameData;
-
-    using ZoneEngine.GameObject.Items;
+    using ZoneEngine.GameObject.Enums;
 
     #endregion
 
     /// <summary>
-    /// Main NonPlayerCharacter Class
     /// </summary>
-    public class NonPlayerCharacter : Dynel, INamedEntity, ISummoner, IAOEvents, IAOActions, ITargetingEntity, IItemContainer
+    public interface IItemHotSwapHandler
     {
-        #region Public Properties
-
         /// <summary>
         /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public string FirstName { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public string LastName { get; set; }
-
-        /// <summary>
-        /// </summary>
-        private IList<Pet> pets;
-
-        /// <summary>
-        /// </summary>
-        public IList<Pet> Pets
-        {
-            get
-            {
-                return this.pets;
-            }
-        }
-
-        #endregion
-
-        /// <summary>
-        /// </summary>
-        public Identity FightingTarget { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public Identity SelectedTarget { get; set; }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="identity">
+        /// <param name="slotFrom">
         /// </param>
-        /// <returns>
-        /// </returns>
-        public bool SetTarget(Identity identity)
-        {
-            this.SelectedTarget = identity;
-            return true;
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="identity">
+        /// <param name="slotTo">
         /// </param>
-        /// <returns>
-        /// </returns>
-        public bool SetFightingTarget(Identity identity)
-        {
-            this.FightingTarget = identity;
-            return true;
-        }
-
-        public BaseInventory BaseInventory { get; private set; }
+        /// <param name="err">
+        /// </param>
+        void TryHotSwap(int slotFrom, int slotTo, ref InventoryError err);
     }
 }

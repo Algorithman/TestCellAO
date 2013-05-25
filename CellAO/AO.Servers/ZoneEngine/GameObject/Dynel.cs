@@ -47,7 +47,7 @@ namespace ZoneEngine.GameObject
 
     /// <summary>
     /// </summary>
-    public class Dynel : GameObject, IInstancedEntity, IStats
+    public class Dynel : GameObject, IInstancedEntity
     {
         #region Fields
 
