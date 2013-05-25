@@ -86,15 +86,6 @@ namespace ZoneEngine.GameObject
             }
         }
 
-        // TODO: Get FightingTarget and SelectedTarget into another interface, doesnt really belong here
-        /// <summary>
-        /// </summary>
-        public Identity FightingTarget { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public Identity SelectedTarget { get; set; }
-
         /// <summary>
         /// </summary>
         public DynelStats Stats

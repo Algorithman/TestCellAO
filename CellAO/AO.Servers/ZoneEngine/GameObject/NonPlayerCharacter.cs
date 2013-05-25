@@ -36,7 +36,7 @@ namespace ZoneEngine.GameObject
     /// <summary>
     /// Main NonPlayerCharacter Class
     /// </summary>
-    public class NonPlayerCharacter : Dynel, INamedEntity, ISummoner, IAOEvents, IAOActions
+    public class NonPlayerCharacter : Dynel, INamedEntity, ISummoner, IAOEvents, IAOActions, ITargetingEntity
     {
         #region Public Properties
 
@@ -67,5 +67,21 @@ namespace ZoneEngine.GameObject
         }
 
         #endregion
+
+        public Identity FightingTarget { get; set; }
+
+        public Identity SelectedTarget { get; set; }
+
+        public bool SetTarget(Identity identity)
+        {
+            this.SelectedTarget = identity;
+            return true;
+        }
+
+        public bool SetFightingTarget(Identity identity)
+        {
+            this.FightingTarget = identity;
+            return true;
+        }
     }
 }

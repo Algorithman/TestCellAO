@@ -32,13 +32,14 @@ namespace ZoneEngine.GameObject
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.GameObject.Playfields;
+    using ZoneEngine.GameObject.Stats;
 
     #endregion
 
     /// <summary>
     /// </summary>
     [ContractClass(typeof(IInstancedEntityContract))]
-    public interface IInstancedEntity : IEntity
+    public interface IInstancedEntity : IEntity, IStats
     {
         #region Public Properties
 
@@ -53,14 +54,6 @@ namespace ZoneEngine.GameObject
         /// <summary>
         /// </summary>
         Quaternion Heading { get; set; }
-
-        /// <summary>
-        /// </summary>
-        Identity FightingTarget { get; set; }
-
-        /// <summary>
-        /// </summary>
-        Identity SelectedTarget { get; set; }
 
         #endregion
     }
@@ -132,12 +125,6 @@ namespace ZoneEngine.GameObject
             }
         }
 
-        /// <summary>
-        /// </summary>
-        public Identity FightingTarget { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public Identity SelectedTarget { get; set; }
+        public DynelStats Stats { get; private set; }
     }
 }

@@ -25,6 +25,8 @@
 
 namespace ZoneEngine.GameObject
 {
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     /// <summary>
     /// </summary>
     public interface IAOActions

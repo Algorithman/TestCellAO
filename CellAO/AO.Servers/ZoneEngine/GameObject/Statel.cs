@@ -30,6 +30,7 @@ namespace ZoneEngine.GameObject
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.GameObject.Playfields;
+    using ZoneEngine.GameObject.Stats;
 
     #endregion
 
@@ -79,8 +80,6 @@ namespace ZoneEngine.GameObject
             }
         }
 
-        public Identity FightingTarget { get; set; }
-
-        public Identity SelectedTarget { get; set; }
+        public DynelStats Stats { get; private set; }
     }
 }

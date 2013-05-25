@@ -132,10 +132,6 @@ namespace ZoneEngine.GameObject
             }
         }
 
-        public Identity FightingTarget { get; set; }
-
-        public Identity SelectedTarget { get; set; }
-
         /// <summary>
         /// </summary>
         public DynelStats Stats
@@ -147,10 +143,6 @@ namespace ZoneEngine.GameObject
             }
         }
 
-        public void SetTarget(Identity target)
-        {
-            this.SelectedTarget = target;
-        }
         #endregion
     }
 }

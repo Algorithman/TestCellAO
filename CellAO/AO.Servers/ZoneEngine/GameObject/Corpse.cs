@@ -36,6 +36,7 @@ namespace ZoneEngine.GameObject
 
     using ZoneEngine.GameObject.Items;
     using ZoneEngine.GameObject.Playfields;
+    using ZoneEngine.GameObject.Stats;
 
     #endregion
 
@@ -104,10 +105,6 @@ namespace ZoneEngine.GameObject
             }
         }
 
-        public Identity FightingTarget { get; set; }
-
-        public Identity SelectedTarget { get; set; }
-
         #endregion
 
         /// <summary>
@@ -146,5 +143,7 @@ namespace ZoneEngine.GameObject
                 return false;
             }
         }
+
+        public DynelStats Stats { get; private set; }
     }
 }

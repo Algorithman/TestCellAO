@@ -39,7 +39,7 @@ namespace ZoneEngine.GameObject
     /// <summary>
     /// </summary>
     [ContractClass(typeof(INamedEntityContract))]
-    public interface INamedEntity : IInstancedEntity, IStats
+    public interface INamedEntity : IInstancedEntity
     {
         #region Public Properties
 
@@ -99,14 +99,6 @@ namespace ZoneEngine.GameObject
             }
         }
 
-        public Identity FightingTarget { get; set; }
-
-        public Identity SelectedTarget { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public DynelStats Stats { get; private set; }
-
         /// <summary>
         /// </summary>
         public string Name
@@ -152,5 +144,7 @@ namespace ZoneEngine.GameObject
             {
             }
         }
+
+        public DynelStats Stats { get; private set; }
     }
 }

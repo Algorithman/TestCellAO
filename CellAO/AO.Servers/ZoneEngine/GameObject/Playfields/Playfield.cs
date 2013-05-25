@@ -319,14 +319,14 @@ namespace ZoneEngine.GameObject.Playfields
         /// </exception>
         public void ExecuteFunction(IMExecuteFunction imExecuteFunction)
         {
-            INamedEntity user = this.FindNamedEntityByIdentity(imExecuteFunction.User);
+            var user = (ITargetingEntity)this.FindNamedEntityByIdentity(imExecuteFunction.User);
             INamedEntity target;
 
             // TODO: Go over the targets, they can return item templates, inventory entries etc too
             switch (imExecuteFunction.Function.Target)
             {
                 case 1:
-                    target = user;
+                    target = (INamedEntity)user;
                     break;
                 case 2:
                     throw new NotImplementedException("Target Wearer not implemented yet");
@@ -338,16 +338,16 @@ namespace ZoneEngine.GameObject.Playfields
                     target = this.FindNamedEntityByIdentity(user.FightingTarget);
                     break;
                 case 19: // Perhaps (if issued from a item) its the item itself
-                    target = user;
+                    target = (INamedEntity)user;
                     break;
                 case 23:
                     target = this.FindNamedEntityByIdentity(user.SelectedTarget);
                     break;
                 case 26:
-                    target = user;
+                    target = (INamedEntity)user;
                     break;
                 case 100:
-                    target = user;
+                    target = (INamedEntity)user;
                     break;
                 default:
                     throw new NotImplementedException(
@@ -356,15 +356,19 @@ namespace ZoneEngine.GameObject.Playfields
 
             Program.FunctionC.CallFunction(
                 imExecuteFunction.Function.FunctionType, 
-                user, 
-                user, 
+                (INamedEntity)user, 
+                (INamedEntity)user, 
                 target, 
                 imExecuteFunction.Function.Arguments.Values.ToArray());
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="obj">
+        /// </param>
         public void Publish(object obj)
         {
-            playfieldBus.Publish(obj);
+            this.playfieldBus.Publish(obj);
         }
     }
 }

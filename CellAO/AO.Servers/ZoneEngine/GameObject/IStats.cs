@@ -29,6 +29,9 @@ namespace ZoneEngine.GameObject
 
     using System.Diagnostics.Contracts;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
+    using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
 
     #endregion
@@ -67,5 +70,19 @@ namespace ZoneEngine.GameObject
                 Contract.Requires(value != null);
             }
         }
+
+        public Identity Identity { get; private set; }
+
+        public IPlayfield Playfield { get; set; }
+
+        public Vector3 Coordinates { get; set; }
+
+        public Quaternion Heading { get; set; }
+
+        public string Name { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
     }
 }

@@ -33,8 +33,6 @@ namespace ZoneEngine.GameObject
 
     using AO.Core;
 
-    using Cell.Core;
-
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
 
@@ -52,7 +50,8 @@ namespace ZoneEngine.GameObject
                                     ISummoner, 
                                     IAOEvents, 
                                     IAOActions, 
-                                    IItemContainer
+                                    IItemContainer, 
+                                    ITargetingEntity
     {
         #region Fields
 
@@ -67,10 +66,6 @@ namespace ZoneEngine.GameObject
         /// <summary>
         /// </summary>
         private readonly IList<Pet> pets = new List<Pet>();
-
-        /// <summary>
-        /// </summary>
-        public Identity FightingTarget = new Identity();
 
         /// <summary>
         /// </summary>
@@ -286,17 +281,6 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        /// <param name="identity">
-        /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        internal void SetTarget(Identity identity)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
         /// <exception cref="NotImplementedException">
         /// </exception>
         public void CalculateSkills()
@@ -394,6 +378,33 @@ namespace ZoneEngine.GameObject
                 this.stats.Health.StatBaseValue = this.stats.Health.GetMaxValue((uint)oldhealth);
                 this.stats.CurrentNano.StatBaseValue = this.stats.CurrentNano.GetMaxValue((uint)oldnano);
             }
+        }
+
+        /// <summary>
+        /// </summary>
+        public Identity FightingTarget { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public Identity SelectedTarget { get; set; }
+
+        bool ITargetingEntity.SetTarget(Identity identity)
+        {
+            return this.SetTarget(identity);
+        }
+
+        public bool SetFightingTarget(Identity identity)
+        {
+            // TODO: Check if target still exists in playfield (not dead, not teleported away)
+            this.FightingTarget = identity;
+            return true;
+        }
+
+        bool SetTarget(Identity identity)
+        {
+            // TODO: Check if target still exists in playfield
+            this.SelectedTarget = identity;
+            return true;
         }
     }
 }

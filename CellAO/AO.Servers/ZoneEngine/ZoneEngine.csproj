@@ -109,6 +109,7 @@
     <Compile Include="Functions\FunctionPrototype.cs" />
     <Compile Include="Functions\set.cs" />
     <Compile Include="GameObject\Enums\Expansions.cs" />
+    <Compile Include="GameObject\ITargetingEntity.cs" />
     <Compile Include="GameObject\Items\AOActions.cs" />
     <Compile Include="GameObject\Items\AOItemAttribute.cs" />
     <Compile Include="GameObject\Items\BaseInventory.cs" />
