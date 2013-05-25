@@ -170,12 +170,12 @@ namespace ZoneEngine
         {
             bool processedargs = false;
 
-            
+
 
             LogUtil.SetupConsoleLogging(LogLevel.Debug);
             LogUtil.SetupFileLogging("${basedir}/ZoneEngineLog.txt", LogLevel.Trace);
 
-            
+
 
             #region NBug Setup
 
@@ -198,7 +198,13 @@ namespace ZoneEngine
 
             ConsoleText ct = new ConsoleText();
             ct.TextRead("main.txt");
-            Console.WriteLine("Loading " + AssemblyInfoclass.Title + "...");
+            Console.Write("Loading ");
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.Write(AssemblyInfoclass.Title + " ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write(AssemblyInfoclass.Description);
+            Console.ResetColor();
+            Console.WriteLine("...");
 
             zoneServer = Container.GetInstance<ZoneServer>();
             int Port = Convert.ToInt32(Config.Instance.CurrentConfig.ZonePort);
@@ -305,17 +311,25 @@ namespace ZoneEngine
 
                         /* Old Lua way
                         string[] files = Directory.GetFiles("Scripts");*/
-                        string[] files = Directory.GetFiles("Scripts\\", "*.cs", SearchOption.AllDirectories);
-                        if (files.Length == 0)
+                        try
                         {
-                            Console.WriteLine("No scripts were found.");
-                            break;
-                        }
+                            string[] files = Directory.GetFiles("Scripts", "*.cs", SearchOption.AllDirectories);
+                            if (files.Length == 0)
+                            {
+                                Console.WriteLine("No scripts were found.");
+                                break;
+                            }
 
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        foreach (string s in files)
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            foreach (string s in files)
+                            {
+                                Console.WriteLine(s);
+                            }
+                        }
+                        catch (Exception)
                         {
-                            Console.WriteLine(s);
+                            Console.ForegroundColor=ConsoleColor.Red;
+                            Console.WriteLine("Scripts folder not found.");                            
                         }
 
                         Console.ResetColor();

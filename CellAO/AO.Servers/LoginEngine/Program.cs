@@ -134,7 +134,13 @@ namespace LoginEngine
 
             var ct = new ConsoleText();
             ct.TextRead("main.txt");
-            Console.WriteLine("Loading " + AssemblyInfoclass.Title + "...");
+            Console.Write("Loading ");
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.Write(AssemblyInfoclass.Title + " ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write(AssemblyInfoclass.Description);
+            Console.ResetColor();
+            Console.WriteLine("...");
 
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("[OK]");
