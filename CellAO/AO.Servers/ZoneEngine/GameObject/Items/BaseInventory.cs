@@ -191,7 +191,7 @@ namespace ZoneEngine.GameObject.Items
             int nextFreeSlot = this.FindFreeSlot();
             if (nextFreeSlot == -1)
             {
-                return InventoryError.Full;
+                return InventoryError.InventoryIsFull;
             }
             Content[nextFreeSlot] = Item;
             return InventoryError.OK;

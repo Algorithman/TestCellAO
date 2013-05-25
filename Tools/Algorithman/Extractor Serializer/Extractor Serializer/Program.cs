@@ -65,6 +65,10 @@ namespace Extractor_Serializer
 
     using MsgPack.Serialization;
 
+    using ZoneEngine.GameObject.Items;
+    using ZoneEngine.GameObject.Nanos;
+    using ZoneEngine.Gameobject.Items;
+
     #endregion
 
     /// <summary>
@@ -256,10 +260,16 @@ namespace Extractor_Serializer
             // GetData(@"D:\c#\extractor serializer\data\perks\",0xf4264);
             var np = new NewParser();
             var rawItemList = new List<AOItem>();
-            var rawNanoList = new List<AONanos>();
+            var rawNanoList = new List<NanoFormula>();
+            int counter = 0;
             foreach (int recnum in extractor.GetRecordInstances(0xFDE85))
             {
                 rawNanoList.Add(np.ParseNano(0xFDE85, recnum, extractor.GetRecordData(0xFDE85, recnum), "temp.sql"));
+                if ((counter % 100) == 0)
+                {
+                    Console.Write("\rNano ID: "+recnum.ToString().PadLeft(9));
+                }
+                counter++;
             }
 
             File.Delete("temp.sql");
@@ -271,6 +281,11 @@ namespace Extractor_Serializer
             foreach (int recnum in extractor.GetRecordInstances(0xF4254))
             {
                 rawItemList.Add(np.ParseItem(0xF4254, recnum, extractor.GetRecordData(0xF4254, recnum), ItemNamesSql));
+                if ((counter % 100) == 0)
+                {
+                    Console.Write("\rItem ID: "+recnum.ToString().PadLeft(9));
+                }
+                counter++;
             }
 
             Console.WriteLine();
@@ -312,15 +327,15 @@ namespace Extractor_Serializer
 
             var ds = new ZOutputStream(sf, zlibConst.Z_BEST_COMPRESSION);
             var sm = new MemoryStream();
-            MessagePackSerializer<List<AONanos>> bf = MessagePackSerializer.Create<List<AONanos>>();
+            MessagePackSerializer<List<NanoFormula>> bf = MessagePackSerializer.Create<List<NanoFormula>>();
 
-            var nanoList2 = new List<AONanos>();
+            var nanoList2 = new List<NanoFormula>();
 
             int maxnum = 5000;
             byte[] buffer = BitConverter.GetBytes(maxnum);
             sm.Write(buffer, 0, buffer.Length);
 
-            foreach (AONanos nanos in rawNanoList)
+            foreach (NanoFormula nanos in rawNanoList)
             {
                 nanoList2.Add(nanos);
                 if (nanoList2.Count == maxnum)

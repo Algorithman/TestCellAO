@@ -192,9 +192,9 @@ namespace RevisionGetter
             }
             catch
             {
-                
+
             }
-            
+
 
             TextReader tr = new StreamReader(filename + ".template");
             List<string> content = new List<string>();
@@ -302,7 +302,7 @@ namespace RevisionGetter
                 {
                     ProcessStartInfo startInfo = new ProcessStartInfo(PathToGit);
                     startInfo.UseShellExecute = false;
-                    startInfo.WorkingDirectory = ".";
+                    startInfo.WorkingDirectory = Path.GetDirectoryName(args[0]);
                     startInfo.Arguments = "describe --tags --long --dirty";
                     startInfo.RedirectStandardOutput = true;
                     Process process = new Process();
@@ -329,7 +329,7 @@ namespace RevisionGetter
                 {
                     ProcessStartInfo startInfo = new ProcessStartInfo(PathToSvn);
                     startInfo.UseShellExecute = false;
-                    startInfo.WorkingDirectory = "..\\..\\..";
+                    startInfo.WorkingDirectory = Path.GetDirectoryName(args[0]) + "\\..\\..\\..";
                     startInfo.Arguments = "info";
                     startInfo.RedirectStandardOutput = true;
                     startInfo.RedirectStandardError = true;

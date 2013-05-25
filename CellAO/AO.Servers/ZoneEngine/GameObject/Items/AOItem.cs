@@ -38,7 +38,7 @@ namespace ZoneEngine.GameObject.Items
     /// <summary>
     /// </summary>
     [Serializable]
-    public class AOItem : Dynel, IItemNanoEvents, IItemNanoActions
+    public class AOItem : IItemNanoEvents, IItemNanoActions
     {
         #region Fields
 
@@ -809,6 +809,12 @@ namespace ZoneEngine.GameObject.Items
         }
 
         #endregion
+        public AOItem()
+        {
+            Events = new List<AOEvents>();
+            Actions = new List<AOActions>();
+
+        }
 
         /// <summary>
         /// </summary>

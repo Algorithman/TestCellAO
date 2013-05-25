@@ -37,7 +37,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MsgPack">
-      <HintPath>..\packages\MsgPack.Cli.0.3\lib\net40-client\MsgPack.dll</HintPath>
+      <HintPath>..\packages\MsgPack.Cli.0.3.1\lib\net40-client\MsgPack.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -54,6 +54,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\CellAO\AO.Servers\ZoneEngine\ZoneEngine.csproj">
+      <Project>{9fab94e5-58ee-475b-b866-e8f2ede31fdd}</Project>
+      <Name>ZoneEngine</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\CellAO\Libraries\Source\AO.Core\AO.Core.csproj">
       <Project>{0b1cca26-dd9c-400a-9ef0-1d9423905f4d}</Project>
       <Name>AO.Core</Name>

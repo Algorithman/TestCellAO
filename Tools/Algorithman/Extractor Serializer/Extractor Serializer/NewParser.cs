@@ -15,7 +15,9 @@ namespace Extractor_Serializer
     using System.IO;
     using System.Text;
 
-    using AO.Core;
+    using ZoneEngine.Function;
+    using ZoneEngine.GameObject.Items;
+    using ZoneEngine.GameObject.Nanos;
 
     #endregion
 
@@ -129,7 +131,6 @@ namespace Extractor_Serializer
             AOItem aoi = new AOItem();
             aoi.LowID = recnum;
             aoi.HighID = recnum;
-            Console.Write("\rItem ID: " + recnum);
             this.br.Skip(16);
 
             int num = this.br.Read3F1();
@@ -265,12 +266,11 @@ namespace Extractor_Serializer
         /// <returns>
         /// The <see cref="AONanos"/>.
         /// </returns>
-        public AONanos ParseNano(int rectype, int recnum, byte[] data, string sqlFile)
+        public NanoFormula ParseNano(int rectype, int recnum, byte[] data, string sqlFile)
         {
             this.br = new BufferedReader(rectype, recnum, data);
-            AONanos aon = new AONanos();
+            NanoFormula aon = new NanoFormula();
             aon.ID = recnum;
-            Console.Write("\rNano ID: " + recnum);
             this.br.Skip(16);
 
             int numberOfAttributes = this.br.Read3F1() - 1;
@@ -362,10 +362,10 @@ namespace Extractor_Serializer
                             this.ParseAnimSoundSet(2, null);
                             break;
                         case 22:
-                            this.ParseActionSet(aon.Actions);
+                            this.ParseActionSet( aon.Actions);
                             break;
                         case 23:
-                            this.ParseShopHash(aon.Events);
+                            this.ParseShopHash( aon.Events);
                             break;
                         default:
                             goto IL_4BF;
@@ -553,6 +553,10 @@ namespace Extractor_Serializer
                         aoa.Requirements.Add(REQ);
                     }
 
+                    if (actions == null)
+                    {
+                        actions = new List<AOActions>();
+                    }
                     actions.Add(aoa);
                     cookedreqs.Clear();
                     num2++;
@@ -723,19 +727,26 @@ namespace Extractor_Serializer
                             break;
                         }
 
-                        AOItemAttribute attack = new AOItemAttribute();
-                        attack.Stat = this.br.ReadInt32();
-                        attack.Value = this.br.ReadInt32();
-
-                        if (value == 12)
+                        try
                         {
-                            list.Add(attack);
-                            num7++;
+                            AOItemAttribute attack = new AOItemAttribute();
+                            attack.Stat = this.br.ReadInt32();
+                            attack.Value = this.br.ReadInt32();
+
+                            if (value == 12)
+                            {
+                                list.Add(attack);
+                                num7++;
+                            }
+
+                            if (value == 13)
+                            {
+                                list2.Add(attack);
+                                num7++;
+                            }
                         }
-
-                        if (value == 13)
+                        catch (Exception)
                         {
-                            list2.Add(attack);
                             num7++;
                         }
                     }
@@ -814,7 +825,10 @@ namespace Extractor_Serializer
             {
                 aoe.Functions.Add(ff);
             }
-
+            if (retlist == null)
+            {
+                retlist=new List<AOEvents>();
+            }
             retlist.Add(aoe);
         }
 
@@ -871,6 +885,10 @@ namespace Extractor_Serializer
                 }
             }
 
+            if (events == null)
+            {
+                events = new List<AOEvents>();
+            }
             events.Add(aoe);
         }
 
