@@ -800,8 +800,7 @@ namespace ZoneEngine.GameObject.Items
             }
 
             itemCopy.Flags = this.Flags;
-            itemCopy.Instance = this.Instance;
-            itemCopy.ItemType = this.ItemType;
+            itemCopy.Identity = this.Identity;
             itemCopy.MultipleCount = this.MultipleCount;
             itemCopy.Nothing = this.Nothing;
             itemCopy.Quality = this.Quality;

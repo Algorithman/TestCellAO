@@ -264,7 +264,7 @@ namespace ZoneEngine.GameObject
         public Character(Identity identity, IZoneClient client)
         {
             this.identity = identity;
-            this.BaseInventory = new BaseInventory(this);
+            this.BaseInventory = new EntityInventory(this);
             this.pets = new List<Pet>();
             this.client = client;
             this.Textures = new List<AOTextures>();
