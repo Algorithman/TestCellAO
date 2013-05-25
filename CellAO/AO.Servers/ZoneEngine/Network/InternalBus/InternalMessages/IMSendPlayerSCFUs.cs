@@ -23,54 +23,21 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.PacketHandlers
+namespace ZoneEngine.Network.InternalBus.InternalMessages
 {
     #region Usings ...
 
-    using System.Threading;
-
-    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
-
-    using ZoneEngine.GameObject;
-    using ZoneEngine.Network;
-    using ZoneEngine.Network.InternalBus.InternalMessages;
-    using ZoneEngine.Network.Packets;
+    using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    public static class CharacterInPlay
+    public class IMSendPlayerSCFUs: InternalMessageBody
     {
-        #region Public Methods and Operators
-
         /// <summary>
         /// </summary>
-        /// <param name="client">
-        /// </param>
-        public static void Read(Client client)
-        {
-            // client got all the needed data and
-            // wants to enter the world. After we
-            // reply to this, the character will really be in game
-
-            var announce = new CharInPlayMessage { Identity = client.Character.Identity, Unknown = 0x00 };
-            client.Playfield.Announce(announce);
-
-            // Mobs get sent whenever player enters playfield, BUT (!) they are NOT synchronized, because the mobs don't save stuff yet.
-            // for instance: the waypoints the mob went through will NOT be saved and therefore when you re-enter the PF, it will AGAIN
-            // walk the same waypoints.
-            // TODO: Fix it
-            /*foreach (MobType mob in NPCPool.Mobs)
-            {
-                // TODO: Make cache - use pf indexing somehow.
-                if (mob.pf == client.Character.pf)
-                {
-                    mob.SendToClient(client);
-                }
-            }*/
-        }
-
-        #endregion
+        public Client toClient;
     }
 }

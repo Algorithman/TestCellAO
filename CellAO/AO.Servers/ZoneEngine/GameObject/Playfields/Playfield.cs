@@ -40,10 +40,12 @@ namespace ZoneEngine.GameObject.Playfields
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
+    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Items;
     using ZoneEngine.Network.InternalBus.InternalMessages;
+    using ZoneEngine.Network.Packets;
 
     #endregion
 
@@ -281,6 +283,9 @@ namespace ZoneEngine.GameObject.Playfields
                 this.playfieldBus.Subscribe<IMSendAOtMessageToClient>(SendAOtMessageToClient));
             this.memBusDisposeContainer.Add(
                 this.playfieldBus.Subscribe<IMSendAOtMessageToPlayfield>(this.SendAOtMessageToPlayfield));
+            this.memBusDisposeContainer.Add(
+                this.playfieldBus.Subscribe<IMSendAOtMessageToPlayfieldOthers>(this.SendAOtMessageToPlayfieldOthers));
+            this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<IMSendPlayerSCFUs>(this.SendSCFUsToClient));
             this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<IMExecuteFunction>(this.ExecuteFunction));
             this.Entities = new HashSet<IInstancedEntity>();
         }
@@ -319,7 +324,45 @@ namespace ZoneEngine.GameObject.Playfields
         /// </param>
         public void SendAOtMessageToPlayfield(IMSendAOtMessageToPlayfield clientMessage)
         {
-            Announce(clientMessage.Body);
+            this.Announce(clientMessage.Body);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="clientMessage">
+        /// </param>
+        public void SendAOtMessageToPlayfieldOthers(IMSendAOtMessageToPlayfieldOthers clientMessage)
+        {
+            this.AnnounceOthers(clientMessage.Body, clientMessage.Identity);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="sendSCFUs">
+        /// </param>
+        public void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs)
+        {
+            Identity dontSendTo = sendSCFUs.toClient.Character.Identity;
+            foreach (IEntity entity in this.Entities)
+            {
+                if (entity.Identity != dontSendTo)
+                {
+                    if (entity.Identity.Type == IdentityType.CanbeAffected)
+                    {
+                        var temp = entity as INamedEntity;
+                        if (temp != null)
+                        {
+                            // TODO: make it NPC-safe
+                            SimpleCharFullUpdateMessage simpleCharFullUpdate =
+                                SimpleCharFullUpdate.ConstructMessage((Character)temp);
+                            sendSCFUs.toClient.SendCompressed(simpleCharFullUpdate);
+
+                            var charInPlay = new CharInPlayMessage { Identity = temp.Identity, Unknown = 0x00 };
+                            sendSCFUs.toClient.SendCompressed(charInPlay);
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>

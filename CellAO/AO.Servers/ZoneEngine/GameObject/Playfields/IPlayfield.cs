@@ -36,6 +36,7 @@ namespace ZoneEngine.GameObject.Playfields
 
     using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Items;
+    using ZoneEngine.Network.InternalBus.InternalMessages;
 
     #endregion
 
@@ -138,5 +139,7 @@ namespace ZoneEngine.GameObject.Playfields
         /// <param name="obj">
         /// </param>
         void Publish(object obj);
+
+        void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs);
     }
 }

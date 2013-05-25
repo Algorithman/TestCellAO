@@ -187,6 +187,8 @@
     <Compile Include="Network\InternalBus\InternalMessages\IMExecuteFunction.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IMSendAOtMessageToClient.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IMSendAOtMessageToPlayfield.cs" />
+    <Compile Include="Network\InternalBus\InternalMessages\IMSendAOtMessageToPlayfieldOthers.cs" />
+    <Compile Include="Network\InternalBus\InternalMessages\IMSendPlayerSCFUs.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\InternalMessage.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\InternalMessageBody.cs" />
     <Compile Include="Network\InternalBus\PlayfieldTimedList.cs" />

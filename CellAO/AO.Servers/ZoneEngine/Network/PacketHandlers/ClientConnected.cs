@@ -33,6 +33,7 @@ namespace ZoneEngine.PacketHandlers
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Network;
+    using ZoneEngine.Network.InternalBus.InternalMessages;
     using ZoneEngine.Network.Packets;
 
     #endregion
@@ -88,6 +89,9 @@ namespace ZoneEngine.PacketHandlers
 
             /* send playfield info to client */
             PlayfieldAnarchyF.Send(client);
+
+            var sendSCFUs = new IMSendPlayerSCFUs { toClient = client };
+            client.Playfield.SendSCFUsToClient(sendSCFUs);
 
             /* set SocialStatus to 0 */
             client.Character.Stats.SetBaseValue(521, 0);
