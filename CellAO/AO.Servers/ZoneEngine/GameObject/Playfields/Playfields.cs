@@ -27,7 +27,6 @@ namespace ZoneEngine.GameObject.Playfields
 {
     #region Usings ...
 
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
@@ -42,10 +41,6 @@ namespace ZoneEngine.GameObject.Playfields
     /// </summary>
     public class DistrictInfo
     {
-        #region Constructor
-
-        #endregion
-
         #region XML
 
         // Generally this shouldn't be used outside of the static constructor
@@ -143,9 +138,6 @@ namespace ZoneEngine.GameObject.Playfields
          * playfield, currently spawned monsters and their locations, etc
          * 
          */
-        #region Constructor
-
-        #endregion
 
         /// <summary>
         /// Playfield ID number

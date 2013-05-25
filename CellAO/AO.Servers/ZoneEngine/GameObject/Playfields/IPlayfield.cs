@@ -133,6 +133,10 @@ namespace ZoneEngine.GameObject.Playfields
         /// </summary>
         void DisconnectAllClients();
 
+        /// <summary>
+        /// </summary>
+        /// <param name="obj">
+        /// </param>
         void Publish(object obj);
     }
 }

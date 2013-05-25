@@ -159,6 +159,13 @@ namespace AO.Core
             this.Update(x, y, z);
         }
 
+        public AOCoord(SmokeLounge.AOtomation.Messaging.GameData.Vector3 vector3)
+        {
+            this.coordinate.x = vector3.X;
+            this.coordinate.y = vector3.Y;
+            this.coordinate.z = vector3.Z;
+        }
+
         #endregion
 
         #region Update

@@ -93,8 +93,6 @@ namespace ZoneEngine.Network.Packets
             fc.Unknown7 = 1;
             fc.Unknown8 = 0;
 
-            
-
             /* part 6 of data (1-st stats block) */
 
             /* Int32 stat number
@@ -299,8 +297,6 @@ namespace ZoneEngine.Network.Packets
             fc.Stats1 = stats1.ToArray();
 
             
-
-            #region Data07 (Stats 2) (32bit - 32bit)
 
             /* Int32 stat number
                Int32 stat value */
@@ -740,7 +736,7 @@ namespace ZoneEngine.Network.Packets
 
             fc.Stats2 = stats2.ToArray();
 
-            #endregion
+            
 
             #region Data08 (Stats 3) (8bit - 8bit)
 

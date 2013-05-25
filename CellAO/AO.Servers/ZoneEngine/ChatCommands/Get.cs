@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -24,6 +25,8 @@
 
 namespace ZoneEngine.ChatCommands
 {
+    #region Usings ...
+
     using System;
     using System.Collections.Generic;
 
@@ -36,8 +39,20 @@ namespace ZoneEngine.ChatCommands
     using ZoneEngine.Network;
     using ZoneEngine.Script;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public class ChatCommandGet : AOChatCommand
     {
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
+        /// <param name="target">
+        /// </param>
+        /// <param name="args">
+        /// </param>
         public override void ExecuteCommand(Client client, Identity target, string[] args)
         {
             // Fallback to self if no target is selected
@@ -45,15 +60,18 @@ namespace ZoneEngine.ChatCommands
             {
                 target = client.Character.Identity;
             }
+
             if (target.Type != IdentityType.CanbeAffected)
             {
                 client.SendChatText("Target must be player/monster/NPC");
                 return;
             }
+
             IInstancedEntity targetDynel = client.Playfield.FindByIdentity(target);
             if (targetDynel != null)
             {
                 Dynel targetCharacter = (Dynel)targetDynel;
+
                 // May be obsolete in the future, let it stay in comment yet
                 // ch.CalculateSkills();  
                 int statId = StatsList.GetStatId(args[1]);
@@ -82,7 +100,7 @@ namespace ZoneEngine.ChatCommands
                     return;
                 }
 
-                string response = "";
+                string response = string.Empty;
                 INamedEntity namedDynel = targetCharacter as INamedEntity;
                 if (namedDynel != null)
                 {
@@ -91,8 +109,10 @@ namespace ZoneEngine.ChatCommands
                 }
                 else
                 {
-                    response = "Dynel " + targetCharacter.Identity.Instance + "Stat " + StatsList.GetStatName(statId) + " (" + statId + ") = " + statValue;
+                    response = "Dynel " + targetCharacter.Identity.Instance + "Stat " + StatsList.GetStatName(statId)
+                               + " (" + statId + ") = " + statValue;
                 }
+
                 client.SendChatText(response);
                 if (statValue != targetCharacter.Stats.StatValueByName(args[1]))
                 {
@@ -100,6 +120,7 @@ namespace ZoneEngine.ChatCommands
                                + effectiveValue;
                     client.SendChatText(response);
                 }
+
                 response = "Trickle: " + trickle + " Modificator: " + mod + " Percentage: " + perc;
                 client.SendChatText(response);
             }
@@ -110,12 +131,22 @@ namespace ZoneEngine.ChatCommands
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
         public override void CommandHelp(Client client)
         {
             // No help needed, no arguments can be given
             return;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="args">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public override bool CheckCommandArguments(string[] args)
         {
             // Two different checks return true: <int> <uint> and <string> <uint>
@@ -129,12 +160,20 @@ namespace ZoneEngine.ChatCommands
             return check1;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public override int GMLevelNeeded()
         {
             // Be a GM
             return 1;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public override List<string> ListCommands()
         {
             List<string> temp = new List<string> { "get" };

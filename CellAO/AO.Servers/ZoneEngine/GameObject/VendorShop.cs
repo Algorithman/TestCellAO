@@ -29,6 +29,8 @@ namespace ZoneEngine.GameObject
 
     using System;
 
+    using AO.Core;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.GameObject.Items;
@@ -36,6 +38,8 @@ namespace ZoneEngine.GameObject
     using ZoneEngine.GameObject.Stats;
 
     using IInventory = ZoneEngine.IInventory;
+    using Quaternion = AO.Core.Quaternion;
+    using Vector3 = AO.Core.Vector3;
 
     #endregion
 
@@ -51,43 +55,33 @@ namespace ZoneEngine.GameObject
         /// </exception>
         public IPlayfield Playfield { get; set; }
 
-        /// <summary>
-        /// </summary>
-        private Vector3 coordinates = new Vector3();
-
-        /// <summary>
-        /// </summary>
-        public Vector3 Coordinates
+        public AOCoord Coordinates
         {
             get
             {
-                return this.coordinates;
+                return new AOCoord(this.RawCoordinates);
             }
-
             set
             {
-                this.coordinates = value;
+                RawCoordinates = value.coordinate;
             }
         }
 
-        /// <summary>
-        /// </summary>
-        private Quaternion heading = new Quaternion();
-
-        /// <summary>
-        /// </summary>
         public Quaternion Heading
         {
             get
             {
-                return this.heading;
+                return this.RawHeading;
             }
-
             set
             {
-                this.heading = value;
+                this.RawHeading = value;
             }
         }
+
+        public Vector3 RawCoordinates { get; set; }
+
+        public Quaternion RawHeading { get; set; }
 
         /// <summary>
         /// </summary>
@@ -99,6 +93,16 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="aof">
+        /// </param>
+        /// <param name="checkAll">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public bool CheckRequirements(AOFunctions aof, bool checkAll)
         {
             throw new NotImplementedException();

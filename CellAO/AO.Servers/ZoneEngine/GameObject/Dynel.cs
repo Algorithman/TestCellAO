@@ -30,12 +30,18 @@ namespace ZoneEngine.GameObject
     using System;
     using System.Diagnostics.Contracts;
 
+    using AO.Core;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.Function;
+    using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Items;
     using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
+
+    using Quaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
+    using Vector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
     #endregion
 
@@ -96,43 +102,357 @@ namespace ZoneEngine.GameObject
             }
         }
 
-        /// <summary>
-        /// </summary>
-        private Vector3 coordinates = new Vector3();
+        AOCoord IInstancedEntity.Coordinates { get; set; }
 
-        /// <summary>
-        /// </summary>
-        public Vector3 Coordinates
+        private DateTime predictionTime;
+
+        public TimeSpan PredictionDuration
         {
             get
             {
-                return this.coordinates;
+                DateTime currentTime = DateTime.UtcNow;
+
+                return currentTime - this.predictionTime;
+            }
+        }
+        /// <summary>
+        /// Calculate Turn time
+        /// </summary>
+        /// <returns>Turn time</returns>
+        private double calculateTurnTime()
+        {
+            int turnSpeed;
+            double turnTime;
+
+            turnSpeed = this.stats.TurnSpeed.Value; // Stat #267 TurnSpeed
+
+            if (turnSpeed == 0)
+            {
+                turnSpeed = 40000;
             }
 
+            turnTime = 70000 / turnSpeed;
+
+            return turnTime;
+        }
+
+        /// <summary>
+        /// Calculate the effective run speed (run, walk, sneak etc)
+        /// </summary>
+        /// <returns>Effective run speed</returns>
+        private int calculateEffectiveRunSpeed()
+        {
+            int effectiveRunSpeed;
+
+            switch (this.moveMode)
+            {
+                case MoveModes.Run:
+                    effectiveRunSpeed = this.stats.RunSpeed.Value; // Stat #156 = RunSpeed
+                    break;
+
+                case MoveModes.Walk:
+                    effectiveRunSpeed = -500;
+                    break;
+
+                case MoveModes.Swim:
+                    // Swim speed is calculated the same as Run Speed except is half as effective
+                    effectiveRunSpeed = this.stats.Swim.Value >> 1; // Stat #138 = Swim
+                    break;
+
+                case MoveModes.Crawl:
+                    effectiveRunSpeed = -600;
+                    break;
+
+                case MoveModes.Sneak:
+                    effectiveRunSpeed = -500;
+                    break;
+
+                case MoveModes.Fly:
+                    effectiveRunSpeed = 2200; // NV: TODO: Propper calc for this!
+                    break;
+
+                default:
+                    // All other movement modes, sitting, sleeping, lounging, rooted, etc have a speed of 0
+                    // As there is no way to 'force' that this way, we just default to 0 and hope that canMove() has been called to properly check.
+                    effectiveRunSpeed = 0;
+                    break;
+            }
+
+            return effectiveRunSpeed;
+        }
+
+
+
+        /// <summary>
+        /// Calculate forward speed
+        /// </summary>
+        /// <returns>forward speed</returns>
+        private double calculateForwardSpeed()
+        {
+            double speed;
+            int effectiveRunSpeed;
+
+            if ((this.moveDirection == MoveDirections.None) || (!this.canMove()))
+            {
+                return 0;
+            }
+
+            effectiveRunSpeed = this.calculateEffectiveRunSpeed();
+
+            if (this.moveDirection == MoveDirections.Forwards)
+            {
+                // NV: TODO: Verify this more. Especially with uber-low runspeeds (negative)
+                speed = Math.Max(0, (effectiveRunSpeed * 0.005) + 4);
+
+                if (this.moveMode != MoveModes.Swim)
+                {
+                    speed = Math.Min(15, speed); // Forward speed is capped at 15 units/sec for non-swimming
+                }
+            }
+            else
+            {
+                // NV: TODO: Verify this more. Especially with uber-low runspeeds (negative)
+                speed = -Math.Max(0, (effectiveRunSpeed * 0.0035) + 4);
+
+                if (this.moveMode != MoveModes.Swim)
+                {
+                    speed = Math.Max(-15, speed); // Backwards speed is capped at 15 units/sec for non-swimming
+                }
+            }
+
+            return speed;
+        }
+
+        /// <summary>
+        /// Can Character move?
+        /// </summary>
+        /// <returns>Can move=true</returns>
+        private bool canMove()
+        {
+            if ((this.moveMode == MoveModes.Run) || (this.moveMode == MoveModes.Walk)
+                || (this.moveMode == MoveModes.Swim) || (this.moveMode == MoveModes.Crawl)
+                || (this.moveMode == MoveModes.Sneak) || (this.moveMode == MoveModes.Fly))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Calculate strafe speed
+        /// </summary>
+        /// <returns>Strafe speed</returns>
+        private double calculateStrafeSpeed()
+        {
+            double speed;
+            int effectiveRunSpeed;
+
+            // Note, you can not strafe while swimming or crawling
+            if ((this.strafeDirection == SpinOrStrafeDirections.None) || (this.moveMode == MoveModes.Swim)
+                || (this.moveMode == MoveModes.Crawl) || (!this.canMove()))
+            {
+                return 0;
+            }
+
+            effectiveRunSpeed = this.calculateEffectiveRunSpeed();
+
+            // NV: TODO: Update this based off Forward runspeed when that is checked (strafe effective run speed = effective run speed / 2)
+            speed = ((effectiveRunSpeed / 2) * 0.005) + 4;
+
+            if (this.strafeDirection == SpinOrStrafeDirections.Left)
+            {
+                speed = -speed;
+            }
+
+            return speed;
+        }
+
+        /// <summary>
+        /// Calculate move vector
+        /// </summary>
+        /// <returns>Movevector</returns>
+        private AO.Core.Vector3 calculateMoveVector()
+        {
+            double forwardSpeed;
+            double strafeSpeed;
+            AO.Core.Vector3 forwardMove;
+            AO.Core.Vector3 strafeMove;
+
+            if (!this.canMove())
+            {
+                return AO.Core.Vector3.Origin;
+            }
+
+            forwardSpeed = this.calculateForwardSpeed();
+            strafeSpeed = this.calculateStrafeSpeed();
+
+            if ((forwardSpeed == 0) && (strafeSpeed == 0))
+            {
+                return AO.Core.Vector3.Origin;
+            }
+
+            if (forwardSpeed != 0)
+            {
+                forwardMove = AO.Core.Quaternion.RotateVector3(this.RawHeading, AO.Core.Vector3.AxisZ);
+                forwardMove.Magnitude = Math.Abs(forwardSpeed);
+                if (forwardSpeed < 0)
+                {
+                    forwardMove = -forwardMove;
+                }
+            }
+            else
+            {
+                forwardMove = AO.Core.Vector3.Origin;
+            }
+
+            if (strafeSpeed != 0)
+            {
+                strafeMove = AO.Core.Quaternion.RotateVector3(this.RawHeading, AO.Core.Vector3.AxisX);
+                strafeMove.Magnitude = Math.Abs(strafeSpeed);
+                if (strafeSpeed < 0)
+                {
+                    strafeMove = -strafeMove;
+                }
+            }
+            else
+            {
+                strafeMove = AO.Core.Vector3.Origin;
+            }
+
+            return forwardMove + strafeMove;
+        }
+
+        /// <summary>
+        /// Calculate Turnangle
+        /// </summary>
+        /// <returns>Turnangle</returns>
+        private double calculateTurnArcAngle()
+        {
+            double turnTime;
+            double angle;
+            double modifiedDuration;
+
+            turnTime = this.calculateTurnTime();
+
+            modifiedDuration = this.PredictionDuration.TotalSeconds % turnTime;
+
+            angle = 2 * Math.PI * modifiedDuration / turnTime;
+
+            return angle;
+        }
+
+
+
+
+        /// <summary>
+        /// </summary>
+        public AO.Core.AOCoord Coordinates
+        {
+            get
+            {
+                if ((this.moveDirection == MoveDirections.None) && (this.strafeDirection == SpinOrStrafeDirections.None))
+                {
+                    return new AOCoord(this.RawCoordinates);
+                }
+                else if (this.spinDirection == SpinOrStrafeDirections.None)
+                {
+                    AO.Core.Vector3 moveVector = this.calculateMoveVector();
+
+                    moveVector = moveVector * this.PredictionDuration.TotalSeconds;
+
+                    return new AOCoord(this.RawCoordinates + moveVector);
+                }
+                else
+                {
+                    AO.Core.Vector3 moveVector;
+                    AO.Core.Vector3 positionFromCentreOfTurningCircle;
+                    double turnArcAngle;
+                    double y;
+                    double duration;
+
+                    duration = this.PredictionDuration.TotalSeconds;
+
+                    moveVector = this.calculateMoveVector();
+                    turnArcAngle = this.calculateTurnArcAngle();
+
+                    // This is calculated seperately as height is unaffected by turning
+                    y = this.RawCoordinates.y + (moveVector.y * duration);
+
+                    if (this.spinDirection == SpinOrStrafeDirections.Left)
+                    {
+                        positionFromCentreOfTurningCircle = new AO.Core.Vector3(moveVector.z, y, -moveVector.x);
+                    }
+                    else
+                    {
+                        positionFromCentreOfTurningCircle = new AO.Core.Vector3(-moveVector.z, y, moveVector.x);
+                    }
+
+                    return
+                        new AOCoord(
+                            this.RawCoordinates +
+                            AO.Core.Quaternion.RotateVector3(
+                                new AO.Core.Quaternion(AO.Core.Vector3.AxisY, turnArcAngle), positionFromCentreOfTurningCircle)
+                            - positionFromCentreOfTurningCircle);
+                }
+            }
             set
             {
-                this.coordinates = value;
+                RawCoordinates = value.coordinate;
             }
         }
 
         /// <summary>
         /// </summary>
-        private Quaternion heading = new Quaternion();
+
+        private SpinOrStrafeDirections spinDirection = SpinOrStrafeDirections.None;
+
+        private SpinOrStrafeDirections strafeDirection = SpinOrStrafeDirections.None;
+
+        private MoveDirections moveDirection = MoveDirections.None;
+
+        private MoveModes moveMode = MoveModes.Run; // Run should be an appropriate default for now
+
+        private MoveModes previousMoveMode = MoveModes.Run; // Run should be an appropriate default for now
 
         /// <summary>
         /// </summary>
-        public Quaternion Heading
+        public AO.Core.Quaternion Heading
         {
             get
             {
-                return this.heading;
-            }
+                if (this.spinDirection == SpinOrStrafeDirections.None)
+                {
+                    return this.RawHeading;
+                }
+                else
+                {
+                    double turnArcAngle;
+                    AO.Core.Quaternion turnQuaterion;
+                    AO.Core.Quaternion newHeading;
 
+                    turnArcAngle = this.calculateTurnArcAngle();
+                    turnQuaterion = new AO.Core.Quaternion(AO.Core.Vector3.AxisY, turnArcAngle);
+
+                    newHeading = AO.Core.Quaternion.Hamilton(turnQuaterion, this.RawHeading);
+                    newHeading.Normalize();
+
+                    return newHeading;
+                }
+            }
             set
             {
-                this.heading = value;
+                RawHeading = value;
             }
         }
+
+        /// <summary>
+        /// </summary>
+        public AO.Core.Vector3 RawCoordinates { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public AO.Core.Quaternion RawHeading { get; set; }
 
         /// <summary>
         /// </summary>
@@ -346,6 +666,178 @@ namespace ZoneEngine.GameObject
             }
 
             return requirementsMet;
+        }
+        /// <summary>
+        /// Update move type
+        /// </summary>
+        /// <param name="moveType">new move type</param>
+        public void UpdateMoveType(byte moveType)
+        {
+            this.predictionTime = DateTime.UtcNow;
+
+            /*
+             * NV: Would be nice to have all other possible values filled out for this at some point... *Looks at Suiv*
+             * More specifically, 10, 13 and 22 - 10 and 13 seem to be tied to spinning with mouse. 22 seems random (ping mabe?)
+             * Also TODO: Tie this with CurrentMovementMode stat and persistance (ie, log off walking, log back on and still walking)
+             * Values of CurrentMovementMode and their effects:
+                0: slow moving feet not animating
+                1: rooted cant sit
+                2: walk
+                3: run
+                4: swim
+                5: crawl
+                6: sneak
+                7: flying
+                8: sitting
+                9: rooted can sit
+                10: same as 0
+                11: sleeping
+                12: lounging
+                13: same as 0
+                14: same as 0
+                15: same as 0
+                16: same as 0
+             */
+            switch (moveType)
+            {
+                case 1: // Forward Start
+                    this.moveDirection = MoveDirections.Forwards;
+                    break;
+                case 2: // Forward Stop
+                    this.moveDirection = MoveDirections.None;
+                    break;
+
+                case 3: // Reverse Start
+                    this.moveDirection = MoveDirections.Backwards;
+                    break;
+                case 4: // Reverse Stop
+                    this.moveDirection = MoveDirections.None;
+                    break;
+
+                case 5: // Strafe Right Start
+                    this.strafeDirection = SpinOrStrafeDirections.Right;
+                    break;
+                case 6: // Strafe Stop (Right)
+                    this.strafeDirection = SpinOrStrafeDirections.None;
+                    break;
+
+                case 7: // Strafe Left Start
+                    this.strafeDirection = SpinOrStrafeDirections.Left;
+                    break;
+                case 8: // Strafe Stop (Left)
+                    this.strafeDirection = SpinOrStrafeDirections.None;
+                    break;
+
+                case 9: // Turn Right Start
+                    this.spinDirection = SpinOrStrafeDirections.Right;
+                    break;
+                case 10: // Mouse Turn Right Start
+                    break;
+                case 11: // Turn Stop (Right)
+                    this.spinDirection = SpinOrStrafeDirections.None;
+                    break;
+
+                case 12: // Turn Left Start
+                    this.spinDirection = SpinOrStrafeDirections.Left;
+                    break;
+                case 13: // Mouse Turn Left Start
+                    break;
+                case 14: // Turn Stop (Left)
+                    this.spinDirection = SpinOrStrafeDirections.None;
+                    break;
+
+                case 15: // Jump Start
+                    // NV: TODO: This!
+                    break;
+                case 16: // Jump Stop
+                    break;
+
+                case 17: // Elevate Up Start
+                    break;
+                case 18: // Elevate Up Stop
+                    break;
+
+                case 19: // ? 19 = 20 = 22 = 31 = 32
+                    break;
+                case 20: // ? 19 = 20 = 22 = 31 = 32
+                    break;
+
+                case 21: // Full Stop
+                    break;
+
+                case 22: // ? 19 = 20 = 22 = 31 = 32
+                    break;
+
+                case 23: // Switch To Frozen Mode
+                    break;
+                case 24: // Switch To Walk Mode
+                    this.moveMode = MoveModes.Walk;
+                    break;
+                case 25: // Switch To Run Mode
+                    this.moveMode = MoveModes.Run;
+                    break;
+                case 26: // Switch To Swim Mode
+                    break;
+                case 27: // Switch To Crawl Mode
+                    this.previousMoveMode = this.moveMode;
+                    this.moveMode = MoveModes.Crawl;
+                    break;
+                case 28: // Switch To Sneak Mode
+                    this.previousMoveMode = this.moveMode;
+                    this.moveMode = MoveModes.Sneak;
+                    break;
+                case 29: // Switch To Fly Mode
+                    break;
+                case 30: // Switch To Sit Ground Mode
+                    this.previousMoveMode = this.moveMode;
+                    this.moveMode = MoveModes.Sit;
+                    this.stats.NanoDelta.CalcTrickle();
+                    this.stats.HealDelta.CalcTrickle();
+                    this.stats.NanoInterval.CalcTrickle();
+                    this.stats.HealInterval.CalcTrickle();
+                    break;
+
+                case 31: // ? 19 = 20 = 22 = 31 = 32
+                    break;
+                case 32: // ? 19 = 20 = 22 = 31 = 32
+                    break;
+
+                case 33: // Switch To Sleep Mode
+                    this.moveMode = MoveModes.Sleep;
+                    break;
+                case 34: // Switch To Lounge Mode
+                    this.moveMode = MoveModes.Lounge;
+                    break;
+
+                case 35: // Leave Swim Mode
+                    break;
+                case 36: // Leave Sneak Mode
+                    this.moveMode = this.previousMoveMode;
+                    break;
+                case 37: // Leave Sit Mode
+                    this.moveMode = this.previousMoveMode;
+                    this.stats.NanoDelta.CalcTrickle();
+                    this.stats.HealDelta.CalcTrickle();
+                    this.stats.NanoInterval.CalcTrickle();
+                    this.stats.HealInterval.CalcTrickle();
+                    break;
+                case 38: // Leave Frozen Mode
+                    break;
+                case 39: // Leave Fly Mode
+                    break;
+                case 40: // Leave Crawl Mode
+                    this.moveMode = this.previousMoveMode;
+                    break;
+                case 41: // Leave Sleep Mode
+                    break;
+                case 42: // Leave Lounge Mode
+                    break;
+                default:
+                    //Console.WriteLine("Unknown MoveType: " + moveType);
+                    break;
+            }
+
+            //Console.WriteLine((moveDirection != 0 ? moveMode.ToString() : "Stand") + "ing in the direction " + moveDirection.ToString() + (spinDirection != 0 ? " while spinning " + spinDirection.ToString() : "") + (strafeDirection != 0 ? " and strafing " + strafeDirection.ToString() : ""));
         }
 
         #endregion

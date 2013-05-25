@@ -30,8 +30,6 @@ namespace ZoneEngine.ChatCommands
     using System;
     using System.Collections.Generic;
 
-    using AO.Core.Logger;
-
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.Function;

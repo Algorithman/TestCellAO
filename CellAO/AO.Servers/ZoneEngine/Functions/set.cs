@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -22,25 +23,49 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-#region Usings...
-#endregion
-
 namespace ZoneEngine.Functions
 {
+    #region Usings ...
+
     using ZoneEngine.GameObject;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     internal class Function_set : FunctionPrototype
     {
+        /// <summary>
+        /// </summary>
         public new int FunctionNumber = 53026;
 
+        /// <summary>
+        /// </summary>
         public new string FunctionName = "set";
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public override int ReturnNumber()
         {
             return this.FunctionNumber;
         }
 
-        public override bool Execute(INamedEntity self, INamedEntity caller, IInstancedEntity target, object[] arguments)
+        /// <summary>
+        /// </summary>
+        /// <param name="self">
+        /// </param>
+        /// <param name="caller">
+        /// </param>
+        /// <param name="target">
+        /// </param>
+        /// <param name="arguments">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public override bool Execute(
+            INamedEntity self, INamedEntity caller, IInstancedEntity target, object[] arguments)
         {
             lock (target)
             {
@@ -48,16 +73,32 @@ namespace ZoneEngine.Functions
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public override string ReturnName()
         {
             return this.FunctionName;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="Self">
+        /// </param>
+        /// <param name="Caller">
+        /// </param>
+        /// <param name="Target">
+        /// </param>
+        /// <param name="Arguments">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public bool FunctionExecute(INamedEntity Self, INamedEntity Caller, IInstancedEntity Target, object[] Arguments)
         {
             int statNumber = (int)Arguments[0];
             int statValue = (int)Arguments[1];
-            IStats temp = Target as IStats;
+            IStats temp = Target;
             if (temp != null)
             {
                 temp.Stats.GetStatbyNumber(statNumber).Set(statValue);

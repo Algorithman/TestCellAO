@@ -30,6 +30,7 @@ namespace ZoneEngine.GameObject
     using System;
     using System.Collections.Generic;
 
+    using AO.Core;
     using AO.Core.Logger;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -37,6 +38,9 @@ namespace ZoneEngine.GameObject
     using ZoneEngine.GameObject.Items;
     using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
+
+    using Quaternion = AO.Core.Quaternion;
+    using Vector3 = AO.Core.Vector3;
 
     #endregion
 
@@ -67,43 +71,33 @@ namespace ZoneEngine.GameObject
             }
         }
 
-        /// <summary>
-        /// </summary>
-        private Vector3 coordinates = new Vector3();
-
-        /// <summary>
-        /// </summary>
-        private Quaternion heading = new Quaternion();
-
-        /// <summary>
-        /// </summary>
-        public Vector3 Coordinates
+        public AOCoord Coordinates
         {
             get
             {
-                return this.coordinates;
+                return new AOCoord(this.RawCoordinates);
             }
-
             set
             {
-                this.coordinates = value;
+                RawCoordinates = value.coordinate;
             }
         }
 
-        /// <summary>
-        /// </summary>
         public Quaternion Heading
         {
             get
             {
-                return this.heading;
+                return RawHeading;
             }
-
             set
             {
-                this.heading = value;
+                RawHeading = value;
             }
         }
+
+        public Vector3 RawCoordinates { get; set; }
+
+        public Quaternion RawHeading { get; set; }
 
         #endregion
 
@@ -144,13 +138,37 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        /// <summary>
+        /// </summary>
         public DynelStats Stats { get; private set; }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="aof">
+        /// </param>
+        /// <param name="checkAll">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public bool CheckRequirements(AOFunctions aof, bool checkAll)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="ch">
+        /// </param>
+        /// <param name="aof">
+        /// </param>
+        /// <param name="checkAll">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public bool CheckRequirements(IStats ch, AOFunctions aof, bool checkAll)
         {
             throw new NotImplementedException();

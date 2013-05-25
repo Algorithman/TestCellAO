@@ -68,16 +68,32 @@ namespace ZoneEngine.GameObject
 
         #endregion
 
+        /// <summary>
+        /// </summary>
         public Identity FightingTarget { get; set; }
 
+        /// <summary>
+        /// </summary>
         public Identity SelectedTarget { get; set; }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="identity">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public bool SetTarget(Identity identity)
         {
             this.SelectedTarget = identity;
             return true;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="identity">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public bool SetFightingTarget(Identity identity)
         {
             this.FightingTarget = identity;

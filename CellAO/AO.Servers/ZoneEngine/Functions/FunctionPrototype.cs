@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -22,11 +23,10 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-#region Usings...
-#endregion
-
 namespace ZoneEngine.Functions
 {
+    #region Usings ...
+
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -35,44 +35,76 @@ namespace ZoneEngine.Functions
 
     using ZoneEngine.GameObject;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public abstract class FunctionPrototype
     {
         /// <summary>
         /// Locks function targets and executes the function
         /// </summary>
-        /// <param name="self">Dynel (Character or NPC)</param>
-        /// <param name="caller">Caller of the function</param>
-        /// <param name="target">Target of the Function (Dynel or Statel)</param>
-        /// <param name="arguments">Function Arguments</param>
-        /// <returns></returns>
-        public abstract bool Execute(INamedEntity self, INamedEntity caller, IInstancedEntity target, object[] arguments);
+        /// <param name="self">
+        /// Dynel (Character or NPC)
+        /// </param>
+        /// <param name="caller">
+        /// Caller of the function
+        /// </param>
+        /// <param name="target">
+        /// Target of the Function (Dynel or Statel)
+        /// </param>
+        /// <param name="arguments">
+        /// Function Arguments
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public abstract bool Execute(
+            INamedEntity self, INamedEntity caller, IInstancedEntity target, object[] arguments);
 
+        /// <summary>
+        /// </summary>
         private int functionNumber = -1;
 
-        private string functionName = "";
+        /// <summary>
+        /// </summary>
+        private string functionName = string.Empty;
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public abstract int ReturnNumber();
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public abstract string ReturnName();
 
+        /// <summary>
+        /// </summary>
         public int FunctionNumber
         {
             get
             {
                 return this.functionNumber;
             }
+
             set
             {
                 this.functionNumber = value;
             }
         }
 
+        /// <summary>
+        /// </summary>
         public string FunctionName
         {
             get
             {
                 return this.functionName;
             }
+
             set
             {
                 this.functionName = value;
@@ -80,17 +112,29 @@ namespace ZoneEngine.Functions
         }
     }
 
+    /// <summary>
+    /// </summary>
     public class FunctionCollection
     {
+        /// <summary>
+        /// </summary>
         private readonly Dictionary<int, Type> functions = new Dictionary<int, Type>();
 
+        /// <summary>
+        /// </summary>
         private Assembly assembly;
 
+        /// <summary>
+        /// </summary>
         public FunctionCollection()
         {
             this.ReadFunctions();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public bool ReadFunctions()
         {
             try
@@ -106,8 +150,8 @@ namespace ZoneEngine.Functions
                             if ((t.Name != "FunctionPrototype") && (t.Name != "FunctionCollection"))
                             {
                                 this.functions.Add(
-                                    ((FunctionPrototype)this.assembly.CreateInstance(t.Namespace + "." + t.Name)).
-                                        ReturnNumber(),
+                                    ((FunctionPrototype)this.assembly.CreateInstance(t.Namespace + "." + t.Name))
+                                        .ReturnNumber(), 
                                     t);
                             }
                         }
@@ -126,6 +170,7 @@ namespace ZoneEngine.Functions
             {
                 return false;
             }
+
             return true;
         }
 
@@ -149,12 +194,19 @@ namespace ZoneEngine.Functions
         /// </param>
         /// <returns>
         /// </returns>
-        public bool CallFunction(int functionNumber, INamedEntity self, INamedEntity caller, IInstancedEntity target, object[] arguments)
+        public bool CallFunction(
+            int functionNumber, INamedEntity self, INamedEntity caller, IInstancedEntity target, object[] arguments)
         {
             FunctionPrototype func = this.GetFunctionByNumber(functionNumber);
             return func.Execute(self, caller, target, arguments);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="functionnumber">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public FunctionPrototype GetFunctionByNumber(int functionnumber)
         {
             if (this.functions.Keys.Contains(functionnumber))
@@ -164,9 +216,14 @@ namespace ZoneEngine.Functions
                     this.assembly.CreateInstance(
                         this.functions[functionnumber].Namespace + "." + this.functions[functionnumber].Name);
             }
+
             return null;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public int NumberofRegisteredFunctions()
         {
             return this.functions.Keys.Count;

@@ -191,6 +191,7 @@
     <Compile Include="Network\InternalBus\PlayfieldTimedListEntry.cs" />
     <Compile Include="Network\IZoneClient.cs" />
     <Compile Include="Network\PacketHandlers\CharacterInPlay.cs" />
+    <Compile Include="Network\PacketHandlers\CharDCMove.cs" />
     <Compile Include="Network\PacketHandlers\ChatCommandHandler.cs" />
     <Compile Include="Network\PacketHandlers\ClientConnected.cs" />
     <Compile Include="Network\Packets\AppearanceUpdate.cs" />

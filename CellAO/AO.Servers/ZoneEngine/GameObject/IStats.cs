@@ -27,6 +27,7 @@ namespace ZoneEngine.GameObject
 {
     #region Usings ...
 
+    using System;
     using System.Diagnostics.Contracts;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -48,7 +49,16 @@ namespace ZoneEngine.GameObject
         /// </summary>
         DynelStats Stats { get; }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="aof">
+        /// </param>
+        /// <param name="checkAll">
+        /// </param>
+        /// <returns>
+        /// </returns>
         bool CheckRequirements(AOFunctions aof, bool checkAll);
+
         #endregion
     }
 
@@ -73,25 +83,47 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="aof">
+        /// </param>
+        /// <param name="checkAll">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public bool CheckRequirements(AOFunctions aof, bool checkAll)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// </summary>
         public Identity Identity { get; private set; }
 
+        /// <summary>
+        /// </summary>
         public IPlayfield Playfield { get; set; }
 
+        /// <summary>
+        /// </summary>
         public Vector3 Coordinates { get; set; }
 
+        /// <summary>
+        /// </summary>
         public Quaternion Heading { get; set; }
 
+        /// <summary>
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// </summary>
         public string FirstName { get; set; }
 
+        /// <summary>
+        /// </summary>
         public string LastName { get; set; }
-
-
     }
 }

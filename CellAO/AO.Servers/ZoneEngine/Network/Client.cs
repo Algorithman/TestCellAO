@@ -34,6 +34,7 @@ namespace ZoneEngine.Network
     using System.Linq;
     using System.Net.Sockets;
 
+    using AO.Core;
     using AO.Core.Components;
     using AO.Core.Events;
     using AO.Core.Logger;
@@ -52,7 +53,9 @@ namespace ZoneEngine.Network
 
     using ZoneEngine.GameObject;
     using ZoneEngine.GameObject.Playfields;
-    using ZoneEngine.Network;
+
+    using Quaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
+    using Vector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
     #endregion
 
@@ -430,15 +433,8 @@ namespace ZoneEngine.Network
             this.character.Name = character.Name;
             this.character.LastName = character.LastName;
             this.character.FirstName = character.FirstName;
-            this.character.Coordinates = new Vector3();
-            this.character.Coordinates.X = character.X;
-            this.character.Coordinates.Y = character.Y;
-            this.character.Coordinates.Z = character.Z;
-            this.character.Heading = new Quaternion();
-            this.character.Heading.X = character.HeadingX;
-            this.character.Heading.Y = character.HeadingY;
-            this.character.Heading.Z = character.HeadingZ;
-            this.character.Heading.W = character.HeadingW;
+            this.character.Coordinates = new AOCoord(character.X, character.Y, character.Z);
+            this.character.Heading = new AO.Core.Quaternion(character.HeadingX, character.HeadingY, character.HeadingZ, character.HeadingW);
             this.character.Playfield = this.server.PlayfieldById(character.Playfield);
             this.Playfield = this.character.Playfield;
             this.Playfield.Entities.Add(this.character);

@@ -37,7 +37,6 @@ namespace ZoneEngine
     using SmokeLounge.AOtomation.Messaging.Messages;
 
     using ZoneEngine.GameObject;
-    using ZoneEngine.GameObject.Playfields;
 
     #endregion
 
@@ -52,6 +51,8 @@ namespace ZoneEngine
         /// </param>
         void SendCompressed(MessageBody messageBody);
 
+        /// <summary>
+        /// </summary>
         Character Character { get; set; }
     }
 
@@ -69,6 +70,8 @@ namespace ZoneEngine
             Contract.Requires(messageBody != null);
         }
 
+        /// <summary>
+        /// </summary>
         public Character Character { get; set; }
 
         /// <summary>

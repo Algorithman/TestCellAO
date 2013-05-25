@@ -27,13 +27,19 @@ namespace ZoneEngine.GameObject
 {
     #region Usings ...
 
+    using System;
     using System.Diagnostics.Contracts;
+
+    using AO.Core;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.GameObject.Items;
     using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
+
+    using Quaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
+    using Vector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
     #endregion
 
@@ -72,33 +78,13 @@ namespace ZoneEngine.GameObject
         /// </summary>
         public IPlayfield Playfield { get; set; }
 
-        /// <summary>
-        /// </summary>
-        public Vector3 Coordinates
-        {
-            get
-            {
-                return default(Vector3);
-            }
+        public AOCoord Coordinates { get; set; }
 
-            set
-            {
-            }
-        }
+        public AO.Core.Quaternion Heading { get; set; }
 
-        /// <summary>
-        /// </summary>
-        public Quaternion Heading
-        {
-            get
-            {
-                return default(Quaternion);
-            }
+        public AO.Core.Vector3 RawCoordinates { get; set; }
 
-            set
-            {
-            }
-        }
+        public AO.Core.Quaternion RawHeading { get; set; }
 
         /// <summary>
         /// </summary>
@@ -146,11 +132,23 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        /// <summary>
+        /// </summary>
         public DynelStats Stats { get; private set; }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="aof">
+        /// </param>
+        /// <param name="checkAll">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public bool CheckRequirements(AOFunctions aof, bool checkAll)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

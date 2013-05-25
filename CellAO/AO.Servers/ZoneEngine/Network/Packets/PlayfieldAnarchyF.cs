@@ -59,9 +59,9 @@ namespace ZoneEngine.Network.Packets
                                   CharacterCoordinates =
                                       new Vector3
                                           {
-                                              X = client.Character.Coordinates.X, 
-                                              Y = client.Character.Coordinates.Y, 
-                                              Z = client.Character.Coordinates.Z, 
+                                              X = client.Character.Coordinates.x, 
+                                              Y = client.Character.Coordinates.y, 
+                                              Z = client.Character.Coordinates.z, 
                                           }, 
                                   PlayfieldId1 =
                                       new Identity

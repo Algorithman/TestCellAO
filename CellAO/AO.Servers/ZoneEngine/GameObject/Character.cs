@@ -388,11 +388,23 @@ namespace ZoneEngine.GameObject
         /// </summary>
         public Identity SelectedTarget { get; set; }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="identity">
+        /// </param>
+        /// <returns>
+        /// </returns>
         bool ITargetingEntity.SetTarget(Identity identity)
         {
             return this.SetTarget(identity);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="identity">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public bool SetFightingTarget(Identity identity)
         {
             // TODO: Check if target still exists in playfield (not dead, not teleported away)
@@ -400,7 +412,13 @@ namespace ZoneEngine.GameObject
             return true;
         }
 
-        bool SetTarget(Identity identity)
+        /// <summary>
+        /// </summary>
+        /// <param name="identity">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        private bool SetTarget(Identity identity)
         {
             // TODO: Check if target still exists in playfield
             this.SelectedTarget = identity;

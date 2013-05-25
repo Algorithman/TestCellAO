@@ -79,6 +79,8 @@ namespace ZoneEngine
         /// </summary>
         private static ZoneServer zoneServer;
 
+        /// <summary>
+        /// </summary>
         public static FunctionCollection FunctionC = new FunctionCollection();
 
         #endregion
@@ -170,21 +172,17 @@ namespace ZoneEngine
         {
             bool processedargs = false;
 
-
-
             LogUtil.SetupConsoleLogging(LogLevel.Debug);
             LogUtil.SetupFileLogging("${basedir}/ZoneEngineLog.txt", LogLevel.Trace);
 
-
-
-            #region NBug Setup
+            
 
             SettingsOverride.LoadCustomSettings("NBug.ZoneEngine.Config");
             Settings.WriteLogToDisk = true;
             AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
             TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
 
-            #endregion
+            
 
             #region Script Loading Code Area..
 
@@ -328,8 +326,8 @@ namespace ZoneEngine
                         }
                         catch (Exception)
                         {
-                            Console.ForegroundColor=ConsoleColor.Red;
-                            Console.WriteLine("Scripts folder not found.");                            
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Scripts folder not found.");
                         }
 
                         Console.ResetColor();

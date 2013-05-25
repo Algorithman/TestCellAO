@@ -27,13 +27,19 @@ namespace ZoneEngine.GameObject
 {
     #region Usings ...
 
+    using System;
     using System.Diagnostics.Contracts;
+
+    using AO.Core;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.GameObject.Items;
     using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
+
+    using Quaternion = AO.Core.Quaternion;
+    using Vector3 = AO.Core.Vector3;
 
     #endregion
 
@@ -50,11 +56,19 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        Vector3 Coordinates { get; set; }
+        AO.Core.AOCoord Coordinates { get; set; }
 
         /// <summary>
         /// </summary>
-        Quaternion Heading { get; set; }
+        AO.Core.Quaternion Heading { get; set; }
+
+        /// <summary>
+        /// </summary>
+        AO.Core.Vector3 RawCoordinates { get; set; }
+
+        /// <summary>
+        /// </summary>
+        AO.Core.Quaternion RawHeading { get; set; }
 
         #endregion
     }
@@ -94,43 +108,31 @@ namespace ZoneEngine.GameObject
             }
         }
 
-        /// <summary>
-        /// </summary>
-        public Vector3 Coordinates
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Vector3>() != null);
-                return default(Vector3);
-            }
+        public AOCoord Coordinates { get; set; }
 
-            set
-            {
-                Contract.Requires(value != null);
-            }
-        }
+        public Quaternion Heading { get; set; }
+
+        public Vector3 RawCoordinates { get; set; }
+
+        public Quaternion RawHeading { get; set; }
 
         /// <summary>
         /// </summary>
-        public Quaternion Heading
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Quaternion>() != null);
-                return default(Quaternion);
-            }
-
-            set
-            {
-                Contract.Requires(value != null);
-            }
-        }
-
         public DynelStats Stats { get; private set; }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="aof">
+        /// </param>
+        /// <param name="checkAll">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public bool CheckRequirements(AOFunctions aof, bool checkAll)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

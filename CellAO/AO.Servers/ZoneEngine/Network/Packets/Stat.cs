@@ -109,24 +109,26 @@ namespace ZoneEngine.Network.Packets
         public static void Send(Client client, int stat, uint value, bool announce)
         {
             var statMessage = new StatMessage
-                              {
-                                  Identity = client.Character.Identity,
-                                  Stats =
-                                      new[]
-                                          {
-                                              new GameTuple<CharacterStat, uint>
-                                                  {
-                                                      Value1 =
-                                                          (CharacterStat)stat, 
-                                                      Value2 = value
-                                                  }
-                                          }
-                              };
-            var statM = new Message() { Body = statMessage };
+                                  {
+                                      Identity = client.Character.Identity, 
+                                      Stats =
+                                          new[]
+                                              {
+                                                  new GameTuple<CharacterStat, uint>
+                                                      {
+                                                          Value1 =
+                                                              (CharacterStat)
+                                                              stat, 
+                                                          Value2 = value
+                                                      }
+                                              }
+                                  };
+            var statM = new Message { Body = statMessage };
             if (!client.Character.DoNotDoTimers)
             {
-                client.Character.Playfield.Publish(new IMSendAOtMessageToClient() { client = client, message = statM });
+                client.Character.Playfield.Publish(new IMSendAOtMessageToClient { client = client, message = statM });
             }
+
             /* announce to playfield? */
             if (announce)
             {
@@ -194,7 +196,7 @@ namespace ZoneEngine.Network.Packets
                     stats.Add(
                         new GameTuple<CharacterStat, uint>
                             {
-                                Value1 = (CharacterStat)keyValuePair.Key,
+                                Value1 = (CharacterStat)keyValuePair.Key, 
                                 Value2 = keyValuePair.Value
                             });
                 }
@@ -240,7 +242,7 @@ namespace ZoneEngine.Network.Packets
             {
                 var statValue = new GameTuple<CharacterStat, uint>
                                     {
-                                        Value1 = (CharacterStat)keyValuePair.Key,
+                                        Value1 = (CharacterStat)keyValuePair.Key, 
                                         Value2 = keyValuePair.Value
                                     };
                 toClient.Add(statValue);

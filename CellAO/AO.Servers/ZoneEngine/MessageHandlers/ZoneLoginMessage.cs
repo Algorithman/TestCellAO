@@ -28,7 +28,6 @@ namespace ZoneEngine.MessageHandlers
     #region Usings ...
 
     using System.ComponentModel.Composition;
-    using System.Threading;
 
     using AO.Core.Components;
 

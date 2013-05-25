@@ -34,15 +34,8 @@ namespace ZoneEngine.GameObject.Stats
 
     using AO.Core;
 
-    using Cell.Core;
-
     using Database;
 
-    using SmokeLounge.AOtomation.Messaging.GameData;
-    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
-
-    using ZoneEngine.Network;
-    using ZoneEngine.Network.InternalBus.InternalMessages;
     using ZoneEngine.Network.Packets;
 
     #endregion
@@ -241,19 +234,23 @@ namespace ZoneEngine.GameObject.Stats
             }
         }
 
+        /// <summary>
+        /// </summary>
         private uint statBaseValue;
+
         /// <summary>
         /// </summary>
         public uint StatBaseValue
         {
             get
             {
-                return statBaseValue;
+                return this.statBaseValue;
             }
+
             set
             {
-                bool sendit = value != statBaseValue;
-                statBaseValue = value;
+                bool sendit = value != this.statBaseValue;
+                this.statBaseValue = value;
                 if (sendit)
                 {
                     Stat.Send(this.Parent, this.StatNumber, value, this.announceToPlayfield);
