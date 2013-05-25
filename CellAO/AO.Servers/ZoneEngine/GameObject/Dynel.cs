@@ -32,6 +32,8 @@ namespace ZoneEngine.GameObject
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.Function;
+    using ZoneEngine.GameObject.Items;
     using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
 
@@ -141,6 +143,209 @@ namespace ZoneEngine.GameObject
                 Contract.Ensures(this.stats != null);
                 return this.stats;
             }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="aof">
+        /// </param>
+        /// <param name="checkAll">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public bool CheckRequirements(AOFunctions aof, bool checkAll)
+        {
+            bool requirementsMet = true;
+            int childOperator = -1; // Starting value
+            bool foundCharRelated = (aof.FunctionType == Constants.FunctiontypeHairMesh)
+                                    || (aof.FunctionType == Constants.FunctiontypeBackMesh)
+                                    || (aof.FunctionType == Constants.FunctiontypeTexture)
+                                    || (aof.FunctionType == Constants.FunctiontypeAttractorMesh)
+                                    || (aof.FunctionType == Constants.FunctiontypeCatMesh)
+                                    || (aof.FunctionType == Constants.FunctiontypeChangeBodyMesh)
+                                    || (aof.FunctionType == Constants.functiontype_shouldermesh)
+                                    || (aof.FunctionType == Constants.FunctiontypeHeadMesh);
+
+            Identity RequirementTargetIdentity = new Identity();
+            foreach (AORequirements aor in aof.Requirements)
+            {
+                switch (aor.Target)
+                {
+                    case Constants.ItemtargetUser:
+                        {
+                            RequirementTargetIdentity = this.identity;
+                            break;
+                        }
+
+                    case Constants.ItemtargetWearer:
+                        {
+                            // TODO: Subject to change, not sure about this one
+                            RequirementTargetIdentity = this.identity;
+                            break;
+                        }
+
+                    case Constants.ItemtargetTarget:
+                        {
+                            // TODO: pass on target 
+                            break;
+                        }
+
+                    case Constants.ItemtargetFightingtarget:
+                        {
+                            var temp = this as ITargetingEntity;
+                            if (temp != null)
+                            {
+                                RequirementTargetIdentity = temp.FightingTarget;
+                            }
+
+                            break;
+                        }
+
+                    case Constants.ItemtargetSelectedtarget:
+                        {
+                            var temp = this as ITargetingEntity;
+                            if (temp != null)
+                            {
+                                RequirementTargetIdentity = temp.SelectedTarget;
+                            }
+
+                            break;
+                        }
+
+                    case Constants.ItemtargetSelf:
+                        {
+                            RequirementTargetIdentity = this.Identity;
+                            break;
+                        }
+
+                    default:
+                        {
+                            RequirementTargetIdentity = new Identity();
+                            break;
+                        }
+                }
+
+                if (RequirementTargetIdentity.Type == IdentityType.None)
+                {
+                    return false;
+
+                    // Target not found, cant check reqs -> FALSE
+                }
+
+                IStats reqTargetStatholder = ((IInstancedEntity)this).Playfield.FindByIdentity(
+                    RequirementTargetIdentity);
+                int statval = reqTargetStatholder.Stats.StatValueByName(aor.Statnumber);
+                bool reqresult = true;
+                switch (aor.Operator)
+                {
+                    case Constants.OperatorAnd:
+                        {
+                            reqresult = (statval & aor.Value) != 0;
+                            break;
+                        }
+
+                    case Constants.OperatorOr:
+                        {
+                            reqresult = (statval | aor.Value) != 0;
+                            break;
+                        }
+
+                    case Constants.OperatorEqualTo:
+                        {
+                            reqresult = statval == aor.Value;
+                            break;
+                        }
+
+                    case Constants.OperatorLessThan:
+                        {
+                            reqresult = statval < aor.Value;
+                            break;
+                        }
+
+                    case Constants.OperatorGreaterThan:
+                        {
+                            reqresult = statval > aor.Value;
+                            break;
+                        }
+
+                    case Constants.OperatorUnequal:
+                        {
+                            reqresult = statval != aor.Value;
+                            break;
+                        }
+
+                    case Constants.OperatorTrue:
+                        {
+                            reqresult = true;
+                            break;
+                        }
+
+                    case Constants.OperatorFalse:
+                        {
+                            reqresult = false;
+                            break;
+                        }
+
+                    case Constants.OperatorBitAnd:
+                        {
+                            reqresult = (statval & aor.Value) != 0;
+                            break;
+                        }
+
+                    case Constants.OperatorBitOr:
+                        {
+                            reqresult = (statval | aor.Value) != 0;
+                            break;
+                        }
+
+                    default:
+                        {
+                            // TRUE for now
+                            reqresult = true;
+                            break;
+                        }
+                }
+
+                switch (childOperator)
+                {
+                    case Constants.OperatorAnd:
+                        {
+                            requirementsMet &= reqresult;
+                            break;
+                        }
+
+                    case Constants.OperatorOr:
+                        {
+                            requirementsMet &= reqresult;
+                            break;
+                        }
+
+                    case -1:
+                        {
+                            requirementsMet = reqresult;
+                            break;
+                        }
+
+                    default:
+                        break;
+                }
+
+                childOperator = aor.ChildOperator;
+            }
+
+            if (!checkAll)
+            {
+                if (foundCharRelated)
+                {
+                    requirementsMet &= foundCharRelated;
+                }
+                else
+                {
+                    requirementsMet = true;
+                }
+            }
+
+            return requirementsMet;
         }
 
         #endregion

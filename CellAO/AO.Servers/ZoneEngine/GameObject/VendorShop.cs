@@ -31,8 +31,11 @@ namespace ZoneEngine.GameObject
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.GameObject.Items;
     using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
+
+    using IInventory = ZoneEngine.IInventory;
 
     #endregion
 
@@ -94,6 +97,11 @@ namespace ZoneEngine.GameObject
             {
                 return this.Stats;
             }
+        }
+
+        public bool CheckRequirements(AOFunctions aof, bool checkAll)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

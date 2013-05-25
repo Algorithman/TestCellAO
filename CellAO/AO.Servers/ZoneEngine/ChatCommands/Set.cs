@@ -30,8 +30,11 @@ namespace ZoneEngine.ChatCommands
     using System;
     using System.Collections.Generic;
 
+    using AO.Core.Logger;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.Function;
     using ZoneEngine.GameObject;
     using ZoneEngine.GameObject.Items;
     using ZoneEngine.GameObject.Stats;
@@ -88,7 +91,7 @@ namespace ZoneEngine.ChatCommands
                 }
             }
 
-            IStats tempch = (IStats)client.Playfield.FindByIdentity(target);
+            IStats tempch = client.Playfield.FindByIdentity(target);
             if (tempch == null)
             {
                 client.SendChatText("Target vanished? This should NOT be reached");
@@ -100,28 +103,30 @@ namespace ZoneEngine.ChatCommands
                 statOldValue = tempch.Stats.GetBaseValue(statId);
                 var IM =
                     new IMExecuteFunction(
-                        new AOFunctions()
+                        new AOFunctions
                             {
-                                Target = ((INamedEntity)tempch).Identity.Instance,
-                                FunctionType = 53026,
-                                Requirements = new List<AORequirements>(),
+                                Target = ((INamedEntity)tempch).Identity.Instance, 
+                                FunctionType = Constants.FunctiontypeSet, 
+                                Requirements = new List<AORequirements>(), 
                                 Arguments =
-                                    new AOFunctionArguments()
+                                    new AOFunctionArguments
                                         {
                                             Values =
-                                                new List<object>()
+                                                new List<object>
                                                     {
-                                                        statId,
+                                                        statId, 
                                                         (int)statNewValue
                                                     }
-                                        },
-                                TickCount = 1,
-                                TickInterval = 1,
+                                        }, 
+                                TickCount = 1, 
+                                TickInterval = 1, 
                                 dolocalstats = true
-                            },
+                            }, 
                         ((INamedEntity)tempch).Identity);
-                ((IInstancedEntity)tempch).Playfield.Publish(IM);
-
+                if (tempch.CheckRequirements(IM.Function, true))
+                {
+                    ((IInstancedEntity)tempch).Playfield.Publish(IM);
+                }
             }
             catch
             {

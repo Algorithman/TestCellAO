@@ -145,5 +145,15 @@ namespace ZoneEngine.GameObject
         }
 
         public DynelStats Stats { get; private set; }
+
+        public bool CheckRequirements(AOFunctions aof, bool checkAll)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool CheckRequirements(IStats ch, AOFunctions aof, bool checkAll)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

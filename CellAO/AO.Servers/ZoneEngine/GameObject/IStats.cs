@@ -31,6 +31,7 @@ namespace ZoneEngine.GameObject
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.GameObject.Items;
     using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
 
@@ -47,6 +48,7 @@ namespace ZoneEngine.GameObject
         /// </summary>
         DynelStats Stats { get; }
 
+        bool CheckRequirements(AOFunctions aof, bool checkAll);
         #endregion
     }
 
@@ -71,6 +73,11 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        public bool CheckRequirements(AOFunctions aof, bool checkAll)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Identity Identity { get; private set; }
 
         public IPlayfield Playfield { get; set; }
@@ -84,5 +91,7 @@ namespace ZoneEngine.GameObject
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
+
+
     }
 }

@@ -31,6 +31,7 @@ namespace ZoneEngine.GameObject
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.GameObject.Items;
     using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
 
@@ -126,5 +127,10 @@ namespace ZoneEngine.GameObject
         }
 
         public DynelStats Stats { get; private set; }
+
+        public bool CheckRequirements(AOFunctions aof, bool checkAll)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
