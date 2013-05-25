@@ -140,6 +140,7 @@
     <Compile Include="MessageHandlers\CharDCMoveHandler.cs" />
     <Compile Include="MessageHandlers\CharInPlayHandler.cs" />
     <Compile Include="MessageHandlers\ChatCmdHandler.cs" />
+    <Compile Include="MessageHandlers\FollowTargeHandler.cs" />
     <Compile Include="MessageHandlers\LookAtHandler.cs" />
     <Compile Include="MessageHandlers\ZoneLoginMessage.cs" />
     <Compile Include="Network\Client.cs" />
