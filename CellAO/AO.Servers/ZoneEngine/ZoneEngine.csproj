@@ -142,6 +142,7 @@
     <Compile Include="MessageHandlers\ChatCmdHandler.cs" />
     <Compile Include="MessageHandlers\FollowTargeHandler.cs" />
     <Compile Include="MessageHandlers\LookAtHandler.cs" />
+    <Compile Include="MessageHandlers\SkillHandler.cs" />
     <Compile Include="MessageHandlers\ZoneLoginMessage.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="GameObject\Dynel.cs" />
@@ -186,6 +187,7 @@
     <Compile Include="Network\InternalBus\InternalMessages\IIMItemNanoAction.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IIMItemNanoEvent.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IMExecuteFunction.cs" />
+    <Compile Include="Network\InternalBus\InternalMessages\IMSendAOtMessageBodyToClient.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IMSendAOtMessageToClient.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IMSendAOtMessageToPlayfield.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IMSendAOtMessageToPlayfieldOthers.cs" />
@@ -199,6 +201,7 @@
     <Compile Include="Network\PacketHandlers\CharDCMove.cs" />
     <Compile Include="Network\PacketHandlers\ChatCommandHandler.cs" />
     <Compile Include="Network\PacketHandlers\ClientConnected.cs" />
+    <Compile Include="Network\PacketHandlers\SkillUpdate.cs" />
     <Compile Include="Network\Packets\AppearanceUpdate.cs" />
     <Compile Include="Network\Packets\ChatServerInfo.cs" />
     <Compile Include="Network\Packets\FullCharacter.cs" />

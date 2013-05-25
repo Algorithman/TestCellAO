@@ -57,9 +57,11 @@ namespace ZoneEngine.ChatCommands
         public override void ExecuteCommand(Client client, Identity target, string[] args)
         {
             // Fallback to self if no target is selected
+            bool fallback = false;
             if (target.Instance == 0)
             {
                 target = client.Character.Identity;
+                fallback = true;
             }
 
             int statId = StatsList.GetStatId(args[1]);
@@ -103,7 +105,7 @@ namespace ZoneEngine.ChatCommands
                     new IMExecuteFunction(
                         new AOFunctions
                             {
-                                Target = ((INamedEntity)tempch).Identity.Instance, 
+                                Target = Constants.ItemtargetSelectedtarget, 
                                 FunctionType = Constants.FunctiontypeSet, 
                                 Requirements = new List<AORequirements>(), 
                                 Arguments =
@@ -121,6 +123,11 @@ namespace ZoneEngine.ChatCommands
                                 dolocalstats = true
                             }, 
                         ((INamedEntity)tempch).Identity);
+                if (fallback)
+                {
+                    IM.Function.Target = Constants.ItemtargetSelf;
+                }
+
                 if (tempch.CheckRequirements(IM.Function, true))
                 {
                     ((IInstancedEntity)tempch).Playfield.Publish(IM);

@@ -285,6 +285,8 @@ namespace ZoneEngine.GameObject.Playfields
                 this.playfieldBus.Subscribe<IMSendAOtMessageToPlayfield>(this.SendAOtMessageToPlayfield));
             this.memBusDisposeContainer.Add(
                 this.playfieldBus.Subscribe<IMSendAOtMessageToPlayfieldOthers>(this.SendAOtMessageToPlayfieldOthers));
+            this.memBusDisposeContainer.Add(
+                this.playfieldBus.Subscribe<IMSendAOtMessageBodyToClient>(this.SendAOtMessageBodyToClient));
             this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<IMSendPlayerSCFUs>(this.SendSCFUsToClient));
             this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<IMExecuteFunction>(this.ExecuteFunction));
             this.Entities = new HashSet<IInstancedEntity>();
@@ -367,6 +369,15 @@ namespace ZoneEngine.GameObject.Playfields
 
         /// <summary>
         /// </summary>
+        /// <param name="msg">
+        /// </param>
+        public void SendAOtMessageBodyToClient(IMSendAOtMessageBodyToClient msg)
+        {
+            msg.client.SendCompressed(msg.Body);
+        }
+
+        /// <summary>
+        /// </summary>
         /// <param name="imExecuteFunction">
         /// </param>
         /// <exception cref="NotImplementedException">
@@ -408,11 +419,21 @@ namespace ZoneEngine.GameObject.Playfields
                         "Unknown target encountered: Target#:" + imExecuteFunction.Function.Target);
             }
 
+            if (target == null)
+            {
+                var temp = user as Character;
+                if (temp != null)
+                {
+                    temp.Client.SendCompressed(new ChatTextMessage() { Identity = temp.Identity, Text = "No valid target found" });
+                    return;
+                }
+            }
+
             Program.FunctionC.CallFunction(
-                imExecuteFunction.Function.FunctionType, 
-                (INamedEntity)user, 
-                (INamedEntity)user, 
-                target, 
+                imExecuteFunction.Function.FunctionType,
+                (INamedEntity)user,
+                (INamedEntity)user,
+                target,
                 imExecuteFunction.Function.Arguments.Values.ToArray());
         }
 
