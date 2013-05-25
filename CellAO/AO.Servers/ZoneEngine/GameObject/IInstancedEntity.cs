@@ -56,19 +56,19 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        AO.Core.AOCoord Coordinates { get; set; }
+        AOCoord Coordinates { get; set; }
 
         /// <summary>
         /// </summary>
-        AO.Core.Quaternion Heading { get; set; }
+        Quaternion Heading { get; set; }
 
         /// <summary>
         /// </summary>
-        AO.Core.Vector3 RawCoordinates { get; set; }
+        Vector3 RawCoordinates { get; set; }
 
         /// <summary>
         /// </summary>
-        AO.Core.Quaternion RawHeading { get; set; }
+        Quaternion RawHeading { get; set; }
 
         #endregion
     }
@@ -108,12 +108,20 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        /// <summary>
+        /// </summary>
         public AOCoord Coordinates { get; set; }
 
+        /// <summary>
+        /// </summary>
         public Quaternion Heading { get; set; }
 
+        /// <summary>
+        /// </summary>
         public Vector3 RawCoordinates { get; set; }
 
+        /// <summary>
+        /// </summary>
         public Quaternion RawHeading { get; set; }
 
         /// <summary>

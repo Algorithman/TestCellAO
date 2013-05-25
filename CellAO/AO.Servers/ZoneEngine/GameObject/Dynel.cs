@@ -40,8 +40,8 @@ namespace ZoneEngine.GameObject
     using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
 
-    using Quaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
-    using Vector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
+    using Quaternion = AO.Core.Quaternion;
+    using Vector3 = AO.Core.Vector3;
 
     #endregion
 
@@ -102,10 +102,16 @@ namespace ZoneEngine.GameObject
             }
         }
 
+        /// <summary>
+        /// </summary>
         AOCoord IInstancedEntity.Coordinates { get; set; }
 
+        /// <summary>
+        /// </summary>
         private DateTime predictionTime;
 
+        /// <summary>
+        /// </summary>
         public TimeSpan PredictionDuration
         {
             get
@@ -115,6 +121,7 @@ namespace ZoneEngine.GameObject
                 return currentTime - this.predictionTime;
             }
         }
+
         /// <summary>
         /// Calculate Turn time
         /// </summary>
@@ -155,6 +162,7 @@ namespace ZoneEngine.GameObject
                     break;
 
                 case MoveModes.Swim:
+
                     // Swim speed is calculated the same as Run Speed except is half as effective
                     effectiveRunSpeed = this.stats.Swim.Value >> 1; // Stat #138 = Swim
                     break;
@@ -172,6 +180,7 @@ namespace ZoneEngine.GameObject
                     break;
 
                 default:
+
                     // All other movement modes, sitting, sleeping, lounging, rooted, etc have a speed of 0
                     // As there is no way to 'force' that this way, we just default to 0 and hope that canMove() has been called to properly check.
                     effectiveRunSpeed = 0;
@@ -180,8 +189,6 @@ namespace ZoneEngine.GameObject
 
             return effectiveRunSpeed;
         }
-
-
 
         /// <summary>
         /// Calculate forward speed
@@ -272,16 +279,16 @@ namespace ZoneEngine.GameObject
         /// Calculate move vector
         /// </summary>
         /// <returns>Movevector</returns>
-        private AO.Core.Vector3 calculateMoveVector()
+        private Vector3 calculateMoveVector()
         {
             double forwardSpeed;
             double strafeSpeed;
-            AO.Core.Vector3 forwardMove;
-            AO.Core.Vector3 strafeMove;
+            Vector3 forwardMove;
+            Vector3 strafeMove;
 
             if (!this.canMove())
             {
-                return AO.Core.Vector3.Origin;
+                return Vector3.Origin;
             }
 
             forwardSpeed = this.calculateForwardSpeed();
@@ -289,12 +296,12 @@ namespace ZoneEngine.GameObject
 
             if ((forwardSpeed == 0) && (strafeSpeed == 0))
             {
-                return AO.Core.Vector3.Origin;
+                return Vector3.Origin;
             }
 
             if (forwardSpeed != 0)
             {
-                forwardMove = AO.Core.Quaternion.RotateVector3(this.RawHeading, AO.Core.Vector3.AxisZ);
+                forwardMove = Quaternion.RotateVector3(this.RawHeading, Vector3.AxisZ);
                 forwardMove.Magnitude = Math.Abs(forwardSpeed);
                 if (forwardSpeed < 0)
                 {
@@ -303,12 +310,12 @@ namespace ZoneEngine.GameObject
             }
             else
             {
-                forwardMove = AO.Core.Vector3.Origin;
+                forwardMove = Vector3.Origin;
             }
 
             if (strafeSpeed != 0)
             {
-                strafeMove = AO.Core.Quaternion.RotateVector3(this.RawHeading, AO.Core.Vector3.AxisX);
+                strafeMove = Quaternion.RotateVector3(this.RawHeading, Vector3.AxisX);
                 strafeMove.Magnitude = Math.Abs(strafeSpeed);
                 if (strafeSpeed < 0)
                 {
@@ -317,7 +324,7 @@ namespace ZoneEngine.GameObject
             }
             else
             {
-                strafeMove = AO.Core.Vector3.Origin;
+                strafeMove = Vector3.Origin;
             }
 
             return forwardMove + strafeMove;
@@ -342,12 +349,9 @@ namespace ZoneEngine.GameObject
             return angle;
         }
 
-
-
-
         /// <summary>
         /// </summary>
-        public AO.Core.AOCoord Coordinates
+        public AOCoord Coordinates
         {
             get
             {
@@ -357,7 +361,7 @@ namespace ZoneEngine.GameObject
                 }
                 else if (this.spinDirection == SpinOrStrafeDirections.None)
                 {
-                    AO.Core.Vector3 moveVector = this.calculateMoveVector();
+                    Vector3 moveVector = this.calculateMoveVector();
 
                     moveVector = moveVector * this.PredictionDuration.TotalSeconds;
 
@@ -365,8 +369,8 @@ namespace ZoneEngine.GameObject
                 }
                 else
                 {
-                    AO.Core.Vector3 moveVector;
-                    AO.Core.Vector3 positionFromCentreOfTurningCircle;
+                    Vector3 moveVector;
+                    Vector3 positionFromCentreOfTurningCircle;
                     double turnArcAngle;
                     double y;
                     double duration;
@@ -381,43 +385,51 @@ namespace ZoneEngine.GameObject
 
                     if (this.spinDirection == SpinOrStrafeDirections.Left)
                     {
-                        positionFromCentreOfTurningCircle = new AO.Core.Vector3(moveVector.z, y, -moveVector.x);
+                        positionFromCentreOfTurningCircle = new Vector3(moveVector.z, y, -moveVector.x);
                     }
                     else
                     {
-                        positionFromCentreOfTurningCircle = new AO.Core.Vector3(-moveVector.z, y, moveVector.x);
+                        positionFromCentreOfTurningCircle = new Vector3(-moveVector.z, y, moveVector.x);
                     }
 
                     return
                         new AOCoord(
-                            this.RawCoordinates +
-                            AO.Core.Quaternion.RotateVector3(
-                                new AO.Core.Quaternion(AO.Core.Vector3.AxisY, turnArcAngle), positionFromCentreOfTurningCircle)
+                            this.RawCoordinates
+                            + Quaternion.RotateVector3(
+                                new Quaternion(Vector3.AxisY, turnArcAngle), positionFromCentreOfTurningCircle)
                             - positionFromCentreOfTurningCircle);
                 }
             }
+
             set
             {
-                RawCoordinates = value.coordinate;
+                this.RawCoordinates = value.coordinate;
             }
         }
 
         /// <summary>
         /// </summary>
-
         private SpinOrStrafeDirections spinDirection = SpinOrStrafeDirections.None;
 
+        /// <summary>
+        /// </summary>
         private SpinOrStrafeDirections strafeDirection = SpinOrStrafeDirections.None;
 
+        /// <summary>
+        /// </summary>
         private MoveDirections moveDirection = MoveDirections.None;
 
+        /// <summary>
+        /// </summary>
         private MoveModes moveMode = MoveModes.Run; // Run should be an appropriate default for now
 
+        /// <summary>
+        /// </summary>
         private MoveModes previousMoveMode = MoveModes.Run; // Run should be an appropriate default for now
 
         /// <summary>
         /// </summary>
-        public AO.Core.Quaternion Heading
+        public Quaternion Heading
         {
             get
             {
@@ -428,31 +440,32 @@ namespace ZoneEngine.GameObject
                 else
                 {
                     double turnArcAngle;
-                    AO.Core.Quaternion turnQuaterion;
-                    AO.Core.Quaternion newHeading;
+                    Quaternion turnQuaterion;
+                    Quaternion newHeading;
 
                     turnArcAngle = this.calculateTurnArcAngle();
-                    turnQuaterion = new AO.Core.Quaternion(AO.Core.Vector3.AxisY, turnArcAngle);
+                    turnQuaterion = new Quaternion(Vector3.AxisY, turnArcAngle);
 
-                    newHeading = AO.Core.Quaternion.Hamilton(turnQuaterion, this.RawHeading);
+                    newHeading = Quaternion.Hamilton(turnQuaterion, this.RawHeading);
                     newHeading.Normalize();
 
                     return newHeading;
                 }
             }
+
             set
             {
-                RawHeading = value;
+                this.RawHeading = value;
             }
         }
 
         /// <summary>
         /// </summary>
-        public AO.Core.Vector3 RawCoordinates { get; set; }
+        public Vector3 RawCoordinates { get; set; }
 
         /// <summary>
         /// </summary>
-        public AO.Core.Quaternion RawHeading { get; set; }
+        public Quaternion RawHeading { get; set; }
 
         /// <summary>
         /// </summary>
@@ -667,10 +680,13 @@ namespace ZoneEngine.GameObject
 
             return requirementsMet;
         }
+
         /// <summary>
         /// Update move type
         /// </summary>
-        /// <param name="moveType">new move type</param>
+        /// <param name="moveType">
+        /// new move type
+        /// </param>
         public void UpdateMoveType(byte moveType)
         {
             this.predictionTime = DateTime.UtcNow;
@@ -747,6 +763,7 @@ namespace ZoneEngine.GameObject
                     break;
 
                 case 15: // Jump Start
+
                     // NV: TODO: This!
                     break;
                 case 16: // Jump Stop
@@ -833,11 +850,12 @@ namespace ZoneEngine.GameObject
                 case 42: // Leave Lounge Mode
                     break;
                 default:
-                    //Console.WriteLine("Unknown MoveType: " + moveType);
+
+                    // Console.WriteLine("Unknown MoveType: " + moveType);
                     break;
             }
 
-            //Console.WriteLine((moveDirection != 0 ? moveMode.ToString() : "Stand") + "ing in the direction " + moveDirection.ToString() + (spinDirection != 0 ? " while spinning " + spinDirection.ToString() : "") + (strafeDirection != 0 ? " and strafing " + strafeDirection.ToString() : ""));
+            // Console.WriteLine((moveDirection != 0 ? moveMode.ToString() : "Stand") + "ing in the direction " + moveDirection.ToString() + (spinDirection != 0 ? " while spinning " + spinDirection.ToString() : "") + (strafeDirection != 0 ? " and strafing " + strafeDirection.ToString() : ""));
         }
 
         #endregion

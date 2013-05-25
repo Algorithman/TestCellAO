@@ -279,6 +279,8 @@ namespace ZoneEngine.GameObject.Playfields
             this.playfieldBus = BusSetup.StartWith<AsyncConfiguration>().Construct();
             this.memBusDisposeContainer.Add(
                 this.playfieldBus.Subscribe<IMSendAOtMessageToClient>(SendAOtMessageToClient));
+            this.memBusDisposeContainer.Add(
+                this.playfieldBus.Subscribe<IMSendAOtMessageToPlayfield>(this.SendAOtMessageToPlayfield));
             this.memBusDisposeContainer.Add(this.playfieldBus.Subscribe<IMExecuteFunction>(this.ExecuteFunction));
             this.Entities = new HashSet<IInstancedEntity>();
         }
@@ -309,6 +311,15 @@ namespace ZoneEngine.GameObject.Playfields
         {
             LogUtil.Debug(clientMessage.message.Body.GetType().ToString());
             clientMessage.client.SendCompressed(clientMessage.message.Body);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="clientMessage">
+        /// </param>
+        public void SendAOtMessageToPlayfield(IMSendAOtMessageToPlayfield clientMessage)
+        {
+            Announce(clientMessage.Body);
         }
 
         /// <summary>

@@ -137,6 +137,7 @@
     <Compile Include="GameObject\Corpse.cs" />
     <Compile Include="GameObject\Character.cs" />
     <Compile Include="Collision\BorderlineCheck.cs" />
+    <Compile Include="MessageHandlers\CharDCMoveHandler.cs" />
     <Compile Include="MessageHandlers\CharInPlayHandler.cs" />
     <Compile Include="MessageHandlers\ChatCmdHandler.cs" />
     <Compile Include="MessageHandlers\LookAtHandler.cs" />
@@ -185,6 +186,7 @@
     <Compile Include="Network\InternalBus\InternalMessages\IIMItemNanoEvent.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IMExecuteFunction.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\IMSendAOtMessageToClient.cs" />
+    <Compile Include="Network\InternalBus\InternalMessages\IMSendAOtMessageToPlayfield.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\InternalMessage.cs" />
     <Compile Include="Network\InternalBus\InternalMessages\InternalMessageBody.cs" />
     <Compile Include="Network\InternalBus\PlayfieldTimedList.cs" />

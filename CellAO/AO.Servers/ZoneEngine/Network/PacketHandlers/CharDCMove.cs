@@ -31,6 +31,8 @@ namespace ZoneEngine.Network.PacketHandlers
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine.Network.InternalBus.InternalMessages;
+
     using Vector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
     #endregion
@@ -149,7 +151,7 @@ namespace ZoneEngine.Network.PacketHandlers
                                 Unknown2 = tmpInt2, 
                                 Unknown3 = tmpInt3
                             };
-            client.Playfield.Announce(reply);
+            client.Playfield.Publish(new IMSendAOtMessageToPlayfield { Body = reply });
 
             // TODO: rewrite statelscheck
             /*

@@ -42,7 +42,7 @@ namespace AO.Core
         /// <summary>
         /// Vector representation of Coordinates
         /// </summary>
-        public Vector3 coordinate;
+        public Vector3 coordinate = new Vector3(0, 0, 0);
 
         /// <summary>
         /// Quaterion representation of Coordinates (w is 0)
@@ -159,6 +159,10 @@ namespace AO.Core
             this.Update(x, y, z);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="vector3">
+        /// </param>
         public AOCoord(SmokeLounge.AOtomation.Messaging.GameData.Vector3 vector3)
         {
             this.coordinate.x = vector3.X;

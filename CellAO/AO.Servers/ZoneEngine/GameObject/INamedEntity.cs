@@ -38,8 +38,8 @@ namespace ZoneEngine.GameObject
     using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
 
-    using Quaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
-    using Vector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
+    using Quaternion = AO.Core.Quaternion;
+    using Vector3 = AO.Core.Vector3;
 
     #endregion
 
@@ -78,13 +78,21 @@ namespace ZoneEngine.GameObject
         /// </summary>
         public IPlayfield Playfield { get; set; }
 
+        /// <summary>
+        /// </summary>
         public AOCoord Coordinates { get; set; }
 
-        public AO.Core.Quaternion Heading { get; set; }
+        /// <summary>
+        /// </summary>
+        public Quaternion Heading { get; set; }
 
-        public AO.Core.Vector3 RawCoordinates { get; set; }
+        /// <summary>
+        /// </summary>
+        public Vector3 RawCoordinates { get; set; }
 
-        public AO.Core.Quaternion RawHeading { get; set; }
+        /// <summary>
+        /// </summary>
+        public Quaternion RawHeading { get; set; }
 
         /// <summary>
         /// </summary>
