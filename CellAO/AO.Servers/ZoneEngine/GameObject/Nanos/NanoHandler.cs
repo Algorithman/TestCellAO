@@ -46,7 +46,7 @@ namespace ZoneEngine.GameObject.Nanos
         /// <summary>
         /// Cache of all item templates
         /// </summary>
-        public static List<NanoFormula> NanoList = new List<NanoFormula>();
+        public static Dictionary<int, NanoFormula> NanoList = new Dictionary<int, NanoFormula>();
 
         /// <summary>
         /// Cache all item templates
@@ -54,47 +54,7 @@ namespace ZoneEngine.GameObject.Nanos
         /// <returns>number of cached items</returns>
         public static int CacheAllNanos()
         {
-            DateTime _now = DateTime.Now;
-            NanoList = new List<NanoFormula>();
-            Stream sf = new FileStream("nanos.dat", FileMode.Open);
-            MemoryStream ms = new MemoryStream();
-
-            ZOutputStream sm = new ZOutputStream(ms);
-            CopyStream(sf, sm);
-
-            ms.Seek(0, SeekOrigin.Begin);
-
-            byte[] buffer = new byte[4];
-            ms.Read(buffer, 0, 4);
-            int packaged = BitConverter.ToInt32(buffer, 0);
-
-            BinaryReader br = new BinaryReader(ms);
-            MessagePackSerializer<List<NanoFormula>> bf = MessagePackSerializer.Create<List<NanoFormula>>();
-
-            while (true)
-            {
-                List<NanoFormula> templist;
-                try
-                {
-                    templist = bf.Unpack(ms);
-                    NanoList.AddRange(templist);
-                    if (templist.Count != packaged)
-                    {
-                        break;
-                    }
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-
-                Console.Write(
-                    "Loaded {0} Nanos in {1}\r", 
-                    new object[] { NanoList.Count, new DateTime((DateTime.Now - _now).Ticks).ToString("mm:ss.ff") });
-            }
-
-            GC.Collect();
-            return NanoList.Count;
+            return CacheAllNanos("nanos.dat");
         }
 
         /// <summary>
@@ -109,7 +69,7 @@ namespace ZoneEngine.GameObject.Nanos
         {
             Contract.Requires(!string.IsNullOrEmpty(fname));
             DateTime _now = DateTime.Now;
-            NanoList = new List<NanoFormula>();
+            NanoList = new Dictionary<int, NanoFormula>();
             Stream sf = new FileStream(fname, FileMode.Open);
             MemoryStream ms = new MemoryStream();
 
@@ -118,6 +78,13 @@ namespace ZoneEngine.GameObject.Nanos
 
             ms.Seek(0, SeekOrigin.Begin);
             BinaryReader br = new BinaryReader(ms);
+            byte versionlength = (byte)ms.ReadByte();
+            char[] version = new char[versionlength];
+            version = br.ReadChars(versionlength);
+
+            // TODO: Check version and print a warning if not same as config.xml's
+            Console.WriteLine("Reading Nanos (" + new string(version) + "):");
+
             MessagePackSerializer<List<NanoFormula>> bf = MessagePackSerializer.Create<List<NanoFormula>>();
 
             byte[] buffer = new byte[4];
@@ -130,7 +97,10 @@ namespace ZoneEngine.GameObject.Nanos
                 try
                 {
                     templist = bf.Unpack(ms);
-                    NanoList.AddRange(templist);
+                    foreach (NanoFormula nf in templist)
+                    {
+                        NanoList.Add(nf.ID, nf);
+                    }
                     if (templist.Count != packaged)
                     {
                         break;
@@ -192,15 +162,12 @@ namespace ZoneEngine.GameObject.Nanos
         /// </returns>
         public static NanoFormula GetNano(int id)
         {
-            foreach (NanoFormula nanoFormula in NanoList)
+            if (!NanoList.ContainsKey(id))
             {
-                if (nanoFormula.ID == id)
-                {
-                    return nanoFormula;
-                }
+                throw new ArgumentOutOfRangeException("No NanoFormula found with ID " + id);
             }
 
-            return null;
+            return NanoList[id];
         }
     }
 }

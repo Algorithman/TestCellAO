@@ -112,6 +112,7 @@
     <Compile Include="GameObject\Enums\Expansions.cs" />
     <Compile Include="GameObject\ITargetingEntity.cs" />
     <Compile Include="GameObject\Items\AOActions.cs" />
+    <Compile Include="GameObject\Items\AOItem.cs" />
     <Compile Include="GameObject\Items\AOItemAttribute.cs" />
     <Compile Include="GameObject\Items\BaseInventory.cs" />
     <Compile Include="GameObject\Items\Inventory\ArmorPageInventory.cs" />
@@ -150,7 +151,7 @@
     <Compile Include="GameObject\Items\AOEvents.cs" />
     <Compile Include="GameObject\Items\AOFunctionArguments.cs" />
     <Compile Include="GameObject\Items\AOFunctions.cs" />
-    <Compile Include="GameObject\Items\AOItem.cs" />
+    <Compile Include="GameObject\Items\AOItemTemplate.cs" />
     <Compile Include="AssemblyInfoclass.cs" />
     <Compile Include="GameObject\Corpse.cs" />
     <Compile Include="GameObject\Character.cs" />

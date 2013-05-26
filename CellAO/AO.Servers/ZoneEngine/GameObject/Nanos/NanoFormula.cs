@@ -53,7 +53,10 @@ namespace ZoneEngine.GameObject.Nanos
         /// <summary>
         /// NCUCost
         /// </summary>
-        public int NCUCost;
+        public int NCUCost()
+        {
+            return this.getItemAttribute(54);
+        }
 
         /// <summary>
         /// Type of instanced item
@@ -73,17 +76,17 @@ namespace ZoneEngine.GameObject.Nanos
         /// <summary>
         /// Item attributes
         /// </summary>
-        public List<AOItemAttribute> Stats = new List<AOItemAttribute>();
+        public Dictionary<int, int> Stats = new Dictionary<int, int>();
 
         /// <summary>
         /// List of Attack attributes
         /// </summary>
-        public List<AOItemAttribute> Attack = new List<AOItemAttribute>();
+        public Dictionary<int, int> Attack = new Dictionary<int, int>();
 
         /// <summary>
         /// List of defensive attributes
         /// </summary>
-        public List<AOItemAttribute> Defend = new List<AOItemAttribute>();
+        public Dictionary<int, int> Defend = new Dictionary<int, int>();
 
         /// <summary>
         /// List of Item events
@@ -108,28 +111,19 @@ namespace ZoneEngine.GameObject.Nanos
             NanoFormula nanoFormula = new NanoFormula();
             nanoFormula.ID = this.ID;
 
-            foreach (AOItemAttribute nanoFormulaAttribute in this.Attack)
+            foreach (KeyValuePair<int, int> nanoFormulaAttribute in this.Attack)
             {
-                AOItemAttribute z = new AOItemAttribute();
-                z.Stat = nanoFormulaAttribute.Stat;
-                z.Value = nanoFormulaAttribute.Value;
-                nanoFormula.Attack.Add(z);
+                nanoFormula.Attack.Add(nanoFormulaAttribute.Key, nanoFormulaAttribute.Value);
             }
 
-            foreach (AOItemAttribute nanoFormulaAttribute in this.Defend)
+            foreach (KeyValuePair<int, int> nanoFormulaAttribute in this.Defend)
             {
-                AOItemAttribute z = new AOItemAttribute();
-                z.Stat = nanoFormulaAttribute.Stat;
-                z.Value = nanoFormulaAttribute.Value;
-                nanoFormula.Defend.Add(z);
+                nanoFormula.Defend.Add(nanoFormulaAttribute.Key, nanoFormulaAttribute.Value);
             }
 
-            foreach (AOItemAttribute nanoFormulaAttribute in this.Stats)
+            foreach (KeyValuePair<int, int> nanoFormulaAttribute in this.Stats)
             {
-                AOItemAttribute z = new AOItemAttribute();
-                z.Stat = nanoFormulaAttribute.Stat;
-                z.Value = nanoFormulaAttribute.Value;
-                nanoFormula.Stats.Add(z);
+                nanoFormula.Stats.Add(nanoFormulaAttribute.Key, nanoFormulaAttribute.Value);
             }
 
             foreach (AOEvents aoEvents in this.Events)
@@ -185,7 +179,6 @@ namespace ZoneEngine.GameObject.Nanos
             nanoFormula.flags = this.flags;
             nanoFormula.Instance = this.Instance;
             nanoFormula.ItemType = this.ItemType;
-            nanoFormula.NCUCost = this.NCUCost;
 
             return nanoFormula;
         }
@@ -215,15 +208,10 @@ namespace ZoneEngine.GameObject.Nanos
         /// </returns>
         public int getItemAttribute(int number)
         {
-            int c;
-            for (c = 0; c < this.Stats.Count; c++)
+            if (Stats.ContainsKey(number))
             {
-                if (number == this.Stats[c].Stat)
-                {
-                    return this.Stats[c].Value;
-                }
+                return Stats[number];
             }
-
             return 0;
         }
 

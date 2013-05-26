@@ -48,7 +48,7 @@ namespace ZoneEngine.Gameobject.Items
         /// <summary>
         /// Cache of all item templates
         /// </summary>
-        public static List<AOItem> ItemList = new List<AOItem>();
+        public static Dictionary<int, AOItemTemplate> ItemList = new Dictionary<int, AOItemTemplate>(); 
 
         /// <summary>
         /// Cache all item templates
@@ -56,47 +56,7 @@ namespace ZoneEngine.Gameobject.Items
         /// <returns>number of cached items</returns>
         public static int CacheAllItems()
         {
-            DateTime _now = DateTime.UtcNow;
-            ItemList = new List<AOItem>();
-            Stream sf = new FileStream("items.dat", FileMode.Open);
-            MemoryStream ms = new MemoryStream();
-
-            ZOutputStream sm = new ZOutputStream(ms);
-            CopyStream(sf, sm);
-
-            ms.Seek(0, SeekOrigin.Begin);
-
-            byte[] buffer = new byte[4];
-            ms.Read(buffer, 0, 4);
-            int packaged = BitConverter.ToInt32(buffer, 0);
-
-            BinaryReader br = new BinaryReader(ms);
-            MessagePackSerializer<List<AOItem>> bf2 = MessagePackSerializer.Create<List<AOItem>>();
-
-            while (true)
-            {
-                List<AOItem> templist;
-                try
-                {
-                    templist = bf2.Unpack(ms);
-                    ItemList.AddRange(templist);
-                    if (templist.Count != packaged)
-                    {
-                        break;
-                    }
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-
-                Console.Write(
-                    "Loaded {0} items in {1}\r", 
-                    new object[] { ItemList.Count, new DateTime((DateTime.UtcNow - _now).Ticks).ToString("mm:ss.ff") });
-            }
-
-            GC.Collect();
-            return ItemList.Count;
+            return CacheAllItems("items.dat");
         }
 
         /// <summary>
@@ -111,7 +71,7 @@ namespace ZoneEngine.Gameobject.Items
         {
             Contract.Requires(!string.IsNullOrEmpty(fname));
             DateTime _now = DateTime.UtcNow;
-            ItemList = new List<AOItem>();
+            ItemList = new Dictionary<int, AOItemTemplate>();
             Stream sf = new FileStream(fname, FileMode.Open);
             MemoryStream ms = new MemoryStream();
 
@@ -120,19 +80,28 @@ namespace ZoneEngine.Gameobject.Items
 
             ms.Seek(0, SeekOrigin.Begin);
             BinaryReader br = new BinaryReader(ms);
-            MessagePackSerializer<List<AOItem>> bf2 = MessagePackSerializer.Create<List<AOItem>>();
+            byte versionlength = (byte)ms.ReadByte();
+            char[] version = new char[versionlength];
+            version = br.ReadChars(versionlength);
+
+            // TODO: Check version and print a warning if not same as config.xml's
+
+            MessagePackSerializer<List<AOItemTemplate>> bf2 = MessagePackSerializer.Create<List<AOItemTemplate>>();
 
             byte[] buffer = new byte[4];
             ms.Read(buffer, 0, 4);
             int packaged = BitConverter.ToInt32(buffer, 0);
-
+            Console.WriteLine("Reading Items (" + new string(version) + "):");
             while (true)
             {
-                List<AOItem> templist;
+                List<AOItemTemplate> templist;
                 try
                 {
                     templist = bf2.Unpack(ms);
-                    ItemList.AddRange(templist);
+                    foreach (AOItemTemplate template in templist)
+                    {
+                        ItemList.Add(template.ID, template);
+                    }
                     if (templist.Count != packaged)
                     {
                         break;
@@ -183,130 +152,6 @@ namespace ZoneEngine.Gameobject.Items
             Console.Write("\r                                             \r");
         }
 
-        #region Item
-
-        /// <summary>
-        /// Get new object of item template with specified ID
-        /// </summary>
-        /// <param name="ID">
-        /// AOID
-        /// </param>
-        /// <returns>
-        /// copied AOItem
-        /// </returns>
-        public static AOItem GetItemTemplate(int ID)
-        {
-            foreach (AOItem it in ItemList)
-            {
-                if (it.LowID == ID)
-                {
-                    return it.ShallowCopy();
-                }
-            }
-
-            return null; // Should not ever happen
-        }
-
-        /// <summary>
-        /// Returns a interpolated version of the items
-        /// </summary>
-        /// <param name="lowID">
-        /// low ID
-        /// </param>
-        /// <param name="highID">
-        /// high ID
-        /// </param>
-        /// <param name="_QL">
-        /// Quality level
-        /// </param>
-        /// <returns>
-        /// interpolated AOItem
-        /// </returns>
-        public static AOItem interpolate(int lowID, int highID, int _QL)
-        {
-            AOItem low = GetItemTemplate(lowID);
-            AOItem high = GetItemTemplate(highID);
-            AOItem interp;
-            if (_QL < low.Quality)
-            {
-                _QL = low.Quality;
-            }
-
-            if (_QL > high.Quality)
-            {
-                _QL = high.Quality;
-            }
-
-            interp = high.ShallowCopy();
-            interp.LowID = low.LowID;
-            if (_QL < high.Quality)
-            {
-                interp = low.ShallowCopy();
-            }
-
-            interp.HighID = high.HighID;
-            interp.Quality = _QL;
-            if ((_QL == low.Quality) || (_QL == high.Quality))
-            {
-                return interp;
-            }
-
-            int attnum = 0;
-
-            // Effecting all attributes, even flags, it doesnt matter, High and low have always the same
-            float ival;
-            float factor = (_QL - low.Quality) / (Single)(high.Quality - low.Quality);
-            while (attnum < low.Stats.Count)
-            {
-                ival = (factor * (high.Stats[attnum].Value - low.Stats[attnum].Value)) + low.Stats[attnum].Value;
-                interp.Stats[attnum].Value = Convert.ToInt32(ival); // Had to go int64 cos of the flags
-                attnum++;
-            }
-
-            // TODO Requirements need interpolation too
-            int evnum = 0;
-            int fnum;
-            int anum;
-            float fval;
-            while (evnum < interp.Events.Count)
-            {
-                fnum = 0;
-                while (fnum < interp.Events[evnum].Functions.Count)
-                {
-                    anum = 0;
-                    while (anum < interp.Events[evnum].Functions[fnum].Arguments.Values.Count)
-                    {
-                        if (high.Events[evnum].Functions[fnum].Arguments.Values[anum] is int)
-                        {
-                            ival = (factor
-                                    * ((int)high.Events[evnum].Functions[fnum].Arguments.Values[anum]
-                                       - (int)low.Events[evnum].Functions[fnum].Arguments.Values[anum]))
-                                   + (int)low.Events[evnum].Functions[fnum].Arguments.Values[anum];
-                            interp.Events[evnum].Functions[fnum].Arguments.Values[anum] = Convert.ToInt32(ival);
-                        }
-
-                        if (high.Events[evnum].Functions[fnum].Arguments.Values[anum] is Single)
-                        {
-                            fval = (factor
-                                    * ((Single)high.Events[evnum].Functions[fnum].Arguments.Values[anum]
-                                       - (Single)low.Events[evnum].Functions[fnum].Arguments.Values[anum]))
-                                   + (Single)low.Events[evnum].Functions[fnum].Arguments.Values[anum];
-                            interp.Events[evnum].Functions[fnum].Arguments.Values[anum] = fval;
-                        }
-
-                        anum++;
-                    }
-
-                    fnum++;
-                }
-
-                evnum++;
-            }
-
-            return interp;
-        }
-
-        #endregion
 
         #region Function handling
 

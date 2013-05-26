@@ -1,11 +1,27 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="">
-//   
-// </copyright>
-// <summary>
-//   
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
+﻿#region License
+
+// Copyright (c) 2005-2013, CellAO Team
+// 
+// All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+// 
+//     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+//     * Neither the name of the CellAO Team nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#endregion
 
 #region License
 
@@ -59,15 +75,13 @@ namespace Extractor_Serializer
     using System.IO;
     using System.Text;
 
-    using AO.Core;
-
     using ComponentAce.Compression.Libs.zlib;
 
     using MsgPack.Serialization;
 
     using ZoneEngine.GameObject.Items;
-    using ZoneEngine.GameObject.Nanos;
     using ZoneEngine.Gameobject.Items;
+    using ZoneEngine.GameObject.Nanos;
 
     #endregion
 
@@ -259,18 +273,26 @@ namespace Extractor_Serializer
             // GetData(@"D:\c#\extractor serializer\data\nanostrains\",0xf4266);
             // GetData(@"D:\c#\extractor serializer\data\perks\",0xf4264);
             var np = new NewParser();
-            var rawItemList = new List<AOItem>();
+            var rawItemList = new List<AOItemTemplate>();
             var rawNanoList = new List<NanoFormula>();
             int counter = 0;
             foreach (int recnum in extractor.GetRecordInstances(0xFDE85))
             {
-                rawNanoList.Add(np.ParseNano(0xFDE85, recnum, extractor.GetRecordData(0xFDE85, recnum), "temp.sql"));
-                if ((counter % 100) == 0)
+                if (counter == 0)
                 {
-                    Console.Write("\rNano ID: "+recnum.ToString().PadLeft(9));
+                    counter = recnum;
                 }
+
+                rawNanoList.Add(np.ParseNano(0xFDE85, recnum, extractor.GetRecordData(0xFDE85, recnum), "temp.sql"));
+                if ((counter % 1000) == 0)
+                {
+                    Console.Write("\rNano ID: " + recnum.ToString().PadLeft(9));
+                }
+
                 counter++;
             }
+
+            Console.Write("\rNano ID: " + rawNanoList[rawNanoList.Count - 1].ID.ToString().PadLeft(9));
 
             File.Delete("temp.sql");
             Console.WriteLine();
@@ -278,17 +300,22 @@ namespace Extractor_Serializer
 
             List<string> ItemNamesSql = new List<string>();
 
+            counter = 0;
             foreach (int recnum in extractor.GetRecordInstances(0xF4254))
             {
                 rawItemList.Add(np.ParseItem(0xF4254, recnum, extractor.GetRecordData(0xF4254, recnum), ItemNamesSql));
-                if ((counter % 100) == 0)
+                if ((counter % 1000) == 0)
                 {
-                    Console.Write("\rItem ID: "+recnum.ToString().PadLeft(9));
+                    Console.Write("\rItem ID: " + recnum.ToString().PadLeft(9));
                 }
+
                 counter++;
             }
 
+            Console.Write("\rItem ID: " + rawItemList[rawItemList.Count - 1].ID.ToString().PadLeft(9));
+
             Console.WriteLine();
+            Console.WriteLine("Items extracted: " + rawItemList.Count);
 
             Console.WriteLine();
             Console.WriteLine("Compacting itemnames.sql");
@@ -332,6 +359,15 @@ namespace Extractor_Serializer
             var nanoList2 = new List<NanoFormula>();
 
             int maxnum = 5000;
+            string version = GetVersion(AOPath);
+            if (version == "")
+            {
+                return;
+            }
+            byte[] versionbuffer = ASCIIEncoding.ASCII.GetBytes(version);
+            sm.WriteByte((byte)(versionbuffer.Length));
+            sm.Write(versionbuffer, 0, versionbuffer.Length);
+
             byte[] buffer = BitConverter.GetBytes(maxnum);
             sm.Write(buffer, 0, buffer.Length);
 
@@ -367,15 +403,18 @@ namespace Extractor_Serializer
 
             ds = new ZOutputStream(sf, zlibConst.Z_BEST_COMPRESSION);
             sm = new MemoryStream();
-            MessagePackSerializer<List<AOItem>> bf2 = MessagePackSerializer.Create<List<AOItem>>();
+            MessagePackSerializer<List<AOItemTemplate>> bf2 = MessagePackSerializer.Create<List<AOItemTemplate>>();
 
-            List<AOItem> items = new List<AOItem>();
+            List<AOItemTemplate> items = new List<AOItemTemplate>();
 
             maxnum = 5000;
+            sm.WriteByte((byte)(versionbuffer.Length));
+            sm.Write(versionbuffer, 0, versionbuffer.Length);
+
             buffer = BitConverter.GetBytes(maxnum);
             sm.Write(buffer, 0, buffer.Length);
 
-            foreach (AOItem it in rawItemList)
+            foreach (AOItemTemplate it in rawItemList)
             {
                 items.Add(it);
                 if (items.Count == maxnum)
@@ -398,6 +437,7 @@ namespace Extractor_Serializer
 
             ItemHandler.CacheAllItems("items.dat");
 
+            Console.WriteLine();
             Console.WriteLine("Items: " + ItemHandler.ItemList.Count + " successfully converted");
 
             Console.WriteLine();
@@ -406,6 +446,30 @@ namespace Extractor_Serializer
             Console.WriteLine("- Apply itemnames.sql to your database");
             Console.WriteLine("Press Enter to exit and have fun with CellAO");
             Console.ReadLine();
+        }
+
+        public static string GetVersion(string path)
+        {
+            string aopath = path;
+            try
+            {
+                while (!File.Exists(Path.Combine(aopath, "version.id")))
+                {
+                    aopath = Path.Combine(aopath, "..");
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("File 'version.id' not found.");
+                Console.WriteLine("Plese press <Enter> to exit.");
+                Console.ReadLine();
+                return "";
+            }
+            TextReader tr = new StreamReader(Path.Combine(aopath, "version.id"));
+
+            string line = tr.ReadToEnd().Trim().Trim('\r').Trim('\n');
+            tr.Close();
+            return line;
         }
 
         #endregion

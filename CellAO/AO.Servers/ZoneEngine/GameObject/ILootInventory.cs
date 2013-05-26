@@ -72,7 +72,7 @@ namespace ZoneEngine.GameObject
         {
             get
             {
-                Contract.Ensures(Contract.Result<IList<AOItem>>() != null);
+                Contract.Ensures(Contract.Result<IList<AOItemTemplate>>() != null);
                 return default(IList<AOItem>);
             }
 

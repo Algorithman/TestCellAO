@@ -63,7 +63,7 @@ namespace Extractor_Serializer
         /// <param name="ITEM">
         /// The item.
         /// </param>
-        public void ParseAnimSoundSet(int typeN, AOItem ITEM)
+        public void ParseAnimSoundSet(int typeN, AOItemTemplate ITEM)
         {
             int num = this.br.ReadInt32();
             int num2 = this.br.Read3F1();
@@ -125,12 +125,11 @@ namespace Extractor_Serializer
         /// <returns>
         /// The <see cref="AOItem"/>.
         /// </returns>
-        public AOItem ParseItem(int rectype, int recnum, byte[] data, List<string> itemnamessql)
+        public AOItemTemplate ParseItem(int rectype, int recnum, byte[] data, List<string> itemnamessql)
         {
             this.br = new BufferedReader(rectype, recnum, data);
-            AOItem aoi = new AOItem();
-            aoi.LowID = recnum;
-            aoi.HighID = recnum;
+            AOItemTemplate aoi = new AOItemTemplate();
+            aoi.ID = recnum;
             this.br.Skip(16);
 
             int num = this.br.Read3F1();
@@ -156,10 +155,7 @@ namespace Extractor_Serializer
                 }
                 else
                 {
-                    AOItemAttribute aoia = new AOItemAttribute();
-                    aoia.Stat = attrkey;
-                    aoia.Value = attrval;
-                    aoi.Stats.Add(aoia);
+                    aoi.Stats.Add(attrkey, attrval);
                 }
 
                 num3++;
@@ -240,7 +236,7 @@ namespace Extractor_Serializer
                     }
 
                     continue;
-                    IL_4BF:
+                IL_4BF:
                     flag4 = false;
                 }
             }
@@ -287,18 +283,11 @@ namespace Extractor_Serializer
                 int attrval = this.br.ReadInt32();
                 if (attrkey == 54)
                 {
-                    aon.NCUCost = attrval;
-                    AOItemAttribute aoia = new AOItemAttribute();
-                    aoia.Stat = attrkey;
-                    aoia.Value = attrval;
-                    aon.Stats.Add(aoia);
+                    aon.Stats.Add(attrkey, attrval);
                 }
                 else
                 {
-                    AOItemAttribute aoia = new AOItemAttribute();
-                    aoia.Stat = attrkey;
-                    aoia.Value = attrval;
-                    aon.Stats.Add(aoia);
+                    aon.Stats.Add(attrkey, attrval);
                 }
 
                 counter++;
@@ -362,17 +351,17 @@ namespace Extractor_Serializer
                             this.ParseAnimSoundSet(2, null);
                             break;
                         case 22:
-                            this.ParseActionSet( aon.Actions);
+                            this.ParseActionSet(aon.Actions);
                             break;
                         case 23:
-                            this.ParseShopHash( aon.Events);
+                            this.ParseShopHash(aon.Events);
                             break;
                         default:
                             goto IL_4BF;
                     }
 
                     continue;
-                    IL_4BF:
+                IL_4BF:
                     flag4 = false;
                 }
             }
@@ -596,8 +585,8 @@ namespace Extractor_Serializer
                     string str = array2[i];
                     int num = int.Parse(str.Trim().Substring(0, str.Length - 1));
                     string text = str.Trim().ToLower().Substring(str.Length - 1, 1);
-                        
-                        // Strings.LCase(Strings.Right(Strings.Trim(str), 1));
+
+                    // Strings.LCase(Strings.Right(Strings.Trim(str), 1));
                     string left = text;
                     flag = left == "n";
                     if (flag)
@@ -700,10 +689,10 @@ namespace Extractor_Serializer
         /// <param name="defstat">
         /// The defstat.
         /// </param>
-        private void ParseAtkDefSet(List<AOItemAttribute> attackstat, List<AOItemAttribute> defstat)
+        private void ParseAtkDefSet(Dictionary<int, int> attackstat, Dictionary<int, int> defstat)
         {
-            List<AOItemAttribute> list = new List<AOItemAttribute>();
-            List<AOItemAttribute> list2 = new List<AOItemAttribute>();
+            Dictionary<int, int> list = new Dictionary<int, int>();
+            Dictionary<int, int> list2 = new Dictionary<int, int>();
 
             this.br.Skip(4);
             int num2 = this.br.Read3F1(); // Number of Attack/Defense Stat members
@@ -729,19 +718,19 @@ namespace Extractor_Serializer
 
                         try
                         {
-                            AOItemAttribute attack = new AOItemAttribute();
-                            attack.Stat = this.br.ReadInt32();
-                            attack.Value = this.br.ReadInt32();
+                            var attrkey = br.ReadInt32();
+                            var attrval = br.ReadInt32();
+
 
                             if (value == 12)
                             {
-                                list.Add(attack);
+                                list.Add(attrkey,attrval);
                                 num7++;
                             }
 
                             if (value == 13)
                             {
-                                list2.Add(attack);
+                                list2.Add(attrkey,attrval);
                                 num7++;
                             }
                         }
@@ -754,14 +743,14 @@ namespace Extractor_Serializer
                     num3++;
                 }
 
-                foreach (AOItemAttribute ua in list)
+                foreach (KeyValuePair<int,int> ua in list)
                 {
-                    attackstat.Add(ua);
+                    attackstat.Add(ua.Key,ua.Value);
                 }
 
-                foreach (AOItemAttribute ua in list2)
+                foreach (KeyValuePair<int, int> ua in list2)
                 {
-                    defstat.Add(ua);
+                    defstat.Add(ua.Key, ua.Value);
                 }
             }
         }
@@ -827,7 +816,7 @@ namespace Extractor_Serializer
             }
             if (retlist == null)
             {
-                retlist=new List<AOEvents>();
+                retlist = new List<AOEvents>();
             }
             retlist.Add(aoe);
         }

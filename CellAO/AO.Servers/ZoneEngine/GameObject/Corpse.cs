@@ -120,8 +120,6 @@ namespace ZoneEngine.GameObject
             this.identity = new Identity();
         }
 
-        /// <summary>
-        /// </summary>
         public IList<AOItem> Inventory { get; private set; }
 
         /// <summary>

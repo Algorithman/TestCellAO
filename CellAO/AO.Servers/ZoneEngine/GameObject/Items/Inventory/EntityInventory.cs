@@ -41,7 +41,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
         /// <summary>
         /// </summary>
-        internal AOItem Ammunition;
+        internal AOItemTemplate Ammunition;
 
         /// <summary>
         /// </summary>

@@ -58,9 +58,16 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public void CheckAdd(int slot, AOItem item, ref InventoryError err)
+        public void CheckAdd(int slot, AOItemTemplate item, ref InventoryError err)
         {
-            throw new NotImplementedException();
+            if (slot == 0x6f)
+            {
+                slot = this.FindFreeSlot();
+            }
+            if (slot == -1)
+            {
+                err=InventoryError.InventoryIsFull;
+            }
         }
 
         /// <summary>
@@ -73,9 +80,8 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public void CheckRemove(int slot, AOItem templ, ref InventoryError err)
+        public void CheckRemove(int slot, AOItemTemplate templ, ref InventoryError err)
         {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -84,9 +90,8 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public void Added(AOItem item)
+        public void Added(AOItemTemplate item)
         {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -97,9 +102,8 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public void Removed(int slot, AOItem item)
+        public void Removed(int slot, AOItemTemplate item)
         {
-            throw new NotImplementedException();
         }
     }
 }

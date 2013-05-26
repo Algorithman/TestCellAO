@@ -79,7 +79,8 @@ namespace ZoneEngine.GameObject.Items
                             Convert.ToInt32(
                                 probability.Next() * (lootTableEntry.MaxQL - lootTableEntry.MinQL)
                                 + lootTableEntry.MinQL);
-                        temp.Add(ItemHandler.interpolate(lootTableEntry.LowID, lootTableEntry.HighID, QL));
+                        AOItem tempitem = new AOItem(QL, lootTableEntry.LowID, lootTableEntry.HighID);
+                        temp.Add(tempitem);
                     }
                 }
 

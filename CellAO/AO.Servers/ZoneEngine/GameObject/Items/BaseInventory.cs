@@ -44,9 +44,6 @@ namespace ZoneEngine.GameObject.Items
         /// </summary>
         public IItemContainer owner { get; private set; }
 
-        /// <summary>
-        /// </summary>
-        public AOItem[] Content { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -55,6 +52,10 @@ namespace ZoneEngine.GameObject.Items
         /// <summary>
         /// </summary>
         public Dynel Owner { get; private set; }
+
+        /// <summary>
+        /// </summary>
+        public AOItem[] Content { get; private set; }
 
         /// <summary>
         /// </summary>
