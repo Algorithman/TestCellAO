@@ -318,5 +318,11 @@ namespace ZoneEngine.GameObject.Items.Inventory
         {
             throw new NotImplementedException();
         }
+
+        public void InitializeInventory(int slots, int firstSlot)
+        {
+            Content = new AOItem[slots];
+            FirstSlotNumber = firstSlot;
+        }
     }
 }

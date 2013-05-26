@@ -44,6 +44,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         public WeaponPageInventory(EntityInventory baseInventory)
             : base(baseInventory)
         {
+            this.InitializeInventory(15,1);
         }
 
         /// <summary>

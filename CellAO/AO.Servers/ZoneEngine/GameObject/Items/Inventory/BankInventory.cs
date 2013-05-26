@@ -36,6 +36,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         public BankInventory(EntityInventory baseInventory)
             : base(baseInventory)
         {
+            this.InitializeInventory(102, 0);
         }
 
         /// <summary>

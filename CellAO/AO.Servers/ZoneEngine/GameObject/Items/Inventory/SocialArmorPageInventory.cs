@@ -44,6 +44,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         public SocialArmorPageInventory(EntityInventory baseInventory)
             : base(baseInventory)
         {
+            this.InitializeInventory(15, 0x31);
         }
 
         /// <summary>

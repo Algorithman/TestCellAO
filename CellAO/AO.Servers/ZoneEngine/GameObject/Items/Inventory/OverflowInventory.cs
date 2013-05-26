@@ -36,6 +36,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         public OverflowInventory(EntityInventory baseInventory)
             : base(baseInventory)
         {
+            this.InitializeInventory(64, 0); // size 64 atm
         }
     }
 }

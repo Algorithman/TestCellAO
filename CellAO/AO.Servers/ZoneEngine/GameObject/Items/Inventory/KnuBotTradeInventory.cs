@@ -36,6 +36,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         public KnuBotTradeInventory(EntityInventory baseInventory)
             : base(baseInventory)
         {
+            this.InitializeInventory(64,0); // Setting it to size 64 atm, dunno which size is proper
         }
     }
 }

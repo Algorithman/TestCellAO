@@ -36,6 +36,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         public OutgoingTradeInventory(EntityInventory baseInventory)
             : base(baseInventory)
         {
+            this.InitializeInventory(64, 0); // sell max 64 items
         }
     }
 }

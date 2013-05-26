@@ -44,6 +44,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         public ImplantPageInventory(EntityInventory baseInventory)
             : base(baseInventory)
         {
+            this.InitializeInventory(15, 0x21);
         }
 
         /// <summary>

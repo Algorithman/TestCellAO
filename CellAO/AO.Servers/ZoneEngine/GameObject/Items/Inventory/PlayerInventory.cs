@@ -44,6 +44,8 @@ namespace ZoneEngine.GameObject.Items.Inventory
         public PlayerInventory(EntityInventory baseInventory)
             : base(baseInventory)
         {
+            // Number of slots can hopefully be changed
+            this.InitializeInventory(30,0x40);
         }
 
         /// <summary>

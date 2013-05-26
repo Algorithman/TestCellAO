@@ -144,14 +144,14 @@ namespace ZoneEngine.GameObject.Items.Inventory
             this.MainInventory[2] = new ImplantPageInventory(this);
             this.MainInventory[3] = new PlayerInventory(this);
             this.MainInventory[4] = new BankInventory(this);
-            this.MainInventory[5] = new BackPackInventory(this); // ??????
-            this.MainInventory[6] = new KnuBotTradeInventory(this);
+            this.MainInventory[5] = new BackPackInventory(this); // Cached Bags, refering to data sent by inventoryupdate packet, we need a handler for this
+            this.MainInventory[6] = new KnuBotTradeInventory(this); // Selling inventory?
             this.MainInventory[7] = new OverflowInventory(this);
             this.MainInventory[8] = new OutgoingTradeInventory(this);
             this.MainInventory[9] = new SocialArmorPageInventory(this);
-            this.MainInventory[10] = new ShopInventory(this);
-            this.MainInventory[11] = new PlayerShopInventory(this);
-            this.MainInventory[12] = new IncomingTradeInventory(this);
+            this.MainInventory[10] = new ShopInventory(this); // Linker to Shop's Inventory
+            this.MainInventory[11] = new PlayerShopInventory(this); // Linker to Player's Shop inventory
+            this.MainInventory[12] = new IncomingTradeInventory(this); // DEAD window (stuff which will be put into overflow when needed?)
         }
 
         /// <summary>
