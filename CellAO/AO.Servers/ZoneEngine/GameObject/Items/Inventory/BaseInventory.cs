@@ -23,7 +23,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject.Items
+namespace ZoneEngine.GameObject.Items.Inventory
 {
     #region Usings ...
 
