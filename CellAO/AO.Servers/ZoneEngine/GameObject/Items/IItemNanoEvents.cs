@@ -32,11 +32,14 @@ namespace ZoneEngine.GameObject.Items
     #endregion
 
     /// <summary>
+    /// Adding Item / Nano Events to class
+    /// TODO: complete with methods
     /// </summary>
     public interface IItemNanoEvents
     {
         /// <summary>
+        /// List of Game Events (onWear, onCollide etc)
         /// </summary>
-        List<AOEvents> Events { get; }
+        List<Events> Events { get; }
     }
 }

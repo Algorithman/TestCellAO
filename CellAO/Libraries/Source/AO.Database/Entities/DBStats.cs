@@ -23,37 +23,25 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject.Items
+namespace AO.Database
 {
     #region Usings ...
 
-    using System;
+    using System.Collections.Generic;
+    using System.Data;
+
+    using Dapper;
 
     #endregion
-
+    
     /// <summary>
-    /// AOItemAttribute
     /// </summary>
-    [Serializable]
-    public class AOItemAttribute
+    public class DBStats
     {
-        /// <summary>
-        /// Stat number of attribute
-        /// </summary>
-        public int Stat;
+        public int type { get; set; }
+        public int instance { get; set; }
+        public int statid { get; set; }
+        public int statvalue { get; set; }
 
-        /// <summary>
-        /// Value of attribute
-        /// </summary>
-        public int Value;
-
-        /// <summary>
-        /// Create a empty AOItemAttribute
-        /// </summary>
-        public AOItemAttribute()
-        {
-            this.Stat = 0;
-            this.Value = 0;
-        }
     }
 }

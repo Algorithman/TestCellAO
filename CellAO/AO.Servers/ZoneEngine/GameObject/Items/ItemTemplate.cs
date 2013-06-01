@@ -36,7 +36,7 @@ namespace ZoneEngine.GameObject.Items
     /// <summary>
     /// </summary>
     [Serializable]
-    public class AOItemTemplate : IItemNanoEvents, IItemNanoActions
+    public class ItemTemplate : IItemNanoEvents, IItemNanoActions
     {
         #region Fields
 
@@ -82,7 +82,7 @@ namespace ZoneEngine.GameObject.Items
                 return this.Stats[number];
             }
 
-            return 0;
+            return 1234567890;
         }
 
         /// <summary>
@@ -699,18 +699,18 @@ namespace ZoneEngine.GameObject.Items
 
         /// <summary>
         /// </summary>
-        public AOItemTemplate()
+        public ItemTemplate()
         {
-            this.Events = new List<AOEvents>();
-            this.Actions = new List<AOActions>();
+            this.Events = new List<Events>();
+            this.Actions = new List<Actions>();
         }
 
         /// <summary>
         /// </summary>
-        public List<AOEvents> Events { get; set; }
+        public List<Events> Events { get; set; }
 
         /// <summary>
         /// </summary>
-        public List<AOActions> Actions { get; set; }
+        public List<Actions> Actions { get; set; }
     }
 }

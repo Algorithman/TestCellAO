@@ -23,12 +23,13 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace Database
+namespace AO.Database
 {
     #region Usings ...
 
     using System.Collections.Generic;
     using System.Data;
+    using System.Linq;
 
     using Dapper;
 
@@ -36,18 +37,18 @@ namespace Database
 
     /// <summary>
     /// </summary>
-    public class CharacterDao
+    public static class StatDao
     {
         /// <summary>
         /// </summary>
         /// <returns>
         /// </returns>
-        public IEnumerable<DBCharacter> GetAll()
+        public static IEnumerable<DBStats> GetAll()
         {
             using (IDbConnection conn = Connector.GetConnection())
             {
                 return
-                    conn.Query<DBCharacter>(
+                    conn.Query<DBStats>(
                         "SELECT Name, FirstName, LastName, Textures0,Textures1,Textures2,Textures3,Textures4,playfield as Playfield, X,Y,Z,HeadingX,HeadingY,HeadingZ,HeadingW FROM characters");
             }
         }
@@ -58,14 +59,52 @@ namespace Database
         /// </param>
         /// <returns>
         /// </returns>
-        public IEnumerable<DBCharacter> GetById(int characterId)
+        public static IEnumerable<DBStats> GetById(int characterId)
         {
             using (IDbConnection conn = Connector.GetConnection())
             {
                 return
-                    conn.Query<DBCharacter>(
+                    conn.Query<DBStats>(
                         "SELECT Name, FirstName, LastName, Textures0,Textures1,Textures2,Textures3,Textures4,playfield as Playfield, X,Y,Z,HeadingX,HeadingY,HeadingZ,HeadingW FROM characters where id = @id", 
                         new { id = characterId });
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="type">
+        /// </param>
+        /// <param name="instance">
+        /// </param>
+        /// <param name="statId">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static DBStats GetById(int type, int instance, int statId)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                return
+                    conn.Query<DBStats>(
+                        "SELECT statid, statvalue FROM stats where (type=@type AND instance=@instance AND statid=@statId)", 
+                        new { type, instance, statId }).First();
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="type">
+        /// </param>
+        /// <param name="instance">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static IEnumerable<DBStats> GetById(int type, int instance)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                return conn.Query<DBStats>(
+                    "SELECT statid, statvalue FROM stats where (type=@type AND instance=@instance)", new { type, instance });
             }
         }
     }

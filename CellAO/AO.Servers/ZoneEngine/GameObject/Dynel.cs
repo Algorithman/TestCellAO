@@ -486,7 +486,7 @@ namespace ZoneEngine.GameObject
         /// </param>
         /// <returns>
         /// </returns>
-        public bool CheckRequirements(AOFunctions aof, bool checkAll)
+        public bool CheckRequirements(Functions aof, bool checkAll)
         {
             bool requirementsMet = true;
             int childOperator = -1; // Starting value
@@ -500,7 +500,7 @@ namespace ZoneEngine.GameObject
                                     || (aof.FunctionType == Constants.FunctiontypeHeadMesh);
 
             Identity RequirementTargetIdentity = new Identity();
-            foreach (AORequirements aor in aof.Requirements)
+            foreach (Requirements aor in aof.Requirements)
             {
                 switch (aor.Target)
                 {

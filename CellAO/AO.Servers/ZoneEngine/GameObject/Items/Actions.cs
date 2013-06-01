@@ -23,74 +23,29 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace Database
+namespace ZoneEngine.GameObject.Items
 {
+    #region Usings ...
+
+    using System;
+    using System.Collections.Generic;
+
+    #endregion
+
     /// <summary>
+    /// AOActions covers all action types, with their reqs
     /// </summary>
-    public class DBCharacter
+    [Serializable]
+    public class Actions
     {
         /// <summary>
+        /// Type of Action (constants in ItemLoader)
         /// </summary>
-        public string Name { get; set; }
+        public int ActionType;
 
         /// <summary>
+        /// List of Requirements for this action
         /// </summary>
-        public string FirstName { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public string LastName { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int Textures0 { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int Textures1 { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int Textures2 { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int Textures3 { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int Textures4 { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int Playfield { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float X { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float Y { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float Z { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float HeadingX { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float HeadingY { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float HeadingZ { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public float HeadingW { get; set; }
+        public List<Requirements> Requirements = new List<Requirements>();
     }
 }

@@ -7,7 +7,7 @@
     <ProjectGuid>{E4C49EA3-504E-4EFB-96D6-3D2217553B14}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Database</RootNamespace>
+    <RootNamespace>AO.Database</RootNamespace>
     <AssemblyName>Database</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -43,6 +43,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,13 +51,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CharacterDao.cs" />
+    <Compile Include="Dao\CharacterDao.cs" />
     <Compile Include="Connector.cs" />
-    <Compile Include="DBCharacter.cs" />
-    <Compile Include="DBStats.cs" />
+    <Compile Include="Dao\InstancedItemDao.cs" />
+    <Compile Include="Dao\StatDao.cs" />
+    <Compile Include="Entities\DBCharacter.cs" />
+    <Compile Include="Entities\DBInstancedItem.cs" />
+    <Compile Include="Entities\DBStats.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StatDao.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

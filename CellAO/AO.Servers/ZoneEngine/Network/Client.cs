@@ -38,10 +38,11 @@ namespace ZoneEngine.Network
     using AO.Core.Components;
     using AO.Core.Events;
     using AO.Core.Logger;
+    using AO.Database;
 
     using Cell.Core;
 
-    using ComponentAce.Compression.Libs.zlib;
+    using zlib;
 
     using Database;
 

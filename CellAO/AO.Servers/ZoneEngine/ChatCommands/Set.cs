@@ -103,13 +103,13 @@ namespace ZoneEngine.ChatCommands
                 statOldValue = tempch.Stats.GetBaseValue(statId);
                 var IM =
                     new IMExecuteFunction(
-                        new AOFunctions
+                        new Functions
                             {
                                 Target = Constants.ItemtargetSelectedtarget, 
                                 FunctionType = Constants.FunctiontypeSet, 
-                                Requirements = new List<AORequirements>(), 
+                                Requirements = new List<Requirements>(), 
                                 Arguments =
-                                    new AOFunctionArguments
+                                    new FunctionArguments
                                         {
                                             Values =
                                                 new List<object>

@@ -37,7 +37,7 @@ namespace ZoneEngine
     using AO.Core.Components;
     using AO.Core.Logger;
 
-    using Database;
+    using AO.Database;
 
     using MySql.Data.MySqlClient;
 
@@ -124,7 +124,7 @@ namespace ZoneEngine
 
                 /* TODO: Readd when necessary classes are done again
                  */
-                Console.WriteLine("Loaded {0} items", ItemHandler.CacheAllItems());
+                Console.WriteLine("Loaded {0} items", ItemLoader.CacheAllItems());
                 Console.WriteLine("Loaded {0} nanos", NanoHandler.CacheAllNanos());
 
                 // Console.WriteLine("Creaated {0} playfields", zoneServer.CreatePlayfields());

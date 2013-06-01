@@ -55,7 +55,7 @@ namespace ZoneEngine.GameObject.Items
 
         /// <summary>
         /// </summary>
-        public AOItem[] Content { get; private set; }
+        public Item[] Content { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -85,7 +85,7 @@ namespace ZoneEngine.GameObject.Items
         /// </param>
         /// <param name="firstSlotNumber">
         /// </param>
-        protected BaseInventory(IItemContainer owner, AOItem[] items, int firstSlotNumber)
+        protected BaseInventory(IItemContainer owner, Item[] items, int firstSlotNumber)
             : this()
         {
             this.owner = owner;
@@ -108,7 +108,7 @@ namespace ZoneEngine.GameObject.Items
         {
             this.owner = owner;
             this.MaxSlots = maxSlots;
-            this.Content = new AOItem[maxSlots];
+            this.Content = new Item[maxSlots];
             this.FirstSlotNumber = firstSlotNumber;
         }
 
@@ -122,7 +122,7 @@ namespace ZoneEngine.GameObject.Items
         {
             int slot = this.FirstSlotNumber;
             bool foundFreeSlot = false;
-            foreach (AOItem item in this.Content)
+            foreach (Item item in this.Content)
             {
                 if (item == null)
                 {
@@ -171,7 +171,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public InventoryError TryAdd(int slot, AOItem item, bool isNew, ItemReceptionType reception)
+        public InventoryError TryAdd(int slot, Item item, bool isNew, ItemReceptionType reception)
         {
             throw new NotImplementedException();
         }
@@ -188,7 +188,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public InventoryError TryAdd(AOItem item, bool isNew, ItemReceptionType reception)
+        public InventoryError TryAdd(Item item, bool isNew, ItemReceptionType reception)
         {
             throw new NotImplementedException();
         }
@@ -203,7 +203,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public InventoryError TryAdd(int Slot, AOItem Item)
+        public InventoryError TryAdd(int Slot, Item Item)
         {
             // TODO: Check for Hotswapping
             if (this.Content[Slot] == null)
@@ -223,7 +223,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public InventoryError TryAdd(AOItem Item)
+        public InventoryError TryAdd(Item Item)
         {
             int nextFreeSlot = this.FindFreeSlot();
             if (nextFreeSlot == -1)
@@ -243,12 +243,12 @@ namespace ZoneEngine.GameObject.Items
         /// </param>
         /// <returns>
         /// </returns>
-        public AOItem Remove(int Slot, bool ownerChange)
+        public Item Remove(int Slot, bool ownerChange)
         {
             if (this.IsValidSlot(Slot))
             {
                 // TODO: Add more checks (eg. is equipped)
-                AOItem item = this.Content[Slot];
+                Item item = this.Content[Slot];
                 this.Content[Slot] = null;
                 return item;
             }
@@ -278,11 +278,11 @@ namespace ZoneEngine.GameObject.Items
         /// </summary>
         /// <returns>
         /// </returns>
-        public IEnumerator<AOItem> GetEnumerator()
+        public IEnumerator<Item> GetEnumerator()
         {
             for (int i = 0; i < this.Content.Length; i++)
             {
-                AOItem item = this.Content[i];
+                Item item = this.Content[i];
                 if (item != null)
                 {
                     yield return item;
@@ -305,7 +305,7 @@ namespace ZoneEngine.GameObject.Items
         /// </param>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public void Add(AOItem item)
+        public void Add(Item item)
         {
             throw new NotImplementedException();
         }
@@ -327,7 +327,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public bool Contains(AOItem item)
+        public bool Contains(Item item)
         {
             throw new NotImplementedException();
         }
@@ -340,7 +340,7 @@ namespace ZoneEngine.GameObject.Items
         /// </param>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public void CopyTo(AOItem[] array, int arrayIndex)
+        public void CopyTo(Item[] array, int arrayIndex)
         {
             throw new NotImplementedException();
         }
@@ -353,7 +353,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public bool Remove(AOItem item)
+        public bool Remove(Item item)
         {
             throw new NotImplementedException();
         }
@@ -374,7 +374,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public int IndexOf(AOItem item)
+        public int IndexOf(Item item)
         {
             throw new NotImplementedException();
         }
@@ -387,7 +387,7 @@ namespace ZoneEngine.GameObject.Items
         /// </param>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public void Insert(int index, AOItem item)
+        public void Insert(int index, Item item)
         {
             throw new NotImplementedException();
         }
@@ -411,7 +411,7 @@ namespace ZoneEngine.GameObject.Items
         /// </exception>
         /// <returns>
         /// </returns>
-        public AOItem this[int index]
+        public Item this[int index]
         {
             get
             {

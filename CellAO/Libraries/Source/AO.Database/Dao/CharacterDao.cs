@@ -23,11 +23,50 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject.Items
+namespace AO.Database
 {
+    #region Usings ...
+
+    using System.Collections.Generic;
+    using System.Data;
+
+    using Dapper;
+
+    #endregion
+
     /// <summary>
     /// </summary>
-    public class InstancedItem : Dynel, IAOEvents, IAOActions
+    public class CharacterDao
     {
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
+        public IEnumerable<DBCharacter> GetAll()
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                return
+                    conn.Query<DBCharacter>(
+                        "SELECT Name, FirstName, LastName, Textures0,Textures1,Textures2,Textures3,Textures4,playfield as Playfield, X,Y,Z,HeadingX,HeadingY,HeadingZ,HeadingW FROM characters");
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="characterId">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public IEnumerable<DBCharacter> GetById(int characterId)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                return
+                    conn.Query<DBCharacter>(
+                        "SELECT Name, FirstName, LastName, Textures0,Textures1,Textures2,Textures3,Textures4,playfield as Playfield, X,Y,Z,HeadingX,HeadingY,HeadingZ,HeadingW FROM characters where id = @id", 
+                        new { id = characterId });
+            }
+        }
     }
 }

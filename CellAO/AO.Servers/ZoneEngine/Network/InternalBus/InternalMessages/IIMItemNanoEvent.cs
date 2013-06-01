@@ -46,6 +46,6 @@ namespace ZoneEngine.Network.InternalBus.InternalMessages
 
         /// <summary>
         /// </summary>
-        AOEvents Event { get; set; }
+        Events Event { get; set; }
     }
 }

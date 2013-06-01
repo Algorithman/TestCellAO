@@ -23,47 +23,77 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject.Items
+namespace AO.Database
 {
     #region Usings ...
 
     using System;
+    using System.Data;
+    using System.Data.SqlClient;
+
+    using AO.Core.Config;
+
+    using MySql.Data.MySqlClient;
+
+    using Npgsql;
 
     #endregion
 
     /// <summary>
-    /// AORequirements
     /// </summary>
-    [Serializable]
-    public class AORequirements
+    public static class Connector
     {
-        #region Fields
+        /// <summary>
+        /// </summary>
+        public static string Sqltype = ConfigReadWrite.Instance.CurrentConfig.SQLType;
 
         /// <summary>
-        /// Child operator
+        /// only needed once to read this
         /// </summary>
-        public int ChildOperator;
+        private static readonly string ConnectionString_MySQL = ConfigReadWrite.Instance.CurrentConfig.MysqlConnection;
 
         /// <summary>
-        /// Operator
         /// </summary>
-        public int Operator;
+        private static readonly string ConnectionString_MSSQL = ConfigReadWrite.Instance.CurrentConfig.MsSqlConnection;
 
         /// <summary>
-        /// Stat to check against
         /// </summary>
-        public int Statnumber;
+        private static readonly string ConnectionString_PostGreSQL =
+            ConfigReadWrite.Instance.CurrentConfig.PostgreConnection;
 
+        // CONNECTION POOLING IS A MUST!!!
+        // TODO: Rewrite needed for config.xml, only providing username, password and database. Create connection string via stringbuilders
         /// <summary>
-        /// Target, from constants
         /// </summary>
-        public int Target;
+        /// <returns>
+        /// </returns>
+        /// <exception cref="Exception">
+        /// </exception>
+        public static IDbConnection GetConnection()
+        {
+            IDbConnection conn = null;
+            if (Sqltype == "MySql")
+            {
+                conn = new MySqlConnection(ConnectionString_MySQL);
+            }
 
-        /// <summary>
-        /// Value to check against
-        /// </summary>
-        public int Value;
+            if (Sqltype == "MsSql")
+            {
+                conn = new SqlConnection(ConnectionString_MSSQL);
+            }
 
-        #endregion
+            if (Sqltype == "PostgreSQL")
+            {
+                conn = new NpgsqlConnection(ConnectionString_PostGreSQL);
+            }
+
+            if (conn == null)
+            {
+                throw new Exception("ConnectionString error");
+            }
+
+            conn.Open();
+            return conn;
+        }
     }
 }

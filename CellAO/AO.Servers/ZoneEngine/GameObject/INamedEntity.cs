@@ -154,7 +154,7 @@ namespace ZoneEngine.GameObject
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public bool CheckRequirements(AOFunctions aof, bool checkAll)
+        public bool CheckRequirements(Functions aof, bool checkAll)
         {
             throw new NotImplementedException();
         }

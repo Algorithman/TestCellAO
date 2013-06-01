@@ -91,12 +91,12 @@ namespace ZoneEngine.GameObject.Nanos
         /// <summary>
         /// List of Item events
         /// </summary>
-        public List<AOEvents> Events = new List<AOEvents>();
+        public List<Events> Events = new List<Events>();
 
         /// <summary>
         /// List of Item Actions (requirement checks)
         /// </summary>
-        public List<AOActions> Actions = new List<AOActions>();
+        public List<Actions> Actions = new List<Actions>();
 
         /// <summary>
         /// </summary>
@@ -126,15 +126,15 @@ namespace ZoneEngine.GameObject.Nanos
                 nanoFormula.Stats.Add(nanoFormulaAttribute.Key, nanoFormulaAttribute.Value);
             }
 
-            foreach (AOEvents aoEvents in this.Events)
+            foreach (Events aoEvents in this.Events)
             {
-                AOEvents newEvent = new AOEvents();
-                foreach (AOFunctions aoFunctions in aoEvents.Functions)
+                Events newEvent = new Events();
+                foreach (Functions aoFunctions in aoEvents.Functions)
                 {
-                    AOFunctions newAOFunctions = new AOFunctions();
-                    foreach (AORequirements aor in aoFunctions.Requirements)
+                    Functions newAOFunctions = new Functions();
+                    foreach (Requirements aor in aoFunctions.Requirements)
                     {
-                        AORequirements newRequirement = new AORequirements();
+                        Requirements newRequirement = new Requirements();
                         newRequirement.ChildOperator = aor.ChildOperator;
                         newRequirement.Operator = aor.Operator;
                         newRequirement.Statnumber = aor.Statnumber;

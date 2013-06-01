@@ -32,11 +32,14 @@ namespace ZoneEngine.GameObject.Items
     #endregion
 
     /// <summary>
+    /// Adding Actions to classes
+    /// TODO: complete with methods
     /// </summary>
     public interface IItemNanoActions
     {
         /// <summary>
+        /// List of Game Action (toUse, toWear)
         /// </summary>
-        List<AOActions> Actions { get; set; }
+        List<Actions> Actions { get; set; }
     }
 }

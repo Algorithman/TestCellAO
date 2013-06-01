@@ -294,7 +294,7 @@ namespace ZoneEngine.GameObject
                 int c3;
                 int oldhealth = this.stats.Health.Value;
                 int oldnano = this.stats.CurrentNano.Value;
-                AOItemTemplate m_item;
+                ItemTemplate m_item;
 
                 this.socialMeshLayer.Clear();
                 this.Textures = new List<AOTextures>();

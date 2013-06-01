@@ -42,6 +42,6 @@ namespace ZoneEngine.Network.InternalBus.InternalMessages
 
         /// <summary>
         /// </summary>
-        AOActions Action { get; set; }
+        Actions Action { get; set; }
     }
 }

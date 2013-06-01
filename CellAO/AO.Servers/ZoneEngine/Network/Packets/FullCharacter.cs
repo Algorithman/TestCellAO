@@ -55,7 +55,7 @@ namespace ZoneEngine.Network.Packets
             /* part 1 of data */
             List<InventorySlot> inventory = new List<InventorySlot>();
             int slot = client.Character.MainInventory.InventoryPage.FirstSlotNumber;
-            foreach (AOItem item in client.Character.MainInventory.InventoryPage)
+            foreach (Item item in client.Character.MainInventory.InventoryPage)
             {
                 if (item != null)
                 {

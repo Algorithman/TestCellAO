@@ -66,9 +66,9 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </summary>
         /// <returns>
         /// </returns>
-        public IEnumerator<AOItem> GetEnumerator()
+        public IEnumerator<Item> GetEnumerator()
         {
-            foreach (AOItem item in this.Content)
+            foreach (Item item in this.Content)
             {
                 if (item != null)
                 {
@@ -92,7 +92,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public void Add(AOItem item)
+        public void Add(Item item)
         {
             throw new NotImplementedException();
         }
@@ -114,7 +114,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public bool Contains(AOItem item)
+        public bool Contains(Item item)
         {
             throw new NotImplementedException();
         }
@@ -127,7 +127,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public void CopyTo(AOItem[] array, int arrayIndex)
+        public void CopyTo(Item[] array, int arrayIndex)
         {
             throw new NotImplementedException();
         }
@@ -140,7 +140,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public bool Remove(AOItem item)
+        public bool Remove(Item item)
         {
             throw new NotImplementedException();
         }
@@ -161,7 +161,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public int IndexOf(AOItem item)
+        public int IndexOf(Item item)
         {
             throw new NotImplementedException();
         }
@@ -174,7 +174,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public void Insert(int index, AOItem item)
+        public void Insert(int index, Item item)
         {
             throw new NotImplementedException();
         }
@@ -198,7 +198,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </exception>
         /// <returns>
         /// </returns>
-        public AOItem this[int index]
+        public Item this[int index]
         {
             get
             {
@@ -213,7 +213,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
         /// <summary>
         /// </summary>
-        public AOItem[] Content { get; private set; }
+        public Item[] Content { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -269,7 +269,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public InventoryError TryAdd(int slot, AOItem item, bool isNew, ItemReceptionType reception)
+        public InventoryError TryAdd(int slot, Item item, bool isNew, ItemReceptionType reception)
         {
             throw new NotImplementedException();
         }
@@ -286,7 +286,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public InventoryError TryAdd(AOItem item, bool isNew, ItemReceptionType reception)
+        public InventoryError TryAdd(Item item, bool isNew, ItemReceptionType reception)
         {
             throw new NotImplementedException();
         }
@@ -301,7 +301,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public AOItem Remove(int slot, bool ownerChange)
+        public Item Remove(int slot, bool ownerChange)
         {
             throw new NotImplementedException();
         }
@@ -321,7 +321,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
         public void InitializeInventory(int slots, int firstSlot)
         {
-            Content = new AOItem[slots];
+            Content = new Item[slots];
             FirstSlotNumber = firstSlot;
         }
     }

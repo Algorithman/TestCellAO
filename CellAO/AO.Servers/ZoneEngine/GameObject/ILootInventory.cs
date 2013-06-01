@@ -44,7 +44,7 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        IList<AOItem> Inventory { get; }
+        IList<Item> Inventory { get; }
 
         #endregion
 
@@ -68,12 +68,12 @@ namespace ZoneEngine.GameObject
     {
         /// <summary>
         /// </summary>
-        public IList<AOItem> Inventory
+        public IList<Item> Inventory
         {
             get
             {
-                Contract.Ensures(Contract.Result<IList<AOItemTemplate>>() != null);
-                return default(IList<AOItem>);
+                Contract.Ensures(Contract.Result<IList<ItemTemplate>>() != null);
+                return default(IList<Item>);
             }
 
             private set

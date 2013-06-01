@@ -43,7 +43,7 @@ namespace ZoneEngine.GameObject.Items
 
         /// <summary>
         /// </summary>
-        private List<AOItem> Items;
+        private List<Item> Items;
 
         /// <summary>
         /// </summary>
@@ -58,19 +58,19 @@ namespace ZoneEngine.GameObject.Items
         public LootTable()
         {
             this.LootTableEntries = new List<LootTableEntry>();
-            this.Items = new List<AOItem>();
+            this.Items = new List<Item>();
         }
 
         /// <summary>
         /// </summary>
         /// <returns>
         /// </returns>
-        public List<AOItem> GetLoot()
+        public List<Item> GetLoot()
         {
             if (this.Items == null)
             {
                 Random probability = new Random((int)DateTime.Now.Ticks);
-                List<AOItem> temp = new List<AOItem>();
+                List<Item> temp = new List<Item>();
                 foreach (LootTableEntry lootTableEntry in this.LootTableEntries)
                 {
                     if (probability.Next() < lootTableEntry.DropRate)
@@ -79,7 +79,7 @@ namespace ZoneEngine.GameObject.Items
                             Convert.ToInt32(
                                 probability.Next() * (lootTableEntry.MaxQL - lootTableEntry.MinQL)
                                 + lootTableEntry.MinQL);
-                        AOItem tempitem = new AOItem(QL, lootTableEntry.LowID, lootTableEntry.HighID);
+                        Item tempitem = new Item(QL, lootTableEntry.LowID, lootTableEntry.HighID);
                         temp.Add(tempitem);
                     }
                 }
@@ -103,7 +103,7 @@ namespace ZoneEngine.GameObject.Items
         public void AddByHash(string hash)
         {
             // Get access to DB/or file and read the appropriate stuff for the hash
-            // Either a AOItem with QL Range (LootTableEntry), or a Hash Group (which lets AddByHash call itself again)
+            // Either a Item with QL Range (LootTableEntry), or a Hash Group (which lets AddByHash call itself again)
             Contract.Requires(hash != null);
             Contract.Requires(hash != string.Empty);
             throw new NotImplementedException("LootTable.AddByHash");

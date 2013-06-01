@@ -45,7 +45,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <param name="err">
         /// </param>
-        void CheckAdd(int slot, AOItemTemplate item, ref InventoryError err);
+        void CheckAdd(int slot, ItemTemplate item, ref InventoryError err);
 
         /// <summary>
         /// Is called before removing the given item to check whether it may actually be removed
@@ -56,14 +56,14 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <param name="err">
         /// </param>
-        void CheckRemove(int slot, AOItemTemplate templ, ref InventoryError err);
+        void CheckRemove(int slot, ItemTemplate templ, ref InventoryError err);
 
         /// <summary>
         /// Is called after the given item is added to the given slot
         /// </summary>
         /// <param name="item">
         /// </param>
-        void Added(AOItemTemplate item);
+        void Added(ItemTemplate item);
 
         /// <summary>
         /// Is called after the given item is removed from the given slot
@@ -72,6 +72,6 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <param name="item">
         /// </param>
-        void Removed(int slot, AOItemTemplate item);
+        void Removed(int slot, ItemTemplate item);
     }
 }

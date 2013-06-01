@@ -102,7 +102,7 @@ namespace ZoneEngine.GameObject.Playfields
 
         /// <summary>
         /// </summary>
-        public List<AOFunctions> EnvironmentFunctions { get; private set; }
+        public List<Functions> EnvironmentFunctions { get; private set; }
 
         /// <summary>
         /// </summary>

@@ -120,7 +120,7 @@ namespace ZoneEngine.GameObject
             this.identity = new Identity();
         }
 
-        public IList<AOItem> Inventory { get; private set; }
+        public IList<Item> Inventory { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -160,7 +160,7 @@ namespace ZoneEngine.GameObject
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public bool CheckRequirements(AOFunctions aof, bool checkAll)
+        public bool CheckRequirements(Functions aof, bool checkAll)
         {
             throw new NotImplementedException();
         }
@@ -177,7 +177,7 @@ namespace ZoneEngine.GameObject
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public bool CheckRequirements(IStats ch, AOFunctions aof, bool checkAll)
+        public bool CheckRequirements(IStats ch, Functions aof, bool checkAll)
         {
             throw new NotImplementedException();
         }

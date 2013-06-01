@@ -70,7 +70,7 @@ namespace ZoneEngine.GameObject.Playfields
 
         /// <summary>
         /// </summary>
-        List<AOFunctions> EnvironmentFunctions { get; }
+        List<Functions> EnvironmentFunctions { get; }
 
         /// <summary>
         /// </summary>

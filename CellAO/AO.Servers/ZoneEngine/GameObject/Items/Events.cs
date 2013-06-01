@@ -23,51 +23,63 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace Database
+namespace ZoneEngine.GameObject.Items
 {
     #region Usings ...
 
+    using System;
     using System.Collections.Generic;
-    using System.Data;
-
-    using Dapper;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    public static class DBStats
+    [Serializable]
+    public class Events
     {
+        #region Fields
+
         /// <summary>
+        /// Type of the Event (constants in ItemLoader)
         /// </summary>
-        /// <param name="characterId">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        public static IEnumerable<StatDao> GetById(int characterId)
+        private int eventType;
+
+        /// <summary>
+        /// List of Functions of the Event
+        /// </summary>
+        private List<Functions> functions = new List<Functions>();
+
+        #endregion
+
+        /// <summary>
+        /// List of Functions of the Event
+        /// </summary>
+        public List<Functions> Functions
         {
-            using (IDbConnection conn = Connector.GetConnection())
+            get
             {
-                return conn.Query<StatDao>(
-                    "SELECT Stat, Value FROM characters_stats where id=@id", new { id = characterId });
+                return this.functions;
+            }
+
+            set
+            {
+                this.functions = value;
             }
         }
 
         /// <summary>
+        /// Type of the Event (constants in ItemLoader)
         /// </summary>
-        /// <param name="characterId">
-        /// </param>
-        /// <param name="statNumber">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        public static IEnumerable<StatDao> GetById(int characterId, int statNumber)
+        public int EventType
         {
-            using (IDbConnection conn = Connector.GetConnection())
+            get
             {
-                return conn.Query<StatDao>(
-                    "SELECT Stat, Value FROM characters_stats where id=@id AND Stat=@statnum", 
-                    new { id = characterId, statnum = statNumber });
+                return this.eventType;
+            }
+
+            set
+            {
+                this.eventType = value;
             }
         }
     }

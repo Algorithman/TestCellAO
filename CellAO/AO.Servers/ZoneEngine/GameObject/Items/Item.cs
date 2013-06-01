@@ -39,64 +39,15 @@ namespace ZoneEngine.GameObject.Items
 
     /// <summary>
     /// </summary>
-    public interface IAOItem
+    public class Item : IItem
     {
         /// <summary>
         /// </summary>
-        int Quality { get; set; }
+        private ItemTemplate templateLow;
 
         /// <summary>
         /// </summary>
-        Identity Identity { get; }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="attributeId">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        int GetAttribute(int attributeId);
-
-        /// <summary>
-        /// </summary>
-        /// <param name="attributeId">
-        /// </param>
-        /// <param name="newValue">
-        /// </param>
-        void SetAttribute(int attributeId, int newValue);
-
-        /// <summary>
-        /// </summary>
-        int LowID { get; }
-
-        /// <summary>
-        /// </summary>
-        int HighID { get; }
-
-        /// <summary>
-        /// </summary>
-        int Nothing { get; }
-
-        /// <summary>
-        /// </summary>
-        int MultipleCount { get; }
-
-        /// <summary>
-        /// </summary>
-        int Flags { get; }
-    }
-
-    /// <summary>
-    /// </summary>
-    public class AOItem : IAOItem
-    {
-        /// <summary>
-        /// </summary>
-        private AOItemTemplate templateLow;
-
-        /// <summary>
-        /// </summary>
-        private AOItemTemplate templateHigh;
+        private ItemTemplate templateHigh;
 
         /// <summary>
         /// </summary>
@@ -147,9 +98,9 @@ namespace ZoneEngine.GameObject.Items
                 {
                     // TODO: Instantiate Item
                 }
-
-                this.Attributes.Add(attributeId, newValue);
             }
+            // Do always set it for caching purposes
+            this.Attributes.Add(attributeId, newValue);
         }
 
         public int LowID
@@ -193,15 +144,20 @@ namespace ZoneEngine.GameObject.Items
             }
         }
 
-        public AOItem(int QL, int lowID, int highID)
+        public void WriteToDatabase()
+        {
+
+        }
+
+        public Item(int QL, int lowID, int highID)
         {
             // Checks:
-            if ((!ItemHandler.ItemList.ContainsKey(lowID)) || (!ItemHandler.ItemList.ContainsKey(highID)))
+            if ((!ItemLoader.ItemList.ContainsKey(lowID)) || (!ItemLoader.ItemList.ContainsKey(highID)))
             {
                 throw new ArgumentOutOfRangeException("No Item found with ID " + lowID);
             }
-            templateLow = ItemHandler.ItemList[lowID];
-            templateHigh = ItemHandler.ItemList[highID];
+            templateLow = ItemLoader.ItemList[lowID];
+            templateHigh = ItemLoader.ItemList[highID];
             Quality = QL < templateLow.Quality
                           ? templateLow.Quality
                           : (QL > templateHigh.Quality ? templateHigh.Quality : QL);

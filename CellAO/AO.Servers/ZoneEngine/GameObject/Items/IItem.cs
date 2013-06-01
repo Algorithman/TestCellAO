@@ -27,60 +27,75 @@ namespace ZoneEngine.GameObject.Items
 {
     #region Usings ...
 
-    using System;
-    using System.Collections.Generic;
+    using SmokeLounge.AOtomation.Messaging.GameData;
 
     #endregion
 
     /// <summary>
+    /// Item Interface
     /// </summary>
-    [Serializable]
-    public class AOEvents
+    public interface IItem
     {
-        #region Fields
+        /// <summary>
+        /// Quality level of the item
+        /// </summary>
+        int Quality { get; set; }
 
         /// <summary>
-        /// Type of the Event (constants in ItemHandler)
+        /// Identity of the item (if it is instanced)
         /// </summary>
-        private int eventType;
+        Identity Identity { get; }
 
         /// <summary>
-        /// List of Functions of the Event
+        /// Get item attribute
         /// </summary>
-        private List<AOFunctions> functions = new List<AOFunctions>();
-
-        #endregion
+        /// <param name="attributeId">
+        /// Id of the attribute
+        /// </param>
+        /// <returns>
+        /// Stored item attribute value
+        /// </returns>
+        int GetAttribute(int attributeId);
 
         /// <summary>
-        /// List of Functions of the Event
+        /// Set an item attribute
         /// </summary>
-        public List<AOFunctions> Functions
-        {
-            get
-            {
-                return this.functions;
-            }
-
-            set
-            {
-                this.functions = value;
-            }
-        }
+        /// <param name="attributeId">
+        /// Id of the attribute
+        /// </param>
+        /// <param name="newValue">
+        /// The new value of the item attribute
+        /// </param>
+        void SetAttribute(int attributeId, int newValue);
 
         /// <summary>
-        /// Type of the Event (constants in ItemHandler)
+        /// LowId of the item template
         /// </summary>
-        public int EventType
-        {
-            get
-            {
-                return this.eventType;
-            }
+        int LowID { get; }
 
-            set
-            {
-                this.eventType = value;
-            }
-        }
+        /// <summary>
+        /// HighId of the item template
+        /// </summary>
+        int HighID { get; }
+
+        /// <summary>
+        /// We Dont Know (TM)
+        /// </summary>
+        int Nothing { get; }
+
+        /// <summary>
+        /// Stacked count of the item
+        /// </summary>
+        int MultipleCount { get; }
+
+        /// <summary>
+        /// Item's Flags
+        /// </summary>
+        int Flags { get; }
+
+        /// <summary>
+        /// Write item to database
+        /// </summary>
+        void WriteToDatabase();
     }
 }

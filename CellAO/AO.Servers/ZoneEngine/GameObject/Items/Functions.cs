@@ -39,27 +39,27 @@ namespace ZoneEngine.GameObject.Items
     /// AOFunctions
     /// </summary>
     [Serializable]
-    public class AOFunctions
+    public class Functions
     {
         #region Fields
 
         /// <summary>
         /// List of Arguments
         /// </summary>
-        public AOFunctionArguments Arguments = new AOFunctionArguments();
+        public FunctionArguments Arguments = new FunctionArguments();
 
         /// <summary>
-        /// Type of function (constants in ItemHandler)
+        /// Type of function (constants in ItemLoader)
         /// </summary>
         public int FunctionType;
 
         /// <summary>
         /// Requirements to execute this function
         /// </summary>
-        public List<AORequirements> Requirements = new List<AORequirements>();
+        public List<Requirements> Requirements = new List<Requirements>();
 
         /// <summary>
-        /// TargetType (constants in ItemHandler)
+        /// TargetType (constants in ItemLoader)
         /// </summary>
         public int Target;
 
@@ -88,83 +88,10 @@ namespace ZoneEngine.GameObject.Items
         /// </param>
         /// <returns>
         /// </returns>
-        public static AOFunctions Deserialize(MemoryStream ms)
+        public static Functions Deserialize(MemoryStream ms)
         {
-            MessagePackSerializer<AOFunctions> fromByte = MessagePackSerializer.Create<AOFunctions>();
+            MessagePackSerializer<Functions> fromByte = MessagePackSerializer.Create<Functions>();
             return fromByte.Unpack(ms);
-        }
-
-        /// <summary>
-        /// Apply function on target
-        /// </summary>
-        /// <param name="dolocalstats">
-        /// Should local stats be processed?
-        /// </param>
-        public void Apply(bool dolocalstats)
-        {
-            /*
-            // At this time Target has already the Dynel ID of the target (be it wearer, target, user or whatever)
-            Client client = Misc.FindClient.FindClientByID(Target);
-            if (client == null)
-                // Client has vanished 
-                return;
-            Character character = client.Character;
-            switch (FunctionType)
-            {
-                // Set Texture
-                case ItemHandler.functiontype_texture:
-                    SqlWrapper ms = new SqlWrapper();
-                    ms.SqlUpdate("Update " + character.getSQLTablefromDynelType() + " set Textures" + Arguments[1].ToString() + "=" + Arguments[0].ToString() + " WHERE ID=" + character.ID.ToString());
-                    break;
-                // Set Headmesh
-                case ItemHandler.functiontype_headmesh:
-                    character.Stats.HeadMesh.Set((uint)Arguments[0]); // Headmesh
-                    break;
-                // Set Shoulder Mesh Right
-                case ItemHandler.functiontype_shouldermesh:
-                    character.Stats.ShoulderMeshRight.Set((uint)Arguments[0]); // Shouldermesh Right
-                    //character.Stats.ShoulderMeshLeft.Set((uint)Arguments[0]); // Shouldermesh Left
-                    break;
-                // Set Backmesh
-                case ItemHandler.functiontype_backmesh:
-                    character.Stats.BackMesh.Set((uint)Arguments[0]); // Backmesh
-                    break;
-                // Set Hairmesh
-                case ItemHandler.functiontype_hairmesh: // Never occurred to me so i suppose Attractormesh=Hairmesh
-                    character.Stats.HairMesh.Set((uint)Arguments[0]); // Hairmesh
-                    break;
-                // Set AttractorMesh
-                case ItemHandler.functiontype_attractormesh:
-                    character.Stats.HairMesh.Set((uint)Arguments[0]); // Attractormesh
-                    break;
-                case ItemHandler.functiontype_modify:
-                    // TODO: req check for OE
-                    if (dolocalstats)
-                    {
-                        character.Stats.SetModifier((Int32)Arguments[0], character.Stats.GetModifier((Int32)Arguments[0]) + (Int32)Arguments[1]);
-                        Console.WriteLine("LS " + Arguments[0].ToString() + " modified by " + Arguments[1].ToString());
-                    }
-                    break;
-                case ItemHandler.functiontype_modifypercentage:
-                    // TODO: req check for OE
-                    if (dolocalstats)
-                    {
-                        character.Stats.SetPercentageModifier((Int32)Arguments[0], character.Stats.GetPercentageModifier((Int32)Arguments[0]) + (Int32)Arguments[1]);
-                        Console.WriteLine("LS " + Arguments[0].ToString() + " modified by %" + Arguments[1].ToString());
-                    }
-                    break;
-                case ItemHandler.functiontype_hit:
-                    if (dolocalstats)
-                    {
-                        int randval = new Random().Next((Int32)Arguments[1], (Int32)Arguments[2]);
-                        UInt32 val = (UInt32)(character.Stats.GetStatbyNumber((Int32)Arguments[0]).Value + randval);
-                        character.Stats.Set((Int32)Arguments[0], val);
-                    }
-                    break;
-                default:
-                    break;
-
-            }*/
         }
 
         /// <summary>
@@ -173,7 +100,7 @@ namespace ZoneEngine.GameObject.Items
         /// </returns>
         public string Serialize()
         {
-            MessagePackSerializer<AOFunctions> toByte = MessagePackSerializer.Create<AOFunctions>();
+            MessagePackSerializer<Functions> toByte = MessagePackSerializer.Create<Functions>();
             var ms = new MemoryStream();
             toByte.Pack(ms, this);
 
@@ -185,12 +112,12 @@ namespace ZoneEngine.GameObject.Items
         /// Copy Function
         /// </summary>
         /// <returns>new copy</returns>
-        public AOFunctions ShallowCopy()
+        public Functions ShallowCopy()
         {
-            AOFunctions newAOF = new AOFunctions();
-            foreach (AORequirements aor in this.Requirements)
+            Functions newAOF = new Functions();
+            foreach (Requirements aor in this.Requirements)
             {
-                AORequirements newAOR = new AORequirements();
+                Requirements newAOR = new Requirements();
                 newAOR.ChildOperator = aor.ChildOperator;
                 newAOR.Operator = aor.Operator;
                 newAOR.Statnumber = aor.Statnumber;

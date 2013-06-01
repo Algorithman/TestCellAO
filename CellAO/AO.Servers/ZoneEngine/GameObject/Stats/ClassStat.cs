@@ -34,7 +34,7 @@ namespace ZoneEngine.GameObject.Stats
 
     using AO.Core;
 
-    using Database;
+    using AO.Database;
 
     using ZoneEngine.Network.Packets;
 
@@ -360,8 +360,9 @@ namespace ZoneEngine.GameObject.Stats
             }
 
             int id = this.Parent.Identity.Instance;
+            int type = (int)this.Parent.Identity.Type;
 
-            this.StatBaseValue = DBStats.GetById(id, this.StatNumber).First().Value;
+            this.StatBaseValue = (uint)StatDao.GetById(type, id, this.StatNumber).statvalue;
         }
 
         /// <summary>
@@ -12226,9 +12227,9 @@ namespace ZoneEngine.GameObject.Stats
         /// </summary>
         public void ReadStatsfromSql()
         {
-            foreach (StatDao statDao in DBStats.GetById(this.flags.Parent.Identity.Instance))
+            foreach (DBStats dbStats in StatDao.GetById((int)this.flags.Parent.Identity.Type,this.flags.Parent.Identity.Instance))
             {
-                this.SetBaseValue(statDao.Stat, statDao.Value);
+                this.SetBaseValue(dbStats.statid, (uint)dbStats.statvalue);
             }
         }
 

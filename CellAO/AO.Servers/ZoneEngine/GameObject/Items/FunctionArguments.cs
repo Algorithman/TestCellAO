@@ -37,13 +37,15 @@ namespace ZoneEngine.GameObject.Items
     #endregion
 
     /// <summary>
+    /// Holder class for Function arguments
     /// </summary>
     [Serializable]
-    public class AOFunctionArguments : IPackable, IUnpackable
+    public class FunctionArguments : IPackable, IUnpackable
     {
         #region Fields
 
         /// <summary>
+        /// The function's arguments
         /// </summary>
         public List<object> Values = new List<object>();
 
@@ -52,10 +54,13 @@ namespace ZoneEngine.GameObject.Items
         #region Public Methods and Operators
 
         /// <summary>
+        /// Use msgpack to compress the data
         /// </summary>
         /// <param name="packer">
+        /// The msgpack packer
         /// </param>
         /// <param name="options">
+        /// msgpack packing options
         /// </param>
         public void PackToMessage(Packer packer, PackingOptions options)
         {
@@ -81,10 +86,13 @@ namespace ZoneEngine.GameObject.Items
         }
 
         /// <summary>
+        /// Unpack from msgpack'd stream
         /// </summary>
         /// <param name="unpacker">
+        /// The msgpack unpacker
         /// </param>
         /// <exception cref="SerializationException">
+        /// Unsuitable data encountered
         /// </exception>
         public void UnpackFromMessage(Unpacker unpacker)
         {

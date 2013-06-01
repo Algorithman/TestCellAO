@@ -39,7 +39,7 @@ namespace ZoneEngine.Network.InternalBus.InternalMessages
     {
         /// <summary>
         /// </summary>
-        public AOFunctions Function;
+        public Functions Function;
 
         /// <summary>
         /// </summary>
@@ -51,7 +51,7 @@ namespace ZoneEngine.Network.InternalBus.InternalMessages
         /// </param>
         /// <param name="user">
         /// </param>
-        public IMExecuteFunction(AOFunctions function, Identity user)
+        public IMExecuteFunction(Functions function, Identity user)
         {
             this.User = user;
             this.Function = function;

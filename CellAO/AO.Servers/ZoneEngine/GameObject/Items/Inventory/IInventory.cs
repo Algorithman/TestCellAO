@@ -35,7 +35,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
     /// <summary>
     /// </summary>
-    public interface IInventory : IList<AOItem>
+    public interface IInventory : IList<Item>
     {
         /// <summary>
         /// </summary>
@@ -43,7 +43,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
         /// <summary>
         /// </summary>
-        AOItem[] Content { get; }
+        Item[] Content { get; }
 
         /// <summary>
         /// </summary>
@@ -87,7 +87,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <returns>
         /// </returns>
-        InventoryError TryAdd(int slot, AOItem item, bool isNew, ItemReceptionType reception);
+        InventoryError TryAdd(int slot, Item item, bool isNew, ItemReceptionType reception);
 
         /// <summary>
         /// </summary>
@@ -99,7 +99,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <returns>
         /// </returns>
-        InventoryError TryAdd(AOItem item, bool isNew, ItemReceptionType reception);
+        InventoryError TryAdd(Item item, bool isNew, ItemReceptionType reception);
 
         /// <summary>
         /// </summary>
@@ -109,7 +109,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <returns>
         /// </returns>
-        AOItem Remove(int slot, bool ownerChange);
+        Item Remove(int slot, bool ownerChange);
 
         /// <summary>
         /// </summary>

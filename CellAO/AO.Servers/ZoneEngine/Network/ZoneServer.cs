@@ -34,6 +34,7 @@ namespace ZoneEngine.Network
     using System.Threading;
 
     using AO.Core.Logger;
+    using AO.Database;
 
     using Cell.Core;
 

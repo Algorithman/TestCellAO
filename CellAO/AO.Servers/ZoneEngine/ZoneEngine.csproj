@@ -102,6 +102,10 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="zlib.net, Version=1.0.3.0, Culture=neutral, PublicKeyToken=47d7877cb3620160">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\zlib.net.1.0.4.0\lib\zlib.net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChatCommands\Get.cs" />
@@ -111,19 +115,21 @@
     <Compile Include="Functions\set.cs" />
     <Compile Include="GameObject\Enums\Expansions.cs" />
     <Compile Include="GameObject\ITargetingEntity.cs" />
-    <Compile Include="GameObject\Items\AOActions.cs" />
-    <Compile Include="GameObject\Items\AOItem.cs" />
-    <Compile Include="GameObject\Items\AOItemAttribute.cs" />
-    <Compile Include="GameObject\Items\BaseInventory.cs" />
+    <Compile Include="GameObject\Items\Actions.cs" />
+    <Compile Include="GameObject\Items\Events.cs" />
+    <Compile Include="GameObject\Items\FunctionArguments.cs" />
+    <Compile Include="GameObject\Items\Functions.cs" />
+    <Compile Include="GameObject\Items\IItem.cs" />
+    <Compile Include="GameObject\Items\IItemNanoActions.cs" />
+    <Compile Include="GameObject\Items\IItemNanoEvents.cs" />
     <Compile Include="GameObject\Items\Inventory\ArmorPageInventory.cs" />
     <Compile Include="GameObject\Items\Inventory\BackPackInventory.cs" />
     <Compile Include="GameObject\Items\Inventory\BankInventory.cs" />
+    <Compile Include="GameObject\Items\Inventory\BaseInventory.cs" />
     <Compile Include="GameObject\Items\Inventory\IItemContainer.cs" />
     <Compile Include="GameObject\Items\Inventory\EntityInventory.cs" />
     <Compile Include="GameObject\Items\Inventory\IInventory.cs" />
     <Compile Include="GameObject\Enums\InventoryError.cs" />
-    <Compile Include="GameObject\Items\IItemNanoActions.cs" />
-    <Compile Include="GameObject\Items\IItemNanoEvents.cs" />
     <Compile Include="GameObject\Items\Inventory\IItemHotSwapHandler.cs" />
     <Compile Include="GameObject\Items\Inventory\IItemSlotHandler.cs" />
     <Compile Include="GameObject\Items\Inventory\ImplantPageInventory.cs" />
@@ -138,7 +144,11 @@
     <Compile Include="GameObject\Items\Inventory\ShopInventory.cs" />
     <Compile Include="GameObject\Items\Inventory\SocialArmorPageInventory.cs" />
     <Compile Include="GameObject\Items\Inventory\WeaponPageInventory.cs" />
-    <Compile Include="GameObject\Items\ItemHandler.cs" />
+    <Compile Include="GameObject\Items\Item.cs" />
+    <Compile Include="GameObject\Items\ItemLoader.cs" />
+    <Compile Include="GameObject\Items\ItemTemplate.cs" />
+    <Compile Include="GameObject\Items\LootTable.cs" />
+    <Compile Include="GameObject\Items\Requirements.cs" />
     <Compile Include="GameObject\Misc\MeshLayers.cs" />
     <Compile Include="GameObject\Nanos\NanoFormula.cs" />
     <Compile Include="GameObject\Nanos\NanoHandler.cs" />
@@ -148,10 +158,6 @@
     <Compile Include="GameObject\Playfields\Playfields.cs" />
     <Compile Include="GameObject\Stats\CharacterStats.cs" />
     <Compile Include="Component\ClientFactory.cs" />
-    <Compile Include="GameObject\Items\AOEvents.cs" />
-    <Compile Include="GameObject\Items\AOFunctionArguments.cs" />
-    <Compile Include="GameObject\Items\AOFunctions.cs" />
-    <Compile Include="GameObject\Items\AOItemTemplate.cs" />
     <Compile Include="AssemblyInfoclass.cs" />
     <Compile Include="GameObject\Corpse.cs" />
     <Compile Include="GameObject\Character.cs" />
@@ -173,8 +179,6 @@
     <Compile Include="GameObject\INamedEntity.cs" />
     <Compile Include="GameObject\IPacketReceivingEntity.cs" />
     <Compile Include="GameObject\ISummoner.cs" />
-    <Compile Include="GameObject\Items\AORequirements.cs" />
-    <Compile Include="GameObject\Items\LootTable.cs" />
     <Compile Include="GameObject\NonPlayerCharacter.cs" />
     <Compile Include="GameObject\Pet.cs" />
     <Compile Include="GameObject\Stats\ClassStat.cs" />
@@ -196,7 +200,6 @@
     <Compile Include="GameObject\Stats\SpecialStats\StatTitleLevel.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\StatWeaponsStyle.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\XPTable.cs" />
-    <Compile Include="GameObject\Items\InstancedItem.cs" />
     <Compile Include="GameObject\IStats.cs" />
     <Compile Include="GameObject\ILootInventory.cs" />
     <Compile Include="GameObject\IAOEvents.cs" />
@@ -2317,17 +2320,13 @@
       <Project>{1ec261bb-153d-487d-8a0a-dd85e850775f}</Project>
       <Name>AO.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\AO.Database\AO.Database.csproj">
+      <Project>{e4c49ea3-504e-4efb-96d6-3d2217553b14}</Project>
+      <Name>AO.Database</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Libraries\Source\Cell.Core\Cell.Core.csproj">
       <Project>{71ab07ad-4d94-4693-8560-47862e5b6e61}</Project>
       <Name>Cell.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Libraries\Source\Database\Database.csproj">
-      <Project>{e4c49ea3-504e-4efb-96d6-3d2217553b14}</Project>
-      <Name>Database</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Libraries\Source\zlib\source\zlib.net.csproj">
-      <Project>{0c89b7a2-a218-49e4-b545-5b044a45f977}</Project>
-      <Name>zlib.net</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Helpers\NiceHexOutput\NiceHexOutput.csproj">
       <Project>{6079cb15-9d05-4142-ab50-00db492dd871}</Project>

@@ -23,29 +23,74 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-namespace ZoneEngine.GameObject.Items
+namespace AO.Database
 {
-    #region Usings ...
-
-    using System;
-    using System.Collections.Generic;
-
-    #endregion
-
     /// <summary>
-    /// AOActions covers all action types, with their reqs
     /// </summary>
-    [Serializable]
-    public class AOActions
+    public class DBCharacter
     {
         /// <summary>
-        /// Type of Action (constants in ItemHandler)
         /// </summary>
-        public int ActionType;
+        public string Name { get; set; }
 
         /// <summary>
-        /// List of Requirements for this action
         /// </summary>
-        public List<AORequirements> Requirements = new List<AORequirements>();
+        public string FirstName { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public string LastName { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public int Textures0 { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public int Textures1 { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public int Textures2 { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public int Textures3 { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public int Textures4 { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public int Playfield { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public float X { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public float Y { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public float Z { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public float HeadingX { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public float HeadingY { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public float HeadingZ { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public float HeadingW { get; set; }
     }
 }
