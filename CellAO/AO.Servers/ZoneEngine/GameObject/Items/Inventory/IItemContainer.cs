@@ -31,6 +31,8 @@ namespace ZoneEngine.GameObject.Items
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.GameObject.Items.Inventory;
+
     #endregion
 
     /// <summary>
