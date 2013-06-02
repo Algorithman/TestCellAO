@@ -122,9 +122,25 @@ namespace AO.Database
             using (IDbConnection conn = Connector.GetConnection())
             {
                 conn.Execute(
-                    "REPLACE INTO stats (type, instance, statid, statvalue) VALUES (@t, @i, @statid, @statvalue)", new { t=type, i=instance, statid = num, statvalue = value });
+                    "REPLACE INTO stats (type, instance, statid, statvalue) VALUES (@t, @i, @statid, @statvalue)", new { t = type, i = instance, statid = num, statvalue = value });
+            }
+        }
+
+        public static void BulkReplace(List<DBStats> stats)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                using (var trans = conn.BeginTransaction())
+                {
+                    conn.Execute(
+                        "DELETE FROM stats WHERE type=@type AND instance=@instance", new { stats[0].type, stats[0].instance }, transaction: trans);
+                    conn.Execute(
+                        "REPLACE INTO stats (type, instance, statid, statvalue) VALUES (@type, @instance, @statid, @statvalue)",
+                        stats,
+                        transaction: trans);
+                    trans.Commit();
+                }
             }
         }
     }
-
 }

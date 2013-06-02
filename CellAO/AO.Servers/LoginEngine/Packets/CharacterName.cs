@@ -28,12 +28,14 @@ namespace LoginEngine.Packets
     #region Usings ...
 
     using System;
+    using System.Collections.Generic;
     using System.Data;
     using System.Text;
 
     using AO.Core;
     using AO.Core.Logger;
     using AO.Database;
+    using AO.Database.Dao;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
@@ -196,8 +198,14 @@ namespace LoginEngine.Packets
         /// </param>
         public void SendNameToStartPlayfield(bool startInSL, int charid)
         {
-            DBCharacter dbCharacter=new DBCharacter{Id=charid,
-            Playfield=4001,X=850,Y=43,Z=565};
+            DBCharacter dbCharacter = new DBCharacter
+            {
+                Id = charid,
+                Playfield = 4001,
+                X = 850,
+                Y = 43,
+                Z = 565
+            };
             if (!startInSL)
             {
                 dbCharacter.Playfield = 4582;
@@ -265,7 +273,7 @@ namespace LoginEngine.Packets
             try
             {
                 /* select new char id */
-                    charID = CharacterDao.GetByCharName(this.Name).Id;
+                charID = CharacterDao.GetByCharName(this.Name).Id;
             }
             catch (Exception e)
             {
@@ -273,53 +281,63 @@ namespace LoginEngine.Packets
                 return 0;
             }
 
+            List<DBStats> stats = new List<DBStats>();
+
+
+            // Transmit GM level into stats table
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 215, statvalue = LoginDataDao.GetByUsername(this.AccountName).GM });
             // Flags
-            StatDao.AddStat(50000, charID, 0, 20);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 0, statvalue = 20 });
             // Level
-            StatDao.AddStat(50000, charID, 54, 1);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 54, statvalue = 1 });
             // SEXXX
-            StatDao.AddStat(50000, charID, 59, this.Gender);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 59, statvalue = this.Gender });
+
             // Headmesh
-            StatDao.AddStat(50000, charID, 64, this.HeadMesh);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 64, statvalue = this.HeadMesh });
             // MonsterScale
-            StatDao.AddStat(50000, charID, 360, this.MonsterScale);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 360, statvalue = this.MonsterScale });
             // Visual Sex (even better ^^)
-            StatDao.AddStat(50000, charID, 369, this.Gender);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 369, statvalue = this.Gender });
+
             // Breed
-            StatDao.AddStat(50000, charID, 4, this.Breed);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 4, statvalue = this.Breed });
             // Visual Breed
-            StatDao.AddStat(50000, charID, 367, this.Breed);
-            
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 367, statvalue = this.Breed });
+
             // Profession / 60
-            StatDao.AddStat(50000, charID, 60, this.Profession);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 60, statvalue = this.Profession });
 
             // VisualProfession / 368
-            StatDao.AddStat(50000, charID, 368, this.Profession);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 368, statvalue = this.Profession });
 
             // Fatness / 47
-            StatDao.AddStat(50000, charID, 47, this.Fatness);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 47, statvalue = this.Fatness });
 
             // Strength / 16
-            StatDao.AddStat(50000, charID, 16, this.Abis[0]);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 16, statvalue = this.Abis[0] });
 
             // Psychic / 21
-            StatDao.AddStat(50000, charID, 21, this.Abis[1]);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 21, statvalue = this.Abis[1] });
 
             // Sense / 20
-            StatDao.AddStat(50000, charID, 20, this.Abis[2]);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 20, statvalue = this.Abis[2] });
 
             // Intelligence / 19
-            StatDao.AddStat(50000, charID, 19, this.Abis[3]);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 19, statvalue = this.Abis[3] });
 
             // Stamina / 18
-            StatDao.AddStat(50000, charID, 18, this.Abis[4]);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 18, statvalue = this.Abis[4] });
 
             // Agility / 17
-            StatDao.AddStat(50000, charID, 17, this.Abis[5]);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 17, statvalue = this.Abis[5] });
 
             // Set HP and NP auf 1
-            StatDao.AddStat(50000, charID, 1, 1);
-            StatDao.AddStat(50000, charID, 214, 1);
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 1, statvalue = 1 });
+            stats.Add(new DBStats { type = 50000, instance = charID, statid = 214, statvalue = 1 });
+
+            StatDao.BulkReplace(stats);
+
             return charID;
         }
 

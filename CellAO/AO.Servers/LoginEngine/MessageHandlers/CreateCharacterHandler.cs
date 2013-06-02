@@ -30,6 +30,7 @@ namespace LoginEngine.MessageHandlers
     using System.ComponentModel.Composition;
 
     using AO.Core.Components;
+    using AO.Database;
 
     using LoginEngine.CoreClient;
     using LoginEngine.Packets;
