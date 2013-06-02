@@ -981,7 +981,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        private readonly DynelStat gmLevel = new DynelStat(215, 0, false, true, false);
+        private readonly DynelStat gmLevel = new DynelStat(215, 0, false, false, false);
 
         /// <summary>
         /// </summary>
@@ -4328,7 +4328,6 @@ namespace ZoneEngine.GameObject.Stats
             this.accountFlags.DoNotDontWriteToSql = true;
             this.playerId.DoNotDontWriteToSql = true;
             this.professionLevel.DoNotDontWriteToSql = true;
-            this.gmLevel.DoNotDontWriteToSql = true;
             this.objectType.DoNotDontWriteToSql = true;
             this.instance.DoNotDontWriteToSql = true;
         }
@@ -11835,15 +11834,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </summary>
         public void WriteStatstoSql()
         {
-            foreach (DynelStat c in this.all)
-            {
-                if (c.DoNotDontWriteToSql)
-                {
-                    continue;
-                }
-
-                c.WriteStatToSql(true);
-            }
+            this.Write();
         }
 
         #endregion
@@ -11901,7 +11892,7 @@ namespace ZoneEngine.GameObject.Stats
             foreach (IStat stat in this.all)
             {
                 // Flags are special cases, save always
-                if ((stat.StatId == 0) || (stat.BaseValue != StatNamesDefaults.GetDefault(stat.StatId)))
+                if ((stat.StatId == 0) || ((stat.BaseValue != StatNamesDefaults.GetDefault(stat.StatId)) && (((DynelStat)stat).DoNotDontWriteToSql == false)))
                 {
                     temp.Add(new DBStats { statid = stat.StatId, statvalue = (int)stat.BaseValue, type = typ, instance = inst });
                 }

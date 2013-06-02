@@ -36,6 +36,8 @@ namespace ZoneEngine.GameObject.Stats
 
     using AO.Database;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine.Network.Packets;
 
     #endregion
@@ -339,22 +341,6 @@ namespace ZoneEngine.GameObject.Stats
         }
 
         /// <summary>
-        /// Read stat from Sql
-        /// </summary>
-        public void ReadStatFromSql()
-        {
-            if (this.DoNotDontWriteToSql)
-            {
-                return;
-            }
-
-            int id = this.Parent.Identity.Instance;
-            int type = (int)this.Parent.Identity.Type;
-
-            this.BaseValue = (uint)StatDao.GetById(type, id, this.StatId).statvalue;
-        }
-
-        /// <summary>
         /// </summary>
         /// <param name="value">
         /// </param>
@@ -406,33 +392,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </summary>
         public void WriteStatToSql()
         {
-            if (this.DoNotDontWriteToSql)
-            {
-                return;
-            }
-
-            int id = this.Parent.Identity.Instance;
-            SqlWrapper sql = new SqlWrapper();
-            if (this.Changed)
-            {
-                /* TODO: REDO
-                if (this.Parent is NonPlayerCharacter)
-                {
-                sql.SqlInsert(
-                "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() +
-                "_stats (ID, Playfield, Stat, Value) VALUES (" + id + "," + this.Parent.PlayField + "," +
-                this.StatNumber + "," + ((Int32)this.StatBaseValue) + ") ON DUPLICATE KEY UPDATE Value=" +
-                ((Int32)this.StatBaseValue) + ";");
-                }
-                else
-                {
-                sql.SqlInsert(
-                "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() + "_stats (ID, Stat, Value) VALUES (" +
-                id + "," + this.StatNumber + "," + ((Int32)this.StatBaseValue) +
-                ") ON DUPLICATE KEY UPDATE Value=" + ((Int32)this.StatBaseValue) + ";");
-                }
-                */
-            }
+            this.WriteStatToSql(this.Changed);
         }
 
         /// <summary>
@@ -447,27 +407,10 @@ namespace ZoneEngine.GameObject.Stats
                 return;
             }
 
-            int id = this.Parent.Identity.Instance;
-            SqlWrapper sql = new SqlWrapper();
             if (doit)
             {
-                /* TODO: REDO
-                if (this.Parent is NonPlayerCharacter)
-                {
-                sql.SqlInsert(
-                "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() +
-                "_stats (ID, Playfield, Stat, Value) VALUES (" + id + "," + this.Parent.PlayField + "," +
-                this.StatNumber + "," + ((Int32)this.StatBaseValue) + ") ON DUPLICATE KEY UPDATE Value=" +
-                ((Int32)this.StatBaseValue) + ";");
-                }
-                else
-                {
-                sql.SqlInsert(
-                "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() + "_stats (ID, Stat, Value) VALUES (" +
-                id + "," + this.StatNumber + "," + ((Int32)this.StatBaseValue) +
-                ") ON DUPLICATE KEY UPDATE Value=" + ((Int32)this.StatBaseValue) + ";");
-                }
-                */
+                Identity id = this.Parent.Identity;
+                StatDao.AddStat((int)id.Type, id.Instance, this.StatId, (int)this.baseValue);
             }
         }
 
