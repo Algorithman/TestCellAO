@@ -105,6 +105,7 @@ namespace ZoneEngine.GameObject.Stats
         public StatelStat(int statNumber)
         {
             this.StatId = statNumber;
+            this.value = StatNamesDefaults.GetDefault(statNumber);
         }
 
         /// <summary>
