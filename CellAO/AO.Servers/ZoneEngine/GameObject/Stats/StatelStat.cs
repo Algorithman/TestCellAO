@@ -30,14 +30,17 @@ namespace ZoneEngine.GameObject.Stats
     public class StatelStat : IStat
     {
         /// <summary>
+        /// Stat's value
         /// </summary>
         private int value;
 
         /// <summary>
+        /// Stat's Id
         /// </summary>
         public int StatId { get; private set; }
 
         /// <summary>
+        /// Stat's value
         /// </summary>
         public int Value
         {
@@ -99,8 +102,10 @@ namespace ZoneEngine.GameObject.Stats
         }
 
         /// <summary>
+        /// Create new Stat and fill with default value
         /// </summary>
         /// <param name="statNumber">
+        /// Stat's id
         /// </param>
         public StatelStat(int statNumber)
         {
@@ -109,10 +114,13 @@ namespace ZoneEngine.GameObject.Stats
         }
 
         /// <summary>
+        /// Create Stat and fill with designated value
         /// </summary>
         /// <param name="statNumber">
+        /// Stat's Id
         /// </param>
         /// <param name="statValue">
+        /// Stat's initial value
         /// </param>
         public StatelStat(int statNumber, int statValue)
             : this(statNumber)
