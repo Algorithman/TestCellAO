@@ -42,7 +42,7 @@ namespace ZoneEngine.GameObject.Stats
 
     /// <summary>
     /// </summary>
-    public class DynelStats
+    public class DynelStats : IStatList
     {
         #region Fields
 
@@ -11846,6 +11846,37 @@ namespace ZoneEngine.GameObject.Stats
         }
 
         #endregion
+
+        IStat IStatList.this[int index]
+        {
+            get
+            {
+                foreach (IStat stat in all)
+                {
+                    if (stat.StatId == index)
+                    {
+                        return stat;
+                    }
+                }
+                throw new StatDoesNotExistException("Stat with Id "+index+" does not exist");
+            }
+        }
+
+        IStat IStatList.this[string name]
+        {
+            get
+            {
+                int index = StatNamesDefaults.GetStatNumber(name);
+                foreach (IStat stat in all)
+                {
+                    if (stat.StatId == index)
+                    {
+                        return stat;
+                    }
+                }
+                throw new StatDoesNotExistException("huh? Stat with Id " + index + " does not exist, but the name "+name+" exists? CODER ALERT");
+            }
+        }
     }
 
     #endregion
