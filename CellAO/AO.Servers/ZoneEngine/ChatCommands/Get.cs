@@ -74,8 +74,13 @@ namespace ZoneEngine.ChatCommands
 
                 // May be obsolete in the future, let it stay in comment yet
                 // ch.CalculateSkills();  
-                int statId = StatsList.GetStatId(args[1]);
-                if (statId == 1234567890)
+                int statId;
+                try
+                {
+                    statId = StatNamesDefaults.GetStatNumber(args[1]);
+
+                }
+                catch (Exception)
                 {
                     client.SendChatText("Unknown Stat name " + args[1]);
                     return;
@@ -88,11 +93,11 @@ namespace ZoneEngine.ChatCommands
                 int perc;
                 try
                 {
-                    statValue = targetCharacter.Stats.GetBaseValue(statId);
-                    effectiveValue = targetCharacter.Stats.StatValueByName(statId);
-                    trickle = targetCharacter.Stats.GetStatbyNumber(statId).Trickle;
-                    mod = targetCharacter.Stats.GetStatbyNumber(statId).Modifier;
-                    perc = targetCharacter.Stats.GetStatbyNumber(statId).PercentageModifier;
+                    statValue = targetCharacter.Stats[statId].BaseValue;
+                    effectiveValue = targetCharacter.Stats[statId].Value;
+                    trickle = targetCharacter.Stats[statId].Trickle;
+                    mod = targetCharacter.Stats[statId].Modifier;
+                    perc = targetCharacter.Stats[statId].PercentageModifier;
                 }
                 catch (StatDoesNotExistException)
                 {
@@ -105,18 +110,18 @@ namespace ZoneEngine.ChatCommands
                 if (namedDynel != null)
                 {
                     response = "Character " + namedDynel.Name + " (" + targetCharacter.Identity.Instance + "): Stat "
-                               + StatsList.GetStatName(statId) + " (" + statId + ") = " + statValue;
+                               + StatNamesDefaults.GetStatName(statId) + " (" + statId + ") = " + statValue;
                 }
                 else
                 {
-                    response = "Dynel " + targetCharacter.Identity.Instance + "Stat " + StatsList.GetStatName(statId)
+                    response = "Dynel " + targetCharacter.Identity.Instance + "Stat " + StatNamesDefaults.GetStatName(statId)
                                + " (" + statId + ") = " + statValue;
                 }
 
                 client.SendChatText(response);
-                if (statValue != targetCharacter.Stats.StatValueByName(args[1]))
+                if (statValue != targetCharacter.Stats[args[1]].Value)
                 {
-                    response = "Effective value Stat " + StatsList.GetStatName(statId) + " (" + statId + ") = "
+                    response = "Effective value Stat " + StatNamesDefaults.GetStatName(statId) + " (" + statId + ") = "
                                + effectiveValue;
                     client.SendChatText(response);
                 }

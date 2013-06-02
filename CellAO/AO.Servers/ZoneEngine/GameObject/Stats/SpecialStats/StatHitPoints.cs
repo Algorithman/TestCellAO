@@ -52,7 +52,7 @@ namespace ZoneEngine.GameObject.Stats
         public StatHitPoints(
             int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
-            this.StatNumber = number;
+            this.StatId = number;
             this.DefaultValue = defaultValue;
 
             this.BaseValue = this.DefaultValue;
@@ -76,7 +76,7 @@ namespace ZoneEngine.GameObject.Stats
             if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter))
             {
                 Character character = (Character)this.Parent;
-                return (uint)Math.Min(val, character.Stats.Life.Value);
+                return (uint)Math.Min(val, character.Stats["Life"].Value);
             }
 
             return base.GetMaxValue(val);

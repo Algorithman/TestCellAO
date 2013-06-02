@@ -27,6 +27,7 @@ namespace ZoneEngine.GameObject.Stats
 {
     #region Usings ...
 
+    using System;
     using System.Collections.Generic;
 
     using AO.Core;
@@ -762,11 +763,14 @@ namespace ZoneEngine.GameObject.Stats
             NameList.Add(1010, "OverrideTextureWeaponLeft");
             NameList.Add(1009, "OverrideTextureWeaponRight");
 
+            Dictionary<int,string> temp = new Dictionary<int, string>();
             // We dont want to be too specific here, so lets turn them all lower case (for user input)
             foreach (int number in NameList.Keys)
             {
-                NameList[number] = NameList[number].ToLower();
+                temp.Add(number,NameList[number].ToLower());
             }
+
+            NameList = temp;
 
             // and create a crossreferencing List
             foreach (KeyValuePair<int, string> keyValuePair in NameList)
@@ -1100,6 +1104,15 @@ namespace ZoneEngine.GameObject.Stats
             }
 
             return NumberList[name.ToLower()];
+        }
+
+        public static string GetStatName(int index)
+        {
+            if (NameList.ContainsKey(index))
+            {
+                return NameList[index];
+            }
+            throw new StatDoesNotExistException("Stat with id '" + index + "' does not exist");
         }
     }
 }

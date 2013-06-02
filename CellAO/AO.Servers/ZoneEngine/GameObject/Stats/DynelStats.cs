@@ -32,6 +32,7 @@ namespace ZoneEngine.GameObject.Stats
     using System.Diagnostics.Contracts;
 
     using AO.Core;
+    using AO.Core.Logger;
     using AO.Database;
 
     using ZoneEngine.Network.Packets;
@@ -3597,25 +3598,25 @@ namespace ZoneEngine.GameObject.Stats
 
             // add Tricklers, try not to do circulars!!
             this.SetAbilityTricklers();
-            this.bodyDevelopment.Affects.Add(this.life.StatNumber);
-            this.nanoEnergyPool.Affects.Add(this.maxNanoEnergy.StatNumber);
-            this.level.Affects.Add(this.life.StatNumber);
-            this.level.Affects.Add(this.maxNanoEnergy.StatNumber);
-            this.level.Affects.Add(this.titleLevel.StatNumber);
-            this.level.Affects.Add(this.nextSK.StatNumber);
-            this.level.Affects.Add(this.nextXP.StatNumber);
-            this.alienLevel.Affects.Add(this.alienNextXP.StatNumber);
-            this.xp.Affects.Add(this.level.StatNumber);
-            this.sk.Affects.Add(this.level.StatNumber);
-            this.alienXP.Affects.Add(this.alienLevel.StatNumber);
-            this.profession.Affects.Add(this.health.StatNumber);
-            this.profession.Affects.Add(this.maxNanoEnergy.StatNumber);
-            this.profession.Affects.Add(this.ip.StatNumber);
-            this.stamina.Affects.Add(this.healDelta.StatNumber);
-            this.psychic.Affects.Add(this.nanoDelta.StatNumber);
-            this.stamina.Affects.Add(this.healInterval.StatNumber);
-            this.psychic.Affects.Add(this.nanoInterval.StatNumber);
-            this.level.Affects.Add(this.ip.StatNumber);
+            this.bodyDevelopment.Affects.Add(this.life.StatId);
+            this.nanoEnergyPool.Affects.Add(this.maxNanoEnergy.StatId);
+            this.level.Affects.Add(this.life.StatId);
+            this.level.Affects.Add(this.maxNanoEnergy.StatId);
+            this.level.Affects.Add(this.titleLevel.StatId);
+            this.level.Affects.Add(this.nextSK.StatId);
+            this.level.Affects.Add(this.nextXP.StatId);
+            this.alienLevel.Affects.Add(this.alienNextXP.StatId);
+            this.xp.Affects.Add(this.level.StatId);
+            this.sk.Affects.Add(this.level.StatId);
+            this.alienXP.Affects.Add(this.alienLevel.StatId);
+            this.profession.Affects.Add(this.health.StatId);
+            this.profession.Affects.Add(this.maxNanoEnergy.StatId);
+            this.profession.Affects.Add(this.ip.StatId);
+            this.stamina.Affects.Add(this.healDelta.StatId);
+            this.psychic.Affects.Add(this.nanoDelta.StatId);
+            this.stamina.Affects.Add(this.healInterval.StatId);
+            this.psychic.Affects.Add(this.nanoInterval.StatId);
+            this.level.Affects.Add(this.ip.StatId);
 
             foreach (DynelStat c in this.all)
             {
@@ -11454,7 +11455,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             foreach (DynelStat c in this.all)
             {
-                if (c.StatNumber != stat)
+                if (c.StatId != stat)
                 {
                     continue;
                 }
@@ -11477,7 +11478,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             foreach (DynelStat c in this.all)
             {
-                if (c.StatNumber != stat)
+                if (c.StatId != stat)
                 {
                     continue;
                 }
@@ -11500,7 +11501,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             foreach (DynelStat c in this.all)
             {
-                if (c.StatNumber != stat)
+                if (c.StatId != stat)
                 {
                     continue;
                 }
@@ -11521,7 +11522,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             foreach (DynelStat c in this.all)
             {
-                if (c.StatNumber != number)
+                if (c.StatId != number)
                 {
                     continue;
                 }
@@ -11555,7 +11556,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             if (!((DynelStat)sender).Parent.DoNotDoTimers)
             {
-                Stat.Send(e.Stat.Parent, e.Stat.StatNumber, e.NewValue, e.Stat.AnnounceToPlayfield);
+                Stat.Send(e.Stat.Parent, e.Stat.StatId, e.NewValue, e.Stat.AnnounceToPlayfield);
 
                 e.Stat.Changed = false;
             }
@@ -11612,7 +11613,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             foreach (DynelStat c in this.all)
             {
-                if (c.StatNumber != stat)
+                if (c.StatId != stat)
                 {
                     continue;
                 }
@@ -11638,7 +11639,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             foreach (DynelStat c in this.all)
             {
-                if (c.StatNumber != stat)
+                if (c.StatId != stat)
                 {
                     continue;
                 }
@@ -11663,7 +11664,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             foreach (DynelStat c in this.all)
             {
-                if (c.StatNumber != stat)
+                if (c.StatId != stat)
                 {
                     continue;
                 }
@@ -11689,7 +11690,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             foreach (DynelStat c in this.all)
             {
-                if (c.StatNumber != number)
+                if (c.StatId != number)
                 {
                     continue;
                 }
@@ -11714,10 +11715,10 @@ namespace ZoneEngine.GameObject.Stats
         public void SetStatValueByName(string statName, uint newValue)
         {
             Contract.Requires(statName != null);
-            int statid = StatsList.GetStatId(statName.ToLower());
+            int statid = StatNamesDefaults.GetStatNumber(statName.ToLower());
             foreach (DynelStat c in this.all)
             {
-                if (c.StatNumber != statid)
+                if (c.StatId != statid)
                 {
                     continue;
                 }
@@ -11742,7 +11743,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             foreach (DynelStat c in this.all)
             {
-                if (c.StatNumber != statId)
+                if (c.StatId != statId)
                 {
                     continue;
                 }
@@ -11765,15 +11766,15 @@ namespace ZoneEngine.GameObject.Stats
         public int StatIdByName(string statName)
         {
             Contract.Requires(statName != null);
-            int statid = StatsList.GetStatId(statName.ToLower());
+            int statid = StatNamesDefaults.GetStatNumber(statName.ToLower());
             foreach (DynelStat c in this.all)
             {
-                if (c.StatNumber != statid)
+                if (c.StatId != statid)
                 {
                     continue;
                 }
 
-                return c.StatNumber;
+                return c.StatId;
             }
 
             throw new StatDoesNotExistException("Stat " + statName + " does not exist.\r\nMethod: GetID");
@@ -11792,7 +11793,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             foreach (DynelStat c in this.all)
             {
-                if (c.StatNumber != number)
+                if (c.StatId != number)
                 {
                     continue;
                 }
@@ -11815,10 +11816,10 @@ namespace ZoneEngine.GameObject.Stats
         public int StatValueByName(string name)
         {
             Contract.Requires(name != null);
-            int statid = StatsList.GetStatId(name.ToLower());
+            int statid = StatNamesDefaults.GetStatNumber(name.ToLower());
             foreach (DynelStat c in this.all)
             {
-                if (c.StatNumber != statid)
+                if (c.StatId != statid)
                 {
                     continue;
                 }
@@ -11876,6 +11877,25 @@ namespace ZoneEngine.GameObject.Stats
                 }
                 throw new StatDoesNotExistException("huh? Stat with Id " + index + " does not exist, but the name "+name+" exists? CODER ALERT");
             }
+        }
+
+        public bool Read()
+        {
+            try
+            {
+                this.ReadStatsfromSql();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Debug(ex.Message);
+                return false;
+            }
+        }
+
+        public bool Write()
+        {
+            throw new NotImplementedException();
         }
     }
 

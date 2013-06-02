@@ -27,7 +27,7 @@ namespace ZoneEngine.GameObject.Stats
 {
     /// <summary>
     /// </summary>
-    public interface IStatList
+    public interface IStatList : IDatabaseObject
     {
         /// <summary>
         /// Number-indexed access to Stats List
@@ -50,5 +50,9 @@ namespace ZoneEngine.GameObject.Stats
         /// IStat object
         /// </returns>
         IStat this[string name] { get; }
+
+        /// <summary>
+        /// </summary>
+        void ClearModifiers();
     }
 }

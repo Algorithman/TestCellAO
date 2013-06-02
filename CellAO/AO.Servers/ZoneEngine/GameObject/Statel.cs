@@ -83,9 +83,17 @@ namespace ZoneEngine.GameObject
         /// </summary>
         public Quaternion RawHeading { get; set; }
 
+        private readonly IStatList stats;
         /// <summary>
         /// </summary>
-        public DynelStats Stats { get; private set; }
+        public IStatList Stats { get
+        {
+            return stats;
+        }
+            private set
+            {
+            }
+        }
 
         /// <summary>
         /// </summary>
@@ -100,6 +108,11 @@ namespace ZoneEngine.GameObject
         public bool CheckRequirements(Functions aof, bool checkAll)
         {
             throw new NotImplementedException();
+        }
+
+        public Statel()
+        {
+            stats=new StatelStats();
         }
     }
 }

@@ -35,6 +35,8 @@ namespace LoginEngine.MessageHandlers
 
     using AO.Core;
     using AO.Core.Components;
+    using AO.Database.Dao;
+    using AO.Database.Entities;
 
     using LoginEngine.CoreClient;
     using LoginEngine.Packets;
@@ -95,13 +97,9 @@ namespace LoginEngine.MessageHandlers
                number of characters allowed (num. of chars doesn't work)*/
             string sqlQuery = "SELECT `Expansions`,`Allowed_Characters` FROM `login` WHERE Username = '"
                               + client.AccountName + "'";
-            var ms = new SqlWrapper();
-            DataTable dt = ms.ReadDatatable(sqlQuery);
-            if (dt.Rows.Count > 0)
-            {
-                expansions = int.Parse((string)dt.Rows[0][0]);
-                allowedCharacters = (int)dt.Rows[0][1];
-            }
+            DBLoginData loginData = LoginDataDao.GetByUsername(client.AccountName);
+            expansions = loginData.Expansions;
+            allowedCharacters = loginData.Allowed_Characters;
 
             IEnumerable<LoginCharacterInfo> characters = from c in CharacterList.LoadCharacters(client.AccountName)
                                                          select

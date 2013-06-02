@@ -63,7 +63,7 @@ namespace ZoneEngine.MessageHandlers
 
             uint baseIp = 0;
 
-            uint characterLevel = (uint)client.Character.Stats.Level.BaseValue;
+            uint characterLevel = client.Character.Stats["Level"].BaseValue;
 
             // Calculate base IP value for character level
             if (characterLevel > 204)
@@ -110,13 +110,13 @@ namespace ZoneEngine.MessageHandlers
             {
                 count--;
                 GameTuple<CharacterStat, uint> stat = skillMessage.Skills[count];
-                client.Character.Stats.SetBaseValue((int)stat.Value1, stat.Value2);
+                client.Character.Stats[(int)stat.Value1].Value= (int)stat.Value2;
                 statlist.Add((int)stat.Value1);
             }
 
             statlist.Add(53); // IP
             uint usedIp = baseIp - (uint)Math.Floor(SkillUpdate.CalculateIP(client.Character));
-            client.Character.Stats.IP.BaseValue = usedIp;
+            client.Character.Stats["IP"].BaseValue = usedIp;
 
             // Send the changed stats back to the client
             count = 0;
@@ -124,7 +124,7 @@ namespace ZoneEngine.MessageHandlers
             while (count < statlist.Count)
             {
                 int stat = statlist[count];
-                uint statval = client.Character.Stats.GetBaseValue(stat);
+                uint statval = client.Character.Stats[stat].BaseValue;
                 newStats.Add(new GameTuple<CharacterStat, uint> { Value1 = (CharacterStat)stat, Value2 = statval });
                 count++;
             }

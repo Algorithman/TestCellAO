@@ -29,6 +29,7 @@ namespace AO.Database
 
     using System.Collections.Generic;
     using System.Data;
+    using System.Linq;
 
     using Dapper;
 
@@ -36,13 +37,13 @@ namespace AO.Database
 
     /// <summary>
     /// </summary>
-    public class CharacterDao
+    public static class CharacterDao
     {
         /// <summary>
         /// </summary>
         /// <returns>
         /// </returns>
-        public IEnumerable<DBCharacter> GetAll()
+        public static IEnumerable<DBCharacter> GetAll()
         {
             using (IDbConnection conn = Connector.GetConnection())
             {
@@ -54,18 +55,107 @@ namespace AO.Database
 
         /// <summary>
         /// </summary>
-        /// <param name="characterId">
+        /// <param name="username">
         /// </param>
         /// <returns>
         /// </returns>
-        public IEnumerable<DBCharacter> GetById(int characterId)
+        public static IEnumerable<DBCharacter> GetAllForUser(string username)
         {
             using (IDbConnection conn = Connector.GetConnection())
             {
                 return
                     conn.Query<DBCharacter>(
-                        "SELECT Name, FirstName, LastName, Textures0,Textures1,Textures2,Textures3,Textures4,playfield as Playfield, X,Y,Z,HeadingX,HeadingY,HeadingZ,HeadingW FROM characters where id = @id", 
+                        "SELECT ID, Username, Name, FirstName, LastName, Textures0,Textures1,Textures2,Textures3,Textures4,playfield as Playfield, X,Y,Z,HeadingX,HeadingY,HeadingZ,HeadingW FROM characters WHERE Username=@username",
+                        new { username });
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="characterId">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static IEnumerable<DBCharacter> GetById(int characterId)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                return
+                    conn.Query<DBCharacter>(
+                        "SELECT Name, FirstName, LastName, Textures0,Textures1,Textures2,Textures3,Textures4,playfield as Playfield, "
+                        + "X,Y,Z,HeadingX,HeadingY,HeadingZ,HeadingW FROM characters where id = @id",
                         new { id = characterId });
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="name">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public static int CharExists(string name)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                int temp =
+                    conn.Query<int>(
+                        "SELECT ID FROM characters where Name = @charname", new { charname = name }).Count();
+                return temp;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="character">
+        /// </param>
+        public static void AddCharacter(DBCharacter character)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                conn.Execute(
+                    "INSERT INTO characters (Name, FirstName, LastName, Textures0,Textures1,Textures2,Textures3,Textures4"
+                    + ",playfield, X,Y,Z,HeadingX,HeadingY,HeadingZ,HeadingW,Username) VALUES (@Name, @FirstName, "
+                    + "@LastName, @Textures0, @Textures1, @Textures3, @Textures4, @Playfield, @X, @Y, @Z, @HeadingX, @HeadingY, "
+                    + "@HeadingZ, @HeadingW, @Online,@username)",
+                    new
+                        {
+                            character.Name,
+                            character.FirstName,
+                            character.LastName,
+                            character.Textures0,
+                            character.Textures1,
+                            character.Textures2,
+                            character.Textures3,
+                            character.Textures4,
+                            character.Playfield,
+                            character.X,
+                            character.Y,
+                            character.Z,
+                            character.HeadingX,
+                            character.HeadingY,
+                            character.HeadingZ,
+                            character.HeadingW,
+                            Online = 0,
+                            username=character.Username
+                        });
+            }
+        }
+
+        public static DBCharacter GetByCharName(string name)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                return conn.Query<DBCharacter>("SELECT * FROM characters WHERE Name=@name", new { name }).First();
+            }
+        }
+
+        public static void UpdatePosition(DBCharacter db)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                conn.Execute(
+                    "UPDATE characters SET playfield = @Playfield, X = @X, Y = @Y, Z = @Z WHERE id=@Id", new { db.Playfield, db.X, db.Y, db.Z, db.Id });
             }
         }
     }

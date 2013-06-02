@@ -148,7 +148,7 @@ namespace ZoneEngine.GameObject.Stats
         public DynelStat(
             int number, uint defaultValue, bool sendBaseValue, bool dontWrite, bool announceToPlayfield)
         {
-            this.StatNumber = number;
+            this.StatId = number;
             this.DefaultValue = defaultValue;
             this.BaseValue = defaultValue;
             this.sendBaseValue = sendBaseValue;
@@ -246,7 +246,7 @@ namespace ZoneEngine.GameObject.Stats
                 this.baseValue = value;
                 if (sendit)
                 {
-                    Stat.Send(this.Parent, this.StatNumber, value, this.announceToPlayfield);
+                    Stat.Send(this.Parent, this.StatId, value, this.announceToPlayfield);
                 }
             }
         }
@@ -254,10 +254,6 @@ namespace ZoneEngine.GameObject.Stats
         /// <summary>
         /// </summary>
         public uint DefaultValue { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int StatNumber { get; set; }
 
         /// <summary>
         /// </summary>
@@ -280,7 +276,7 @@ namespace ZoneEngine.GameObject.Stats
 
         public int Modifier { get; set; }
 
-        public int StatId { get; private set; }
+        public int StatId { get; set; }
 
         /// <summary>
         /// </summary>
@@ -316,7 +312,7 @@ namespace ZoneEngine.GameObject.Stats
 
             foreach (int c in this.affects)
             {
-                this.Parent.Stats.GetStatbyNumber(c).CalcTrickle();
+                this.Parent.Stats[c].CalcTrickle();
             }
         }
 
@@ -355,7 +351,7 @@ namespace ZoneEngine.GameObject.Stats
             int id = this.Parent.Identity.Instance;
             int type = (int)this.Parent.Identity.Type;
 
-            this.BaseValue = (uint)StatDao.GetById(type, id, this.StatNumber).statvalue;
+            this.BaseValue = (uint)StatDao.GetById(type, id, this.StatId).statvalue;
         }
 
         /// <summary>

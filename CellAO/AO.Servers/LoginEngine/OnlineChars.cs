@@ -31,6 +31,7 @@ namespace LoginEngine
     using System.Data;
 
     using AO.Core;
+    using AO.Database.Dao;
 
     #endregion
 
@@ -56,14 +57,7 @@ namespace LoginEngine
         /// </exception>
         public static bool IsOnline(int id)
         {
-            var sql = new SqlWrapper();
-            DataTable dt = sql.ReadDatatable("SELECT * FROM characters WHERE ID = " + id + ";");
-            if (dt.Rows.Count == 0)
-            {
-                throw new CharacterDoesNotExistException("Character does not exist: " + id);
-            }
-
-            if ((Int16)dt.Rows[0]["Online"] == 1)
+            if (OnlineDao.IsOnline(id).Online == 1)
             {
                 return true;
             }
@@ -77,8 +71,7 @@ namespace LoginEngine
         /// </param>
         public static void SetOnline(int id)
         {
-            var sql = new SqlWrapper();
-            sql.SqlUpdate("UPDATE characters SET Online = 1 WHERE ID = " + id + ";");
+            OnlineDao.SetOnline(id);
         }
 
         #endregion

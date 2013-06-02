@@ -45,7 +45,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         public StatWeaponsStyle(int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
-            this.StatNumber = number;
+            this.StatId = number;
             this.DefaultValue = defaultValue;
 
             this.BaseValue = this.DefaultValue;
@@ -65,7 +65,7 @@ namespace ZoneEngine.GameObject.Stats
             if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter))
             {
                 // This condition could be obsolete
-                this.Value = this.Parent.Stats.WeaponStyleLeft.Value | this.Parent.Stats.WeaponStyleRight.Value;
+                this.Value = this.Parent.Stats["WeaponStyleLeft"].Value | this.Parent.Stats["WeaponStyleRight"].Value;
             }
         }
 

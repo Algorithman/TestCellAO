@@ -88,13 +88,19 @@ namespace ZoneEngine.GameObject
         /// </summary>
         public Quaternion RawHeading { get; set; }
 
+        private IStatList stats;
+
         /// <summary>
         /// </summary>
-        public DynelStats Stats
+        public IStatList Stats
         {
             get
             {
-                return this.Stats;
+                return this.stats;
+            }
+            private set
+            {
+                this.stats = value;
             }
         }
 
@@ -118,5 +124,9 @@ namespace ZoneEngine.GameObject
         /// <summary>
         /// </summary>
         public BaseInventory BaseInventory { get; private set; }
+        public VendorShop()
+        {
+            this.stats=new StatelStats();
+        }
     }
 }

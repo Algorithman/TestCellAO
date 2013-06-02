@@ -53,7 +53,7 @@ namespace ZoneEngine.GameObject.Stats
         public StatSkill(
             int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
-            this.StatNumber = number;
+            this.StatId = number;
             this.DefaultValue = defaultValue;
 
             this.BaseValue = this.DefaultValue;
@@ -70,22 +70,22 @@ namespace ZoneEngine.GameObject.Stats
         /// </summary>
         public override void CalcTrickle()
         {
-            double strengthTrickle = SkillTrickleTable.table[this.StatNumber - 100, 1];
-            double agilityTrickle = SkillTrickleTable.table[this.StatNumber - 100, 2];
-            double staminaTrickle = SkillTrickleTable.table[this.StatNumber - 100, 3];
-            double intelligenceTrickle = SkillTrickleTable.table[this.StatNumber - 100, 4];
-            double senseTrickle = SkillTrickleTable.table[this.StatNumber - 100, 5];
-            double psychicTrickle = SkillTrickleTable.table[this.StatNumber - 100, 6];
+            double strengthTrickle = SkillTrickleTable.table[this.StatId - 100, 1];
+            double agilityTrickle = SkillTrickleTable.table[this.StatId - 100, 2];
+            double staminaTrickle = SkillTrickleTable.table[this.StatId - 100, 3];
+            double intelligenceTrickle = SkillTrickleTable.table[this.StatId - 100, 4];
+            double senseTrickle = SkillTrickleTable.table[this.StatId - 100, 5];
+            double psychicTrickle = SkillTrickleTable.table[this.StatId - 100, 6];
 
             this.Trickle =
                 Convert.ToInt32(
                     Math.Floor(
-                        (strengthTrickle * this.Parent.Stats.Strength.Value
-                         + staminaTrickle * this.Parent.Stats.Stamina.Value
-                         + senseTrickle * this.Parent.Stats.Sense.Value
-                         + agilityTrickle * this.Parent.Stats.Agility.Value
-                         + intelligenceTrickle * this.Parent.Stats.Intelligence.Value
-                         + psychicTrickle * this.Parent.Stats.Psychic.Value) / 4));
+                        (strengthTrickle * this.Parent.Stats["Strength"].Value
+                         + staminaTrickle * this.Parent.Stats["Stamina"].Value
+                         + senseTrickle * this.Parent.Stats["Sense"].Value
+                         + agilityTrickle * this.Parent.Stats["Agility"].Value
+                         + intelligenceTrickle * this.Parent.Stats["Intelligence"].Value
+                         + psychicTrickle * this.Parent.Stats["Psychic"].Value) / 4));
 
             if (!this.Parent.Starting)
             {

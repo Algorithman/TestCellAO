@@ -52,5 +52,21 @@ namespace ZoneEngine.GameObject.Stats
         /// <summary>
         /// </summary>
         int PercentageModifier { get; set; }
+
+        /// <summary>
+        /// </summary>
+        bool AnnounceToPlayfield { get; set; }
+
+        /// <summary>
+        /// </summary>
+        void CalcTrickle();
+
+        /// <summary>
+        /// </summary>
+        void AffectStats();
+
+        /// <summary>
+        /// </summary>
+        uint GetMaxValue(uint old);
     }
 }

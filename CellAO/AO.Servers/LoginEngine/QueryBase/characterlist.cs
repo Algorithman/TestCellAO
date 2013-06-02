@@ -32,6 +32,7 @@ namespace LoginEngine.QueryBase
     using System.Data;
 
     using AO.Core;
+    using AO.Database;
 
     using LoginEngine.Packets;
 
@@ -52,24 +53,19 @@ namespace LoginEngine.QueryBase
         public static List<CharacterEntry> LoadCharacters(string accountName)
         {
             var characters = new List<CharacterEntry>();
-            var ms = new SqlWrapper();
-
-            string SqlQuery =
-                "SELECT `characters`.`ID`, `characters`.`Name`, `characters`.`playfield`, (SELECT `Value` FROM `characters_stats` WHERE `characters`.`ID` = `characters_stats`.`ID` AND `Stat` = 54) as level, (SELECT `Value` FROM `characters_stats` WHERE `characters`.`ID` = `characters_stats`.`ID` AND `Stat` = 4) as breed, (SELECT `Value` FROM `characters_stats` WHERE `characters`.`ID` = `characters_stats`.`ID` AND `Stat` = 59) as gender, (SELECT `Value` FROM `characters_stats` WHERE `characters`.`ID` = `characters_stats`.`ID` AND `Stat` = 60) as profession FROM `characters` WHERE `characters`.Username = '"
-                + accountName + "'";
-            DataTable dt = ms.ReadDatatable(SqlQuery);
-
-            foreach (DataRow row in dt.Rows)
+            
+            foreach (DBCharacter ch in CharacterDao.GetAllForUser(accountName))
             {
                 var charentry = new CharacterEntry();
-                charentry.Id = (Int32)row["ID"];
-                charentry.Name = (string)row["Name"];
-                charentry.Playfield = (Int32)row["playfield"];
-                charentry.Level = (Int32)row["level"];
-                charentry.Breed = (Int32)row["breed"];
-                charentry.Gender = (Int32)row["gender"];
-                charentry.Profession = (Int32)row["profession"];
+                charentry.Id = ch.Id;
+                charentry.Name = ch.Name;
+                charentry.Playfield = ch.Playfield;
+                charentry.Level = StatDao.GetById(50000, ch.Id, 54).statvalue; // 54 = Level
+                charentry.Breed = StatDao.GetById(50000, ch.Id, 4).statvalue; // 4 = Breed
+                charentry.Gender = StatDao.GetById(50000, ch.Id, 59).statvalue; // 59 = Sex
+                charentry.Profession = StatDao.GetById(50000, ch.Id, 60).statvalue; // 60 = Profession
                 characters.Add(charentry);
+                
             }
 
             return characters;

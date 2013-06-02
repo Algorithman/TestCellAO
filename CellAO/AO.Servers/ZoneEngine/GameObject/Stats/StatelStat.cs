@@ -116,6 +116,34 @@ namespace ZoneEngine.GameObject.Stats
             }
         }
 
+        public bool AnnounceToPlayfield { get; set; }
+
+        /// <summary>
+        /// Nothing to do here, no trickles in statels
+        /// </summary>
+        public void CalcTrickle()
+        {
+            return;
+        }
+
+        /// <summary>
+        /// Never called on statels
+        /// </summary>
+        public void AffectStats()
+        {
+        }
+
+        /// <summary>
+        /// Never called on Statels
+        /// </summary>
+        /// <param name="old"></param>
+        /// old (actual) value
+        /// <returns></returns>
+        public uint GetMaxValue(uint old)
+        {
+            return 0;
+        }
+
         /// <summary>
         /// Create new Stat and fill with default value
         /// </summary>

@@ -61,7 +61,7 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        protected DynelStats stats;
+        private DynelStats stats;
 
         /// <summary>
         /// </summary>
@@ -469,7 +469,7 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        public DynelStats Stats
+        public IStatList Stats
         {
             get
             {
@@ -567,7 +567,7 @@ namespace ZoneEngine.GameObject
 
                 IStats reqTargetStatholder = ((IInstancedEntity)this).Playfield.FindByIdentity(
                     RequirementTargetIdentity);
-                int statval = reqTargetStatholder.Stats.StatValueByName(aor.Statnumber);
+                int statval = reqTargetStatholder.Stats[aor.Statnumber].Value;
                 bool reqresult = true;
                 switch (aor.Operator)
                 {

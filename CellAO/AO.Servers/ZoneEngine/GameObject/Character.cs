@@ -292,8 +292,8 @@ namespace ZoneEngine.GameObject
                 int c;
                 int c2;
                 int c3;
-                int oldhealth = this.stats.Health.Value;
-                int oldnano = this.stats.CurrentNano.Value;
+                int oldhealth = this.Stats["Health"].Value;
+                int oldnano = this.Stats["CurrentNano"].Value;
                 ItemTemplate m_item;
 
                 this.socialMeshLayer.Clear();
@@ -314,9 +314,9 @@ namespace ZoneEngine.GameObject
                 this.SocialTab.Add(1007, 0);
 
                 // Clear Modifiers (adds and percentages)
-                this.stats.ClearModifiers();
-                this.meshLayer.AddMesh(0, this.stats.HeadMesh.Value, 0, 4);
-                this.socialMeshLayer.AddMesh(0, this.stats.HeadMesh.Value, 0, 4);
+                this.Stats.ClearModifiers();
+                this.meshLayer.AddMesh(0, this.Stats["HeadMesh"].Value, 0, 4);
+                this.socialMeshLayer.AddMesh(0, this.Stats["HeadMesh"].Value, 0, 4);
 
                 /*
                 // Apply all modifying item functions to localstats
@@ -365,15 +365,15 @@ namespace ZoneEngine.GameObject
                 }
 
                 // Calculating the trickledown
-                this.stats.Strength.AffectStats();
-                this.stats.Agility.AffectStats();
-                this.stats.Stamina.AffectStats();
-                this.stats.Intelligence.AffectStats();
-                this.stats.Sense.AffectStats();
-                this.stats.Psychic.AffectStats();
+                this.Stats["Strength"].AffectStats();
+                this.Stats["Agility"].AffectStats();
+                this.Stats["Stamina"].AffectStats();
+                this.Stats["Intelligence"].AffectStats();
+                this.Stats["Sense"].AffectStats();
+                this.Stats["Psychic"].AffectStats();
 
-                this.stats.Health.BaseValue = this.stats.Health.GetMaxValue((uint)oldhealth);
-                this.stats.CurrentNano.BaseValue = this.stats.CurrentNano.GetMaxValue((uint)oldnano);
+                this.Stats["Health"].BaseValue = this.Stats["Health"].GetMaxValue((uint)oldhealth);
+                this.Stats["CurrentNano"].BaseValue = this.Stats["CurrentNano"].GetMaxValue((uint)oldnano);
             }
         }
 

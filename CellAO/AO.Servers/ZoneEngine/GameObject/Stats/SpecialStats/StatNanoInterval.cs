@@ -56,7 +56,7 @@ namespace ZoneEngine.GameObject.Stats
         public StatNanoInterval(
             int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
-            this.StatNumber = number;
+            this.StatId = number;
             this.DefaultValue = defaultValue;
 
             this.BaseValue = this.DefaultValue;
@@ -80,15 +80,15 @@ namespace ZoneEngine.GameObject.Stats
                 // calculating Nano and Heal Delta and interval
                 int nanoInterval = 28
                                    - (Math.Min(
-                                       (int)Math.Floor(Convert.ToDouble(character.Stats.Psychic.Value) / 60), 13) * 2);
-                character.Stats.NanoInterval.BaseValue = (uint)nanoInterval; // Healinterval
+                                       (int)Math.Floor(Convert.ToDouble(character.Stats["Psychic"].Value) / 60), 13) * 2);
+                character.Stats["NanoInterval"].BaseValue = (uint)nanoInterval; // Healinterval
 
                 /* TODO Add Proper Timers w/e is in the other file too
                 character.PurgeTimer(1);
                 AOTimers at = new AOTimers();
                 at.Strain = 1;
                 */
-                int nanoDelta = character.Stats.NanoDelta.Value;
+                int nanoDelta = character.Stats["NanoDelta"].Value;
                 if (character.MoveMode == MoveModes.Sit)
                 {
                     int nanoDelta2 = nanoDelta >> 1;

@@ -63,14 +63,17 @@ namespace ZoneEngine.ChatCommands
                 target = client.Character.Identity;
                 fallback = true;
             }
-
-            int statId = StatsList.GetStatId(args[1]);
-            if (statId == 1234567890)
+            int statId = 0;
+            try
+            {
+                statId = StatNamesDefaults.GetStatNumber(args[1]);
+            }
+            catch (Exception)
             {
                 client.SendChatText("Unknown Stat name " + args[1]);
                 return;
             }
-
+            
             uint statNewValue = 1234567890;
             try
             {
@@ -100,7 +103,7 @@ namespace ZoneEngine.ChatCommands
             uint statOldValue;
             try
             {
-                statOldValue = tempch.Stats.GetBaseValue(statId);
+                statOldValue = tempch.Stats[statId].BaseValue;
                 var IM =
                     new IMExecuteFunction(
                         new Functions
@@ -144,12 +147,12 @@ namespace ZoneEngine.ChatCommands
             if (namedEntity != null)
             {
                 response = "Character " + namedEntity.Name + " (" + target.Instance + "): Stat "
-                           + StatsList.GetStatName(statId) + " (" + statId + ") =";
+                           + StatNamesDefaults.GetStatName(statId) + " (" + statId + ") =";
             }
             else
             {
                 response = "Dynel (" + ((IInstancedEntity)tempch).Identity.Instance + "): Stat "
-                           + StatsList.GetStatName(statId) + " (" + statId + ") =";
+                           + StatNamesDefaults.GetStatName(statId) + " (" + statId + ") =";
             }
 
             response += " Old: " + statOldValue;

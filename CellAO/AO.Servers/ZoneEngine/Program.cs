@@ -48,6 +48,7 @@ namespace ZoneEngine
 
     using ZoneEngine.Collision;
     using ZoneEngine.Functions;
+    using ZoneEngine.GameObject.Stats;
     using ZoneEngine.Gameobject.Items;
     using ZoneEngine.GameObject.Nanos;
     using ZoneEngine.Network;

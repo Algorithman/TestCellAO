@@ -36,6 +36,8 @@ namespace LoginEngine
     using AO.Core;
     using AO.Core.Components;
     using AO.Core.Logger;
+    using AO.Database.Dao;
+    using AO.Database.Entities;
 
     using LoginEngine.CoreServer;
 
@@ -120,14 +122,14 @@ namespace LoginEngine
             LogUtil.SetupConsoleLogging(LogLevel.Debug);
             LogUtil.SetupFileLogging("${basedir}/LoginEngineLog.txt", LogLevel.Trace);
 
-            
+
 
             SettingsOverride.LoadCustomSettings("NBug.LoginEngine.Config");
             Settings.WriteLogToDisk = true;
             AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
             TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
 
-            
+
 
             Console.Title = "CellAO " + AssemblyInfoclass.Title + " Console. Version: " + AssemblyInfoclass.Description
                             + " " + AssemblyInfoclass.AssemblyVersion + " " + AssemblyInfoclass.Trademark;
@@ -246,7 +248,7 @@ namespace LoginEngine
                         ct.TextRead("loginisnotrunning.txt");
                         break;
 
-                        #region Help Commands....
+                    #region Help Commands....
 
                     case "help":
                         ct.TextRead("logincmdhelp.txt");
@@ -267,7 +269,7 @@ namespace LoginEngine
                         ct.TextRead("logincmdhelpsetpass.txt");
                         break;
 
-                        #endregion
+                    #endregion
 
                     default:
 
@@ -365,42 +367,28 @@ namespace LoginEngine
                                 break;
                             }
 
-                            const string FormatString =
-                                "INSERT INTO `login` (`CreationDate`, `Flags`,`AccountFlags`,`Username`,`Password`,`Allowed_Characters`,`Expansions`, `GM`, `Email`, `FirstName`, `LastName`) VALUES "
-                                + "(NOW(), '0', '0', '{0}', '{1}', {2}, {3}, {4}, '{5}', '{6}', '{7}');";
-
-                            var le = new LoginEncryption();
-
-                            string hashedPassword = le.GeneratePasswordHash(password);
-
-                            string sql = string.Format(
-                                FormatString, 
-                                username, 
-                                hashedPassword, 
-                                numChars, 
-                                expansions, 
-                                gm, 
-                                email, 
-                                firstname, 
-                                lastname);
-                            var sqlWrapper = new SqlWrapper();
+                            DBLoginData login = new DBLoginData
+                                                    {
+                                                        Username=username,
+                                                        AccountFlags = 0,
+                                                        Allowed_Characters = numChars,
+                                                        CreationDate = DateTime.Now,
+                                                        Email = email,
+                                                        Expansions = expansions,
+                                                        FirstName = firstname,
+                                                        LastName = lastname,
+                                                        GM = gm,
+                                                        Flags = 0,
+                                                        Password = new LoginEncryption().GeneratePasswordHash(password)
+                                                    };
                             try
                             {
-                                sqlWrapper.SqlInsert(sql);
+                                LoginDataDao.WriteLoginData(login);
                             }
-                            catch (MySqlException ex)
+                            catch (Exception ex)
                             {
-                                switch (ex.Number)
-                                {
-                                    case 1062: // duplicate entry for key
-                                        Console.WriteLine("A user account with this username already exists.");
-                                        break;
-                                    default:
-                                        Console.WriteLine(
-                                            "An error occured while trying to add a new user account:\n{0}", ex.Message);
-                                        break;
-                                }
-
+                                Console.WriteLine(
+                                    "An error occured while trying to add a new user account:\n{0}", ex.Message);
                                 break;
                             }
 
@@ -453,21 +441,17 @@ namespace LoginEngine
                             string newpass = parts[2];
                             var le = new LoginEncryption();
                             string hashed = le.GeneratePasswordHash(newpass);
-                            string formatString;
-                            formatString = "UPDATE `login` SET Password = '{0}' WHERE login.Username = '{1}'";
 
-                            string sql = string.Format(formatString, hashed, username);
-
-                            var updt = new SqlWrapper();
                             try
                             {
-                                updt.SqlUpdate(sql);
+                                LoginDataDao.WriteNewPassword(
+                                    new DBLoginData { Username = username, Password = hashed });
                             }
-                                
-                                
                                 // yeah this part here, some kind of exception handling for mysql errors
-                            catch
+                            catch (Exception ex)
                             {
+                                Console.WriteLine("Could not set new Password\r\n"+ex.Message);
+                                LogUtil.ErrorException(ex);
                             }
                         }
 

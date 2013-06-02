@@ -274,13 +274,13 @@
     <Content Include="SQLTables\charactersuploadednanos.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SQLTables\characters_stats.sql">
+    <Content Include="SQLTables\stats.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SQLTables\doors.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="SQLTables\Instanced_Items.sql">
+    <Content Include="SQLTables\instanceditems.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SQLTables\itemnames.sql">

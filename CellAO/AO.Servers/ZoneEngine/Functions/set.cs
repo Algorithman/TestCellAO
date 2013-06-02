@@ -101,7 +101,7 @@ namespace ZoneEngine.Functions
             IStats tempTarget = Target;
             if (tempTarget != null)
             {
-                tempTarget.Stats.GetStatbyNumber(statNumber).Set(statValue);
+                tempTarget.Stats[statNumber].Value = statValue;
                 return true;
             }
 

@@ -416,7 +416,7 @@ namespace ZoneEngine.Network
         public void CreateCharacter(int charId)
         {
             this.character = new Character(new Identity { Type = IdentityType.CanbeAffected, Instance = charId }, this);
-            IEnumerable<DBCharacter> daochar = new CharacterDao().GetById(charId);
+            IEnumerable<DBCharacter> daochar = CharacterDao.GetById(charId);
             if (daochar.Count() == 0)
             {
                 throw new Exception("Character " + charId.ToString() + " not found.");
@@ -439,7 +439,7 @@ namespace ZoneEngine.Network
             this.character.Playfield = this.server.PlayfieldById(character.Playfield);
             this.Playfield = this.character.Playfield;
             this.Playfield.Entities.Add(this.character);
-            this.character.Stats.ReadStatsfromSql();
+            this.character.Stats.Read();
         }
 
         /// <summary>

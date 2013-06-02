@@ -54,7 +54,7 @@ namespace ZoneEngine.GameObject.Stats
         public StatCurrentNano(
             int number, uint defaultValue, bool sendBaseValue, bool dontWrite, bool announce)
         {
-            this.StatNumber = number;
+            this.StatId = number;
             this.DefaultValue = defaultValue;
 
             this.BaseValue = this.DefaultValue;
@@ -78,7 +78,7 @@ namespace ZoneEngine.GameObject.Stats
             if ((this.Parent is Character) || (this.Parent is NonPlayerCharacter))
             {
                 Character c = (Character)this.Parent;
-                return (uint)Math.Min(val, c.Stats.MaxNanoEnergy.Value);
+                return (uint)Math.Min(val, c.Stats["MaxNanoEnergy"].Value);
             }
 
             return base.GetMaxValue(val);

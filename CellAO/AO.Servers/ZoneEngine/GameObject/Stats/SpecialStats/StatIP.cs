@@ -56,7 +56,7 @@ namespace ZoneEngine.GameObject.Stats
         public StatIP(
             int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
-            this.StatNumber = number;
+            this.StatId = number;
             this.DefaultValue = defaultValue;
 
             this.BaseValue = this.DefaultValue;
@@ -80,7 +80,7 @@ namespace ZoneEngine.GameObject.Stats
                 int baseIP = 0;
                 int characterLevel;
 
-                characterLevel = (Int32)ch.Stats.Level.BaseValue;
+                characterLevel = (Int32)ch.Stats["Level"].BaseValue;
 
                 // Calculate base IP value for character level
                 if (characterLevel > 204)

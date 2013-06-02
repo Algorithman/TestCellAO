@@ -52,7 +52,7 @@ namespace ZoneEngine.GameObject.Stats
         public StatNanoDelta(
             int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
-            this.StatNumber = number;
+            this.StatId = number;
             this.DefaultValue = defaultValue;
 
             this.BaseValue = this.DefaultValue;
@@ -74,8 +74,8 @@ namespace ZoneEngine.GameObject.Stats
                 // This condition could be obsolete
                 Character character = (Character)this.Parent;
                 uint[] nanodelta = { 3, 3, 4, 2, 12, 15, 20 };
-                uint nanoDelta = nanodelta[character.Stats.Breed.Value - 1]
-                                 + (uint)Math.Floor((double)(character.Stats.NanoEnergyPool.Value / 100));
+                uint nanoDelta = nanodelta[character.Stats["Breed"].Value - 1]
+                                 + (uint)Math.Floor((double)(character.Stats["NanoEnergyPool"].Value / 100));
 
                 // Whats this? TODO: Find the original routine again
                 this.BaseValue = nanoDelta;

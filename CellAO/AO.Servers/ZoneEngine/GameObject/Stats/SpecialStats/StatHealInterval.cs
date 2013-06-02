@@ -56,7 +56,7 @@ namespace ZoneEngine.GameObject.Stats
         public StatHealInterval(
             int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
-            this.StatNumber = number;
+            this.StatId = number;
             this.DefaultValue = defaultValue;
 
             this.BaseValue = this.DefaultValue;
@@ -78,9 +78,9 @@ namespace ZoneEngine.GameObject.Stats
                 Character character = (Character)this.Parent;
 
                 // calculating Nano and Heal Delta and interval
-                int healinterval = 29 - Math.Min(character.Stats.Stamina.Value / 30, 27);
+                int healinterval = 29 - Math.Min(character.Stats["Stamina"].Value / 30, 27);
 
-                character.Stats.HealInterval.BaseValue = (uint)healinterval; // Healinterval
+                character.Stats["HealInterval"].BaseValue = (uint)healinterval; // Healinterval
 
                 /* TODO: Create Timed Queue for this stuff
                  * TODO: Create AOFunctions properly
@@ -89,7 +89,7 @@ namespace ZoneEngine.GameObject.Stats
                 character.AddTimer(0, DateTime.Now + TimeSpan.FromSeconds(healinterval * 1000), aof, true);
                 */
                 int sitBonusInterval = 0;
-                int healDelta = character.Stats.HealDelta.Value;
+                int healDelta = character.Stats["HealDelta"].Value;
                 if (character.MoveMode == MoveModes.Sit)
                 {
                     sitBonusInterval = 1000;

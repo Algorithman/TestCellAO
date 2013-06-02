@@ -97,10 +97,10 @@ namespace ZoneEngine.Network.Packets
 
             lock (character)
             {
-                VisualFlags = character.Stats.VisualFlags.Value;
+                VisualFlags = character.Stats["VisualFlags"].Value;
 
-                socialonly = (character.Stats.VisualFlags.Value & 0x40) > 0;
-                showsocial = (character.Stats.VisualFlags.Value & 0x20) > 0;
+                socialonly = (character.Stats["VisualFlags"].Value & 0x40) > 0;
+                showsocial = (character.Stats["VisualFlags"].Value & 0x20) > 0;
 
                 /*
                 showhelmet = ((character.Stats.VisualFlags.Value & 0x4) > 0);

@@ -32,6 +32,8 @@ namespace LoginEngine.Packets
     using System.Text;
 
     using AO.Core;
+    using AO.Core.Logger;
+    using AO.Database;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
@@ -113,15 +115,8 @@ namespace LoginEngine.Packets
         /// </returns>
         public int CheckAgainstDatabase()
         {
-            var ms = new SqlWrapper();
-            int charCount = 0;
-
-            // TODO:COUNT
-            string sqlQuery = "SELECT count(`ID`) FROM `characters` WHERE Name = " + "'" + this.Name + "'";
-            charCount = ms.SqlCount(sqlQuery);
-
             /* name in use */
-            if (charCount > 0)
+            if (CharacterDao.CharExists(this.Name) > 0)
             {
                 return 0;
             }
@@ -143,8 +138,8 @@ namespace LoginEngine.Packets
                 /* i assume there should be somewhere a flag, caus FC can reenable a deleted char.. */
                 string sqlQuery = "DELETE FROM `characters` WHERE ID = " + charid;
                 ms.SqlDelete(sqlQuery);
-                sqlQuery = "DELETE FROM `characters_stats` WHERE ID = " + charid;
-                ms.SqlDelete(sqlQuery);
+                StatDao.DeleteStats(50000, charid);
+
                 sqlQuery = "DELETE FROM `organizations` WHERE ID = " + charid;
                 ms.SqlDelete(sqlQuery);
                 sqlQuery = "DELETE FROM `inventory` WHERE ID = " + charid;
@@ -201,23 +196,16 @@ namespace LoginEngine.Packets
         /// </param>
         public void SendNameToStartPlayfield(bool startInSL, int charid)
         {
-            var ms = new SqlWrapper();
-
-            /* set startplayfield */
-            string sqlUpdate = "UPDATE `characters` set ";
-
-            if (startInSL)
+            DBCharacter dbCharacter=new DBCharacter{Id=charid,
+            Playfield=4001,X=850,Y=43,Z=565};
+            if (!startInSL)
             {
-                sqlUpdate += "`playfield`=4001,`X`=850,`Y`=43,`Z`=565 ";
+                dbCharacter.Playfield = 4582;
+                dbCharacter.X = 939;
+                dbCharacter.Y = 20;
+                dbCharacter.Z = 732;
             }
-            else
-            {
-                sqlUpdate += "`playfield`=4582,`X`=939,`Y`=20,`Z`=732 ";
-            }
-
-            sqlUpdate += " where `ID` = " + charid;
-
-            ms.SqlUpdate(sqlUpdate);
+            CharacterDao.UpdatePosition(dbCharacter);
         }
 
         #endregion
@@ -230,7 +218,6 @@ namespace LoginEngine.Packets
         /// </returns>
         private int CreateNewChar()
         {
-            var ms = new SqlWrapper();
             int charID = 0;
             switch (this.Breed)
             {
@@ -257,99 +244,82 @@ namespace LoginEngine.Packets
              * usage for default stats that are never changed from their default value
              *           ~NV
              */
-            ms.SqlDelete("DELETE FROM `characters_stats` WHERE ID=" + charID);
-            string sqlInsert = "INSERT INTO `characters` (`Username`,`Name`,`FirstName`,`LastName`,";
-            string sqlValues = "VALUES('" + this.AccountName + "','" + this.Name + "','','',";
-            sqlInsert += "`playfield`,`X`,`Y`,`Z`,`HeadingX`,`HeadingY`,`HeadingZ`,`HeadingW`)";
-            sqlValues += "0,0,0,0,0,0,0,0)";
-            sqlInsert += sqlValues;
-
+            // Delete orphaned stats for charID
+            StatDao.DeleteStats(50000, charID);
             try
             {
-                ms.SqlInsert(sqlInsert);
+                CharacterDao.AddCharacter(new DBCharacter
+                                              {
+                                                  FirstName = "",
+                                                  LastName = "",
+                                                  Name = this.Name,
+                                                  Username = this.AccountName,
+                                              });
             }
             catch (Exception e)
             {
-                Console.WriteLine(sqlInsert + e.Message);
+                LogUtil.ErrorException(e);
                 return 0;
             }
 
             try
             {
                 /* select new char id */
-                string sqlQuery = "SELECT `ID` FROM `characters` WHERE Name = " + "'" + this.Name + "'";
-                DataTable dt = ms.ReadDatatable(sqlQuery);
-
-                foreach (DataRow row in dt.Rows)
-                {
-                    charID = (Int32)row[0];
-                }
+                    charID = CharacterDao.GetByCharName(this.Name).Id;
             }
             catch (Exception e)
             {
-                ms.sqlclose();
-                Console.WriteLine(this.Name + e.Message);
+                LogUtil.ErrorException(e);
                 return 0;
             }
 
-            ms.SqlDelete("DELETE FROM `characters_stats` WHERE ID=" + charID);
-            sqlInsert = "INSERT INTO `characters_stats` (`ID`, `Stat`, `Value`) VALUES ";
-
-            // Flags / 0 (Player) 
-            sqlInsert += "(" + charID + ", 0, " + 20 + "),";
-
-            // Level / 54
-            sqlInsert += "(" + charID + ", 54, " + 1 + "),";
-
-            // HeadMesh / 64
-            sqlInsert += "(" + charID + ", 64, " + this.HeadMesh + "),";
-
-            // MonsterScale / 360
-            sqlInsert += "(" + charID + ", 360, " + this.MonsterScale + "),";
-
-            // Sex / 59
-            sqlInsert += "(" + charID + ", 59, " + this.Gender + "),";
-
-            // VisualSex / 369
-            sqlInsert += "(" + charID + ", 369, " + this.Gender + "),";
-
-            // Breed / 4
-            sqlInsert += "(" + charID + ", 4, " + this.Breed + "),";
-
-            // VisualBreed / 367
-            sqlInsert += "(" + charID + ", 367, " + this.Breed + "),";
-
+            // Flags
+            StatDao.AddStat(50000, charID, 0, 20);
+            // Level
+            StatDao.AddStat(50000, charID, 54, 1);
+            // SEXXX
+            StatDao.AddStat(50000, charID, 59, this.Gender);
+            // Headmesh
+            StatDao.AddStat(50000, charID, 64, this.HeadMesh);
+            // MonsterScale
+            StatDao.AddStat(50000, charID, 360, this.MonsterScale);
+            // Visual Sex (even better ^^)
+            StatDao.AddStat(50000, charID, 369, this.Gender);
+            // Breed
+            StatDao.AddStat(50000, charID, 4, this.Breed);
+            // Visual Breed
+            StatDao.AddStat(50000, charID, 367, this.Breed);
+            
             // Profession / 60
-            sqlInsert += "(" + charID + ", 60, " + this.Profession + "),";
+            StatDao.AddStat(50000, charID, 60, this.Profession);
 
             // VisualProfession / 368
-            sqlInsert += "(" + charID + ", 368, " + this.Profession + "),";
+            StatDao.AddStat(50000, charID, 368, this.Profession);
 
             // Fatness / 47
-            sqlInsert += "(" + charID + ", 47, " + this.Fatness + "),";
+            StatDao.AddStat(50000, charID, 47, this.Fatness);
 
             // Strength / 16
-            sqlInsert += "(" + charID + ", 16, " + this.Abis[0] + "),";
+            StatDao.AddStat(50000, charID, 16, this.Abis[0]);
 
             // Psychic / 21
-            sqlInsert += "(" + charID + ", 21, " + this.Abis[1] + "),";
+            StatDao.AddStat(50000, charID, 21, this.Abis[1]);
 
             // Sense / 20
-            sqlInsert += "(" + charID + ", 20, " + this.Abis[2] + "),";
+            StatDao.AddStat(50000, charID, 20, this.Abis[2]);
 
             // Intelligence / 19
-            sqlInsert += "(" + charID + ", 19, " + this.Abis[3] + "),";
+            StatDao.AddStat(50000, charID, 19, this.Abis[3]);
 
             // Stamina / 18
-            sqlInsert += "(" + charID + ", 18, " + this.Abis[4] + "),";
+            StatDao.AddStat(50000, charID, 18, this.Abis[4]);
 
             // Agility / 17
-            sqlInsert += "(" + charID + ", 17, " + this.Abis[5] + "),";
+            StatDao.AddStat(50000, charID, 17, this.Abis[5]);
 
             // Set HP and NP auf 1
-            sqlInsert += "(" + charID + ",1,1),";
-            sqlInsert += "(" + charID + ",214,1);";
-            ms.SqlInsert(sqlInsert);
+            StatDao.AddStat(50000, charID, 1, 1);
+            StatDao.AddStat(50000, charID, 214, 1);
             return charID;
         }
 

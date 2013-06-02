@@ -870,7 +870,7 @@ namespace ZoneEngine.Network.Packets
             var tuple = new GameTuple<int, uint>
                             {
                                 Value1 = statId, 
-                                Value2 = client.Character.Stats.GetBaseValue(statId)
+                                Value2 = client.Character.Stats[statId].BaseValue
                             };
 
             list.Add(tuple);
@@ -894,7 +894,7 @@ namespace ZoneEngine.Network.Packets
             var tuple = new GameTuple<byte, short>
                             {
                                 Value1 = (byte)statId, 
-                                Value2 = (short)client.Character.Stats.GetBaseValue(statId)
+                                Value2 = (short)client.Character.Stats[statId].BaseValue
                             };
 
             list.Add(tuple);
@@ -918,7 +918,7 @@ namespace ZoneEngine.Network.Packets
             var tuple = new GameTuple<byte, byte>
                             {
                                 Value1 = (byte)statId, 
-                                Value2 = (byte)client.Character.Stats.GetBaseValue(statId)
+                                Value2 = (byte)client.Character.Stats[statId].BaseValue
                             };
 
             list.Add(tuple);

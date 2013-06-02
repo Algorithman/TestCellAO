@@ -65,7 +65,7 @@ namespace AO.Database
             {
                 return
                     conn.Query<DBStats>(
-                        "SELECT Name, FirstName, LastName, Textures0,Textures1,Textures2,Textures3,Textures4,playfield as Playfield, X,Y,Z,HeadingX,HeadingY,HeadingZ,HeadingW FROM characters where id = @id", 
+                        "SELECT Name, FirstName, LastName, Textures0,Textures1,Textures2,Textures3,Textures4,playfield as Playfield, X,Y,Z,HeadingX,HeadingY,HeadingZ,HeadingW FROM characters where id = @id",
                         new { id = characterId });
             }
         }
@@ -86,7 +86,7 @@ namespace AO.Database
             {
                 return
                     conn.Query<DBStats>(
-                        "SELECT statid, statvalue FROM stats where (type=@type AND instance=@instance AND statid=@statId)", 
+                        "SELECT statid, statvalue FROM stats where (type=@type AND instance=@instance AND statid=@statId)",
                         new { type, instance, statId }).First();
             }
         }
@@ -107,5 +107,24 @@ namespace AO.Database
                     "SELECT statid, statvalue FROM stats where (type=@type AND instance=@instance)", new { type, instance });
             }
         }
+
+        public static void DeleteStats(int type, int instance)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                conn.Execute(
+                    "DELETE FROM stats WHERE type=@type AND instance=@instance", new { type, instance });
+            }
+        }
+
+        public static void AddStat(int type, int instance, int num, int value)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                conn.Execute(
+                    "REPLACE INTO stats (type, instance, statid, statvalue) VALUES (@t, @i, @statid, @statvalue)", new { t=type, i=instance, statid = num, statvalue = value });
+            }
+        }
     }
+
 }

@@ -54,9 +54,13 @@
     <Compile Include="Dao\CharacterDao.cs" />
     <Compile Include="Connector.cs" />
     <Compile Include="Dao\InstancedItemDao.cs" />
+    <Compile Include="Dao\OnlineDao.cs" />
+    <Compile Include="Dao\LoginDataDao.cs" />
     <Compile Include="Dao\StatDao.cs" />
     <Compile Include="Entities\DBCharacter.cs" />
     <Compile Include="Entities\DBInstancedItem.cs" />
+    <Compile Include="Entities\DBOnline.cs" />
+    <Compile Include="Entities\DBLoginData.cs" />
     <Compile Include="Entities\DBStats.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

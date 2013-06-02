@@ -31,6 +31,8 @@ namespace LoginEngine.QueryBase
     using System.Data;
 
     using AO.Core;
+    using AO.Database.Dao;
+    using AO.Database.Entities;
 
     #endregion
 
@@ -70,14 +72,8 @@ namespace LoginEngine.QueryBase
         /// </param>
         public void GetLoginFlags(string recvLogin)
         {
-            string sqlQuery = "SELECT Flags FROM login WHERE Username = " + "'" + recvLogin + "'";
-            var ms = new SqlWrapper();
-            DataTable dt = ms.ReadDatatable(sqlQuery);
-
-            foreach (DataRow row in dt.Rows)
-            {
-                this.flagsL = (Int32)row[0];
-            }
+            DBLoginData login = LoginDataDao.GetByUsername(recvLogin);
+            this.flagsL = login.Flags;
         }
 
         #endregion

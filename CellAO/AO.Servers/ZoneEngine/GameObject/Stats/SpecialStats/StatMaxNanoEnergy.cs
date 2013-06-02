@@ -46,7 +46,7 @@ namespace ZoneEngine.GameObject.Stats
         public StatMaxNanoEnergy(
             int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
-            this.StatNumber = number;
+            this.StatId = number;
             this.DefaultValue = defaultValue;
 
             this.BaseValue = this.DefaultValue;
@@ -93,15 +93,15 @@ namespace ZoneEngine.GameObject.Stats
             {
                 // This condition could be obsolete
                 Character character = (Character)this.Parent;
-                uint breed = character.Stats.Breed.BaseValue;
-                uint profession = character.Stats.Profession.BaseValue;
+                uint breed = character.Stats["Breed"].BaseValue;
+                uint profession = character.Stats["Profession"].BaseValue;
                 if (profession > 13)
                 {
                     profession--;
                 }
 
-                uint titleLevel = character.Stats.TitleLevel.BaseValue;
-                uint level = character.Stats.Level.BaseValue;
+                uint titleLevel = character.Stats["TitleLevel"].BaseValue;
+                uint level = character.Stats["Level"].BaseValue;
 
                 // BreedBaseNP+(Level*(TableProfNP+BreedModiNP))+(NanoEnergyPool*BreedMultiNP))
                 if (this.Parent is NonPlayerCharacter)
@@ -110,19 +110,19 @@ namespace ZoneEngine.GameObject.Stats
                     this.Set(
                         (uint)
                         (breedBaseNanoPoints[breed - 1]
-                         + (character.Stats.Level.Value
+                         + (character.Stats["Level"].Value
                             * (tableProfessionNanoPoints[6, 8] + breedModificatorNanoPoints[breed - 1]))
-                         + (character.Stats.NanoEnergyPool.Value * breedMultiplicatorNanoPoints[breed - 1])));
+                         + (character.Stats["NanoEnergyPool"].Value * breedMultiplicatorNanoPoints[breed - 1])));
                 }
                 else
                 {
                     this.Set(
                         (uint)
                         (breedBaseNanoPoints[breed - 1]
-                         + (character.Stats.Level.Value
+                         + (character.Stats["Level"].Value
                             * (tableProfessionNanoPoints[titleLevel - 1, profession - 1]
                                + breedModificatorNanoPoints[breed - 1]))
-                         + (character.Stats.NanoEnergyPool.Value * breedMultiplicatorNanoPoints[breed - 1])));
+                         + (character.Stats["NanoEnergyPool"].Value * breedMultiplicatorNanoPoints[breed - 1])));
                 }
             }
 

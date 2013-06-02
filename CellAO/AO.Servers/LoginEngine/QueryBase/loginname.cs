@@ -30,6 +30,8 @@ namespace LoginEngine.QueryBase
     using System.Data;
 
     using AO.Core;
+    using AO.Database.Dao;
+    using AO.Database.Entities;
 
     #endregion
 
@@ -67,14 +69,7 @@ namespace LoginEngine.QueryBase
         /// </param>
         public void GetLoginName(string recvLogin)
         {
-            string SqlQuery = "SELECT Username FROM login WHERE Username = " + "'" + recvLogin + "'";
-            var ms = new SqlWrapper();
-            DataTable dt = ms.ReadDatatable(SqlQuery);
-
-            foreach (DataRow row in dt.Rows)
-            {
-                this.loginN = (string)row[0];
-            }
+            this.loginN = LoginDataDao.GetByUsername(recvLogin).Username;
         }
 
         #endregion

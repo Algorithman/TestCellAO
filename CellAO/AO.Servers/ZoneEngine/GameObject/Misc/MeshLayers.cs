@@ -238,7 +238,7 @@ namespace ZoneEngine.GameObject.Misc
                 meshs = character.MeshLayer.GetMeshs();
                 socials = character.SocialMeshLayer.GetMeshs();
 
-                int visualFlags = character.Stats.VisualFlags.Value;
+                int visualFlags = character.Stats["VisualFlags"].Value;
                 rightPadVisible = (visualFlags & 0x1) > 0;
                 leftPadVisible = (visualFlags & 0x2) > 0;
                 bool showHelmet = (visualFlags & 0x4) > 0;
@@ -251,7 +251,7 @@ namespace ZoneEngine.GameObject.Misc
                     {
                         // Helmet there?
                         // This probably needs to be looked at (glasses/visors)
-                        if (meshs.ElementAt(0).Mesh != character.Stats.HeadMesh.BaseValue)
+                        if (meshs.ElementAt(0).Mesh != character.Stats["HeadMesh"].BaseValue)
                         {
                             // Dont remove the head :)
                             meshs.RemoveAt(0);
@@ -262,7 +262,7 @@ namespace ZoneEngine.GameObject.Misc
                     {
                         // Helmet there?
                         // This probably needs to be looked at (glasses/visors)
-                        if (socials.ElementAt(0).Mesh != character.Stats.HeadMesh.BaseValue)
+                        if (socials.ElementAt(0).Mesh != character.Stats["HeadMesh"].BaseValue)
                         {
                             // Dont remove the head :)
                             socials.RemoveAt(0);
@@ -353,7 +353,7 @@ namespace ZoneEngine.GameObject.Misc
                         // Compare layer only when both slots are set
                         if (cloth.Position == 0)
                         {
-                            if (social.Mesh != character.Stats.HeadMesh.BaseValue)
+                            if (social.Mesh != character.Stats["HeadMesh"].BaseValue)
                             {
                                 cloth = social;
                             }

@@ -29,6 +29,8 @@ namespace AO.Database
     /// </summary>
     public class DBCharacter
     {
+        public int Id { get; set; }
+        public string Username { get; set; }
         /// <summary>
         /// </summary>
         public string Name { get; set; }

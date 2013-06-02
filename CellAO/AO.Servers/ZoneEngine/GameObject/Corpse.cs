@@ -118,6 +118,7 @@ namespace ZoneEngine.GameObject
             // TODO: get correct Iplayfield and set it
             // this.playfield = new Identity();
             this.identity = new Identity();
+            this.stats = new StatelStats();
         }
 
         public IList<Item> Inventory { get; private set; }
@@ -146,38 +147,23 @@ namespace ZoneEngine.GameObject
             }
         }
 
-        /// <summary>
-        /// </summary>
-        public DynelStats Stats { get; private set; }
+        private IStatList stats;
 
         /// <summary>
         /// </summary>
-        /// <param name="aof">
-        /// </param>
-        /// <param name="checkAll">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public bool CheckRequirements(Functions aof, bool checkAll)
+        public IStatList Stats
         {
-            throw new NotImplementedException();
+            get
+            {
+                return this.stats;
+            }
+            private set
+            {
+                this.stats = value;
+            }
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="ch">
-        /// </param>
-        /// <param name="aof">
-        /// </param>
-        /// <param name="checkAll">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public bool CheckRequirements(IStats ch, Functions aof, bool checkAll)
+        public bool CheckRequirements(Functions aof, bool checkAll)
         {
             throw new NotImplementedException();
         }

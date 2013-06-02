@@ -126,7 +126,7 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        public DynelStats Stats { get; private set; }
+        public IStatList Stats { get; private set; }
 
         /// <summary>
         /// </summary>

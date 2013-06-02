@@ -45,7 +45,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         public StatHealth(int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
-            this.StatNumber = number;
+            this.StatId = number;
             this.DefaultValue = defaultValue;
 
             this.BaseValue = this.DefaultValue;
@@ -89,32 +89,32 @@ namespace ZoneEngine.GameObject.Stats
             {
                 // This condition could be obsolete
                 Character character = (Character)this.Parent;
-                uint breed = character.Stats.Breed.BaseValue;
-                uint profession = character.Stats.Profession.BaseValue;
+                uint breed = character.Stats["Breed"].BaseValue;
+                uint profession = character.Stats["Profession"].BaseValue;
                 if (profession > 13)
                 {
                     profession--;
                 }
 
-                uint titleLevel = character.Stats.TitleLevel.BaseValue;
-                uint level = character.Stats.Level.BaseValue;
+                uint titleLevel = character.Stats["TitleLevel"].BaseValue;
+                uint level = character.Stats["Level"].BaseValue;
 
                 // BreedBaseHP+(Level*(TableProfHP+BreedModiHP))+(BodyDevelopment*BreedMultiHP))
                 if (this.Parent is NonPlayerCharacter)
                 {
                     // TODO: correct calculation of mob HP
                     Set(
-                        breedBaseHitPoints[breed - 1] + (character.Stats.Level.Value * tableProfessionHitPoints[6, 8])
-                        + (character.Stats.BodyDevelopment.Value + breedMultiplicatorHitPoints[breed - 1]));
+                        breedBaseHitPoints[breed - 1] + (character.Stats["Level"].Value * tableProfessionHitPoints[6, 8])
+                        + (character.Stats["BodyDevelopment"].Value + breedMultiplicatorHitPoints[breed - 1]));
                 }
                 else
                 {
                     Set(
                         breedBaseHitPoints[breed - 1]
-                        + (character.Stats.Level.Value
+                        + (character.Stats["Level"].Value
                            * (tableProfessionHitPoints[titleLevel - 1, profession - 1]
                               + breedModificatorHitPoints[breed - 1]))
-                        + (character.Stats.BodyDevelopment.Value * breedMultiplicatorHitPoints[breed - 1]));
+                        + (character.Stats["BodyDevelopment"].Value * breedMultiplicatorHitPoints[breed - 1]));
                 }
 
                 // ch.Stats.Health.StatBaseValue = (UInt32)Math.Min(ch.Stats.Health.Value, StatBaseValue);

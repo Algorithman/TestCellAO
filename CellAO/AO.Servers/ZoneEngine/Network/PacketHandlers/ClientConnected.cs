@@ -94,7 +94,7 @@ namespace ZoneEngine.PacketHandlers
             client.Playfield.SendSCFUsToClient(sendSCFUs);
 
             /* set SocialStatus to 0 */
-            client.Character.Stats.SetBaseValue(521, 0);
+            client.Character.Stats[521].BaseValue = 0;
             Stat.Send(client, 521, 0, false);
 
             var identity = new Identity { Type = IdentityType.CanbeAffected, Instance = charID };

@@ -79,5 +79,23 @@ namespace ZoneEngine.GameObject.Stats
                 return this.statList[index];
             }
         }
+
+        /// <summary>
+        /// Nothing to do here, they're always 0
+        /// </summary>
+        public void ClearModifiers()
+        {
+            return;
+        }
+
+        public bool Read()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public bool Write()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

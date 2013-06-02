@@ -182,7 +182,7 @@ namespace ZoneEngine.Network.Packets
             var toPlayfield = new List<int>();
             foreach (KeyValuePair<int, uint> keyValuePair in statsToUpdate)
             {
-                if (ch.Stats.GetStatbyNumber(keyValuePair.Key).AnnounceToPlayfield)
+                if (ch.Stats[keyValuePair.Key].AnnounceToPlayfield)
                 {
                     toPlayfield.Add(keyValuePair.Key);
                 }
@@ -229,7 +229,7 @@ namespace ZoneEngine.Network.Packets
             var toPlayfieldIds = new List<int>();
             foreach (KeyValuePair<int, uint> keyValuePair in statsToUpdate)
             {
-                if (client.Character.Stats.GetStatbyNumber(keyValuePair.Key).AnnounceToPlayfield)
+                if (client.Character.Stats[keyValuePair.Key].AnnounceToPlayfield)
                 {
                     toPlayfieldIds.Add(keyValuePair.Key);
                 }
@@ -285,7 +285,7 @@ namespace ZoneEngine.Network.Packets
         /// </returns>
         public static uint Set(Client client, int stat, uint value, bool announce)
         {
-            var oldValue = (uint)client.Character.Stats.StatValueByName(stat);
+            var oldValue = (uint)client.Character.Stats[stat].Value;
             Send(client, stat, value, announce);
             return oldValue;
         }

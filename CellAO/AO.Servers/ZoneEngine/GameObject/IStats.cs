@@ -47,7 +47,7 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        DynelStats Stats { get; }
+        IStatList Stats { get; }
 
         /// <summary>
         /// </summary>
@@ -69,12 +69,12 @@ namespace ZoneEngine.GameObject
     {
         /// <summary>
         /// </summary>
-        public DynelStats Stats
+        public IStatList Stats
         {
             get
             {
                 Contract.Ensures(this.Stats != null);
-                return default(DynelStats);
+                return default(IStatList);
             }
 
             private set

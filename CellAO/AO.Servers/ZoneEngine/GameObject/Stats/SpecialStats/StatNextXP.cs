@@ -52,7 +52,7 @@ namespace ZoneEngine.GameObject.Stats
         public StatNextXP(
             int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
-            this.StatNumber = number;
+            this.StatId = number;
             this.DefaultValue = defaultValue;
 
             this.BaseValue = this.DefaultValue;
@@ -71,7 +71,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             get
             {
-                int level = this.Parent.Stats.Level.Value;
+                int level = this.Parent.Stats["Level"].Value;
                 if (level >= 200)
                 {
                     return 0;

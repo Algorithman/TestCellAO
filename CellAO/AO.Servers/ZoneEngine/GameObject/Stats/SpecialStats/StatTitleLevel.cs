@@ -45,7 +45,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         public StatTitleLevel(int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
-            this.StatNumber = number;
+            this.StatId = number;
             this.DefaultValue = defaultValue;
 
             this.BaseValue = this.DefaultValue;
@@ -66,7 +66,7 @@ namespace ZoneEngine.GameObject.Stats
             {
                 // This condition could be obsolete
                 Character character = (Character)this.Parent;
-                int level = character.Stats.Level.Value;
+                int level = character.Stats["Level"].Value;
 
                 if (level >= 205)
                 {

@@ -54,7 +54,7 @@ namespace ZoneEngine.GameObject.Stats
         public StatAlienNextXP(
             int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
-            this.StatNumber = number;
+            this.StatId = number;
             this.DefaultValue = defaultValue;
 
             this.BaseValue = this.DefaultValue;
@@ -73,7 +73,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             get
             {
-                int level = this.Parent.Stats.AlienLevel.Value;
+                int level = this.Parent.Stats["AlienLevel"].Value;
                 return Convert.ToInt32(XPTable.TableAlienXP[level, 2]);
             }
 
