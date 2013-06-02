@@ -33,7 +33,7 @@ namespace ZoneEngine.GameObject.Stats
 
     /// <summary>
     /// </summary>
-    public class StatNanoDelta : ClassStat
+    public class StatNanoDelta : DynelStat
     {
         #region Constructors and Destructors
 
@@ -43,8 +43,6 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         /// <param name="defaultValue">
         /// </param>
-        /// <param name="name">
-        /// </param>
         /// <param name="sendBaseValue">
         /// </param>
         /// <param name="doNotWrite">
@@ -52,15 +50,15 @@ namespace ZoneEngine.GameObject.Stats
         /// <param name="announceToPlayfield">
         /// </param>
         public StatNanoDelta(
-            int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
+            int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
             this.StatNumber = number;
-            this.StatDefaultValue = (uint)defaultValue;
+            this.DefaultValue = defaultValue;
 
-            this.StatBaseValue = this.StatDefaultValue;
-            this.SendBaseValue = true;
-            this.DoNotDontWriteToSql = false;
-            this.AnnounceToPlayfield = false;
+            this.BaseValue = this.DefaultValue;
+            this.SendBaseValue = sendBaseValue;
+            this.DoNotDontWriteToSql = doNotWrite;
+            this.AnnounceToPlayfield = announceToPlayfield;
         }
 
         #endregion
@@ -80,7 +78,7 @@ namespace ZoneEngine.GameObject.Stats
                                  + (uint)Math.Floor((double)(character.Stats.NanoEnergyPool.Value / 100));
 
                 // Whats this? TODO: Find the original routine again
-                this.StatBaseValue = nanoDelta;
+                this.BaseValue = nanoDelta;
 
                 if (!this.Parent.Starting)
                 {

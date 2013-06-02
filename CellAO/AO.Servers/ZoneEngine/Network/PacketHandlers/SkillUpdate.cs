@@ -68,10 +68,10 @@ namespace ZoneEngine.Network.PacketHandlers
             int[] breedMultiplicatorHitPoints = { 3, 3, 2, 4 };
             int[] breedModificatorHitPoints = { 0, -1, -1, 0 };
 
-            uint breed = dynel.Stats.Breed.StatBaseValue;
-            uint profession = dynel.Stats.Profession.StatBaseValue;
-            uint titlelevel = dynel.Stats.TitleLevel.StatBaseValue;
-            uint level = dynel.Stats.Level.StatBaseValue;
+            uint breed = dynel.Stats.Breed.BaseValue;
+            uint profession = dynel.Stats.Profession.BaseValue;
+            uint titlelevel = dynel.Stats.TitleLevel.BaseValue;
+            uint level = dynel.Stats.Level.BaseValue;
 
             // BreedBaseHP+(Level*(TableProfHP+BreedModiHP))+(BodyDevelopment*BreedMultiHP))
             return
@@ -91,8 +91,8 @@ namespace ZoneEngine.Network.PacketHandlers
         public static double CalculateIP(Dynel dynel)
         {
             double calc = 0;
-            uint breed = dynel.Stats.Breed.StatBaseValue; // 4 = Breed
-            uint profession = dynel.Stats.Profession.StatBaseValue - 1; // 60 = Profession
+            uint breed = dynel.Stats.Breed.BaseValue; // 4 = Breed
+            uint profession = dynel.Stats.Profession.BaseValue - 1; // 60 = Profession
 
             double[,] skillCosts =
                 {
@@ -235,10 +235,10 @@ namespace ZoneEngine.Network.PacketHandlers
             int[] breedMultiplicatorNanoPoints = { 3, 3, 4, 2 };
             int[] breedModificatorNanoPoints = { 0, -1, 1, -2 };
 
-            uint breed = dynel.Stats.Breed.StatBaseValue;
-            uint profession = dynel.Stats.Profession.StatBaseValue;
-            uint titleLevel = dynel.Stats.TitleLevel.StatBaseValue;
-            uint level = dynel.Stats.Level.StatBaseValue;
+            uint breed = dynel.Stats.Breed.BaseValue;
+            uint profession = dynel.Stats.Profession.BaseValue;
+            uint titleLevel = dynel.Stats.TitleLevel.BaseValue;
+            uint level = dynel.Stats.Level.BaseValue;
 
             // BreedBaseNP+(Level*(TableProfNP+BreedModiNP))+(NanoEnergyPool*BreedMultiNP))
             return

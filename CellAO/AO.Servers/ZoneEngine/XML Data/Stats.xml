@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Stats>
   <Stat id="0" Name="Flags">
     <FullName />
@@ -884,7 +884,7 @@
     <FullName />
     <Default>0</Default>
   </Stat>
-  <Stat id="221" Name="MaxNanoEnergy">
+  <Stat id="221" Name="maxMaxNanoEnergyEnergy">
     <FullName />
     <Default>1</Default>
   </Stat>

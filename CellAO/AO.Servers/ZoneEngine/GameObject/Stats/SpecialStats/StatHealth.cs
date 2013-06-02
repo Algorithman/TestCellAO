@@ -27,7 +27,7 @@ namespace ZoneEngine.GameObject.Stats
 {
     /// <summary>
     /// </summary>
-    public class StatHealth : ClassStat
+    public class StatHealth : DynelStat
     {
         #region Constructors and Destructors
 
@@ -37,21 +37,18 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         /// <param name="defaultValue">
         /// </param>
-        /// <param name="name">
-        /// </param>
         /// <param name="sendBaseValue">
         /// </param>
         /// <param name="doNotWrite">
         /// </param>
         /// <param name="announceToPlayfield">
         /// </param>
-        public StatHealth(
-            int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
+        public StatHealth(int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
             this.StatNumber = number;
-            this.StatDefaultValue = (uint)defaultValue;
+            this.DefaultValue = defaultValue;
 
-            this.StatBaseValue = this.StatDefaultValue;
+            this.BaseValue = this.DefaultValue;
             this.SendBaseValue = sendBaseValue;
             this.DoNotDontWriteToSql = doNotWrite;
             this.AnnounceToPlayfield = announceToPlayfield;
@@ -92,15 +89,15 @@ namespace ZoneEngine.GameObject.Stats
             {
                 // This condition could be obsolete
                 Character character = (Character)this.Parent;
-                uint breed = character.Stats.Breed.StatBaseValue;
-                uint profession = character.Stats.Profession.StatBaseValue;
+                uint breed = character.Stats.Breed.BaseValue;
+                uint profession = character.Stats.Profession.BaseValue;
                 if (profession > 13)
                 {
                     profession--;
                 }
 
-                uint titleLevel = character.Stats.TitleLevel.StatBaseValue;
-                uint level = character.Stats.Level.StatBaseValue;
+                uint titleLevel = character.Stats.TitleLevel.BaseValue;
+                uint level = character.Stats.Level.BaseValue;
 
                 // BreedBaseHP+(Level*(TableProfHP+BreedModiHP))+(BodyDevelopment*BreedMultiHP))
                 if (this.Parent is NonPlayerCharacter)

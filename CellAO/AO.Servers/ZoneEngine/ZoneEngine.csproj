@@ -115,6 +115,7 @@
     <Compile Include="Functions\set.cs" />
     <Compile Include="GameObject\Enums\Expansions.cs" />
     <Compile Include="GameObject\IDatabaseObject.cs" />
+    <Compile Include="GameObject\Stats\DynelStats.cs" />
     <Compile Include="GameObject\Stats\IStatList.cs" />
     <Compile Include="GameObject\ITargetingEntity.cs" />
     <Compile Include="GameObject\Items\Actions.cs" />
@@ -187,7 +188,7 @@
     <Compile Include="GameObject\ISummoner.cs" />
     <Compile Include="GameObject\NonPlayerCharacter.cs" />
     <Compile Include="GameObject\Pet.cs" />
-    <Compile Include="GameObject\Stats\ClassStat.cs" />
+    <Compile Include="GameObject\Stats\DynelStat.cs" />
     <Compile Include="GameObject\Stats\SkillTrickleTable.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\StatAlienNextXP.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\StatHealDelta.cs" />
@@ -195,11 +196,10 @@
     <Compile Include="GameObject\Stats\SpecialStats\StatHealth.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\StatHitPoints.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\StatIP.cs" />
-    <Compile Include="GameObject\Stats\SpecialStats\StatLevel.cs" />
-    <Compile Include="GameObject\Stats\SpecialStats\StatNano.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatMaxNanoEnergy.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\StatNanoDelta.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\StatNanoInterval.cs" />
-    <Compile Include="GameObject\Stats\SpecialStats\StatNanoPoints.cs" />
+    <Compile Include="GameObject\Stats\SpecialStats\StatCurrentNano.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\StatNextSK.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\StatNextXP.cs" />
     <Compile Include="GameObject\Stats\SpecialStats\StatSkill.cs" />

@@ -810,7 +810,7 @@ namespace ZoneEngine.Network.Packets
             /* CurrentNano */
             AddStat816(client, stats4, 214);
 
-            /* MaxNanoEnergy */
+            /* maxMaxNanoEnergyEnergy */
             AddStat816(client, stats4, 221);
 
             /* MaxNCU */

@@ -35,7 +35,7 @@ namespace ZoneEngine.GameObject.Stats
 
     /// <summary>
     /// </summary>
-    public class StatNanoInterval : ClassStat
+    public class StatNanoInterval : DynelStat
     {
         #region Constructors and Destructors
 
@@ -54,15 +54,15 @@ namespace ZoneEngine.GameObject.Stats
         /// <param name="announceToPlayfield">
         /// </param>
         public StatNanoInterval(
-            int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
+            int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
             this.StatNumber = number;
-            this.StatDefaultValue = (uint)defaultValue;
+            this.DefaultValue = defaultValue;
 
-            this.StatBaseValue = this.StatDefaultValue;
-            this.SendBaseValue = true;
-            this.DoNotDontWriteToSql = false;
-            this.AnnounceToPlayfield = false;
+            this.BaseValue = this.DefaultValue;
+            this.SendBaseValue = sendBaseValue;
+            this.DoNotDontWriteToSql = doNotWrite;
+            this.AnnounceToPlayfield = announceToPlayfield;
         }
 
         #endregion
@@ -81,7 +81,7 @@ namespace ZoneEngine.GameObject.Stats
                 int nanoInterval = 28
                                    - (Math.Min(
                                        (int)Math.Floor(Convert.ToDouble(character.Stats.Psychic.Value) / 60), 13) * 2);
-                character.Stats.NanoInterval.StatBaseValue = (uint)nanoInterval; // Healinterval
+                character.Stats.NanoInterval.BaseValue = (uint)nanoInterval; // Healinterval
 
                 /* TODO Add Proper Timers w/e is in the other file too
                 character.PurgeTimer(1);

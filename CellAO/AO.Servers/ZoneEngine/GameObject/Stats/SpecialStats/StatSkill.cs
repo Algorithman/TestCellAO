@@ -32,8 +32,9 @@ namespace ZoneEngine.GameObject.Stats
     #endregion
 
     /// <summary>
+    /// Combining all Skills (MM/BM/1HE etc pp)
     /// </summary>
-    public class StatSkill : ClassStat
+    public class StatSkill : DynelStat
     {
         #region Constructors and Destructors
 
@@ -43,8 +44,6 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         /// <param name="defaultValue">
         /// </param>
-        /// <param name="name">
-        /// </param>
         /// <param name="sendBaseValue">
         /// </param>
         /// <param name="doNotWrite">
@@ -52,15 +51,15 @@ namespace ZoneEngine.GameObject.Stats
         /// <param name="announceToPlayfield">
         /// </param>
         public StatSkill(
-            int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
+            int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
             this.StatNumber = number;
-            this.StatDefaultValue = (uint)defaultValue;
+            this.DefaultValue = defaultValue;
 
-            this.StatBaseValue = this.StatDefaultValue;
-            this.SendBaseValue = true;
-            this.DoNotDontWriteToSql = false;
-            this.AnnounceToPlayfield = false;
+            this.BaseValue = this.DefaultValue;
+            this.SendBaseValue = sendBaseValue;
+            this.DoNotDontWriteToSql = doNotWrite;
+            this.AnnounceToPlayfield = announceToPlayfield;
         }
 
         #endregion

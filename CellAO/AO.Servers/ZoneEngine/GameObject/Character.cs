@@ -372,8 +372,8 @@ namespace ZoneEngine.GameObject
                 this.stats.Sense.AffectStats();
                 this.stats.Psychic.AffectStats();
 
-                this.stats.Health.StatBaseValue = this.stats.Health.GetMaxValue((uint)oldhealth);
-                this.stats.CurrentNano.StatBaseValue = this.stats.CurrentNano.GetMaxValue((uint)oldnano);
+                this.stats.Health.BaseValue = this.stats.Health.GetMaxValue((uint)oldhealth);
+                this.stats.CurrentNano.BaseValue = this.stats.CurrentNano.GetMaxValue((uint)oldnano);
             }
         }
 

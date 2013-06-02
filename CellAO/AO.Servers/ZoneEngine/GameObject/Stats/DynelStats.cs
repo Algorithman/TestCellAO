@@ -30,490 +30,11 @@ namespace ZoneEngine.GameObject.Stats
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
-    using System.Linq;
 
     using AO.Core;
-
     using AO.Database;
 
     using ZoneEngine.Network.Packets;
-
-    #endregion
-
-    #region StatChangedEventArgs
-
-    /// <summary>
-    /// Event Arguments for changed stats
-    /// </summary>
-    public class StatChangedEventArgs : EventArgs
-    {
-        #region Constructors and Destructors
-
-        /// <summary>
-        /// </summary>
-        /// <param name="changedStat">
-        /// </param>
-        /// <param name="valueBeforeChange">
-        /// </param>
-        /// <param name="valueAfterChange">
-        /// </param>
-        /// <param name="announceToPlayfield">
-        /// </param>
-        public StatChangedEventArgs(
-            ClassStat changedStat, uint valueBeforeChange, uint valueAfterChange, bool announceToPlayfield)
-        {
-            this.Stat = changedStat;
-            this.OldValue = valueBeforeChange;
-            this.NewValue = valueAfterChange;
-            this.AnnounceToPlayfield = announceToPlayfield;
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        /// <summary>
-        /// </summary>
-        public bool AnnounceToPlayfield { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public uint NewValue { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public uint OldValue { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public Dynel Parent
-        {
-            get
-            {
-                return this.Stat.Parent;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public ClassStat Stat { get; private set; }
-
-        #endregion
-    }
-
-    #endregion
-
-    #region ClassStat  class for one stat
-
-    /// <summary>
-    /// </summary>
-    public class ClassStat
-    {
-        #region Fields
-
-        /// <summary>
-        /// </summary>
-        private readonly List<int> affects = new List<int>();
-
-        /// <summary>
-        /// </summary>
-        private bool announceToPlayfield = true;
-
-        /// <summary>
-        /// </summary>
-        private bool sendBaseValue = true;
-
-        /// <summary>
-        /// </summary>
-        private int statPercentageModifier = 100; // From Items/Perks/Nanos
-
-        #endregion
-
-        #region Constructors and Destructors
-
-        /// <summary>
-        /// </summary>
-        /// <param name="number">
-        /// </param>
-        /// <param name="defaultValue">
-        /// </param>
-        /// <param name="name">
-        /// </param>
-        /// <param name="sendBaseValue">
-        /// </param>
-        /// <param name="dontWrite">
-        /// </param>
-        /// <param name="announceToPlayfield">
-        /// </param>
-        public ClassStat(
-            int number, uint defaultValue, string name, bool sendBaseValue, bool dontWrite, bool announceToPlayfield)
-        {
-            this.DoNotDontWriteToSql = true;
-            this.StatNumber = number;
-            this.StatDefaultValue = defaultValue;
-            this.StatBaseValue = defaultValue;
-            this.StatDefaultValue = defaultValue;
-            this.sendBaseValue = sendBaseValue;
-            this.DoNotDontWriteToSql = dontWrite;
-            this.announceToPlayfield = announceToPlayfield;
-
-            // Obsolete            StatName = name;
-        }
-
-        /// <summary>
-        /// </summary>
-        public ClassStat()
-        {
-        }
-
-        #endregion
-
-        #region Public Events
-
-        /// <summary>
-        /// </summary>
-        public event EventHandler<StatChangedEventArgs> RaiseAfterStatChangedEvent;
-
-        /// <summary>
-        /// </summary>
-        public event EventHandler<StatChangedEventArgs> RaiseBeforeStatChangedEvent;
-
-        #endregion
-
-        #region Public Properties
-
-        /// <summary>
-        /// </summary>
-        public List<int> Affects
-        {
-            get
-            {
-                return this.affects;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public bool AnnounceToPlayfield
-        {
-            get
-            {
-                return this.announceToPlayfield;
-            }
-
-            set
-            {
-                this.announceToPlayfield = value;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public bool Changed { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public bool DoNotDontWriteToSql { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public Dynel Parent { get; private set; }
-
-        /// <summary>
-        /// </summary>
-        public bool SendBaseValue
-        {
-            get
-            {
-                return this.sendBaseValue;
-            }
-
-            set
-            {
-                this.sendBaseValue = value;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        private uint statBaseValue;
-
-        /// <summary>
-        /// </summary>
-        public uint StatBaseValue
-        {
-            get
-            {
-                return this.statBaseValue;
-            }
-
-            set
-            {
-                bool sendit = value != this.statBaseValue;
-                this.statBaseValue = value;
-                if (sendit)
-                {
-                    Stat.Send(this.Parent, this.StatNumber, value, this.announceToPlayfield);
-                }
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public uint StatDefaultValue { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int StatModifier { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int StatNumber { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public int StatPercentageModifier
-        {
-            get
-            {
-                return this.statPercentageModifier;
-            }
-
-            set
-            {
-                this.statPercentageModifier = value;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        public int Trickle { get; set; }
-
-        /// <summary>
-        /// </summary>
-        public virtual int Value
-        {
-            get
-            {
-                return (int)Math.Floor(
-                    (double) // ReSharper disable PossibleLossOfFraction
-                    ((this.StatBaseValue + this.StatModifier + this.Trickle) * this.statPercentageModifier / 100));
-
-                // ReSharper restore PossibleLossOfFraction
-            }
-
-            set
-            {
-                this.Set(value);
-            }
-        }
-
-        #endregion
-
-        #region Public Methods and Operators
-
-        /// <summary>
-        /// </summary>
-        public void AffectStats()
-        {
-            if (!(this.Parent is Character) && !(this.Parent is NonPlayerCharacter))
-            {
-                return;
-            }
-
-            foreach (int c in this.affects)
-            {
-                this.Parent.Stats.GetStatbyNumber(c).CalcTrickle();
-            }
-        }
-
-        /// <summary>
-        /// Calculate trickle value (prototype)
-        /// </summary>
-        public virtual void CalcTrickle()
-        {
-            if (!this.Parent.Starting)
-            {
-                this.AffectStats();
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="val">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        public virtual uint GetMaxValue(uint val)
-        {
-            return val;
-        }
-
-        /// <summary>
-        /// Read stat from Sql
-        /// </summary>
-        public void ReadStatFromSql()
-        {
-            if (this.DoNotDontWriteToSql)
-            {
-                return;
-            }
-
-            int id = this.Parent.Identity.Instance;
-            int type = (int)this.Parent.Identity.Type;
-
-            this.StatBaseValue = (uint)StatDao.GetById(type, id, this.StatNumber).statvalue;
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="value">
-        /// </param>
-        public void Set(uint value)
-        {
-            if ((this.Parent == null) || this.Parent.Starting)
-            {
-                this.StatBaseValue = value;
-                return;
-            }
-
-            if (value != this.StatBaseValue)
-            {
-                uint oldvalue = (uint)this.Value;
-                uint max = this.GetMaxValue(value);
-                this.OnBeforeStatChangedEvent(new StatChangedEventArgs(this, oldvalue, max, this.announceToPlayfield));
-                this.StatBaseValue = max;
-                this.OnAfterStatChangedEvent(new StatChangedEventArgs(this, oldvalue, max, this.announceToPlayfield));
-                this.Changed = true;
-                this.WriteStatToSql();
-
-                if (!this.Parent.Starting)
-                {
-                    this.AffectStats();
-                }
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="value">
-        /// </param>
-        public void Set(int value)
-        {
-            this.Set((uint)value);
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="parent">
-        /// </param>
-        public void SetParent(Dynel parent)
-        {
-            this.Parent = parent;
-        }
-
-        /// <summary>
-        /// Write Stat to Sql
-        /// </summary>
-        public void WriteStatToSql()
-        {
-            if (this.DoNotDontWriteToSql)
-            {
-                return;
-            }
-
-            int id = this.Parent.Identity.Instance;
-            SqlWrapper sql = new SqlWrapper();
-            if (this.Changed)
-            {
-                /* TODO: REDO
-                if (this.Parent is NonPlayerCharacter)
-                {
-                sql.SqlInsert(
-                "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() +
-                "_stats (ID, Playfield, Stat, Value) VALUES (" + id + "," + this.Parent.PlayField + "," +
-                this.StatNumber + "," + ((Int32)this.StatBaseValue) + ") ON DUPLICATE KEY UPDATE Value=" +
-                ((Int32)this.StatBaseValue) + ";");
-                }
-                else
-                {
-                sql.SqlInsert(
-                "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() + "_stats (ID, Stat, Value) VALUES (" +
-                id + "," + this.StatNumber + "," + ((Int32)this.StatBaseValue) +
-                ") ON DUPLICATE KEY UPDATE Value=" + ((Int32)this.StatBaseValue) + ";");
-                }
-                */
-            }
-        }
-
-        /// <summary>
-        /// Write Stat to Sql
-        /// </summary>
-        /// <param name="doit">
-        /// </param>
-        public void WriteStatToSql(bool doit)
-        {
-            if (this.DoNotDontWriteToSql)
-            {
-                return;
-            }
-
-            int id = this.Parent.Identity.Instance;
-            SqlWrapper sql = new SqlWrapper();
-            if (doit)
-            {
-                /* TODO: REDO
-                if (this.Parent is NonPlayerCharacter)
-                {
-                sql.SqlInsert(
-                "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() +
-                "_stats (ID, Playfield, Stat, Value) VALUES (" + id + "," + this.Parent.PlayField + "," +
-                this.StatNumber + "," + ((Int32)this.StatBaseValue) + ") ON DUPLICATE KEY UPDATE Value=" +
-                ((Int32)this.StatBaseValue) + ";");
-                }
-                else
-                {
-                sql.SqlInsert(
-                "INSERT INTO " + (this.Parent).GetSqlTablefromDynelType() + "_stats (ID, Stat, Value) VALUES (" +
-                id + "," + this.StatNumber + "," + ((Int32)this.StatBaseValue) +
-                ") ON DUPLICATE KEY UPDATE Value=" + ((Int32)this.StatBaseValue) + ";");
-                }
-                */
-            }
-        }
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// </summary>
-        /// <param name="e">
-        /// </param>
-        private void OnAfterStatChangedEvent(StatChangedEventArgs e)
-        {
-            EventHandler<StatChangedEventArgs> handler = this.RaiseAfterStatChangedEvent;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="e">
-        /// </param>
-        private void OnBeforeStatChangedEvent(StatChangedEventArgs e)
-        {
-            EventHandler<StatChangedEventArgs> handler = this.RaiseBeforeStatChangedEvent;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        #endregion
-    }
 
     #endregion
 
@@ -527,3046 +48,2835 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat absorbChemicalAC = new ClassStat(241, 0, "AbsorbChemicalAC", true, false, false);
+        private readonly DynelStat absorbChemicalAC = new DynelStat(241, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat absorbColdAC = new ClassStat(243, 0, "AbsorbColdAC", true, false, false);
+        private readonly DynelStat absorbColdAC = new DynelStat(243, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat absorbEnergyAC = new ClassStat(240, 0, "AbsorbEnergyAC", true, false, false);
+        private readonly DynelStat absorbEnergyAC = new DynelStat(240, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat absorbFireAC = new ClassStat(244, 0, "AbsorbFireAC", true, false, false);
+        private readonly DynelStat absorbFireAC = new DynelStat(244, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat absorbMeleeAC = new ClassStat(239, 0, "AbsorbMeleeAC", true, false, false);
+        private readonly DynelStat absorbMeleeAC = new DynelStat(239, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat absorbNanoAC = new ClassStat(246, 0, "AbsorbNanoAC", true, false, false);
+        private readonly DynelStat absorbNanoAC = new DynelStat(246, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat absorbPoisonAC = new ClassStat(245, 0, "AbsorbPoisonAC", true, false, false);
+        private readonly DynelStat absorbPoisonAC = new DynelStat(245, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat absorbProjectileAC = new ClassStat(238, 0, "AbsorbProjectileAC", true, false, false);
+        private readonly DynelStat absorbProjectileAC = new DynelStat(238, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat absorbRadiationAC = new ClassStat(242, 0, "AbsorbRadiationAC", true, false, false);
+        private readonly DynelStat absorbRadiationAC = new DynelStat(242, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat accessCount = new ClassStat(35, 1234567890, "AccessCount", false, false, false);
+        private readonly DynelStat accessCount = new DynelStat(35, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat accessGrant = new ClassStat(258, 1234567890, "AccessGrant", false, false, false);
+        private readonly DynelStat accessGrant = new DynelStat(258, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat accessKey = new ClassStat(195, 1234567890, "AccessKey", false, false, false);
+        private readonly DynelStat accessKey = new DynelStat(195, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat accountFlags = new ClassStat(660, 1234567890, "AccountFlags", false, true, false);
+        private readonly DynelStat accountFlags = new DynelStat(660, 1234567890, false, true, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat accumulatedDamage = new ClassStat(
-            222, 1234567890, "AccumulatedDamage", false, false, false);
+        private readonly DynelStat accumulatedDamage = new DynelStat(222, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat acgEntranceStyles = new ClassStat(
-            384, 1234567890, "ACGEntranceStyles", false, false, false);
+        private readonly DynelStat acgEntranceStyles = new DynelStat(384, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat acgItemCategoryId = new ClassStat(
-            704, 1234567890, "ACGItemCategoryID", false, false, false);
+        private readonly DynelStat acgItemCategoryId = new DynelStat(704, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat acgItemLevel = new ClassStat(701, 1234567890, "ACGItemLevel", false, false, false);
+        private readonly DynelStat acgItemLevel = new DynelStat(701, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat acgItemSeed = new ClassStat(700, 1234567890, "ACGItemSeed", false, false, false);
+        private readonly DynelStat acgItemSeed = new DynelStat(700, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat acgItemTemplateId = new ClassStat(
-            702, 1234567890, "ACGItemTemplateID", false, false, false);
+        private readonly DynelStat acgItemTemplateId = new DynelStat(702, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat acgItemTemplateId2 = new ClassStat(
-            703, 1234567890, "ACGItemTemplateID2", false, false, false);
+        private readonly DynelStat acgItemTemplateId2 = new DynelStat(703, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat actionCategory = new ClassStat(
-            588, 1234567890, "ActionCategory", false, false, false);
+        private readonly DynelStat actionCategory = new DynelStat(588, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat advantageHash1 = new ClassStat(
-            651, 1234567890, "AdvantageHash1", false, false, false);
+        private readonly DynelStat advantageHash1 = new DynelStat(651, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat advantageHash2 = new ClassStat(
-            652, 1234567890, "AdvantageHash2", false, false, false);
+        private readonly DynelStat advantageHash2 = new DynelStat(652, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat advantageHash3 = new ClassStat(
-            653, 1234567890, "AdvantageHash3", false, false, false);
+        private readonly DynelStat advantageHash3 = new DynelStat(653, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat advantageHash4 = new ClassStat(
-            654, 1234567890, "AdvantageHash4", false, false, false);
+        private readonly DynelStat advantageHash4 = new DynelStat(654, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat advantageHash5 = new ClassStat(
-            655, 1234567890, "AdvantageHash5", false, false, false);
+        private readonly DynelStat advantageHash5 = new DynelStat(655, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill adventuring = new StatSkill(137, 5, "Adventuring", true, false, false);
+        private readonly StatSkill adventuring = new StatSkill(137, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat age = new ClassStat(58, 0, "Age", false, false, false);
+        private readonly DynelStat age = new DynelStat(58, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat aggDef = new ClassStat(51, 100, "AggDef", false, false, false);
+        private readonly DynelStat aggDef = new DynelStat(51, 100, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat aggressiveness = new ClassStat(
-            201, 1234567890, "Aggressiveness", false, false, false);
+        private readonly DynelStat aggressiveness = new DynelStat(201, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat agility = new ClassStat(17, 0, "Agility", true, false, false);
+        private readonly DynelStat agility = new DynelStat(17, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill aimedShot = new StatSkill(151, 5, "AimedShot", true, false, false);
+        private readonly StatSkill aimedShot = new StatSkill(151, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat alienLevel = new ClassStat(169, 0, "AlienLevel", false, false, false);
+        private readonly DynelStat alienLevel = new DynelStat(169, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatAlienNextXP alienNextXP = new StatAlienNextXP(
-            178, 1500, "AlienNextXP", false, false, false);
+        private readonly StatAlienNextXP alienNextXP = new StatAlienNextXP(178, 1500, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat alienXP = new ClassStat(40, 0, "AlienXP", false, false, false);
+        private readonly DynelStat alienXP = new DynelStat(40, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat alignment = new ClassStat(62, 0, "Alignment", false, false, false);
+        private readonly DynelStat alignment = new DynelStat(62, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly List<ClassStat> all = new List<ClassStat>();
+        private readonly List<DynelStat> all = new List<DynelStat>();
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat ammoName = new ClassStat(399, 1234567890, "AmmoName", false, false, false);
+        private readonly DynelStat ammoName = new DynelStat(399, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat ammoType = new ClassStat(420, 1234567890, "AmmoType", false, false, false);
+        private readonly DynelStat ammoType = new DynelStat(420, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat ams = new ClassStat(22, 1234567890, "AMS", false, false, false);
+        private readonly DynelStat ams = new DynelStat(22, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat amsCap = new ClassStat(538, 1234567890, "AmsCap", false, false, false);
+        private readonly DynelStat amsCap = new DynelStat(538, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat amsModifier = new ClassStat(276, 0, "AMSModifier", false, false, false);
+        private readonly DynelStat amsModifier = new DynelStat(276, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat anim = new ClassStat(13, 1234567890, "Anim", false, false, false);
+        private readonly DynelStat anim = new DynelStat(13, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat animPlay = new ClassStat(501, 1234567890, "AnimPlay", false, false, false);
+        private readonly DynelStat animPlay = new DynelStat(501, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat animPos = new ClassStat(500, 1234567890, "AnimPos", false, false, false);
+        private readonly DynelStat animPos = new DynelStat(500, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat animSet = new ClassStat(353, 1234567890, "AnimSet", false, false, false);
+        private readonly DynelStat animSet = new DynelStat(353, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat animSpeed = new ClassStat(502, 1234567890, "AnimSpeed", false, false, false);
+        private readonly DynelStat animSpeed = new DynelStat(502, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat apartmentAccessCard = new ClassStat(
-            584, 1234567890, "ApartmentAccessCard", false, false, false);
+        private readonly DynelStat apartmentAccessCard = new DynelStat(584, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat apartmentsAllowed = new ClassStat(582, 1, "ApartmentsAllowed", false, false, false);
+        private readonly DynelStat apartmentsAllowed = new DynelStat(582, 1, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat apartmentsOwned = new ClassStat(583, 0, "ApartmentsOwned", false, false, false);
+        private readonly DynelStat apartmentsOwned = new DynelStat(583, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat areaInstance = new ClassStat(87, 1234567890, "AreaInstance", false, false, false);
+        private readonly DynelStat areaInstance = new DynelStat(87, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat areaType = new ClassStat(86, 1234567890, "AreaType", false, false, false);
+        private readonly DynelStat areaType = new DynelStat(86, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat armourType = new ClassStat(424, 1234567890, "ArmourType", false, false, false);
+        private readonly DynelStat armourType = new DynelStat(424, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill assaultRifle = new StatSkill(116, 5, "AssaultRifle", true, false, false);
+        private readonly StatSkill assaultRifle = new StatSkill(116, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat attackCount = new ClassStat(36, 1234567890, "AttackCount", false, false, false);
+        private readonly DynelStat attackCount = new DynelStat(36, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat attackRange = new ClassStat(287, 1234567890, "AttackRange", false, false, false);
+        private readonly DynelStat attackRange = new DynelStat(287, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat attackShield = new ClassStat(516, 1234567890, "AttackShield", false, false, false);
+        private readonly DynelStat attackShield = new DynelStat(516, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat attackSpeed = new ClassStat(3, 5, "AttackSpeed", false, false, false);
+        private readonly DynelStat attackSpeed = new DynelStat(3, 5, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat attackType = new ClassStat(354, 1234567890, "AttackType", false, false, false);
+        private readonly DynelStat attackType = new DynelStat(354, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat attitude = new ClassStat(63, 0, "Attitude", false, false, false);
+        private readonly DynelStat attitude = new DynelStat(63, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat autoAttackFlags = new ClassStat(349, 5, "AutoAttackFlags", false, false, false);
+        private readonly DynelStat autoAttackFlags = new DynelStat(349, 5, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat autoLockTimeDefault = new ClassStat(
-            175, 1234567890, "AutoLockTimeDefault", false, false, false);
+        private readonly DynelStat autoLockTimeDefault = new DynelStat(175, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat autoUnlockTimeDefault = new ClassStat(
-            176, 1234567890, "AutoUnlockTimeDefault", false, false, false);
+        private readonly DynelStat autoUnlockTimeDefault = new DynelStat(176, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat backMesh = new ClassStat(38, 0, "BackMesh", false, false, false);
+        private readonly DynelStat backMesh = new DynelStat(38, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat backstab = new ClassStat(489, 1234567890, "Backstab", true, false, false);
+        private readonly DynelStat backstab = new DynelStat(489, 1234567890, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat bandolierSlots = new ClassStat(46, 1234567890, "BandolierSlots", false, false, false);
+        private readonly DynelStat bandolierSlots = new DynelStat(46, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat battlestationRep = new ClassStat(670, 10, "BattlestationRep", false, false, false);
+        private readonly DynelStat battlestationRep = new DynelStat(670, 10, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat battlestationSide = new ClassStat(668, 0, "BattlestationSide", false, false, false);
+        private readonly DynelStat battlestationSide = new DynelStat(668, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat beltSlots = new ClassStat(45, 0, "BeltSlots", false, false, false);
+        private readonly DynelStat beltSlots = new DynelStat(45, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat berserkMode = new ClassStat(235, 1234567890, "BerserkMode", false, false, false);
+        private readonly DynelStat berserkMode = new DynelStat(235, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill biologicalMetamorphose = new StatSkill(
-            128, 5, "BiologicalMetamorphose", true, false, false);
+        private readonly StatSkill biologicalMetamorphose = new StatSkill(128, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat birthDate = new ClassStat(248, 1234567890, "BirthDate", false, false, false);
+        private readonly DynelStat birthDate = new DynelStat(248, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill bodyDevelopment = new StatSkill(152, 5, "BodyDevelopment", true, false, false);
+        private readonly StatSkill bodyDevelopment = new StatSkill(152, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill bow = new StatSkill(111, 5, "Bow", true, false, false);
+        private readonly StatSkill bow = new StatSkill(111, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill bowSpecialAttack = new StatSkill(121, 5, "BowSpecialAttack", true, false, false);
+        private readonly StatSkill bowSpecialAttack = new StatSkill(121, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat brainType = new ClassStat(340, 1234567890, "BrainType", false, false, false);
+        private readonly DynelStat brainType = new DynelStat(340, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill brawl = new StatSkill(142, 5, "Brawl", true, false, false);
+        private readonly StatSkill brawl = new StatSkill(142, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill breakingEntry = new StatSkill(165, 5, "BreakingEntry", true, false, false);
+        private readonly StatSkill breakingEntry = new StatSkill(165, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat breed = new ClassStat(4, 1234567890, "Breed", false, false, false);
+        private readonly DynelStat breed = new DynelStat(4, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat breedHostility = new ClassStat(
-            204, 1234567890, "BreedHostility", false, false, false);
+        private readonly DynelStat breedHostility = new DynelStat(204, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat breedLimit = new ClassStat(320, 1234567890, "BreedLimit", false, false, false);
+        private readonly DynelStat breedLimit = new DynelStat(320, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat buildingComplexInst = new ClassStat(
-            188, 1234567890, "BuildingComplexInst", false, false, false);
+        private readonly DynelStat buildingComplexInst = new DynelStat(188, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat buildingInstance = new ClassStat(
-            185, 1234567890, "BuildingInstance", false, false, false);
+        private readonly DynelStat buildingInstance = new DynelStat(185, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat buildingType = new ClassStat(184, 1234567890, "BuildingType", false, false, false);
+        private readonly DynelStat buildingType = new DynelStat(184, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill burst = new StatSkill(148, 5, "Burst", true, false, false);
+        private readonly StatSkill burst = new StatSkill(148, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat burstRecharge = new ClassStat(374, 1234567890, "BurstRecharge", false, false, false);
+        private readonly DynelStat burstRecharge = new DynelStat(374, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat buyModifier = new ClassStat(426, 1234567890, "BuyModifier", false, false, false);
+        private readonly DynelStat buyModifier = new DynelStat(426, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat can = new ClassStat(30, 1234567890, "Can", false, false, false);
+        private readonly DynelStat can = new DynelStat(30, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat canChangeClothes = new ClassStat(
-            223, 1234567890, "CanChangeClothes", false, false, false);
+        private readonly DynelStat canChangeClothes = new DynelStat(223, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat cardOwnerInstance = new ClassStat(
-            187, 1234567890, "CardOwnerInstance", false, false, false);
+        private readonly DynelStat cardOwnerInstance = new DynelStat(187, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat cardOwnerType = new ClassStat(186, 1234567890, "CardOwnerType", false, false, false);
+        private readonly DynelStat cardOwnerType = new DynelStat(186, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat cash = new ClassStat(61, 0, "Cash", false, false, false);
+        private readonly DynelStat cash = new DynelStat(61, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat castEffectType = new ClassStat(
-            428, 1234567890, "CastEffectType", false, false, false);
+        private readonly DynelStat castEffectType = new DynelStat(428, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat castSelfAbstractAnim = new ClassStat(
-            378, 1234567890, "CastSelfAbstractAnim", false, false, false);
+        private readonly DynelStat castSelfAbstractAnim = new DynelStat(378, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat castSound = new ClassStat(270, 1234567890, "CastSound", false, false, false);
+        private readonly DynelStat castSound = new DynelStat(270, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat castTargetAbstractAnim = new ClassStat(
-            377, 1234567890, "CastTargetAbstractAnim", false, false, false);
+        private readonly DynelStat castTargetAbstractAnim = new DynelStat(377, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat catAnim = new ClassStat(401, 1234567890, "CATAnim", false, false, false);
+        private readonly DynelStat catAnim = new DynelStat(401, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat catAnimFlags = new ClassStat(402, 1234567890, "CATAnimFlags", false, false, false);
+        private readonly DynelStat catAnimFlags = new DynelStat(402, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat catMesh = new ClassStat(42, 1234567890, "CATMesh", false, false, false);
+        private readonly DynelStat catMesh = new DynelStat(42, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat chanceOfBreakOnDebuff = new ClassStat(
-            386, 1234567890, "ChanceOfBreakOnDebuff", false, false, false);
+        private readonly DynelStat chanceOfBreakOnDebuff = new DynelStat(386, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat chanceOfBreakOnSpellAttack = new ClassStat(
-            385, 1234567890, "ChanceOfBreakOnSpellAttack", false, false, false);
+        private readonly DynelStat chanceOfBreakOnSpellAttack = new DynelStat(385, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat chanceOfUse = new ClassStat(422, 1234567890, "ChanceOfUse", false, false, false);
+        private readonly DynelStat chanceOfUse = new DynelStat(422, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat changeSideCount = new ClassStat(237, 0, "ChangeSideCount", false, false, false);
+        private readonly DynelStat changeSideCount = new DynelStat(237, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat charRadius = new ClassStat(421, 1234567890, "CharRadius", false, false, false);
+        private readonly DynelStat charRadius = new DynelStat(421, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat charState = new ClassStat(434, 1234567890, "CharState", false, false, false);
+        private readonly DynelStat charState = new DynelStat(434, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat charTmp1 = new ClassStat(441, 1234567890, "CharTmp1", false, false, false);
+        private readonly DynelStat charTmp1 = new DynelStat(441, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat charTmp2 = new ClassStat(442, 1234567890, "CharTmp2", false, false, false);
+        private readonly DynelStat charTmp2 = new DynelStat(442, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat charTmp3 = new ClassStat(443, 1234567890, "CharTmp3", false, false, false);
+        private readonly DynelStat charTmp3 = new DynelStat(443, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat charTmp4 = new ClassStat(444, 1234567890, "CharTmp4", false, false, false);
+        private readonly DynelStat charTmp4 = new DynelStat(444, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat chemicalAC = new ClassStat(93, 0, "ChemicalAC", true, false, false);
+        private readonly DynelStat chemicalAC = new DynelStat(93, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat chemicalDamageModifier = new ClassStat(
-            281, 0, "ChemicalDamageModifier", false, false, false);
+        private readonly DynelStat chemicalDamageModifier = new DynelStat(281, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill chemistry = new StatSkill(163, 5, "Chemistry", true, false, false);
+        private readonly StatSkill chemistry = new StatSkill(163, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat chestFlags = new ClassStat(394, 1234567890, "ChestFlags", false, false, false);
+        private readonly DynelStat chestFlags = new DynelStat(394, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat cityInstance = new ClassStat(640, 1234567890, "CityInstance", false, false, false);
+        private readonly DynelStat cityInstance = new DynelStat(640, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat cityTerminalRechargePercent = new ClassStat(
-            642, 1234567890, "CityTerminalRechargePercent", false, false, false);
+        private readonly DynelStat cityTerminalRechargePercent = new DynelStat(642, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clan = new ClassStat(5, 0, "Clan", false, false, false);
+        private readonly DynelStat clan = new DynelStat(5, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanConserver = new ClassStat(571, 0, "ClanConserver", false, false, false);
+        private readonly DynelStat clanConserver = new DynelStat(571, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanDevoted = new ClassStat(570, 0, "ClanDevoted", false, false, false);
+        private readonly DynelStat clanDevoted = new DynelStat(570, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanFinalized = new ClassStat(314, 1234567890, "ClanFinalized", false, false, false);
+        private readonly DynelStat clanFinalized = new DynelStat(314, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanGaia = new ClassStat(563, 0, "ClanGaia", false, false, false);
+        private readonly DynelStat clanGaia = new DynelStat(563, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanHierarchy = new ClassStat(260, 1234567890, "ClanHierarchy", false, false, false);
+        private readonly DynelStat clanHierarchy = new DynelStat(260, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanInstance = new ClassStat(305, 1234567890, "ClanInstance", false, false, false);
+        private readonly DynelStat clanInstance = new DynelStat(305, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanItemInstance = new ClassStat(
-            331, 1234567890, "ClanItemInstance", false, false, false);
+        private readonly DynelStat clanItemInstance = new DynelStat(331, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanItemType = new ClassStat(330, 1234567890, "ClanItemType", false, false, false);
+        private readonly DynelStat clanItemType = new DynelStat(330, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanLevel = new ClassStat(48, 1234567890, "ClanLevel", false, false, false);
+        private readonly DynelStat clanLevel = new DynelStat(48, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanPrice = new ClassStat(302, 1234567890, "ClanPrice", false, false, false);
+        private readonly DynelStat clanPrice = new DynelStat(302, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanRedeemed = new ClassStat(572, 0, "ClanRedeemed", false, false, false);
+        private readonly DynelStat clanRedeemed = new DynelStat(572, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanSentinels = new ClassStat(561, 0, "ClanSentinels", false, false, false);
+        private readonly DynelStat clanSentinels = new DynelStat(561, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanType = new ClassStat(304, 1234567890, "ClanType", false, false, false);
+        private readonly DynelStat clanType = new DynelStat(304, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanUpkeepInterval = new ClassStat(
-            312, 1234567890, "ClanUpkeepInterval", false, false, false);
+        private readonly DynelStat clanUpkeepInterval = new DynelStat(312, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clanVanguards = new ClassStat(565, 0, "ClanVanguards", false, false, false);
+        private readonly DynelStat clanVanguards = new DynelStat(565, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat clientActivated = new ClassStat(
-            262, 1234567890, "ClientActivated", false, false, false);
+        private readonly DynelStat clientActivated = new DynelStat(262, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill closeCombatInitiative = new StatSkill(
-            118, 5, "CloseCombatInitiative", true, false, false);
+        private readonly StatSkill closeCombatInitiative = new StatSkill(118, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat coldAC = new ClassStat(95, 0, "ColdAC", true, false, false);
+        private readonly DynelStat coldAC = new DynelStat(95, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat coldDamageModifier = new ClassStat(
-            311, 1234567890, "ColdDamageModifier", false, false, false);
+        private readonly DynelStat coldDamageModifier = new DynelStat(311, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat collideCheckInterval = new ClassStat(
-            437, 1234567890, "CollideCheckInterval", false, false, false);
+        private readonly DynelStat collideCheckInterval = new DynelStat(437, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat collisionRadius = new ClassStat(
-            357, 1234567890, "CollisionRadius", false, false, false);
+        private readonly DynelStat collisionRadius = new DynelStat(357, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat commandRange = new ClassStat(456, 1234567890, "CommandRange", false, false, false);
+        private readonly DynelStat commandRange = new DynelStat(456, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat compulsion = new ClassStat(328, 1234567890, "Compulsion", false, false, false);
+        private readonly DynelStat compulsion = new DynelStat(328, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill computerLiteracy = new StatSkill(161, 5, "ComputerLiteracy", true, false, false);
+        private readonly StatSkill computerLiteracy = new StatSkill(161, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill concealment = new StatSkill(164, 5, "Concealment", true, false, false);
+        private readonly StatSkill concealment = new StatSkill(164, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat conditionState = new ClassStat(
-            530, 1234567890, "ConditionState", false, false, false);
+        private readonly DynelStat conditionState = new DynelStat(530, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat conformity = new ClassStat(200, 1234567890, "Conformity", false, false, false);
+        private readonly DynelStat conformity = new DynelStat(200, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat corpseAnimKey = new ClassStat(417, 1234567890, "CorpseAnimKey", false, false, false);
+        private readonly DynelStat corpseAnimKey = new DynelStat(417, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat corpseHash = new ClassStat(398, 1234567890, "Corpse_Hash", false, false, false);
+        private readonly DynelStat corpseHash = new DynelStat(398, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat corpseInstance = new ClassStat(
-            416, 1234567890, "CorpseInstance", false, false, false);
+        private readonly DynelStat corpseInstance = new DynelStat(416, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat corpseType = new ClassStat(415, 1234567890, "CorpseType", false, false, false);
+        private readonly DynelStat corpseType = new DynelStat(415, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat criticalDecrease = new ClassStat(
-            391, 1234567890, "CriticalDecrease", false, false, false);
+        private readonly DynelStat criticalDecrease = new DynelStat(391, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat criticalIncrease = new ClassStat(
-            379, 1234567890, "CriticalIncrease", false, false, false);
+        private readonly DynelStat criticalIncrease = new DynelStat(379, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat currBodyLocation = new ClassStat(220, 0, "CurrBodyLocation", false, false, false);
+        private readonly DynelStat currBodyLocation = new DynelStat(220, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat currentMass = new ClassStat(78, 0, "CurrentMass", false, false, false);
+        private readonly DynelStat currentMass = new DynelStat(78, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat currentMovementMode = new ClassStat(
-            173, 3, "CurrentMovementMode", false, false, false);
+        private readonly DynelStat currentMovementMode = new DynelStat(173, 3, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat currentNCU = new ClassStat(180, 0, "CurrentNCU", false, false, false);
+        private readonly DynelStat currentNCU = new DynelStat(180, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatNanoPoints currentNano = new StatNanoPoints(214, 1, "CurrentNano", false, false, false);
+        private readonly StatCurrentNano currentNano = new StatCurrentNano(214, 1, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat currentPlayfield = new ClassStat(
-            589, 1234567890, "CurrentPlayfield", false, false, false);
+        private readonly DynelStat currentPlayfield = new DynelStat(589, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat currentState = new ClassStat(423, 0, "CurrentState", false, false, false);
+        private readonly DynelStat currentState = new DynelStat(423, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat currentTime = new ClassStat(578, 1234567890, "CurrentTime", false, false, false);
+        private readonly DynelStat currentTime = new DynelStat(578, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat damageBonus = new ClassStat(284, 1234567890, "DamageBonus", false, false, false);
+        private readonly DynelStat damageBonus = new DynelStat(284, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat damageOverrideType = new ClassStat(
-            339, 1234567890, "DamageOverrideType", false, false, false);
+        private readonly DynelStat damageOverrideType = new DynelStat(339, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat damageToNano = new ClassStat(659, 1234567890, "DamageToNano", false, false, false);
+        private readonly DynelStat damageToNano = new DynelStat(659, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat damageToNanoMultiplier = new ClassStat(
-            661, 1234567890, "DamageToNanoMultiplier", false, false, false);
+        private readonly DynelStat damageToNanoMultiplier = new DynelStat(661, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat damageType = new ClassStat(436, 1234567890, "DamageType", false, false, false);
+        private readonly DynelStat damageType = new DynelStat(436, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat deadTimer = new ClassStat(34, 0, "DeadTimer", false, false, false);
+        private readonly DynelStat deadTimer = new DynelStat(34, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat deathReason = new ClassStat(338, 1234567890, "DeathReason", false, false, false);
+        private readonly DynelStat deathReason = new DynelStat(338, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat debuffFormula = new ClassStat(332, 1234567890, "DebuffFormula", false, false, false);
+        private readonly DynelStat debuffFormula = new DynelStat(332, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat defaultAttackType = new ClassStat(
-            292, 1234567890, "DefaultAttackType", false, false, false);
+        private readonly DynelStat defaultAttackType = new DynelStat(292, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat defaultPos = new ClassStat(88, 1234567890, "DefaultPos", false, false, false);
+        private readonly DynelStat defaultPos = new DynelStat(88, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat desiredTargetDistance = new ClassStat(
-            447, 1234567890, "DesiredTargetDistance", false, false, false);
+        private readonly DynelStat desiredTargetDistance = new DynelStat(447, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat dieAnim = new ClassStat(387, 1234567890, "DieAnim", false, false, false);
+        private readonly DynelStat dieAnim = new DynelStat(387, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill dimach = new StatSkill(144, 5, "Dimach", true, false, false);
+        private readonly StatSkill dimach = new StatSkill(144, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill disarmTrap = new StatSkill(135, 5, "DisarmTrap", true, false, false);
+        private readonly StatSkill disarmTrap = new StatSkill(135, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat displayCATAnim = new ClassStat(
-            403, 1234567890, "DisplayCATAnim", false, false, false);
+        private readonly DynelStat displayCATAnim = new DynelStat(403, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat displayCATMesh = new ClassStat(
-            404, 1234567890, "DisplayCATMesh", false, false, false);
+        private readonly DynelStat displayCATMesh = new DynelStat(404, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat distanceToSpawnpoint = new ClassStat(
-            641, 1234567890, "DistanceToSpawnpoint", false, false, false);
+        private readonly DynelStat distanceToSpawnpoint = new DynelStat(641, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill distanceWeaponInitiative = new StatSkill(
-            119, 5, "DistanceWeaponInitiative", true, false, false);
+        private readonly StatSkill distanceWeaponInitiative = new StatSkill(119, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat districtNano = new ClassStat(590, 1234567890, "DistrictNano", false, false, false);
+        private readonly DynelStat districtNano = new DynelStat(590, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat districtNanoInterval = new ClassStat(
-            591, 1234567890, "DistrictNanoInterval", false, false, false);
+        private readonly DynelStat districtNanoInterval = new DynelStat(591, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat dms = new ClassStat(29, 1234567890, "DMS", false, false, false);
+        private readonly DynelStat dms = new DynelStat(29, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat dmsModifier = new ClassStat(277, 0, "DMSModifier", false, false, false);
+        private readonly DynelStat dmsModifier = new DynelStat(277, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill dodge = new StatSkill(154, 5, "Dodge", true, false, false);
+        private readonly StatSkill dodge = new StatSkill(154, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat doorBlockTime = new ClassStat(335, 1234567890, "DoorBlockTime", false, false, false);
+        private readonly DynelStat doorBlockTime = new DynelStat(335, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat doorFlags = new ClassStat(259, 1234567890, "DoorFlags", false, false, false);
+        private readonly DynelStat doorFlags = new DynelStat(259, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill driveAir = new StatSkill(139, 5, "DriveAir", true, false, false);
+        private readonly StatSkill driveAir = new StatSkill(139, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill driveGround = new StatSkill(166, 5, "DriveGround", true, false, false);
+        private readonly StatSkill driveGround = new StatSkill(166, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill driveWater = new StatSkill(117, 5, "DriveWater", true, false, false);
+        private readonly StatSkill driveWater = new StatSkill(117, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill duck = new StatSkill(153, 5, "Duck", true, false, false);
+        private readonly StatSkill duck = new StatSkill(153, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat dudChance = new ClassStat(534, 1234567890, "DudChance", false, false, false);
+        private readonly DynelStat dudChance = new DynelStat(534, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat durationModifier = new ClassStat(
-            464, 1234567890, "DurationModifier", false, false, false);
+        private readonly DynelStat durationModifier = new DynelStat(464, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat effectBlue = new ClassStat(462, 1234567890, "EffectBlue", false, false, false);
+        private readonly DynelStat effectBlue = new DynelStat(462, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat effectGreen = new ClassStat(461, 1234567890, "EffectGreen", false, false, false);
+        private readonly DynelStat effectGreen = new DynelStat(461, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat effectIcon = new ClassStat(183, 1234567890, "EffectIcon", false, false, false);
+        private readonly DynelStat effectIcon = new DynelStat(183, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat effectRed = new ClassStat(460, 1234567890, "EffectRed", false, false, false);
+        private readonly DynelStat effectRed = new DynelStat(460, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat effectType = new ClassStat(413, 1234567890, "EffectType", false, false, false);
+        private readonly DynelStat effectType = new DynelStat(413, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill electricalEngineering = new StatSkill(
-            126, 5, "ElectricalEngineering", true, false, false);
+        private readonly StatSkill electricalEngineering = new StatSkill(126, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat energy = new ClassStat(26, 1234567890, "Energy", false, false, false);
+        private readonly DynelStat energy = new DynelStat(26, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat energyAC = new ClassStat(92, 0, "EnergyAC", true, false, false);
+        private readonly DynelStat energyAC = new DynelStat(92, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat energyDamageModifier = new ClassStat(
-            280, 0, "EnergyDamageModifier", false, false, false);
+        private readonly DynelStat energyDamageModifier = new DynelStat(280, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat equipDelay = new ClassStat(211, 1234567890, "EquipDelay", false, false, false);
+        private readonly DynelStat equipDelay = new DynelStat(211, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat equippedWeapons = new ClassStat(
-            274, 1234567890, "EquippedWeapons", false, false, false);
+        private readonly DynelStat equippedWeapons = new DynelStat(274, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill evade = new StatSkill(155, 5, "Evade", true, false, false);
+        private readonly StatSkill evade = new StatSkill(155, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat exitInstance = new ClassStat(189, 1234567890, "ExitInstance", false, false, false);
+        private readonly DynelStat exitInstance = new DynelStat(189, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat expansion = new ClassStat(389, 0, "Expansion", false, true, false);
+        private readonly DynelStat expansion = new DynelStat(389, 0, false, true, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat expansionPlayfield = new ClassStat(
-            531, 1234567890, "ExpansionPlayfield", false, false, false);
+        private readonly DynelStat expansionPlayfield = new DynelStat(531, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat extenalDoorInstance = new ClassStat(
-            193, 1234567890, "ExtenalDoorInstance", false, false, false);
+        private readonly DynelStat extenalDoorInstance = new DynelStat(193, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat extenalPlayfieldInstance = new ClassStat(
-            192, 1234567890, "ExtenalPlayfieldInstance", false, false, false);
+        private readonly DynelStat extenalPlayfieldInstance = new DynelStat(192, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat extendedFlags = new ClassStat(598, 1234567890, "ExtendedFlags", false, false, false);
+        private readonly DynelStat extendedFlags = new DynelStat(598, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat extendedTime = new ClassStat(373, 1234567890, "ExtendedTime", false, false, false);
+        private readonly DynelStat extendedTime = new DynelStat(373, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat extroverty = new ClassStat(203, 1234567890, "Extroverty", false, false, false);
+        private readonly DynelStat extroverty = new DynelStat(203, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat fabricType = new ClassStat(41, 1234567890, "FabricType", false, false, false);
+        private readonly DynelStat fabricType = new DynelStat(41, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat face = new ClassStat(31, 1234567890, "Face", false, false, false);
+        private readonly DynelStat face = new DynelStat(31, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat faceTexture = new ClassStat(347, 1234567890, "FaceTexture", false, false, false);
+        private readonly DynelStat faceTexture = new DynelStat(347, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat factionModifier = new ClassStat(
-            543, 1234567890, "FactionModifier", false, false, false);
+        private readonly DynelStat factionModifier = new DynelStat(543, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat fallDamage = new ClassStat(474, 1234567890, "FallDamage", false, false, false);
+        private readonly DynelStat fallDamage = new DynelStat(474, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill fastAttack = new StatSkill(147, 5, "FastAttack", true, false, false);
+        private readonly StatSkill fastAttack = new StatSkill(147, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat fatness = new ClassStat(47, 1234567890, "Fatness", false, false, false);
+        private readonly DynelStat fatness = new DynelStat(47, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat features = new ClassStat(224, 6, "Features", false, false, false);
+        private readonly DynelStat features = new DynelStat(224, 6, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill fieldQuantumPhysics = new StatSkill(
-            157, 5, "FieldQuantumPhysics", true, false, false);
+        private readonly StatSkill fieldQuantumPhysics = new StatSkill(157, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat fireAC = new ClassStat(97, 0, "FireAC", true, false, false);
+        private readonly DynelStat fireAC = new DynelStat(97, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat fireDamageModifier = new ClassStat(316, 0, "FireDamageModifier", false, false, false);
+        private readonly DynelStat fireDamageModifier = new DynelStat(316, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill firstAid = new StatSkill(123, 5, "FirstAid", true, false, false);
+        private readonly StatSkill firstAid = new StatSkill(123, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat fixtureFlags = new ClassStat(473, 1234567890, "FixtureFlags", false, false, false);
+        private readonly DynelStat fixtureFlags = new DynelStat(473, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat flags = new ClassStat(0, 8917569, "Flags", false, false, true);
+        private readonly DynelStat flags = new DynelStat(0, 8917569, false, false, true);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill flingShot = new StatSkill(150, 5, "FlingShot", true, false, false);
+        private readonly StatSkill flingShot = new StatSkill(150, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill fullAuto = new StatSkill(167, 5, "FullAuto", true, false, false);
+        private readonly StatSkill fullAuto = new StatSkill(167, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat fullAutoRecharge = new ClassStat(
-            375, 1234567890, "FullAutoRecharge", false, false, false);
+        private readonly DynelStat fullAutoRecharge = new DynelStat(375, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat gatherAbstractAnim = new ClassStat(
-            376, 1234567890, "GatherAbstractAnim", false, false, false);
+        private readonly DynelStat gatherAbstractAnim = new DynelStat(376, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat gatherEffectType = new ClassStat(
-            366, 1234567890, "GatherEffectType", false, false, false);
+        private readonly DynelStat gatherEffectType = new DynelStat(366, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat gatherSound = new ClassStat(269, 1234567890, "GatherSound", false, false, false);
+        private readonly DynelStat gatherSound = new DynelStat(269, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat genderLimit = new ClassStat(321, 1234567890, "GenderLimit", false, false, false);
+        private readonly DynelStat genderLimit = new DynelStat(321, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat globalClanInstance = new ClassStat(
-            310, 1234567890, "GlobalClanInstance", false, false, false);
+        private readonly DynelStat globalClanInstance = new DynelStat(310, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat globalClanType = new ClassStat(
-            309, 1234567890, "GlobalClanType", false, false, false);
+        private readonly DynelStat globalClanType = new DynelStat(309, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat globalResearchGoal = new ClassStat(266, 0, "GlobalResearchGoal", false, false, false);
+        private readonly DynelStat globalResearchGoal = new DynelStat(266, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat globalResearchLevel = new ClassStat(
-            264, 0, "GlobalResearchLevel", false, false, false);
+        private readonly DynelStat globalResearchLevel = new DynelStat(264, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat gmLevel = new ClassStat(215, 0, "GmLevel", false, true, false);
+        private readonly DynelStat gmLevel = new DynelStat(215, 0, false, true, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat gos = new ClassStat(566, 0, "GOS", false, false, false);
+        private readonly DynelStat gos = new DynelStat(566, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill grenade = new StatSkill(109, 5, "Grenade", true, false, false);
+        private readonly StatSkill grenade = new StatSkill(109, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat hairMesh = new ClassStat(32, 0, "HairMesh", false, false, false);
+        private readonly DynelStat hairMesh = new DynelStat(32, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat hasAlwaysLootable = new ClassStat(
-            345, 1234567890, "HasAlwaysLootable", false, false, false);
+        private readonly DynelStat hasAlwaysLootable = new DynelStat(345, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat hasKnuBotData = new ClassStat(768, 1234567890, "HasKnuBotData", false, false, false);
+        private readonly DynelStat hasKnuBotData = new DynelStat(768, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat hateValueModifyer = new ClassStat(
-            288, 1234567890, "HateValueModifyer", false, false, false);
+        private readonly DynelStat hateValueModifyer = new DynelStat(288, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat headMesh = new ClassStat(64, 0, "HeadMesh", false, false, false);
+        private readonly DynelStat headMesh = new DynelStat(64, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatHealDelta healDelta = new StatHealDelta(343, 1234567890, "HealDelta", false, false, false);
+        private readonly StatHealDelta healDelta = new StatHealDelta(343, 1234567890, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatHealInterval healInterval = new StatHealInterval(
-            342, 29, "HealInterval", false, false, false);
+        private readonly StatHealInterval healInterval = new StatHealInterval(342, 29, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat healMultiplier = new ClassStat(
-            535, 1234567890, "HealMultiplier", false, false, false);
+        private readonly DynelStat healMultiplier = new DynelStat(535, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatHitPoints health = new StatHitPoints(27, 1, "Health", false, false, false);
+        private readonly StatHitPoints health = new StatHitPoints(27, 1, true, false, true);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat healthChange = new ClassStat(172, 1234567890, "HealthChange", false, false, false);
+        private readonly DynelStat healthChange = new DynelStat(172, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat healthChangeBest = new ClassStat(
-            170, 1234567890, "HealthChangeBest", false, false, false);
+        private readonly DynelStat healthChangeBest = new DynelStat(170, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat healthChangeWorst = new ClassStat(
-            171, 1234567890, "HealthChangeWorst", false, false, false);
+        private readonly DynelStat healthChangeWorst = new DynelStat(171, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat height = new ClassStat(28, 1234567890, "Height", false, false, false);
+        private readonly DynelStat height = new DynelStat(28, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat hitEffectType = new ClassStat(361, 1234567890, "HitEffectType", false, false, false);
+        private readonly DynelStat hitEffectType = new DynelStat(361, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat hitSound = new ClassStat(272, 1234567890, "HitSound", false, false, false);
+        private readonly DynelStat hitSound = new DynelStat(272, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat houseTemplate = new ClassStat(620, 1234567890, "HouseTemplate", false, false, false);
+        private readonly DynelStat houseTemplate = new DynelStat(620, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat hpLevelUp = new ClassStat(601, 1234567890, "HPLevelUp", false, false, false);
+        private readonly DynelStat hpLevelUp = new DynelStat(601, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat hpPerSkill = new ClassStat(602, 1234567890, "HPPerSkill", false, false, false);
+        private readonly DynelStat hpPerSkill = new DynelStat(602, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat icon = new ClassStat(79, 0, "Icon", false, false, false);
+        private readonly DynelStat icon = new DynelStat(79, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat impactEffectType = new ClassStat(
-            414, 1234567890, "ImpactEffectType", false, false, false);
+        private readonly DynelStat impactEffectType = new DynelStat(414, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat inPlay = new ClassStat(194, 0, "InPlay", false, false, false);
+        private readonly DynelStat inPlay = new DynelStat(194, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat info = new ClassStat(15, 1234567890, "Info", false, false, false);
+        private readonly DynelStat info = new DynelStat(15, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat initiativeType = new ClassStat(
-            440, 1234567890, "InitiativeType", false, false, false);
+        private readonly DynelStat initiativeType = new DynelStat(440, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat instance = new ClassStat(1002, 1234567890, "Instance", false, true, false);
+        private readonly DynelStat instance = new DynelStat(1002, 1234567890, false, true, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat insurancePercentage = new ClassStat(
-            236, 0, "InsurancePercentage", false, false, false);
+        private readonly DynelStat insurancePercentage = new DynelStat(236, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat insuranceTime = new ClassStat(49, 0, "InsuranceTime", false, false, false);
+        private readonly DynelStat insuranceTime = new DynelStat(49, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat intelligence = new ClassStat(19, 0, "Intelligence", true, false, false);
+        private readonly DynelStat intelligence = new DynelStat(19, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat interactionRadius = new ClassStat(
-            297, 1234567890, "InteractionRadius", false, false, false);
+        private readonly DynelStat interactionRadius = new DynelStat(297, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat interruptModifier = new ClassStat(
-            383, 1234567890, "InterruptModifier", false, false, false);
+        private readonly DynelStat interruptModifier = new DynelStat(383, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat invadersKilled = new ClassStat(615, 0, "InvadersKilled", false, false, false);
+        private readonly DynelStat invadersKilled = new DynelStat(615, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat inventoryId = new ClassStat(55, 1234567890, "InventoryId", false, false, false);
+        private readonly DynelStat inventoryId = new DynelStat(55, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat inventoryTimeout = new ClassStat(
-            50, 1234567890, "InventoryTimeout", false, false, false);
+        private readonly DynelStat inventoryTimeout = new DynelStat(50, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatIP ip = new StatIP(53, 1500, "IP", false, false, false);
+        private readonly StatIP ip = new StatIP(53, 1500, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat isFightingMe = new ClassStat(410, 0, "IsFightingMe", false, false, false);
+        private readonly DynelStat isFightingMe = new DynelStat(410, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat isVehicle = new ClassStat(658, 1234567890, "IsVehicle", false, false, false);
+        private readonly DynelStat isVehicle = new DynelStat(658, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat itemAnim = new ClassStat(99, 1234567890, "ItemAnim", true, false, false);
+        private readonly DynelStat itemAnim = new DynelStat(99, 1234567890, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat itemClass = new ClassStat(76, 1234567890, "ItemClass", false, false, false);
+        private readonly DynelStat itemClass = new DynelStat(76, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat itemDelay = new ClassStat(294, 1234567890, "ItemDelay", false, false, false);
+        private readonly DynelStat itemDelay = new DynelStat(294, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat itemDelayCap = new ClassStat(523, 1234567890, "ItemDelayCap", false, false, false);
+        private readonly DynelStat itemDelayCap = new DynelStat(523, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat itemHateValue = new ClassStat(283, 1234567890, "ItemHateValue", false, false, false);
+        private readonly DynelStat itemHateValue = new DynelStat(283, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat itemOpposedSkill = new ClassStat(
-            295, 1234567890, "ItemOpposedSkill", false, false, false);
+        private readonly DynelStat itemOpposedSkill = new DynelStat(295, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat itemSIS = new ClassStat(296, 1234567890, "ItemSIS", false, false, false);
+        private readonly DynelStat itemSIS = new DynelStat(296, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat itemSkill = new ClassStat(293, 1234567890, "ItemSkill", false, false, false);
+        private readonly DynelStat itemSkill = new DynelStat(293, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat itemType = new ClassStat(72, 0, "ItemType", false, false, false);
+        private readonly DynelStat itemType = new DynelStat(72, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat killedByInvaders = new ClassStat(616, 0, "KilledByInvaders", false, false, false);
+        private readonly DynelStat killedByInvaders = new DynelStat(616, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat lastConcretePlayfieldInstance = new ClassStat(
-            191, 0, "LastConcretePlayfieldInstance", false, false, false);
+        private readonly DynelStat lastConcretePlayfieldInstance = new DynelStat(191, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat lastMailCheckTime = new ClassStat(
-            650, 1283065897, "LastMailCheckTime", false, false, false);
+        private readonly DynelStat lastMailCheckTime = new DynelStat(650, 1283065897, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat lastPerkResetTime = new ClassStat(577, 0, "LastPerkResetTime", false, false, false);
+        private readonly DynelStat lastPerkResetTime = new DynelStat(577, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat lastRnd = new ClassStat(522, 1234567890, "LastRnd", false, false, false);
+        private readonly DynelStat lastRnd = new DynelStat(522, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat lastSK = new ClassStat(574, 0, "LastSK", false, false, false);
+        private readonly DynelStat lastSK = new DynelStat(574, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat lastSaveXP = new ClassStat(372, 0, "LastSaveXP", false, false, false);
+        private readonly DynelStat lastSaveXP = new DynelStat(372, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat lastSaved = new ClassStat(249, 1234567890, "LastSaved", false, false, false);
+        private readonly DynelStat lastSaved = new DynelStat(249, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat lastXP = new ClassStat(57, 0, "LastXP", false, false, false);
+        private readonly DynelStat lastXP = new DynelStat(57, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat leaderLockDownTime = new ClassStat(
-            614, 1234567890, "LeaderLockDownTime", false, false, false);
+        private readonly DynelStat leaderLockDownTime = new DynelStat(614, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat level = new ClassStat(54, 1234567890, "Level", false, false, false);
+        private readonly DynelStat level = new DynelStat(54, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat levelLimit = new ClassStat(322, 1234567890, "LevelLimit", false, false, false);
+        private readonly DynelStat levelLimit = new DynelStat(322, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatHealth life = new StatHealth(1, 1, "Life", true, false, false);
+        private readonly StatHealth life = new StatHealth(1, 1, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat liquidType = new ClassStat(268, 1234567890, "LiquidType", false, false, false);
+        private readonly DynelStat liquidType = new DynelStat(268, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat lockDifficulty = new ClassStat(
-            299, 1234567890, "LockDifficulty", false, false, false);
+        private readonly DynelStat lockDifficulty = new DynelStat(299, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat lockDownTime = new ClassStat(613, 1234567890, "LockDownTime", false, false, false);
+        private readonly DynelStat lockDownTime = new DynelStat(613, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat losHeight = new ClassStat(466, 1234567890, "LOSHeight", false, false, false);
+        private readonly DynelStat losHeight = new DynelStat(466, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat lowresMesh = new ClassStat(390, 1234567890, "LowresMesh", false, false, false);
+        private readonly DynelStat lowresMesh = new DynelStat(390, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill lrEnergyWeapon = new StatSkill(133, 5, "LR_EnergyWeapon", true, false, false);
+        private readonly StatSkill lrEnergyWeapon = new StatSkill(133, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill lrMultipleWeapon = new StatSkill(134, 5, "LR_MultipleWeapon", true, false, false);
+        private readonly StatSkill lrMultipleWeapon = new StatSkill(134, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat mapAreaPart1 = new ClassStat(471, 0, "MapAreaPart1", false, false, false);
+        private readonly DynelStat mapAreaPart1 = new DynelStat(471, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat mapAreaPart2 = new ClassStat(472, 0, "MapAreaPart2", false, false, false);
+        private readonly DynelStat mapAreaPart2 = new DynelStat(472, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat mapAreaPart3 = new ClassStat(585, 0, "MapAreaPart3", false, false, false);
+        private readonly DynelStat mapAreaPart3 = new DynelStat(585, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat mapAreaPart4 = new ClassStat(586, 0, "MapAreaPart4", false, false, false);
+        private readonly DynelStat mapAreaPart4 = new DynelStat(586, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat mapFlags = new ClassStat(9, 0, "MapFlags", false, false, false);
+        private readonly DynelStat mapFlags = new DynelStat(9, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill mapNavigation = new StatSkill(140, 5, "MapNavigation", true, false, false);
+        private readonly StatSkill mapNavigation = new StatSkill(140, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat mapOptions = new ClassStat(470, 0, "MapOptions", false, false, false);
+        private readonly DynelStat mapOptions = new DynelStat(470, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill martialArts = new StatSkill(100, 5, "MartialArts", true, false, false);
+        private readonly StatSkill martialArts = new StatSkill(100, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill materialCreation = new StatSkill(130, 5, "MaterialCreation", true, false, false);
+        private readonly StatSkill materialCreation = new StatSkill(130, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill materialLocation = new StatSkill(131, 5, "MaterialLocation", true, false, false);
+        private readonly StatSkill materialLocation = new StatSkill(131, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill materialMetamorphose = new StatSkill(
-            127, 5, "MaterialMetamorphose", true, false, false);
+        private readonly StatSkill materialMetamorphose = new StatSkill(127, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat maxDamage = new ClassStat(285, 1234567890, "MaxDamage", false, false, false);
+        private readonly DynelStat maxDamage = new DynelStat(285, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat maxEnergy = new ClassStat(212, 1234567890, "MaxEnergy", false, false, false);
+        private readonly DynelStat maxEnergy = new DynelStat(212, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat maxMass = new ClassStat(24, 1234567890, "MaxMass", false, false, false);
+        private readonly DynelStat maxMass = new DynelStat(24, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat maxNCU = new ClassStat(181, 8, "MaxNCU", false, false, false);
+        private readonly DynelStat maxNCU = new DynelStat(181, 8, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatNano maxNanoEnergy = new StatNano(221, 1, "MaxNanoEnergy", false, false, false);
+        private readonly StatMaxNanoEnergy maxNanoEnergy = new StatMaxNanoEnergy(221, 1, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat maxShopItems = new ClassStat(606, 1234567890, "MaxShopItems", false, false, false);
+        private readonly DynelStat maxShopItems = new DynelStat(606, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat mechData = new ClassStat(662, 0, "MechData", false, false, false);
+        private readonly DynelStat mechData = new DynelStat(662, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill mechanicalEngineering = new StatSkill(
-            125, 5, "MechanicalEngineering", true, false, false);
+        private readonly StatSkill mechanicalEngineering = new StatSkill(125, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat meleeAC = new ClassStat(91, 0, "MeleeAC", true, false, false);
+        private readonly DynelStat meleeAC = new DynelStat(91, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat meleeDamageModifier = new ClassStat(
-            279, 0, "MeleeDamageModifier", false, false, false);
+        private readonly DynelStat meleeDamageModifier = new DynelStat(279, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill meleeEnergyWeapon = new StatSkill(104, 5, "MeleeEnergyWeapon", true, false, false);
+        private readonly StatSkill meleeEnergyWeapon = new StatSkill(104, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill meleeMultiple = new StatSkill(101, 5, "MeleeMultiple", true, false, false);
+        private readonly StatSkill meleeMultiple = new StatSkill(101, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat memberInstance = new ClassStat(
-            308, 1234567890, "MemberInstance", false, false, false);
+        private readonly DynelStat memberInstance = new DynelStat(308, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat memberType = new ClassStat(307, 1234567890, "MemberType", false, false, false);
+        private readonly DynelStat memberType = new DynelStat(307, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat members = new ClassStat(300, 999, "Members", false, false, false);
+        private readonly DynelStat members = new DynelStat(300, 999, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat mesh = new ClassStat(12, 17530, "Mesh", false, false, false);
+        private readonly DynelStat mesh = new DynelStat(12, 17530, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat metaType = new ClassStat(75, 0, "MetaType", false, false, false);
+        private readonly DynelStat metaType = new DynelStat(75, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat metersWalked = new ClassStat(252, 1234567890, "MeetersWalked", false, false, false);
+        private readonly DynelStat metersWalked = new DynelStat(252, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat minDamage = new ClassStat(286, 1234567890, "MinDamage", false, false, false);
+        private readonly DynelStat minDamage = new DynelStat(286, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat minMembers = new ClassStat(301, 1234567890, "MinMembers", false, false, false);
+        private readonly DynelStat minMembers = new DynelStat(301, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat missionBits1 = new ClassStat(256, 0, "MissionBits1", false, false, false);
+        private readonly DynelStat missionBits1 = new DynelStat(256, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat missionBits10 = new ClassStat(617, 0, "MissionBits10", false, false, false);
+        private readonly DynelStat missionBits10 = new DynelStat(617, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat missionBits11 = new ClassStat(618, 0, "MissionBits11", false, false, false);
+        private readonly DynelStat missionBits11 = new DynelStat(618, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat missionBits12 = new ClassStat(619, 0, "MissionBits12", false, false, false);
+        private readonly DynelStat missionBits12 = new DynelStat(619, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat missionBits2 = new ClassStat(257, 0, "MissionBits2", false, false, false);
+        private readonly DynelStat missionBits2 = new DynelStat(257, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat missionBits3 = new ClassStat(303, 0, "MissionBits3", false, false, false);
+        private readonly DynelStat missionBits3 = new DynelStat(303, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat missionBits4 = new ClassStat(432, 0, "MissionBits4", false, false, false);
+        private readonly DynelStat missionBits4 = new DynelStat(432, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat missionBits5 = new ClassStat(65, 0, "MissionBits5", false, false, false);
+        private readonly DynelStat missionBits5 = new DynelStat(65, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat missionBits6 = new ClassStat(66, 0, "MissionBits6", false, false, false);
+        private readonly DynelStat missionBits6 = new DynelStat(66, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat missionBits7 = new ClassStat(67, 0, "MissionBits7", false, false, false);
+        private readonly DynelStat missionBits7 = new DynelStat(67, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat missionBits8 = new ClassStat(544, 0, "MissionBits8", false, false, false);
+        private readonly DynelStat missionBits8 = new DynelStat(544, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat missionBits9 = new ClassStat(545, 0, "MissionBits9", false, false, false);
+        private readonly DynelStat missionBits9 = new DynelStat(545, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat monsterData = new ClassStat(359, 0, "MonsterData", false, false, true);
+        private readonly DynelStat monsterData = new DynelStat(359, 0, false, false, true);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat monsterLevelsKilled = new ClassStat(
-            254, 1234567890, "MonsterLevelsKilled", false, false, false);
+        private readonly DynelStat monsterLevelsKilled = new DynelStat(254, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat monsterScale = new ClassStat(360, 1234567890, "MonsterScale", false, false, true);
+        private readonly DynelStat monsterScale = new DynelStat(360, 1234567890, false, false, true);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat monsterTexture = new ClassStat(
-            344, 1234567890, "MonsterTexture", false, false, false);
+        private readonly DynelStat monsterTexture = new DynelStat(344, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat monthsPaid = new ClassStat(69, 0, "MonthsPaid", false, false, false);
+        private readonly DynelStat monthsPaid = new DynelStat(69, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat moreFlags = new ClassStat(177, 1234567890, "MoreFlags", false, false, true);
+        private readonly DynelStat moreFlags = new DynelStat(177, 1234567890, false, false, true);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat multipleCount = new ClassStat(412, 1234567890, "MultipleCount", false, false, false);
+        private readonly DynelStat multipleCount = new DynelStat(412, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat name = new ClassStat(14, 1234567890, "Name", false, false, false);
+        private readonly DynelStat name = new DynelStat(14, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat nameTemplate = new ClassStat(446, 1234567890, "NameTemplate", false, false, false);
+        private readonly DynelStat nameTemplate = new DynelStat(446, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill nanoAC = new StatSkill(168, 5, "NanoAC", true, false, false);
+        private readonly StatSkill nanoAC = new StatSkill(168, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat nanoDamageModifier = new ClassStat(315, 0, "NanoDamageModifier", false, false, false);
+        private readonly DynelStat nanoDamageModifier = new DynelStat(315, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat nanoDamageMultiplier = new ClassStat(
-            536, 0, "NanoDamageMultiplier", false, false, false);
+        private readonly DynelStat nanoDamageMultiplier = new DynelStat(536, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatNanoDelta nanoDelta = new StatNanoDelta(364, 1234567890, "NanoDelta", false, false, false);
+        private readonly StatNanoDelta nanoDelta = new StatNanoDelta(364, 1234567890, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill nanoEnergyPool = new StatSkill(132, 5, "NanoEnergyPool", true, false, false);
+        private readonly StatSkill nanoEnergyPool = new StatSkill(132, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat nanoFocusLevel = new ClassStat(355, 0, "NanoFocusLevel", false, false, false);
+        private readonly DynelStat nanoFocusLevel = new DynelStat(355, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatNanoInterval nanoInterval = new StatNanoInterval(
-            363, 28, "NanoInterval", false, false, false);
+        private readonly StatNanoInterval nanoInterval = new StatNanoInterval(363, 28, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat nanoPoints = new ClassStat(407, 1234567890, "NanoPoints", false, false, false);
+        private readonly DynelStat nanoPoints = new DynelStat(407, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill nanoProgramming = new StatSkill(160, 5, "NanoProgramming", true, false, false);
+        private readonly StatSkill nanoProgramming = new StatSkill(160, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill nanoProwessInitiative = new StatSkill(
-            149, 5, "NanoProwessInitiative", true, false, false);
+        private readonly StatSkill nanoProwessInitiative = new StatSkill(149, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat nanoSpeed = new ClassStat(406, 1234567890, "NanoSpeed", false, false, false);
+        private readonly DynelStat nanoSpeed = new DynelStat(406, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat nanoVulnerability = new ClassStat(
-            537, 1234567890, "NanoVulnerability", false, false, false);
+        private readonly DynelStat nanoVulnerability = new DynelStat(537, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat newbieHP = new ClassStat(600, 1234567890, "NewbieHP", false, false, false);
+        private readonly DynelStat newbieHP = new DynelStat(600, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat newbieNP = new ClassStat(603, 1234567890, "NewbieNP", false, false, false);
+        private readonly DynelStat newbieNP = new DynelStat(603, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat nextDoorInBuilding = new ClassStat(
-            190, 1234567890, "NextDoorInBuilding", false, false, false);
+        private readonly DynelStat nextDoorInBuilding = new DynelStat(190, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat nextFormula = new ClassStat(411, 1234567890, "NextFormula", false, false, false);
+        private readonly DynelStat nextFormula = new DynelStat(411, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatNextSK nextSK = new StatNextSK(575, 0, "NextSK", false, false, false);
+        private readonly StatNextSK nextSK = new StatNextSK(575, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatNextXP nextXP = new StatNextXP(350, 1450, "NextXP", false, false, false);
+        private readonly StatNextXP nextXP = new StatNextXP(350, 1450, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npCostModifier = new ClassStat(318, 0, "NPCostModifier", false, false, false);
+        private readonly DynelStat npCostModifier = new DynelStat(318, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npLevelUp = new ClassStat(604, 1234567890, "NPLevelUp", false, false, false);
+        private readonly DynelStat npLevelUp = new DynelStat(604, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npPerSkill = new ClassStat(605, 1234567890, "NPPerSkill", false, false, false);
+        private readonly DynelStat npPerSkill = new DynelStat(605, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcBrainState = new ClassStat(429, 1234567890, "NPCBrainState", false, false, false);
+        private readonly DynelStat npcBrainState = new DynelStat(429, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcCommand = new ClassStat(439, 1234567890, "NPCCommand", false, false, false);
+        private readonly DynelStat npcCommand = new DynelStat(439, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcCommandArg = new ClassStat(445, 1234567890, "NPCCommandArg", false, false, false);
+        private readonly DynelStat npcCommandArg = new DynelStat(445, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcCryForHelpRange = new ClassStat(
-            465, 1234567890, "NPCCryForHelpRange", false, false, false);
+        private readonly DynelStat npcCryForHelpRange = new DynelStat(465, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcFamily = new ClassStat(455, 1234567890, "NPCFamily", false, false, false);
+        private readonly DynelStat npcFamily = new DynelStat(455, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcFlags = new ClassStat(179, 1234567890, "NPCFlags", false, false, false);
+        private readonly DynelStat npcFlags = new DynelStat(179, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcFovStatus = new ClassStat(533, 1234567890, "NPCFovStatus", false, false, false);
+        private readonly DynelStat npcFovStatus = new DynelStat(533, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcHasPatrolList = new ClassStat(
-            452, 1234567890, "NPCHasPatrolList", false, false, false);
+        private readonly DynelStat npcHasPatrolList = new DynelStat(452, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcHash = new ClassStat(356, 1234567890, "NPCHash", false, false, false);
+        private readonly DynelStat npcHash = new DynelStat(356, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcHatelistSize = new ClassStat(
-            457, 1234567890, "NPCHatelistSize", false, false, false);
+        private readonly DynelStat npcHatelistSize = new DynelStat(457, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcIsSurrendering = new ClassStat(
-            449, 1234567890, "NPCIsSurrendering", false, false, false);
+        private readonly DynelStat npcIsSurrendering = new DynelStat(449, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcNumPets = new ClassStat(458, 1234567890, "NPCNumPets", false, false, false);
+        private readonly DynelStat npcNumPets = new DynelStat(458, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcScriptAmsScale = new ClassStat(
-            581, 1234567890, "NPCScriptAMSScale", false, false, false);
+        private readonly DynelStat npcScriptAmsScale = new DynelStat(581, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcSpellArg1 = new ClassStat(638, 1234567890, "NPCSpellArg1", false, false, false);
+        private readonly DynelStat npcSpellArg1 = new DynelStat(638, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcSpellRet1 = new ClassStat(639, 1234567890, "NPCSpellRet1", false, false, false);
+        private readonly DynelStat npcSpellRet1 = new DynelStat(639, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcSurrenderInstance = new ClassStat(
-            451, 1234567890, "NPCSurrenderInstance", false, false, false);
+        private readonly DynelStat npcSurrenderInstance = new DynelStat(451, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcUseFightModeRegenRate = new ClassStat(
-            519, 1234567890, "NPCUseFightModeRegenRate", false, false, false);
+        private readonly DynelStat npcUseFightModeRegenRate = new DynelStat(519, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcVicinityChars = new ClassStat(
-            453, 1234567890, "NPCVicinityChars", false, false, false);
+        private readonly DynelStat npcVicinityChars = new DynelStat(453, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcVicinityFamily = new ClassStat(
-            580, 1234567890, "NPCVicinityFamily", false, false, false);
+        private readonly DynelStat npcVicinityFamily = new DynelStat(580, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat npcVicinityPlayers = new ClassStat(
-            518, 1234567890, "NPCVicinityPlayers", false, false, false);
+        private readonly DynelStat npcVicinityPlayers = new DynelStat(518, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat numAttackEffects = new ClassStat(
-            291, 1234567890, "NumAttackEffects", false, false, false);
+        private readonly DynelStat numAttackEffects = new DynelStat(291, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat numberOfItems = new ClassStat(396, 1234567890, "NumberOfItems", false, false, false);
+        private readonly DynelStat numberOfItems = new DynelStat(396, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat numberOfTeamMembers = new ClassStat(
-            587, 1234567890, "NumberOfTeamMembers", false, false, false);
+        private readonly DynelStat numberOfTeamMembers = new DynelStat(587, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat numberOnHateList = new ClassStat(
-            529, 1234567890, "NumberOnHateList", false, false, false);
+        private readonly DynelStat numberOnHateList = new DynelStat(529, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat objectType = new ClassStat(1001, 1234567890, "Type", false, true, false);
+        private readonly DynelStat objectType = new DynelStat(1001, 1234567890, false, true, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat odMaxSizeAdd = new ClassStat(463, 1234567890, "ODMaxSizeAdd", false, false, false);
+        private readonly DynelStat odMaxSizeAdd = new DynelStat(463, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat odMinSizeAdd = new ClassStat(459, 1234567890, "ODMinSizeAdd", false, false, false);
+        private readonly DynelStat odMinSizeAdd = new DynelStat(459, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat oldTimeExist = new ClassStat(392, 1234567890, "OldTimeExist", false, false, false);
+        private readonly DynelStat oldTimeExist = new DynelStat(392, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat onTowerCreation = new ClassStat(
-            513, 1234567890, "OnTowerCreation", false, false, false);
+        private readonly DynelStat onTowerCreation = new DynelStat(513, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill onehBluntWeapons = new StatSkill(102, 5, "1hBluntWeapons", true, false, false);
+        private readonly StatSkill onehBluntWeapons = new StatSkill(102, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill onehEdgedWeapon = new StatSkill(103, 5, "1hEdgedWeapon", true, false, false);
+        private readonly StatSkill onehEdgedWeapon = new StatSkill(103, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat orientationMode = new ClassStat(
-            197, 1234567890, "OrientationMode", false, false, false);
+        private readonly DynelStat orientationMode = new DynelStat(197, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat originatorType = new ClassStat(
-            490, 1234567890, "OriginatorType", false, false, false);
+        private readonly DynelStat originatorType = new DynelStat(490, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat otArmedForces = new ClassStat(560, 0, "OTArmedForces", false, false, false);
+        private readonly DynelStat otArmedForces = new DynelStat(560, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat otFollowers = new ClassStat(567, 0, "OTFollowers", false, false, false);
+        private readonly DynelStat otFollowers = new DynelStat(567, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat otMed = new ClassStat(562, 1234567890, "OTMed", false, false, false);
+        private readonly DynelStat otMed = new DynelStat(562, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat otOperator = new ClassStat(568, 0, "OTOperator", false, false, false);
+        private readonly DynelStat otOperator = new DynelStat(568, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat otTrans = new ClassStat(564, 0, "OTTrans", false, false, false);
+        private readonly DynelStat otTrans = new DynelStat(564, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat otUnredeemed = new ClassStat(569, 0, "OTUnredeemed", false, false, false);
+        private readonly DynelStat otUnredeemed = new DynelStat(569, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat outerRadius = new ClassStat(358, 1234567890, "OuterRadius", false, false, false);
+        private readonly DynelStat outerRadius = new DynelStat(358, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat overrideMaterial = new ClassStat(
-            337, 1234567890, "OverrideMaterial", false, false, false);
+        private readonly DynelStat overrideMaterial = new DynelStat(337, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat overrideTexture = new ClassStat(
-            336, 1234567890, "OverrideTexture", false, false, false);
+        private readonly DynelStat overrideTexture = new DynelStat(336, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat overrideTextureAttractor = new ClassStat(
-            1014, 0, "OverrideTextureAttractor", false, false, false);
+        private readonly DynelStat overrideTextureAttractor = new DynelStat(1014, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat overrideTextureBack = new ClassStat(
-            1013, 0, "OverrideTextureBack", false, false, false);
+        private readonly DynelStat overrideTextureBack = new DynelStat(1013, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat overrideTextureHead = new ClassStat(
-            1008, 0, "OverrideTextureHead", false, false, false);
+        private readonly DynelStat overrideTextureHead = new DynelStat(1008, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat overrideTextureShoulderpadLeft = new ClassStat(
-            1012, 0, "OverrideTextureShoulderpadLeft", false, false, false);
+        private readonly DynelStat overrideTextureShoulderpadLeft = new DynelStat(1012, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat overrideTextureShoulderpadRight = new ClassStat(
-            1011, 0, "OverrideTextureShoulderpadRight", false, false, false);
+        private readonly DynelStat overrideTextureShoulderpadRight = new DynelStat(1011, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat overrideTextureWeaponLeft = new ClassStat(
-            1010, 0, "OverrideTextureWeaponLeft", false, false, false);
+        private readonly DynelStat overrideTextureWeaponLeft = new DynelStat(1010, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat overrideTextureWeaponRight = new ClassStat(
-            1009, 0, "OverrideTextureWeaponRight", false, false, false);
+        private readonly DynelStat overrideTextureWeaponRight = new DynelStat(1009, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat ownedTowers = new ClassStat(514, 1234567890, "OwnedTowers", false, false, false);
+        private readonly DynelStat ownedTowers = new DynelStat(514, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat ownerInstance = new ClassStat(433, 1234567890, "OwnerInstance", false, false, false);
+        private readonly DynelStat ownerInstance = new DynelStat(433, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat paidPoints = new ClassStat(672, 0, "PaidPoints", false, false, false);
+        private readonly DynelStat paidPoints = new DynelStat(672, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat parentInstance = new ClassStat(44, 1234567890, "ParentInstance", false, false, false);
+        private readonly DynelStat parentInstance = new DynelStat(44, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat parentType = new ClassStat(43, 1234567890, "ParentType", false, false, false);
+        private readonly DynelStat parentType = new DynelStat(43, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill parry = new StatSkill(145, 5, "Parry", true, false, false);
+        private readonly StatSkill parry = new StatSkill(145, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat percentChemicalDamage = new ClassStat(
-            628, 1234567890, "PercentChemicalDamage", false, false, false);
+        private readonly DynelStat percentChemicalDamage = new DynelStat(628, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat percentColdDamage = new ClassStat(
-            622, 1234567890, "PercentColdDamage", false, false, false);
+        private readonly DynelStat percentColdDamage = new DynelStat(622, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat percentEnergyDamage = new ClassStat(
-            627, 1234567890, "PercentEnergyDamage", false, false, false);
+        private readonly DynelStat percentEnergyDamage = new DynelStat(627, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat percentFireDamage = new ClassStat(
-            621, 1234567890, "PercentFireDamage", false, false, false);
+        private readonly DynelStat percentFireDamage = new DynelStat(621, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat percentMeleeDamage = new ClassStat(
-            623, 1234567890, "PercentMeleeDamage", false, false, false);
+        private readonly DynelStat percentMeleeDamage = new DynelStat(623, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat percentPoisonDamage = new ClassStat(
-            625, 1234567890, "PercentPoisonDamage", false, false, false);
+        private readonly DynelStat percentPoisonDamage = new DynelStat(625, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat percentProjectileDamage = new ClassStat(
-            624, 1234567890, "PercentProjectileDamage", false, false, false);
+        private readonly DynelStat percentProjectileDamage = new DynelStat(624, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat percentRadiationDamage = new ClassStat(
-            626, 1234567890, "PercentRadiationDamage", false, false, false);
+        private readonly DynelStat percentRadiationDamage = new DynelStat(626, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat percentRemainingHealth = new ClassStat(
-            525, 1234567890, "PercentRemainingHealth", false, false, false);
+        private readonly DynelStat percentRemainingHealth = new DynelStat(525, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat percentRemainingNano = new ClassStat(
-            526, 1234567890, "PercentRemainingNano", false, false, false);
+        private readonly DynelStat percentRemainingNano = new DynelStat(526, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill perception = new StatSkill(136, 5, "Perception", true, false, false);
+        private readonly StatSkill perception = new StatSkill(136, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat personalResearchGoal = new ClassStat(
-            265, 0, "PersonalResearchGoal", false, false, false);
+        private readonly DynelStat personalResearchGoal = new DynelStat(265, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat personalResearchLevel = new ClassStat(
-            263, 0, "PersonalResearchLevel", false, false, false);
+        private readonly DynelStat personalResearchLevel = new DynelStat(263, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat petCounter = new ClassStat(251, 1234567890, "PetCounter", false, false, false);
+        private readonly DynelStat petCounter = new DynelStat(251, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat petMaster = new ClassStat(196, 1234567890, "PetMaster", false, false, false);
+        private readonly DynelStat petMaster = new DynelStat(196, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat petReq1 = new ClassStat(467, 1234567890, "PetReq1", false, false, false);
+        private readonly DynelStat petReq1 = new DynelStat(467, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat petReq2 = new ClassStat(468, 1234567890, "PetReq2", false, false, false);
+        private readonly DynelStat petReq2 = new DynelStat(468, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat petReq3 = new ClassStat(469, 1234567890, "PetReq3", false, false, false);
+        private readonly DynelStat petReq3 = new DynelStat(469, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat petReqVal1 = new ClassStat(485, 1234567890, "PetReqVal1", false, false, false);
+        private readonly DynelStat petReqVal1 = new DynelStat(485, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat petReqVal2 = new ClassStat(486, 1234567890, "PetReqVal2", false, false, false);
+        private readonly DynelStat petReqVal2 = new DynelStat(486, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat petReqVal3 = new ClassStat(487, 1234567890, "PetReqVal3", false, false, false);
+        private readonly DynelStat petReqVal3 = new DynelStat(487, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat petState = new ClassStat(671, 1234567890, "PetState", false, false, false);
+        private readonly DynelStat petState = new DynelStat(671, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat petType = new ClassStat(512, 1234567890, "PetType", false, false, false);
+        private readonly DynelStat petType = new DynelStat(512, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill pharmaceuticals = new StatSkill(159, 5, "Pharmaceuticals", true, false, false);
+        private readonly StatSkill pharmaceuticals = new StatSkill(159, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill physicalProwessInitiative = new StatSkill(
-            120, 5, "PhysicalProwessInitiative", true, false, false);
+        private readonly StatSkill physicalProwessInitiative = new StatSkill(120, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill piercing = new StatSkill(106, 5, "Piercing", true, false, false);
+        private readonly StatSkill piercing = new StatSkill(106, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill pistol = new StatSkill(112, 5, "Pistol", true, false, false);
+        private readonly StatSkill pistol = new StatSkill(112, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat placement = new ClassStat(298, 1234567890, "Placement", false, false, false);
+        private readonly DynelStat placement = new DynelStat(298, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat playerId = new ClassStat(607, 1234567890, "PlayerID", false, true, false);
+        private readonly DynelStat playerId = new DynelStat(607, 1234567890, false, true, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat playerKilling = new ClassStat(323, 1234567890, "PlayerKilling", false, false, false);
+        private readonly DynelStat playerKilling = new DynelStat(323, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat playerOptions = new ClassStat(576, 0, "PlayerOptions", false, false, false);
+        private readonly DynelStat playerOptions = new DynelStat(576, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat playfieldType = new ClassStat(438, 1234567890, "PlayfieldType", false, false, false);
+        private readonly DynelStat playfieldType = new DynelStat(438, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat poisonAC = new ClassStat(96, 0, "PoisonAC", true, false, false);
+        private readonly DynelStat poisonAC = new DynelStat(96, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat poisonDamageModifier = new ClassStat(
-            317, 0, "PoisonDamageModifier", false, false, false);
+        private readonly DynelStat poisonDamageModifier = new DynelStat(317, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat prevMovementMode = new ClassStat(174, 3, "PrevMovementMode", false, false, false);
+        private readonly DynelStat prevMovementMode = new DynelStat(174, 3, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat previousHealth = new ClassStat(11, 50, "PreviousHealth", false, false, false);
+        private readonly DynelStat previousHealth = new DynelStat(11, 50, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat price = new ClassStat(74, 1234567890, "Price", false, false, false);
+        private readonly DynelStat price = new DynelStat(74, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat primaryItemInstance = new ClassStat(
-            81, 1234567890, "PrimaryItemInstance", false, false, false);
+        private readonly DynelStat primaryItemInstance = new DynelStat(81, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat primaryItemType = new ClassStat(
-            80, 1234567890, "PrimaryItemType", false, false, false);
+        private readonly DynelStat primaryItemType = new DynelStat(80, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat primaryTemplateId = new ClassStat(
-            395, 1234567890, "PrimaryTemplateID", false, false, false);
+        private readonly DynelStat primaryTemplateId = new DynelStat(395, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat procChance1 = new ClassStat(556, 1234567890, "ProcChance1", false, false, false);
+        private readonly DynelStat procChance1 = new DynelStat(556, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat procChance2 = new ClassStat(557, 1234567890, "ProcChance2", false, false, false);
+        private readonly DynelStat procChance2 = new DynelStat(557, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat procChance3 = new ClassStat(558, 1234567890, "ProcChance3", false, false, false);
+        private readonly DynelStat procChance3 = new DynelStat(558, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat procChance4 = new ClassStat(559, 1234567890, "ProcChance4", false, false, false);
+        private readonly DynelStat procChance4 = new DynelStat(559, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat procInitiative1 = new ClassStat(
-            539, 1234567890, "ProcInitiative1", false, false, false);
+        private readonly DynelStat procInitiative1 = new DynelStat(539, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat procInitiative2 = new ClassStat(
-            540, 1234567890, "ProcInitiative2", false, false, false);
+        private readonly DynelStat procInitiative2 = new DynelStat(540, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat procInitiative3 = new ClassStat(
-            541, 1234567890, "ProcInitiative3", false, false, false);
+        private readonly DynelStat procInitiative3 = new DynelStat(541, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat procInitiative4 = new ClassStat(
-            542, 1234567890, "ProcInitiative4", false, false, false);
+        private readonly DynelStat procInitiative4 = new DynelStat(542, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat procNano1 = new ClassStat(552, 1234567890, "ProcNano1", false, false, false);
+        private readonly DynelStat procNano1 = new DynelStat(552, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat procNano2 = new ClassStat(553, 1234567890, "ProcNano2", false, false, false);
+        private readonly DynelStat procNano2 = new DynelStat(553, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat procNano3 = new ClassStat(554, 1234567890, "ProcNano3", false, false, false);
+        private readonly DynelStat procNano3 = new DynelStat(554, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat procNano4 = new ClassStat(555, 1234567890, "ProcNano4", false, false, false);
+        private readonly DynelStat procNano4 = new DynelStat(555, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat profession = new ClassStat(60, 1234567890, "Profession", false, false, false);
+        private readonly DynelStat profession = new DynelStat(60, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat professionLevel = new ClassStat(
-            10, 1234567890, "ProfessionLevel", false, true, false);
+        private readonly DynelStat professionLevel = new DynelStat(10, 1234567890, false, true, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat projectileAC = new ClassStat(90, 0, "ProjectileAC", true, false, false);
+        private readonly DynelStat projectileAC = new DynelStat(90, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat projectileDamageModifier = new ClassStat(
-            278, 0, "ProjectileDamageModifier", false, false, false);
+        private readonly DynelStat projectileDamageModifier = new DynelStat(278, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat proximityRangeIndoors = new ClassStat(
-            484, 1234567890, "ProximityRangeIndoors", false, false, false);
+        private readonly DynelStat proximityRangeIndoors = new DynelStat(484, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat proximityRangeOutdoors = new ClassStat(
-            454, 1234567890, "ProximityRangeOutdoors", false, false, false);
+        private readonly DynelStat proximityRangeOutdoors = new DynelStat(454, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat psychic = new ClassStat(21, 0, "Psychic", true, false, false);
+        private readonly DynelStat psychic = new DynelStat(21, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill psychologicalModification = new StatSkill(
-            129, 5, "PsychologicalModification", true, false, false);
+        private readonly StatSkill psychologicalModification = new StatSkill(129, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill psychology = new StatSkill(162, 5, "Psychology", true, false, false);
+        private readonly StatSkill psychology = new StatSkill(162, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat pvPLevelsKilled = new ClassStat(
-            255, 1234567890, "PvPLevelsKilled", false, false, false);
+        private readonly DynelStat pvPLevelsKilled = new DynelStat(255, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat pvpDuelDeaths = new ClassStat(675, 0, "PVPDuelDeaths", false, false, false);
+        private readonly DynelStat pvpDuelDeaths = new DynelStat(675, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat pvpDuelKills = new ClassStat(674, 0, "PVPDuelKills", false, false, false);
+        private readonly DynelStat pvpDuelKills = new DynelStat(674, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat pvpDuelScore = new ClassStat(684, 0, "PVPDuelScore", false, false, false);
+        private readonly DynelStat pvpDuelScore = new DynelStat(684, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat pvpProfessionDuelDeaths = new ClassStat(
-            677, 0, "PVPProfessionDuelDeaths", false, false, false);
+        private readonly DynelStat pvpProfessionDuelDeaths = new DynelStat(677, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat pvpProfessionDuelKills = new ClassStat(
-            676, 0, "PVPProfessionDuelKills", false, false, false);
+        private readonly DynelStat pvpProfessionDuelKills = new DynelStat(676, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat pvpRankedSoloDeaths = new ClassStat(
-            679, 0, "PVPRankedSoloDeaths", false, false, false);
+        private readonly DynelStat pvpRankedSoloDeaths = new DynelStat(679, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat pvpRankedSoloKills = new ClassStat(678, 0, "PVPRankedSoloKills", false, false, false);
+        private readonly DynelStat pvpRankedSoloKills = new DynelStat(678, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat pvpRankedTeamDeaths = new ClassStat(
-            681, 0, "PVPRankedTeamDeaths", false, false, false);
+        private readonly DynelStat pvpRankedTeamDeaths = new DynelStat(681, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat pvpRankedTeamKills = new ClassStat(680, 0, "PVPRankedTeamKills", false, false, false);
+        private readonly DynelStat pvpRankedTeamKills = new DynelStat(680, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat pvpRating = new ClassStat(333, 1300, "PvP_Rating", false, false, false);
+        private readonly DynelStat pvpRating = new DynelStat(333, 1300, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat pvpSoloScore = new ClassStat(682, 0, "PVPSoloScore", false, false, false);
+        private readonly DynelStat pvpSoloScore = new DynelStat(682, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat pvpTeamScore = new ClassStat(683, 0, "PVPTeamScore", false, false, false);
+        private readonly DynelStat pvpTeamScore = new DynelStat(683, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat qtDungeonInstance = new ClassStat(
-            497, 1234567890, "QTDungeonInstance", false, false, false);
+        private readonly DynelStat qtDungeonInstance = new DynelStat(497, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat qtKillNumMonsterCount1 = new ClassStat(
-            504, 1234567890, "QTKillNumMonsterCount1", false, false, false);
+        private readonly DynelStat qtKillNumMonsterCount1 = new DynelStat(504, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat qtKillNumMonsterCount2 = new ClassStat(
-            506, 1234567890, "QTKillNumMonsterCount2", false, false, false);
+        private readonly DynelStat qtKillNumMonsterCount2 = new DynelStat(506, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat qtKillNumMonsterCount3 = new ClassStat(
-            508, 1234567890, "QTKillNumMonsterCount3", false, false, false);
+        private readonly DynelStat qtKillNumMonsterCount3 = new DynelStat(508, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat qtKillNumMonsterID3 = new ClassStat(
-            507, 1234567890, "QTKillNumMonsterID3", false, false, false);
+        private readonly DynelStat qtKillNumMonsterID3 = new DynelStat(507, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat qtKillNumMonsterId1 = new ClassStat(
-            503, 1234567890, "QTKillNumMonsterID1", false, false, false);
+        private readonly DynelStat qtKillNumMonsterId1 = new DynelStat(503, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat qtKillNumMonsterId2 = new ClassStat(
-            505, 1234567890, "QTKillNumMonsterID2", false, false, false);
+        private readonly DynelStat qtKillNumMonsterId2 = new DynelStat(505, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat qtKilledMonsters = new ClassStat(
-            499, 1234567890, "QTKilledMonsters", false, false, false);
+        private readonly DynelStat qtKilledMonsters = new DynelStat(499, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat qtNumMonsters = new ClassStat(498, 1234567890, "QTNumMonsters", false, false, false);
+        private readonly DynelStat qtNumMonsters = new DynelStat(498, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat questAsMaximumRange = new ClassStat(
-            802, 1234567890, "QuestASMaximumRange", false, false, false);
+        private readonly DynelStat questAsMaximumRange = new DynelStat(802, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat questAsMinimumRange = new ClassStat(
-            801, 1234567890, "QuestASMinimumRange", false, false, false);
+        private readonly DynelStat questAsMinimumRange = new DynelStat(801, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat questBoothDifficulty = new ClassStat(
-            800, 1234567890, "QuestBoothDifficulty", false, false, false);
+        private readonly DynelStat questBoothDifficulty = new DynelStat(800, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat questIndex0 = new ClassStat(509, 1234567890, "QuestIndex0", false, false, false);
+        private readonly DynelStat questIndex0 = new DynelStat(509, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat questIndex1 = new ClassStat(492, 1234567890, "QuestIndex1", false, false, false);
+        private readonly DynelStat questIndex1 = new DynelStat(492, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat questIndex2 = new ClassStat(493, 1234567890, "QuestIndex2", false, false, false);
+        private readonly DynelStat questIndex2 = new DynelStat(493, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat questIndex3 = new ClassStat(494, 1234567890, "QuestIndex3", false, false, false);
+        private readonly DynelStat questIndex3 = new DynelStat(494, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat questIndex4 = new ClassStat(495, 1234567890, "QuestIndex4", false, false, false);
+        private readonly DynelStat questIndex4 = new DynelStat(495, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat questIndex5 = new ClassStat(496, 1234567890, "QuestIndex5", false, false, false);
+        private readonly DynelStat questIndex5 = new DynelStat(496, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat questInstance = new ClassStat(491, 1234567890, "QuestInstance", false, false, false);
+        private readonly DynelStat questInstance = new DynelStat(491, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat questLevelsSolved = new ClassStat(
-            253, 1234567890, "QuestLevelsSolved", false, false, false);
+        private readonly DynelStat questLevelsSolved = new DynelStat(253, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat questStat = new ClassStat(261, 1234567890, "QuestStat", false, false, false);
+        private readonly DynelStat questStat = new DynelStat(261, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat questTimeout = new ClassStat(510, 1234567890, "QuestTimeout", false, false, false);
+        private readonly DynelStat questTimeout = new DynelStat(510, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat race = new ClassStat(89, 1, "Race", false, false, false);
+        private readonly DynelStat race = new DynelStat(89, 1, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat radiationAC = new ClassStat(94, 0, "RadiationAC", true, false, false);
+        private readonly DynelStat radiationAC = new DynelStat(94, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat radiationDamageModifier = new ClassStat(
-            282, 0, "RadiationDamageModifier", false, false, false);
+        private readonly DynelStat radiationDamageModifier = new DynelStat(282, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat rangeIncreaserNF = new ClassStat(381, 0, "RangeIncreaserNF", false, false, false);
+        private readonly DynelStat rangeIncreaserNF = new DynelStat(381, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat rangeIncreaserWeapon = new ClassStat(
-            380, 0, "RangeIncreaserWeapon", false, false, false);
+        private readonly DynelStat rangeIncreaserWeapon = new DynelStat(380, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat readOnly = new ClassStat(435, 1234567890, "ReadOnly", false, false, false);
+        private readonly DynelStat readOnly = new DynelStat(435, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat rechargeDelay = new ClassStat(210, 1234567890, "RechargeDelay", false, false, false);
+        private readonly DynelStat rechargeDelay = new DynelStat(210, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat rechargeDelayCap = new ClassStat(
-            524, 1234567890, "RechargeDelayCap", false, false, false);
+        private readonly DynelStat rechargeDelayCap = new DynelStat(524, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reclaimItem = new ClassStat(365, 1234567890, "ReclaimItem", false, false, false);
+        private readonly DynelStat reclaimItem = new DynelStat(365, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectChemicalAC = new ClassStat(208, 0, "ReflectChemicalAC", true, false, false);
+        private readonly DynelStat reflectChemicalAC = new DynelStat(208, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectColdAC = new ClassStat(217, 0, "ReflectColdAC", true, false, false);
+        private readonly DynelStat reflectColdAC = new DynelStat(217, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectEnergyAC = new ClassStat(207, 0, "ReflectEnergyAC", true, false, false);
+        private readonly DynelStat reflectEnergyAC = new DynelStat(207, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectFireAC = new ClassStat(219, 0, "ReflectFireAC", true, false, false);
+        private readonly DynelStat reflectFireAC = new DynelStat(219, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectMeleeAC = new ClassStat(206, 0, "ReflectMeleeAC", true, false, false);
+        private readonly DynelStat reflectMeleeAC = new DynelStat(206, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectNanoAC = new ClassStat(218, 0, "ReflectNanoAC", true, false, false);
+        private readonly DynelStat reflectNanoAC = new DynelStat(218, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectPoisonAC = new ClassStat(225, 0, "ReflectPoisonAC", false, false, false);
+        private readonly DynelStat reflectPoisonAC = new DynelStat(225, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectProjectileAC = new ClassStat(
-            205, 0, "ReflectProjectileAC", true, false, false);
+        private readonly DynelStat reflectProjectileAC = new DynelStat(205, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectRadiationAC = new ClassStat(216, 0, "ReflectRadiationAC", true, false, false);
+        private readonly DynelStat reflectRadiationAC = new DynelStat(216, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectReturnedChemicalAC = new ClassStat(
-            478, 0, "ReflectReturnedChemicalAC", false, false, false);
+        private readonly DynelStat reflectReturnedChemicalAC = new DynelStat(478, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectReturnedColdAC = new ClassStat(
-            480, 0, "ReflectReturnedColdAC", false, false, false);
+        private readonly DynelStat reflectReturnedColdAC = new DynelStat(480, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectReturnedEnergyAC = new ClassStat(
-            477, 0, "ReflectReturnedEnergyAC", false, false, false);
+        private readonly DynelStat reflectReturnedEnergyAC = new DynelStat(477, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectReturnedFireAC = new ClassStat(
-            482, 0, "ReflectReturnedFireAC", false, false, false);
+        private readonly DynelStat reflectReturnedFireAC = new DynelStat(482, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectReturnedMeleeAC = new ClassStat(
-            476, 0, "ReflectReturnedMeleeAC", false, false, false);
+        private readonly DynelStat reflectReturnedMeleeAC = new DynelStat(476, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectReturnedNanoAC = new ClassStat(
-            481, 0, "ReflectReturnedNanoAC", false, false, false);
+        private readonly DynelStat reflectReturnedNanoAC = new DynelStat(481, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectReturnedPoisonAC = new ClassStat(
-            483, 0, "ReflectReturnedPoisonAC", false, false, false);
+        private readonly DynelStat reflectReturnedPoisonAC = new DynelStat(483, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectReturnedProjectileAC = new ClassStat(
-            475, 0, "ReflectReturnedProjectileAC", false, false, false);
+        private readonly DynelStat reflectReturnedProjectileAC = new DynelStat(475, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat reflectReturnedRadiationAC = new ClassStat(
-            479, 0, "ReflectReturnedRadiationAC", false, false, false);
+        private readonly DynelStat reflectReturnedRadiationAC = new DynelStat(479, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat regainXPPercentage = new ClassStat(593, 0, "RegainXPPercentage", false, false, false);
+        private readonly DynelStat regainXPPercentage = new DynelStat(593, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat repairDifficulty = new ClassStat(
-            73, 1234567890, "RepairDifficulty", false, false, false);
+        private readonly DynelStat repairDifficulty = new DynelStat(73, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat repairSkill = new ClassStat(77, 1234567890, "RepairSkill", false, false, false);
+        private readonly DynelStat repairSkill = new DynelStat(77, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat resistModifier = new ClassStat(
-            393, 1234567890, "ResistModifier", false, false, false);
+        private readonly DynelStat resistModifier = new DynelStat(393, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat restModifier = new ClassStat(425, 1234567890, "RestModifier", false, false, false);
+        private readonly DynelStat restModifier = new DynelStat(425, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat resurrectDest = new ClassStat(362, 1234567890, "ResurrectDest", false, false, false);
+        private readonly DynelStat resurrectDest = new DynelStat(362, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill rifle = new StatSkill(113, 5, "Rifle", true, false, false);
+        private readonly StatSkill rifle = new StatSkill(113, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill riposte = new StatSkill(143, 5, "Riposte", true, false, false);
+        private readonly StatSkill riposte = new StatSkill(143, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat ritualTargetInst = new ClassStat(
-            370, 1234567890, "RitualTargetInst", false, false, false);
+        private readonly DynelStat ritualTargetInst = new DynelStat(370, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat rnd = new ClassStat(520, 1234567890, "Rnd", false, false, false);
+        private readonly DynelStat rnd = new DynelStat(520, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat rotation = new ClassStat(400, 1234567890, "Rotation", false, false, false);
+        private readonly DynelStat rotation = new DynelStat(400, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat rp = new ClassStat(199, 0, "RP", false, false, false);
+        private readonly DynelStat rp = new DynelStat(199, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill runSpeed = new StatSkill(156, 5, "RunSpeed", true, false, false);
+        private readonly StatSkill runSpeed = new StatSkill(156, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat savedXP = new ClassStat(334, 0, "SavedXP", false, false, false);
+        private readonly DynelStat savedXP = new DynelStat(334, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat school = new ClassStat(405, 1234567890, "School", false, false, false);
+        private readonly DynelStat school = new DynelStat(405, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat secondaryItemInstance = new ClassStat(
-            83, 1234567890, "SecondaryItemInstance", false, false, false);
+        private readonly DynelStat secondaryItemInstance = new DynelStat(83, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat secondaryItemTemplate = new ClassStat(
-            273, 1234567890, "SecondaryItemTemplate", false, false, false);
+        private readonly DynelStat secondaryItemTemplate = new DynelStat(273, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat secondaryItemType = new ClassStat(
-            82, 1234567890, "SecondaryItemType", false, false, false);
+        private readonly DynelStat secondaryItemType = new DynelStat(82, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat selectedTarget = new ClassStat(
-            431, 1234567890, "SelectedTarget", false, false, false);
+        private readonly DynelStat selectedTarget = new DynelStat(431, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat selectedTargetType = new ClassStat(
-            397, 1234567890, "SelectedTargetType", false, false, false);
+        private readonly DynelStat selectedTargetType = new DynelStat(397, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat sellModifier = new ClassStat(427, 1234567890, "SellModifier", false, false, false);
+        private readonly DynelStat sellModifier = new DynelStat(427, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat sense = new ClassStat(20, 0, "Sense", true, false, false);
+        private readonly DynelStat sense = new DynelStat(20, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill senseImprovement = new StatSkill(122, 5, "SenseImprovement", true, false, false);
+        private readonly StatSkill senseImprovement = new StatSkill(122, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat sessionTime = new ClassStat(198, 1234567890, "SessionTime", false, false, false);
+        private readonly DynelStat sessionTime = new DynelStat(198, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat sex = new ClassStat(59, 1234567890, "Sex", false, false, false);
+        private readonly DynelStat sex = new DynelStat(59, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shadowBreed = new ClassStat(532, 0, "ShadowBreed", false, false, false);
+        private readonly DynelStat shadowBreed = new DynelStat(532, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shadowBreedTemplate = new ClassStat(
-            579, 0, "ShadowBreedTemplate", false, false, false);
+        private readonly DynelStat shadowBreedTemplate = new DynelStat(579, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shieldChemicalAC = new ClassStat(229, 0, "ShieldChemicalAC", true, false, false);
+        private readonly DynelStat shieldChemicalAC = new DynelStat(229, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shieldColdAC = new ClassStat(231, 0, "ShieldColdAC", true, false, false);
+        private readonly DynelStat shieldColdAC = new DynelStat(231, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shieldEnergyAC = new ClassStat(228, 0, "ShieldEnergyAC", true, false, false);
+        private readonly DynelStat shieldEnergyAC = new DynelStat(228, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shieldFireAC = new ClassStat(233, 0, "ShieldFireAC", true, false, false);
+        private readonly DynelStat shieldFireAC = new DynelStat(233, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shieldMeleeAC = new ClassStat(227, 0, "ShieldMeleeAC", true, false, false);
+        private readonly DynelStat shieldMeleeAC = new DynelStat(227, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shieldNanoAC = new ClassStat(232, 0, "ShieldNanoAC", true, false, false);
+        private readonly DynelStat shieldNanoAC = new DynelStat(232, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shieldPoisonAC = new ClassStat(234, 0, "ShieldPoisonAC", true, false, false);
+        private readonly DynelStat shieldPoisonAC = new DynelStat(234, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shieldProjectileAC = new ClassStat(226, 0, "ShieldProjectileAC", true, false, false);
+        private readonly DynelStat shieldProjectileAC = new DynelStat(226, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shieldRadiationAC = new ClassStat(230, 0, "ShieldRadiationAC", true, false, false);
+        private readonly DynelStat shieldRadiationAC = new DynelStat(230, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shopFlags = new ClassStat(610, 1234567890, "ShopFlags", false, false, false);
+        private readonly DynelStat shopFlags = new DynelStat(610, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shopId = new ClassStat(657, 1234567890, "ShopID", false, false, false);
+        private readonly DynelStat shopId = new DynelStat(657, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shopIndex = new ClassStat(656, 1234567890, "ShopIndex", false, false, false);
+        private readonly DynelStat shopIndex = new DynelStat(656, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shopLastUsed = new ClassStat(611, 1234567890, "ShopLastUsed", false, false, false);
+        private readonly DynelStat shopLastUsed = new DynelStat(611, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shopPrice = new ClassStat(599, 1234567890, "ShopPrice", false, false, false);
+        private readonly DynelStat shopPrice = new DynelStat(599, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shopRent = new ClassStat(608, 1234567890, "ShopRent", false, false, false);
+        private readonly DynelStat shopRent = new DynelStat(608, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shopType = new ClassStat(612, 1234567890, "ShopType", false, false, false);
+        private readonly DynelStat shopType = new DynelStat(612, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill shotgun = new StatSkill(115, 5, "Shotgun", true, false, false);
+        private readonly StatSkill shotgun = new StatSkill(115, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shoulderMeshHolder = new ClassStat(39, 0, "WeaponMeshRight", false, false, false);
+        private readonly DynelStat shoulderMeshHolder = new DynelStat(39, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shoulderMeshLeft = new ClassStat(1005, 0, "ShoulderMeshLeft", false, false, false);
+        private readonly DynelStat shoulderMeshLeft = new DynelStat(1005, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat shoulderMeshRight = new ClassStat(1004, 0, "ShoulderMeshRight", false, false, false);
+        private readonly DynelStat shoulderMeshRight = new DynelStat(1004, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat side = new ClassStat(33, 0, "Side", false, false, false);
+        private readonly DynelStat side = new DynelStat(33, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat sisCap = new ClassStat(352, 1234567890, "SISCap", false, false, false);
+        private readonly DynelStat sisCap = new DynelStat(352, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat sk = new ClassStat(573, 0, "SK", false, false, false);
+        private readonly DynelStat sk = new DynelStat(573, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat skillDisabled = new ClassStat(329, 1234567890, "SkillDisabled", false, false, false);
+        private readonly DynelStat skillDisabled = new DynelStat(329, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat skillLockModifier = new ClassStat(382, 0, "SkillLockModifier", false, false, false);
+        private readonly DynelStat skillLockModifier = new DynelStat(382, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat skillTimeOnSelectedTarget = new ClassStat(
-            371, 1234567890, "SkillTimeOnSelectedTarget", false, false, false);
+        private readonly DynelStat skillTimeOnSelectedTarget = new DynelStat(371, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill sneakAttack = new StatSkill(146, 5, "SneakAttack", true, false, false);
+        private readonly StatSkill sneakAttack = new StatSkill(146, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat socialStatus = new ClassStat(521, 0, "SocialStatus", false, false, false);
+        private readonly DynelStat socialStatus = new DynelStat(521, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat soundVolume = new ClassStat(250, 1234567890, "SoundVolume", false, false, false);
+        private readonly DynelStat soundVolume = new DynelStat(250, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat specialAttackShield = new ClassStat(
-            517, 1234567890, "SpecialAttackShield", false, false, false);
+        private readonly DynelStat specialAttackShield = new DynelStat(517, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat specialCondition = new ClassStat(348, 1, "SpecialCondition", false, false, false);
+        private readonly DynelStat specialCondition = new DynelStat(348, 1, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat specialization = new ClassStat(182, 0, "Specialization", false, false, false);
+        private readonly DynelStat specialization = new DynelStat(182, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat speedPenalty = new ClassStat(70, 1234567890, "SpeedPenalty", false, false, false);
+        private readonly DynelStat speedPenalty = new DynelStat(70, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat stability = new ClassStat(202, 1234567890, "Stability", false, false, false);
+        private readonly DynelStat stability = new DynelStat(202, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat stackingLine2 = new ClassStat(546, 1234567890, "StackingLine2", false, false, false);
+        private readonly DynelStat stackingLine2 = new DynelStat(546, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat stackingLine3 = new ClassStat(547, 1234567890, "StackingLine3", false, false, false);
+        private readonly DynelStat stackingLine3 = new DynelStat(547, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat stackingLine4 = new ClassStat(548, 1234567890, "StackingLine4", false, false, false);
+        private readonly DynelStat stackingLine4 = new DynelStat(548, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat stackingLine5 = new ClassStat(549, 1234567890, "StackingLine5", false, false, false);
+        private readonly DynelStat stackingLine5 = new DynelStat(549, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat stackingLine6 = new ClassStat(550, 1234567890, "StackingLine6", false, false, false);
+        private readonly DynelStat stackingLine6 = new DynelStat(550, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat stackingOrder = new ClassStat(551, 1234567890, "StackingOrder", false, false, false);
+        private readonly DynelStat stackingOrder = new DynelStat(551, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat stamina = new ClassStat(18, 0, "Stamina", true, false, false);
+        private readonly DynelStat stamina = new DynelStat(18, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat statOne = new ClassStat(290, 1234567890, "StatOne", false, false, false);
+        private readonly DynelStat statOne = new DynelStat(290, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat state = new ClassStat(7, 0, "State", false, false, false);
+        private readonly DynelStat state = new DynelStat(7, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat stateAction = new ClassStat(98, 1234567890, "StateAction", true, false, false);
+        private readonly DynelStat stateAction = new DynelStat(98, 1234567890, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat stateMachine = new ClassStat(450, 1234567890, "StateMachine", false, false, false);
+        private readonly DynelStat stateMachine = new DynelStat(450, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat staticInstance = new ClassStat(23, 1234567890, "StaticInstance", false, false, false);
+        private readonly DynelStat staticInstance = new DynelStat(23, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat staticType = new ClassStat(25, 1234567890, "StaticType", false, false, false);
+        private readonly DynelStat staticType = new DynelStat(25, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat streamCheckMagic = new ClassStat(
-            999, 1234567890, "StreamCheckMagic", false, false, false);
+        private readonly DynelStat streamCheckMagic = new DynelStat(999, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat strength = new ClassStat(16, 0, "Strength", true, false, false);
+        private readonly DynelStat strength = new DynelStat(16, 0, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill subMachineGun = new StatSkill(114, 5, "SubMachineGun", true, false, false);
+        private readonly StatSkill subMachineGun = new StatSkill(114, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill swim = new StatSkill(138, 5, "Swim", true, false, false);
+        private readonly StatSkill swim = new StatSkill(138, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat synergyHash = new ClassStat(609, 1234567890, "SynergyHash", false, false, false);
+        private readonly DynelStat synergyHash = new DynelStat(609, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat taboo = new ClassStat(327, 1234567890, "Taboo", false, false, false);
+        private readonly DynelStat taboo = new DynelStat(327, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat targetDistance = new ClassStat(
-            527, 1234567890, "TargetDistance", false, false, false);
+        private readonly DynelStat targetDistance = new DynelStat(527, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat targetDistanceChange = new ClassStat(
-            889, 1234567890, "TargetDistanceChange", false, false, false);
+        private readonly DynelStat targetDistanceChange = new DynelStat(889, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat targetFacing = new ClassStat(488, 1234567890, "TargetFacing", false, false, false);
+        private readonly DynelStat targetFacing = new DynelStat(488, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat team = new ClassStat(6, 0, "Team", false, false, false);
+        private readonly DynelStat team = new DynelStat(6, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat teamAllowed = new ClassStat(324, 1234567890, "TeamAllowed", false, false, false);
+        private readonly DynelStat teamAllowed = new DynelStat(324, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat teamCloseness = new ClassStat(528, 1234567890, "TeamCloseness", false, false, false);
+        private readonly DynelStat teamCloseness = new DynelStat(528, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat teamSide = new ClassStat(213, 0, "TeamSide", false, false, false);
+        private readonly DynelStat teamSide = new DynelStat(213, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat teleportPauseMilliSeconds = new ClassStat(
-            351, 1234567890, "TeleportPauseMilliSeconds", false, false, false);
+        private readonly DynelStat teleportPauseMilliSeconds = new DynelStat(351, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat tempSavePlayfield = new ClassStat(595, 0, "TempSavePlayfield", false, false, false);
+        private readonly DynelStat tempSavePlayfield = new DynelStat(595, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat tempSaveTeamId = new ClassStat(594, 0, "TempSaveTeamID", false, false, false);
+        private readonly DynelStat tempSaveTeamId = new DynelStat(594, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat tempSaveX = new ClassStat(596, 0, "TempSaveX", false, false, false);
+        private readonly DynelStat tempSaveX = new DynelStat(596, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat tempSaveY = new ClassStat(597, 0, "TempSaveY", false, false, false);
+        private readonly DynelStat tempSaveY = new DynelStat(597, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat temporarySkillReduction = new ClassStat(
-            247, 0, "TemporarySkillReduction", false, false, false);
+        private readonly DynelStat temporarySkillReduction = new DynelStat(247, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill throwingKnife = new StatSkill(108, 5, "ThrowingKnife", true, false, false);
+        private readonly StatSkill throwingKnife = new StatSkill(108, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill thrownGrapplingWeapons = new StatSkill(
-            110, 5, "ThrownGrapplingWeapons", true, false, false);
+        private readonly StatSkill thrownGrapplingWeapons = new StatSkill(110, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat tideRequiredDynelId = new ClassStat(
-            900, 1234567890, "TideRequiredDynelID", false, false, false);
+        private readonly DynelStat tideRequiredDynelId = new DynelStat(900, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat timeExist = new ClassStat(8, 1234567890, "TimeExist", false, false, false);
+        private readonly DynelStat timeExist = new DynelStat(8, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat timeSinceCreation = new ClassStat(
-            56, 1234567890, "TimeSinceCreation", false, false, false);
+        private readonly DynelStat timeSinceCreation = new DynelStat(56, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat timeSinceUpkeep = new ClassStat(
-            313, 1234567890, "TimeSinceUpkeep", false, false, false);
+        private readonly DynelStat timeSinceUpkeep = new DynelStat(313, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatTitleLevel titleLevel = new StatTitleLevel(37, 1, "TitleLevel", false, false, false);
+        private readonly StatTitleLevel titleLevel = new StatTitleLevel(37, 1, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat totalDamage = new ClassStat(629, 1234567890, "TotalDamage", false, false, false);
+        private readonly DynelStat totalDamage = new DynelStat(629, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat totalMass = new ClassStat(71, 1234567890, "TotalMass", false, false, false);
+        private readonly DynelStat totalMass = new DynelStat(71, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat towerInstance = new ClassStat(515, 1234567890, "TowerInstance", false, false, false);
+        private readonly DynelStat towerInstance = new DynelStat(515, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat towerNpcHash = new ClassStat(511, 1234567890, "Tower_NPCHash", false, false, false);
+        private readonly DynelStat towerNpcHash = new DynelStat(511, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat towerType = new ClassStat(388, 1234567890, "TowerType", false, false, false);
+        private readonly DynelStat towerType = new DynelStat(388, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat tracerEffectType = new ClassStat(
-            419, 1234567890, "TracerEffectType", false, false, false);
+        private readonly DynelStat tracerEffectType = new DynelStat(419, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat trackChemicalDamage = new ClassStat(
-            633, 1234567890, "TrackChemicalDamage", false, false, false);
+        private readonly DynelStat trackChemicalDamage = new DynelStat(633, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat trackColdDamage = new ClassStat(
-            635, 1234567890, "TrackColdDamage", false, false, false);
+        private readonly DynelStat trackColdDamage = new DynelStat(635, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat trackEnergyDamage = new ClassStat(
-            632, 1234567890, "TrackEnergyDamage", false, false, false);
+        private readonly DynelStat trackEnergyDamage = new DynelStat(632, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat trackFireDamage = new ClassStat(
-            637, 1234567890, "TrackFireDamage", false, false, false);
+        private readonly DynelStat trackFireDamage = new DynelStat(637, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat trackMeleeDamage = new ClassStat(
-            631, 1234567890, "TrackMeleeDamage", false, false, false);
+        private readonly DynelStat trackMeleeDamage = new DynelStat(631, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat trackPoisonDamage = new ClassStat(
-            636, 1234567890, "TrackPoisonDamage", false, false, false);
+        private readonly DynelStat trackPoisonDamage = new DynelStat(636, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat trackProjectileDamage = new ClassStat(
-            630, 1234567890, "TrackProjectileDamage", false, false, false);
+        private readonly DynelStat trackProjectileDamage = new DynelStat(630, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat trackRadiationDamage = new ClassStat(
-            634, 1234567890, "TrackRadiationDamage", false, false, false);
+        private readonly DynelStat trackRadiationDamage = new DynelStat(634, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat tradeLimit = new ClassStat(346, 1234567890, "TradeLimit", false, false, false);
+        private readonly DynelStat tradeLimit = new DynelStat(346, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat trainSkill = new ClassStat(408, 1234567890, "TrainSkill", false, false, false);
+        private readonly DynelStat trainSkill = new DynelStat(408, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat trainSkillCost = new ClassStat(
-            409, 1234567890, "TrainSkillCost", false, false, false);
+        private readonly DynelStat trainSkillCost = new DynelStat(409, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat trapDifficulty = new ClassStat(
-            289, 1234567890, "TrapDifficulty", false, false, false);
+        private readonly DynelStat trapDifficulty = new DynelStat(289, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat travelSound = new ClassStat(271, 1234567890, "TravelSound", false, false, false);
+        private readonly DynelStat travelSound = new DynelStat(271, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill treatment = new StatSkill(124, 5, "Treatment", true, false, false);
+        private readonly StatSkill treatment = new StatSkill(124, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat turnSpeed = new ClassStat(267, 40000, "TurnSpeed", false, false, false);
+        private readonly DynelStat turnSpeed = new DynelStat(267, 40000, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill tutoring = new StatSkill(141, 5, "Tutoring", true, false, false);
+        private readonly StatSkill tutoring = new StatSkill(141, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill twohBluntWeapons = new StatSkill(107, 5, "2hBluntWeapons", true, false, false);
+        private readonly StatSkill twohBluntWeapons = new StatSkill(107, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill twohEdgedWeapons = new StatSkill(105, 5, "2hEdgedWeapons", true, false, false);
+        private readonly StatSkill twohEdgedWeapons = new StatSkill(105, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat unarmedTemplateInstance = new ClassStat(
-            418, 0, "UnarmedTemplateInstance", false, false, false);
+        private readonly DynelStat unarmedTemplateInstance = new DynelStat(418, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat unreadMailCount = new ClassStat(649, 0, "UnreadMailCount", false, false, false);
+        private readonly DynelStat unreadMailCount = new DynelStat(649, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat unsavedXP = new ClassStat(592, 0, "UnsavedXP", false, false, false);
+        private readonly DynelStat unsavedXP = new DynelStat(592, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat userInstance = new ClassStat(85, 1234567890, "UserInstance", false, false, false);
+        private readonly DynelStat userInstance = new DynelStat(85, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat userType = new ClassStat(84, 1234567890, "UserType", false, false, false);
+        private readonly DynelStat userType = new DynelStat(84, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat vehicleAC = new ClassStat(664, 1234567890, "VehicleAC", false, false, false);
+        private readonly DynelStat vehicleAC = new DynelStat(664, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat vehicleDamage = new ClassStat(665, 1234567890, "VehicleDamage", false, false, false);
+        private readonly DynelStat vehicleDamage = new DynelStat(665, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat vehicleHealth = new ClassStat(666, 1234567890, "VehicleHealth", false, false, false);
+        private readonly DynelStat vehicleHealth = new DynelStat(666, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat vehicleSpeed = new ClassStat(667, 1234567890, "VehicleSpeed", false, false, false);
+        private readonly DynelStat vehicleSpeed = new DynelStat(667, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat veteranPoints = new ClassStat(68, 0, "VeteranPoints", false, false, false);
+        private readonly DynelStat veteranPoints = new DynelStat(68, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat vicinityRange = new ClassStat(448, 1234567890, "VicinityRange", false, false, false);
+        private readonly DynelStat vicinityRange = new DynelStat(448, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat victoryPoints = new ClassStat(669, 0, "VP", false, false, false);
+        private readonly DynelStat victoryPoints = new DynelStat(669, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat visualBreed = new ClassStat(367, 1234567890, "VisualBreed", false, false, true);
+        private readonly DynelStat visualBreed = new DynelStat(367, 1234567890, false, false, true);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat visualFlags = new ClassStat(673, 31, "VisualFlags", false, false, false);
+        private readonly DynelStat visualFlags = new DynelStat(673, 31, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat visualLodLevel = new ClassStat(
-            888, 1234567890, "VisualLODLevel", false, false, false);
+        private readonly DynelStat visualLodLevel = new DynelStat(888, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat visualProfession = new ClassStat(
-            368, 1234567890, "VisualProfession", false, false, true);
+        private readonly DynelStat visualProfession = new DynelStat(368, 1234567890, false, false, true);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat visualSex = new ClassStat(369, 1234567890, "VisualSex", false, false, true);
+        private readonly DynelStat visualSex = new DynelStat(369, 1234567890, false, false, true);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat volumeMass = new ClassStat(2, 1234567890, "VolumeMass", false, false, false);
+        private readonly DynelStat volumeMass = new DynelStat(2, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat voteCount = new ClassStat(306, 1234567890, "VoteCount", false, false, false);
+        private readonly DynelStat voteCount = new DynelStat(306, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat waitState = new ClassStat(430, 2, "WaitState", false, false, false);
+        private readonly DynelStat waitState = new DynelStat(430, 2, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat weaponDisallowedInstance = new ClassStat(
-            326, 1234567890, "WeaponDisallowedInstance", false, false, false);
+        private readonly DynelStat weaponDisallowedInstance = new DynelStat(326, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat weaponDisallowedType = new ClassStat(
-            325, 1234567890, "WeaponDisallowedType", false, false, false);
+        private readonly DynelStat weaponDisallowedType = new DynelStat(325, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat weaponMeshHolder = new ClassStat(209, 0, "WeaponMeshRight", false, false, false);
+        private readonly DynelStat weaponMeshHolder = new DynelStat(209, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat weaponMeshLeft = new ClassStat(1007, 0, "WeaponMeshLeft", false, false, false);
+        private readonly DynelStat weaponMeshLeft = new DynelStat(1007, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat weaponMeshRight = new ClassStat(1006, 0, "WeaponMeshRight", false, false, false);
+        private readonly DynelStat weaponMeshRight = new DynelStat(1006, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly StatSkill weaponSmithing = new StatSkill(158, 5, "WeaponSmithing", true, false, false);
+        private readonly StatSkill weaponSmithing = new StatSkill(158, 5, true, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat weaponStyleLeft = new ClassStat(1015, 0, "WeaponStyleLeft", false, false, false);
+        private readonly DynelStat weaponStyleLeft = new DynelStat(1015, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat weaponStyleRight = new ClassStat(1016, 0, "WeaponStyleRight", false, false, false);
+        private readonly DynelStat weaponStyleRight = new DynelStat(1016, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat weaponsStyle = new ClassStat(1003, 1234567890, "WeaponType", false, false, false);
+        private readonly DynelStat weaponsStyle = new DynelStat(1003, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat xp = new ClassStat(52, 0, "XP", false, false, false);
+        private readonly DynelStat xp = new DynelStat(52, 0, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat xpBonus = new ClassStat(341, 1234567890, "XPBonus", false, false, false);
+        private readonly DynelStat xpBonus = new DynelStat(341, 1234567890, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat xpKillRange = new ClassStat(275, 5, "XPKillRange", false, false, false);
+        private readonly DynelStat xpKillRange = new DynelStat(275, 5, false, false, false);
 
         /// <summary>
         /// </summary>
-        private readonly ClassStat xpModifier = new ClassStat(319, 0, "XPModifier", false, false, false);
+        private readonly DynelStat xpModifier = new DynelStat(319, 0, false, false, false);
 
         #endregion
 
@@ -4307,7 +3617,7 @@ namespace ZoneEngine.GameObject.Stats
             this.psychic.Affects.Add(this.nanoInterval.StatNumber);
             this.level.Affects.Add(this.ip.StatNumber);
 
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 c.SetParent(parent);
             }
@@ -5028,7 +4338,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AbsorbChemicalAC
+        public DynelStat AbsorbChemicalAC
         {
             get
             {
@@ -5038,7 +4348,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AbsorbColdAC
+        public DynelStat AbsorbColdAC
         {
             get
             {
@@ -5048,7 +4358,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AbsorbEnergyAC
+        public DynelStat AbsorbEnergyAC
         {
             get
             {
@@ -5058,7 +4368,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AbsorbFireAC
+        public DynelStat AbsorbFireAC
         {
             get
             {
@@ -5068,7 +4378,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AbsorbMeleeAC
+        public DynelStat AbsorbMeleeAC
         {
             get
             {
@@ -5078,7 +4388,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AbsorbNanoAC
+        public DynelStat AbsorbNanoAC
         {
             get
             {
@@ -5088,7 +4398,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AbsorbPoisonAC
+        public DynelStat AbsorbPoisonAC
         {
             get
             {
@@ -5098,7 +4408,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AbsorbProjectileAC
+        public DynelStat AbsorbProjectileAC
         {
             get
             {
@@ -5108,7 +4418,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AbsorbRadiationAC
+        public DynelStat AbsorbRadiationAC
         {
             get
             {
@@ -5118,7 +4428,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AccessCount
+        public DynelStat AccessCount
         {
             get
             {
@@ -5128,7 +4438,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AccessGrant
+        public DynelStat AccessGrant
         {
             get
             {
@@ -5138,7 +4448,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AccessKey
+        public DynelStat AccessKey
         {
             get
             {
@@ -5148,7 +4458,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AccountFlags
+        public DynelStat AccountFlags
         {
             get
             {
@@ -5158,7 +4468,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AccumulatedDamage
+        public DynelStat AccumulatedDamage
         {
             get
             {
@@ -5168,7 +4478,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AcgEntranceStyles
+        public DynelStat AcgEntranceStyles
         {
             get
             {
@@ -5178,7 +4488,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AcgItemCategoryId
+        public DynelStat AcgItemCategoryId
         {
             get
             {
@@ -5188,7 +4498,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AcgItemLevel
+        public DynelStat AcgItemLevel
         {
             get
             {
@@ -5198,7 +4508,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AcgItemSeed
+        public DynelStat AcgItemSeed
         {
             get
             {
@@ -5208,7 +4518,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AcgItemTemplateId
+        public DynelStat AcgItemTemplateId
         {
             get
             {
@@ -5218,7 +4528,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AcgItemTemplateId2
+        public DynelStat AcgItemTemplateId2
         {
             get
             {
@@ -5228,7 +4538,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ActionCategory
+        public DynelStat ActionCategory
         {
             get
             {
@@ -5238,7 +4548,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AdvantageHash1
+        public DynelStat AdvantageHash1
         {
             get
             {
@@ -5248,7 +4558,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AdvantageHash2
+        public DynelStat AdvantageHash2
         {
             get
             {
@@ -5258,7 +4568,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AdvantageHash3
+        public DynelStat AdvantageHash3
         {
             get
             {
@@ -5268,7 +4578,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AdvantageHash4
+        public DynelStat AdvantageHash4
         {
             get
             {
@@ -5278,7 +4588,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AdvantageHash5
+        public DynelStat AdvantageHash5
         {
             get
             {
@@ -5298,7 +4608,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Age
+        public DynelStat Age
         {
             get
             {
@@ -5308,7 +4618,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AggDef
+        public DynelStat AggDef
         {
             get
             {
@@ -5318,7 +4628,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Aggressiveness
+        public DynelStat Aggressiveness
         {
             get
             {
@@ -5328,7 +4638,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Agility
+        public DynelStat Agility
         {
             get
             {
@@ -5348,7 +4658,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AlienLevel
+        public DynelStat AlienLevel
         {
             get
             {
@@ -5368,7 +4678,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AlienXP
+        public DynelStat AlienXP
         {
             get
             {
@@ -5378,7 +4688,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Alignment
+        public DynelStat Alignment
         {
             get
             {
@@ -5388,7 +4698,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public List<ClassStat> All
+        public List<DynelStat> All
         {
             get
             {
@@ -5398,7 +4708,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AmmoName
+        public DynelStat AmmoName
         {
             get
             {
@@ -5408,7 +4718,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AmmoType
+        public DynelStat AmmoType
         {
             get
             {
@@ -5418,7 +4728,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Ams
+        public DynelStat Ams
         {
             get
             {
@@ -5428,7 +4738,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AmsCap
+        public DynelStat AmsCap
         {
             get
             {
@@ -5438,7 +4748,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AmsModifier
+        public DynelStat AmsModifier
         {
             get
             {
@@ -5448,7 +4758,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Anim
+        public DynelStat Anim
         {
             get
             {
@@ -5458,7 +4768,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AnimPlay
+        public DynelStat AnimPlay
         {
             get
             {
@@ -5468,7 +4778,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AnimPos
+        public DynelStat AnimPos
         {
             get
             {
@@ -5478,7 +4788,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AnimSet
+        public DynelStat AnimSet
         {
             get
             {
@@ -5488,7 +4798,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AnimSpeed
+        public DynelStat AnimSpeed
         {
             get
             {
@@ -5498,7 +4808,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ApartmentAccessCard
+        public DynelStat ApartmentAccessCard
         {
             get
             {
@@ -5508,7 +4818,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ApartmentsAllowed
+        public DynelStat ApartmentsAllowed
         {
             get
             {
@@ -5518,7 +4828,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ApartmentsOwned
+        public DynelStat ApartmentsOwned
         {
             get
             {
@@ -5528,7 +4838,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AreaInstance
+        public DynelStat AreaInstance
         {
             get
             {
@@ -5538,7 +4848,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AreaType
+        public DynelStat AreaType
         {
             get
             {
@@ -5548,7 +4858,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ArmourType
+        public DynelStat ArmourType
         {
             get
             {
@@ -5568,7 +4878,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AttackCount
+        public DynelStat AttackCount
         {
             get
             {
@@ -5578,7 +4888,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AttackRange
+        public DynelStat AttackRange
         {
             get
             {
@@ -5588,7 +4898,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AttackShield
+        public DynelStat AttackShield
         {
             get
             {
@@ -5598,7 +4908,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AttackSpeed
+        public DynelStat AttackSpeed
         {
             get
             {
@@ -5608,7 +4918,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AttackType
+        public DynelStat AttackType
         {
             get
             {
@@ -5618,7 +4928,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Attitude
+        public DynelStat Attitude
         {
             get
             {
@@ -5628,7 +4938,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AutoAttackFlags
+        public DynelStat AutoAttackFlags
         {
             get
             {
@@ -5638,7 +4948,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AutoLockTimeDefault
+        public DynelStat AutoLockTimeDefault
         {
             get
             {
@@ -5648,7 +4958,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat AutoUnlockTimeDefault
+        public DynelStat AutoUnlockTimeDefault
         {
             get
             {
@@ -5658,7 +4968,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BackMesh
+        public DynelStat BackMesh
         {
             get
             {
@@ -5668,7 +4978,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Backstab
+        public DynelStat Backstab
         {
             get
             {
@@ -5678,7 +4988,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BandolierSlots
+        public DynelStat BandolierSlots
         {
             get
             {
@@ -5688,7 +4998,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BattlestationRep
+        public DynelStat BattlestationRep
         {
             get
             {
@@ -5698,7 +5008,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BattlestationSide
+        public DynelStat BattlestationSide
         {
             get
             {
@@ -5708,7 +5018,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BeltSlots
+        public DynelStat BeltSlots
         {
             get
             {
@@ -5718,7 +5028,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BerserkMode
+        public DynelStat BerserkMode
         {
             get
             {
@@ -5738,7 +5048,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BirthDate
+        public DynelStat BirthDate
         {
             get
             {
@@ -5778,7 +5088,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BrainType
+        public DynelStat BrainType
         {
             get
             {
@@ -5808,7 +5118,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Breed
+        public DynelStat Breed
         {
             get
             {
@@ -5818,7 +5128,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BreedHostility
+        public DynelStat BreedHostility
         {
             get
             {
@@ -5828,7 +5138,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BreedLimit
+        public DynelStat BreedLimit
         {
             get
             {
@@ -5838,7 +5148,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BuildingComplexInst
+        public DynelStat BuildingComplexInst
         {
             get
             {
@@ -5848,7 +5158,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BuildingInstance
+        public DynelStat BuildingInstance
         {
             get
             {
@@ -5858,7 +5168,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BuildingType
+        public DynelStat BuildingType
         {
             get
             {
@@ -5878,7 +5188,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BurstRecharge
+        public DynelStat BurstRecharge
         {
             get
             {
@@ -5888,7 +5198,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat BuyModifier
+        public DynelStat BuyModifier
         {
             get
             {
@@ -5898,7 +5208,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Can
+        public DynelStat Can
         {
             get
             {
@@ -5908,7 +5218,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CanChangeClothes
+        public DynelStat CanChangeClothes
         {
             get
             {
@@ -5918,7 +5228,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CardOwnerInstance
+        public DynelStat CardOwnerInstance
         {
             get
             {
@@ -5928,7 +5238,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CardOwnerType
+        public DynelStat CardOwnerType
         {
             get
             {
@@ -5938,7 +5248,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Cash
+        public DynelStat Cash
         {
             get
             {
@@ -5948,7 +5258,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CastEffectType
+        public DynelStat CastEffectType
         {
             get
             {
@@ -5958,7 +5268,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CastSelfAbstractAnim
+        public DynelStat CastSelfAbstractAnim
         {
             get
             {
@@ -5968,7 +5278,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CastSound
+        public DynelStat CastSound
         {
             get
             {
@@ -5978,7 +5288,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CastTargetAbstractAnim
+        public DynelStat CastTargetAbstractAnim
         {
             get
             {
@@ -5988,7 +5298,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CatAnim
+        public DynelStat CatAnim
         {
             get
             {
@@ -5998,7 +5308,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CatAnimFlags
+        public DynelStat CatAnimFlags
         {
             get
             {
@@ -6008,7 +5318,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CatMesh
+        public DynelStat CatMesh
         {
             get
             {
@@ -6018,7 +5328,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ChanceOfBreakOnDebuff
+        public DynelStat ChanceOfBreakOnDebuff
         {
             get
             {
@@ -6028,7 +5338,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ChanceOfBreakOnSpellAttack
+        public DynelStat ChanceOfBreakOnSpellAttack
         {
             get
             {
@@ -6038,7 +5348,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ChanceOfUse
+        public DynelStat ChanceOfUse
         {
             get
             {
@@ -6048,7 +5358,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ChangeSideCount
+        public DynelStat ChangeSideCount
         {
             get
             {
@@ -6058,7 +5368,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CharRadius
+        public DynelStat CharRadius
         {
             get
             {
@@ -6068,7 +5378,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CharState
+        public DynelStat CharState
         {
             get
             {
@@ -6078,7 +5388,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CharTmp1
+        public DynelStat CharTmp1
         {
             get
             {
@@ -6088,7 +5398,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CharTmp2
+        public DynelStat CharTmp2
         {
             get
             {
@@ -6098,7 +5408,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CharTmp3
+        public DynelStat CharTmp3
         {
             get
             {
@@ -6108,7 +5418,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CharTmp4
+        public DynelStat CharTmp4
         {
             get
             {
@@ -6118,7 +5428,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ChemicalAC
+        public DynelStat ChemicalAC
         {
             get
             {
@@ -6128,7 +5438,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ChemicalDamageModifier
+        public DynelStat ChemicalDamageModifier
         {
             get
             {
@@ -6148,7 +5458,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ChestFlags
+        public DynelStat ChestFlags
         {
             get
             {
@@ -6158,7 +5468,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CityInstance
+        public DynelStat CityInstance
         {
             get
             {
@@ -6168,7 +5478,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CityTerminalRechargePercent
+        public DynelStat CityTerminalRechargePercent
         {
             get
             {
@@ -6178,7 +5488,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Clan
+        public DynelStat Clan
         {
             get
             {
@@ -6188,7 +5498,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanConserver
+        public DynelStat ClanConserver
         {
             get
             {
@@ -6198,7 +5508,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanDevoted
+        public DynelStat ClanDevoted
         {
             get
             {
@@ -6208,7 +5518,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanFinalized
+        public DynelStat ClanFinalized
         {
             get
             {
@@ -6218,7 +5528,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanGaia
+        public DynelStat ClanGaia
         {
             get
             {
@@ -6228,7 +5538,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanHierarchy
+        public DynelStat ClanHierarchy
         {
             get
             {
@@ -6238,7 +5548,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanInstance
+        public DynelStat ClanInstance
         {
             get
             {
@@ -6248,7 +5558,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanItemInstance
+        public DynelStat ClanItemInstance
         {
             get
             {
@@ -6258,7 +5568,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanItemType
+        public DynelStat ClanItemType
         {
             get
             {
@@ -6268,7 +5578,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanLevel
+        public DynelStat ClanLevel
         {
             get
             {
@@ -6278,7 +5588,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanPrice
+        public DynelStat ClanPrice
         {
             get
             {
@@ -6288,7 +5598,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanRedeemed
+        public DynelStat ClanRedeemed
         {
             get
             {
@@ -6298,7 +5608,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanSentinels
+        public DynelStat ClanSentinels
         {
             get
             {
@@ -6308,7 +5618,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanType
+        public DynelStat ClanType
         {
             get
             {
@@ -6318,7 +5628,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanUpkeepInterval
+        public DynelStat ClanUpkeepInterval
         {
             get
             {
@@ -6328,7 +5638,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClanVanguards
+        public DynelStat ClanVanguards
         {
             get
             {
@@ -6338,7 +5648,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ClientActivated
+        public DynelStat ClientActivated
         {
             get
             {
@@ -6358,7 +5668,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ColdAC
+        public DynelStat ColdAC
         {
             get
             {
@@ -6368,7 +5678,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ColdDamageModifier
+        public DynelStat ColdDamageModifier
         {
             get
             {
@@ -6378,7 +5688,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CollideCheckInterval
+        public DynelStat CollideCheckInterval
         {
             get
             {
@@ -6388,7 +5698,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CollisionRadius
+        public DynelStat CollisionRadius
         {
             get
             {
@@ -6398,7 +5708,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CommandRange
+        public DynelStat CommandRange
         {
             get
             {
@@ -6408,7 +5718,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Compulsion
+        public DynelStat Compulsion
         {
             get
             {
@@ -6438,7 +5748,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ConditionState
+        public DynelStat ConditionState
         {
             get
             {
@@ -6448,7 +5758,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Conformity
+        public DynelStat Conformity
         {
             get
             {
@@ -6458,7 +5768,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CorpseAnimKey
+        public DynelStat CorpseAnimKey
         {
             get
             {
@@ -6468,7 +5778,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CorpseHash
+        public DynelStat CorpseHash
         {
             get
             {
@@ -6478,7 +5788,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CorpseInstance
+        public DynelStat CorpseInstance
         {
             get
             {
@@ -6488,7 +5798,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CorpseType
+        public DynelStat CorpseType
         {
             get
             {
@@ -6498,7 +5808,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CriticalDecrease
+        public DynelStat CriticalDecrease
         {
             get
             {
@@ -6508,7 +5818,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CriticalIncrease
+        public DynelStat CriticalIncrease
         {
             get
             {
@@ -6518,7 +5828,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CurrBodyLocation
+        public DynelStat CurrBodyLocation
         {
             get
             {
@@ -6528,7 +5838,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CurrentMass
+        public DynelStat CurrentMass
         {
             get
             {
@@ -6538,7 +5848,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CurrentMovementMode
+        public DynelStat CurrentMovementMode
         {
             get
             {
@@ -6548,7 +5858,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public StatNanoPoints CurrentNano
+        public StatCurrentNano CurrentNano
         {
             get
             {
@@ -6558,7 +5868,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CurrentNcu
+        public DynelStat CurrentNcu
         {
             get
             {
@@ -6568,7 +5878,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CurrentPlayfield
+        public DynelStat CurrentPlayfield
         {
             get
             {
@@ -6578,7 +5888,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CurrentState
+        public DynelStat CurrentState
         {
             get
             {
@@ -6588,7 +5898,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat CurrentTime
+        public DynelStat CurrentTime
         {
             get
             {
@@ -6598,7 +5908,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DamageBonus
+        public DynelStat DamageBonus
         {
             get
             {
@@ -6608,7 +5918,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DamageOverrideType
+        public DynelStat DamageOverrideType
         {
             get
             {
@@ -6618,7 +5928,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DamageToNano
+        public DynelStat DamageToNano
         {
             get
             {
@@ -6628,7 +5938,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DamageToNanoMultiplier
+        public DynelStat DamageToNanoMultiplier
         {
             get
             {
@@ -6638,7 +5948,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DamageType
+        public DynelStat DamageType
         {
             get
             {
@@ -6648,7 +5958,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DeadTimer
+        public DynelStat DeadTimer
         {
             get
             {
@@ -6658,7 +5968,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DeathReason
+        public DynelStat DeathReason
         {
             get
             {
@@ -6668,7 +5978,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DebuffFormula
+        public DynelStat DebuffFormula
         {
             get
             {
@@ -6678,7 +5988,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DefaultAttackType
+        public DynelStat DefaultAttackType
         {
             get
             {
@@ -6688,7 +5998,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DefaultPos
+        public DynelStat DefaultPos
         {
             get
             {
@@ -6698,7 +6008,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DesiredTargetDistance
+        public DynelStat DesiredTargetDistance
         {
             get
             {
@@ -6708,7 +6018,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DieAnim
+        public DynelStat DieAnim
         {
             get
             {
@@ -6738,7 +6048,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DisplayCatAnim
+        public DynelStat DisplayCatAnim
         {
             get
             {
@@ -6748,7 +6058,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DisplayCatMesh
+        public DynelStat DisplayCatMesh
         {
             get
             {
@@ -6758,7 +6068,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DistanceToSpawnpoint
+        public DynelStat DistanceToSpawnpoint
         {
             get
             {
@@ -6778,7 +6088,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DistrictNano
+        public DynelStat DistrictNano
         {
             get
             {
@@ -6788,7 +6098,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DistrictNanoInterval
+        public DynelStat DistrictNanoInterval
         {
             get
             {
@@ -6798,7 +6108,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Dms
+        public DynelStat Dms
         {
             get
             {
@@ -6808,7 +6118,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DmsModifier
+        public DynelStat DmsModifier
         {
             get
             {
@@ -6828,7 +6138,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DoorBlockTime
+        public DynelStat DoorBlockTime
         {
             get
             {
@@ -6838,7 +6148,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DoorFlags
+        public DynelStat DoorFlags
         {
             get
             {
@@ -6888,7 +6198,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DudChance
+        public DynelStat DudChance
         {
             get
             {
@@ -6898,7 +6208,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat DurationModifier
+        public DynelStat DurationModifier
         {
             get
             {
@@ -6908,7 +6218,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat EffectBlue
+        public DynelStat EffectBlue
         {
             get
             {
@@ -6918,7 +6228,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat EffectGreen
+        public DynelStat EffectGreen
         {
             get
             {
@@ -6928,7 +6238,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat EffectIcon
+        public DynelStat EffectIcon
         {
             get
             {
@@ -6938,7 +6248,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat EffectRed
+        public DynelStat EffectRed
         {
             get
             {
@@ -6948,7 +6258,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat EffectType
+        public DynelStat EffectType
         {
             get
             {
@@ -6968,7 +6278,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Energy
+        public DynelStat Energy
         {
             get
             {
@@ -6978,7 +6288,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat EnergyAC
+        public DynelStat EnergyAC
         {
             get
             {
@@ -6988,7 +6298,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat EnergyDamageModifier
+        public DynelStat EnergyDamageModifier
         {
             get
             {
@@ -6998,7 +6308,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat EquipDelay
+        public DynelStat EquipDelay
         {
             get
             {
@@ -7008,7 +6318,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat EquippedWeapons
+        public DynelStat EquippedWeapons
         {
             get
             {
@@ -7028,7 +6338,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ExitInstance
+        public DynelStat ExitInstance
         {
             get
             {
@@ -7038,7 +6348,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Expansion
+        public DynelStat Expansion
         {
             get
             {
@@ -7048,7 +6358,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ExpansionPlayfield
+        public DynelStat ExpansionPlayfield
         {
             get
             {
@@ -7058,7 +6368,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ExtenalDoorInstance
+        public DynelStat ExtenalDoorInstance
         {
             get
             {
@@ -7068,7 +6378,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ExtenalPlayfieldInstance
+        public DynelStat ExtenalPlayfieldInstance
         {
             get
             {
@@ -7078,7 +6388,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ExtendedFlags
+        public DynelStat ExtendedFlags
         {
             get
             {
@@ -7088,7 +6398,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ExtendedTime
+        public DynelStat ExtendedTime
         {
             get
             {
@@ -7098,7 +6408,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Extroverty
+        public DynelStat Extroverty
         {
             get
             {
@@ -7108,7 +6418,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat FabricType
+        public DynelStat FabricType
         {
             get
             {
@@ -7118,7 +6428,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Face
+        public DynelStat Face
         {
             get
             {
@@ -7128,7 +6438,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat FaceTexture
+        public DynelStat FaceTexture
         {
             get
             {
@@ -7138,7 +6448,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat FactionModifier
+        public DynelStat FactionModifier
         {
             get
             {
@@ -7148,7 +6458,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat FallDamage
+        public DynelStat FallDamage
         {
             get
             {
@@ -7168,7 +6478,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Fatness
+        public DynelStat Fatness
         {
             get
             {
@@ -7178,7 +6488,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Features
+        public DynelStat Features
         {
             get
             {
@@ -7198,7 +6508,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat FireAC
+        public DynelStat FireAC
         {
             get
             {
@@ -7208,7 +6518,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat FireDamageModifier
+        public DynelStat FireDamageModifier
         {
             get
             {
@@ -7228,7 +6538,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat FixtureFlags
+        public DynelStat FixtureFlags
         {
             get
             {
@@ -7238,7 +6548,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Flags
+        public DynelStat Flags
         {
             get
             {
@@ -7268,7 +6578,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat FullAutoRecharge
+        public DynelStat FullAutoRecharge
         {
             get
             {
@@ -7278,7 +6588,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat GMLevel
+        public DynelStat GMLevel
         {
             get
             {
@@ -7288,7 +6598,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat GatherAbstractAnim
+        public DynelStat GatherAbstractAnim
         {
             get
             {
@@ -7298,7 +6608,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat GatherEffectType
+        public DynelStat GatherEffectType
         {
             get
             {
@@ -7308,7 +6618,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat GatherSound
+        public DynelStat GatherSound
         {
             get
             {
@@ -7318,7 +6628,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat GenderLimit
+        public DynelStat GenderLimit
         {
             get
             {
@@ -7328,7 +6638,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat GlobalClanInstance
+        public DynelStat GlobalClanInstance
         {
             get
             {
@@ -7338,7 +6648,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat GlobalClanType
+        public DynelStat GlobalClanType
         {
             get
             {
@@ -7348,7 +6658,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat GlobalResearchGoal
+        public DynelStat GlobalResearchGoal
         {
             get
             {
@@ -7358,7 +6668,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat GlobalResearchLevel
+        public DynelStat GlobalResearchLevel
         {
             get
             {
@@ -7368,7 +6678,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Gos
+        public DynelStat Gos
         {
             get
             {
@@ -7388,7 +6698,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat HPLevelUp
+        public DynelStat HPLevelUp
         {
             get
             {
@@ -7398,7 +6708,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat HPPerSkill
+        public DynelStat HPPerSkill
         {
             get
             {
@@ -7408,7 +6718,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat HairMesh
+        public DynelStat HairMesh
         {
             get
             {
@@ -7418,7 +6728,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat HasAlwaysLootable
+        public DynelStat HasAlwaysLootable
         {
             get
             {
@@ -7428,7 +6738,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat HasKnuBotData
+        public DynelStat HasKnuBotData
         {
             get
             {
@@ -7438,7 +6748,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat HateValueModifyer
+        public DynelStat HateValueModifyer
         {
             get
             {
@@ -7448,7 +6758,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat HeadMesh
+        public DynelStat HeadMesh
         {
             get
             {
@@ -7478,7 +6788,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat HealMultiplier
+        public DynelStat HealMultiplier
         {
             get
             {
@@ -7498,7 +6808,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat HealthChange
+        public DynelStat HealthChange
         {
             get
             {
@@ -7508,7 +6818,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat HealthChangeBest
+        public DynelStat HealthChangeBest
         {
             get
             {
@@ -7518,7 +6828,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat HealthChangeWorst
+        public DynelStat HealthChangeWorst
         {
             get
             {
@@ -7528,7 +6838,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Height
+        public DynelStat Height
         {
             get
             {
@@ -7538,7 +6848,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat HitEffectType
+        public DynelStat HitEffectType
         {
             get
             {
@@ -7548,7 +6858,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat HitSound
+        public DynelStat HitSound
         {
             get
             {
@@ -7558,7 +6868,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat HouseTemplate
+        public DynelStat HouseTemplate
         {
             get
             {
@@ -7578,7 +6888,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Icon
+        public DynelStat Icon
         {
             get
             {
@@ -7588,7 +6898,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ImpactEffectType
+        public DynelStat ImpactEffectType
         {
             get
             {
@@ -7598,7 +6908,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat InPlay
+        public DynelStat InPlay
         {
             get
             {
@@ -7608,7 +6918,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Info
+        public DynelStat Info
         {
             get
             {
@@ -7618,7 +6928,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat InitiativeType
+        public DynelStat InitiativeType
         {
             get
             {
@@ -7628,7 +6938,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Instance
+        public DynelStat Instance
         {
             get
             {
@@ -7638,7 +6948,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat InsurancePercentage
+        public DynelStat InsurancePercentage
         {
             get
             {
@@ -7648,7 +6958,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat InsuranceTime
+        public DynelStat InsuranceTime
         {
             get
             {
@@ -7658,7 +6968,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Intelligence
+        public DynelStat Intelligence
         {
             get
             {
@@ -7668,7 +6978,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat InteractionRadius
+        public DynelStat InteractionRadius
         {
             get
             {
@@ -7678,7 +6988,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat InterruptModifier
+        public DynelStat InterruptModifier
         {
             get
             {
@@ -7688,7 +6998,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat InvadersKilled
+        public DynelStat InvadersKilled
         {
             get
             {
@@ -7698,7 +7008,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat InventoryId
+        public DynelStat InventoryId
         {
             get
             {
@@ -7708,7 +7018,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat InventoryTimeout
+        public DynelStat InventoryTimeout
         {
             get
             {
@@ -7718,7 +7028,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat IsFightingMe
+        public DynelStat IsFightingMe
         {
             get
             {
@@ -7728,7 +7038,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat IsVehicle
+        public DynelStat IsVehicle
         {
             get
             {
@@ -7738,7 +7048,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ItemAnim
+        public DynelStat ItemAnim
         {
             get
             {
@@ -7748,7 +7058,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ItemClass
+        public DynelStat ItemClass
         {
             get
             {
@@ -7758,7 +7068,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ItemDelay
+        public DynelStat ItemDelay
         {
             get
             {
@@ -7768,7 +7078,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ItemDelayCap
+        public DynelStat ItemDelayCap
         {
             get
             {
@@ -7778,7 +7088,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ItemHateValue
+        public DynelStat ItemHateValue
         {
             get
             {
@@ -7788,7 +7098,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ItemOpposedSkill
+        public DynelStat ItemOpposedSkill
         {
             get
             {
@@ -7798,7 +7108,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ItemSis
+        public DynelStat ItemSis
         {
             get
             {
@@ -7808,7 +7118,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ItemSkill
+        public DynelStat ItemSkill
         {
             get
             {
@@ -7818,7 +7128,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ItemType
+        public DynelStat ItemType
         {
             get
             {
@@ -7828,7 +7138,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat KilledByInvaders
+        public DynelStat KilledByInvaders
         {
             get
             {
@@ -7858,7 +7168,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LastConcretePlayfieldInstance
+        public DynelStat LastConcretePlayfieldInstance
         {
             get
             {
@@ -7868,7 +7178,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LastMailCheckTime
+        public DynelStat LastMailCheckTime
         {
             get
             {
@@ -7878,7 +7188,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LastPerkResetTime
+        public DynelStat LastPerkResetTime
         {
             get
             {
@@ -7888,7 +7198,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LastRnd
+        public DynelStat LastRnd
         {
             get
             {
@@ -7898,7 +7208,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LastSK
+        public DynelStat LastSK
         {
             get
             {
@@ -7908,7 +7218,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LastSaveXP
+        public DynelStat LastSaveXP
         {
             get
             {
@@ -7918,7 +7228,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LastSaved
+        public DynelStat LastSaved
         {
             get
             {
@@ -7928,7 +7238,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LastXP
+        public DynelStat LastXP
         {
             get
             {
@@ -7938,7 +7248,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LeaderLockDownTime
+        public DynelStat LeaderLockDownTime
         {
             get
             {
@@ -7948,7 +7258,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Level
+        public DynelStat Level
         {
             get
             {
@@ -7958,7 +7268,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LevelLimit
+        public DynelStat LevelLimit
         {
             get
             {
@@ -7978,7 +7288,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LiquidType
+        public DynelStat LiquidType
         {
             get
             {
@@ -7988,7 +7298,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LockDifficulty
+        public DynelStat LockDifficulty
         {
             get
             {
@@ -7998,7 +7308,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LockDownTime
+        public DynelStat LockDownTime
         {
             get
             {
@@ -8008,7 +7318,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LosHeight
+        public DynelStat LosHeight
         {
             get
             {
@@ -8018,7 +7328,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat LowresMesh
+        public DynelStat LowresMesh
         {
             get
             {
@@ -8028,7 +7338,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MapAreaPart1
+        public DynelStat MapAreaPart1
         {
             get
             {
@@ -8038,7 +7348,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MapAreaPart2
+        public DynelStat MapAreaPart2
         {
             get
             {
@@ -8048,7 +7358,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MapAreaPart3
+        public DynelStat MapAreaPart3
         {
             get
             {
@@ -8058,7 +7368,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MapAreaPart4
+        public DynelStat MapAreaPart4
         {
             get
             {
@@ -8068,7 +7378,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MapFlags
+        public DynelStat MapFlags
         {
             get
             {
@@ -8088,7 +7398,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MapOptions
+        public DynelStat MapOptions
         {
             get
             {
@@ -8138,7 +7448,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MaxDamage
+        public DynelStat MaxDamage
         {
             get
             {
@@ -8148,7 +7458,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MaxEnergy
+        public DynelStat MaxEnergy
         {
             get
             {
@@ -8158,7 +7468,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MaxMass
+        public DynelStat MaxMass
         {
             get
             {
@@ -8168,7 +7478,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public StatNano MaxNanoEnergy
+        public StatMaxNanoEnergy MaxNanoEnergy
         {
             get
             {
@@ -8178,7 +7488,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MaxNcu
+        public DynelStat MaxNcu
         {
             get
             {
@@ -8188,7 +7498,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MaxShopItems
+        public DynelStat MaxShopItems
         {
             get
             {
@@ -8198,7 +7508,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MechData
+        public DynelStat MechData
         {
             get
             {
@@ -8218,7 +7528,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MeleeAC
+        public DynelStat MeleeAC
         {
             get
             {
@@ -8228,7 +7538,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MeleeDamageModifier
+        public DynelStat MeleeDamageModifier
         {
             get
             {
@@ -8258,7 +7568,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MemberInstance
+        public DynelStat MemberInstance
         {
             get
             {
@@ -8268,7 +7578,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MemberType
+        public DynelStat MemberType
         {
             get
             {
@@ -8278,7 +7588,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Members
+        public DynelStat Members
         {
             get
             {
@@ -8288,7 +7598,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Mesh
+        public DynelStat Mesh
         {
             get
             {
@@ -8298,7 +7608,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MetaType
+        public DynelStat MetaType
         {
             get
             {
@@ -8308,7 +7618,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MetersWalked
+        public DynelStat MetersWalked
         {
             get
             {
@@ -8318,7 +7628,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MinDamage
+        public DynelStat MinDamage
         {
             get
             {
@@ -8328,7 +7638,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MinMembers
+        public DynelStat MinMembers
         {
             get
             {
@@ -8338,7 +7648,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MissionBits1
+        public DynelStat MissionBits1
         {
             get
             {
@@ -8348,7 +7658,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MissionBits10
+        public DynelStat MissionBits10
         {
             get
             {
@@ -8358,7 +7668,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MissionBits11
+        public DynelStat MissionBits11
         {
             get
             {
@@ -8368,7 +7678,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MissionBits12
+        public DynelStat MissionBits12
         {
             get
             {
@@ -8378,7 +7688,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MissionBits2
+        public DynelStat MissionBits2
         {
             get
             {
@@ -8388,7 +7698,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MissionBits3
+        public DynelStat MissionBits3
         {
             get
             {
@@ -8398,7 +7708,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MissionBits4
+        public DynelStat MissionBits4
         {
             get
             {
@@ -8408,7 +7718,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MissionBits5
+        public DynelStat MissionBits5
         {
             get
             {
@@ -8418,7 +7728,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MissionBits6
+        public DynelStat MissionBits6
         {
             get
             {
@@ -8428,7 +7738,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MissionBits7
+        public DynelStat MissionBits7
         {
             get
             {
@@ -8438,7 +7748,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MissionBits8
+        public DynelStat MissionBits8
         {
             get
             {
@@ -8448,7 +7758,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MissionBits9
+        public DynelStat MissionBits9
         {
             get
             {
@@ -8458,7 +7768,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MonsterData
+        public DynelStat MonsterData
         {
             get
             {
@@ -8468,7 +7778,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MonsterLevelsKilled
+        public DynelStat MonsterLevelsKilled
         {
             get
             {
@@ -8478,7 +7788,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MonsterScale
+        public DynelStat MonsterScale
         {
             get
             {
@@ -8488,7 +7798,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MonsterTexture
+        public DynelStat MonsterTexture
         {
             get
             {
@@ -8498,7 +7808,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MonthsPaid
+        public DynelStat MonthsPaid
         {
             get
             {
@@ -8508,7 +7818,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MoreFlags
+        public DynelStat MoreFlags
         {
             get
             {
@@ -8518,7 +7828,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat MultipleCount
+        public DynelStat MultipleCount
         {
             get
             {
@@ -8528,7 +7838,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NPCostModifier
+        public DynelStat NPCostModifier
         {
             get
             {
@@ -8538,7 +7848,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NPLevelUp
+        public DynelStat NPLevelUp
         {
             get
             {
@@ -8548,7 +7858,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NPPerSkill
+        public DynelStat NPPerSkill
         {
             get
             {
@@ -8558,7 +7868,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Name
+        public DynelStat Name
         {
             get
             {
@@ -8568,7 +7878,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NameTemplate
+        public DynelStat NameTemplate
         {
             get
             {
@@ -8588,7 +7898,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NanoDamageModifier
+        public DynelStat NanoDamageModifier
         {
             get
             {
@@ -8598,7 +7908,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NanoDamageMultiplier
+        public DynelStat NanoDamageMultiplier
         {
             get
             {
@@ -8628,7 +7938,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NanoFocusLevel
+        public DynelStat NanoFocusLevel
         {
             get
             {
@@ -8648,7 +7958,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NanoPoints
+        public DynelStat NanoPoints
         {
             get
             {
@@ -8678,7 +7988,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NanoSpeed
+        public DynelStat NanoSpeed
         {
             get
             {
@@ -8688,7 +7998,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NanoVulnerability
+        public DynelStat NanoVulnerability
         {
             get
             {
@@ -8698,7 +8008,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NewbieHP
+        public DynelStat NewbieHP
         {
             get
             {
@@ -8708,7 +8018,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NewbieNP
+        public DynelStat NewbieNP
         {
             get
             {
@@ -8718,7 +8028,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NextDoorInBuilding
+        public DynelStat NextDoorInBuilding
         {
             get
             {
@@ -8728,7 +8038,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NextFormula
+        public DynelStat NextFormula
         {
             get
             {
@@ -8758,7 +8068,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcBrainState
+        public DynelStat NpcBrainState
         {
             get
             {
@@ -8768,7 +8078,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcCommand
+        public DynelStat NpcCommand
         {
             get
             {
@@ -8778,7 +8088,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcCommandArg
+        public DynelStat NpcCommandArg
         {
             get
             {
@@ -8788,7 +8098,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcCryForHelpRange
+        public DynelStat NpcCryForHelpRange
         {
             get
             {
@@ -8798,7 +8108,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcFamily
+        public DynelStat NpcFamily
         {
             get
             {
@@ -8808,7 +8118,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcFlags
+        public DynelStat NpcFlags
         {
             get
             {
@@ -8818,7 +8128,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcFovStatus
+        public DynelStat NpcFovStatus
         {
             get
             {
@@ -8828,7 +8138,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcHasPatrolList
+        public DynelStat NpcHasPatrolList
         {
             get
             {
@@ -8838,7 +8148,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcHash
+        public DynelStat NpcHash
         {
             get
             {
@@ -8848,7 +8158,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcHatelistSize
+        public DynelStat NpcHatelistSize
         {
             get
             {
@@ -8858,7 +8168,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcIsSurrendering
+        public DynelStat NpcIsSurrendering
         {
             get
             {
@@ -8868,7 +8178,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcNumPets
+        public DynelStat NpcNumPets
         {
             get
             {
@@ -8878,7 +8188,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcScriptAmsScale
+        public DynelStat NpcScriptAmsScale
         {
             get
             {
@@ -8888,7 +8198,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcSpellArg1
+        public DynelStat NpcSpellArg1
         {
             get
             {
@@ -8898,7 +8208,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcSpellRet1
+        public DynelStat NpcSpellRet1
         {
             get
             {
@@ -8908,7 +8218,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcSurrenderInstance
+        public DynelStat NpcSurrenderInstance
         {
             get
             {
@@ -8918,7 +8228,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcUseFightModeRegenRate
+        public DynelStat NpcUseFightModeRegenRate
         {
             get
             {
@@ -8928,7 +8238,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcVicinityChars
+        public DynelStat NpcVicinityChars
         {
             get
             {
@@ -8938,7 +8248,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcVicinityFamily
+        public DynelStat NpcVicinityFamily
         {
             get
             {
@@ -8948,7 +8258,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NpcVicinityPlayers
+        public DynelStat NpcVicinityPlayers
         {
             get
             {
@@ -8958,7 +8268,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NumAttackEffects
+        public DynelStat NumAttackEffects
         {
             get
             {
@@ -8968,7 +8278,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NumberOfItems
+        public DynelStat NumberOfItems
         {
             get
             {
@@ -8978,7 +8288,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NumberOfTeamMembers
+        public DynelStat NumberOfTeamMembers
         {
             get
             {
@@ -8988,7 +8298,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat NumberOnHateList
+        public DynelStat NumberOnHateList
         {
             get
             {
@@ -8998,7 +8308,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ODMaxSizeAdd
+        public DynelStat ODMaxSizeAdd
         {
             get
             {
@@ -9008,7 +8318,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ODMinSizeAdd
+        public DynelStat ODMinSizeAdd
         {
             get
             {
@@ -9018,7 +8328,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OTArmedForces
+        public DynelStat OTArmedForces
         {
             get
             {
@@ -9028,7 +8338,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OTFollowers
+        public DynelStat OTFollowers
         {
             get
             {
@@ -9038,7 +8348,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OTMed
+        public DynelStat OTMed
         {
             get
             {
@@ -9048,7 +8358,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OTOperator
+        public DynelStat OTOperator
         {
             get
             {
@@ -9058,7 +8368,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OTTrans
+        public DynelStat OTTrans
         {
             get
             {
@@ -9068,7 +8378,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OTUnredeemed
+        public DynelStat OTUnredeemed
         {
             get
             {
@@ -9078,7 +8388,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ObjectType
+        public DynelStat ObjectType
         {
             get
             {
@@ -9088,7 +8398,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OldTimeExist
+        public DynelStat OldTimeExist
         {
             get
             {
@@ -9098,7 +8408,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OnTowerCreation
+        public DynelStat OnTowerCreation
         {
             get
             {
@@ -9128,7 +8438,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OrientationMode
+        public DynelStat OrientationMode
         {
             get
             {
@@ -9138,7 +8448,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OriginatorType
+        public DynelStat OriginatorType
         {
             get
             {
@@ -9148,7 +8458,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OuterRadius
+        public DynelStat OuterRadius
         {
             get
             {
@@ -9158,7 +8468,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OverrideMaterial
+        public DynelStat OverrideMaterial
         {
             get
             {
@@ -9168,7 +8478,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OverrideTexture
+        public DynelStat OverrideTexture
         {
             get
             {
@@ -9178,7 +8488,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OverrideTextureAttractor
+        public DynelStat OverrideTextureAttractor
         {
             get
             {
@@ -9188,7 +8498,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OverrideTextureBack
+        public DynelStat OverrideTextureBack
         {
             get
             {
@@ -9198,7 +8508,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OverrideTextureHead
+        public DynelStat OverrideTextureHead
         {
             get
             {
@@ -9208,7 +8518,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OverrideTextureShoulderpadLeft
+        public DynelStat OverrideTextureShoulderpadLeft
         {
             get
             {
@@ -9218,7 +8528,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OverrideTextureShoulderpadRight
+        public DynelStat OverrideTextureShoulderpadRight
         {
             get
             {
@@ -9228,7 +8538,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OverrideTextureWeaponLeft
+        public DynelStat OverrideTextureWeaponLeft
         {
             get
             {
@@ -9238,7 +8548,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OverrideTextureWeaponRight
+        public DynelStat OverrideTextureWeaponRight
         {
             get
             {
@@ -9248,7 +8558,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OwnedTowers
+        public DynelStat OwnedTowers
         {
             get
             {
@@ -9258,7 +8568,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat OwnerInstance
+        public DynelStat OwnerInstance
         {
             get
             {
@@ -9268,7 +8578,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PaidPoints
+        public DynelStat PaidPoints
         {
             get
             {
@@ -9278,7 +8588,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ParentInstance
+        public DynelStat ParentInstance
         {
             get
             {
@@ -9288,7 +8598,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ParentType
+        public DynelStat ParentType
         {
             get
             {
@@ -9308,7 +8618,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PercentChemicalDamage
+        public DynelStat PercentChemicalDamage
         {
             get
             {
@@ -9318,7 +8628,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PercentColdDamage
+        public DynelStat PercentColdDamage
         {
             get
             {
@@ -9328,7 +8638,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PercentEnergyDamage
+        public DynelStat PercentEnergyDamage
         {
             get
             {
@@ -9338,7 +8648,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PercentFireDamage
+        public DynelStat PercentFireDamage
         {
             get
             {
@@ -9348,7 +8658,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PercentMeleeDamage
+        public DynelStat PercentMeleeDamage
         {
             get
             {
@@ -9358,7 +8668,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PercentPoisonDamage
+        public DynelStat PercentPoisonDamage
         {
             get
             {
@@ -9368,7 +8678,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PercentProjectileDamage
+        public DynelStat PercentProjectileDamage
         {
             get
             {
@@ -9378,7 +8688,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PercentRadiationDamage
+        public DynelStat PercentRadiationDamage
         {
             get
             {
@@ -9388,7 +8698,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PercentRemainingHealth
+        public DynelStat PercentRemainingHealth
         {
             get
             {
@@ -9398,7 +8708,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PercentRemainingNano
+        public DynelStat PercentRemainingNano
         {
             get
             {
@@ -9418,7 +8728,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PersonalResearchGoal
+        public DynelStat PersonalResearchGoal
         {
             get
             {
@@ -9428,7 +8738,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PersonalResearchLevel
+        public DynelStat PersonalResearchLevel
         {
             get
             {
@@ -9438,7 +8748,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PetCounter
+        public DynelStat PetCounter
         {
             get
             {
@@ -9448,7 +8758,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PetMaster
+        public DynelStat PetMaster
         {
             get
             {
@@ -9458,7 +8768,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PetReq1
+        public DynelStat PetReq1
         {
             get
             {
@@ -9468,7 +8778,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PetReq2
+        public DynelStat PetReq2
         {
             get
             {
@@ -9478,7 +8788,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PetReq3
+        public DynelStat PetReq3
         {
             get
             {
@@ -9488,7 +8798,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PetReqVal1
+        public DynelStat PetReqVal1
         {
             get
             {
@@ -9498,7 +8808,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PetReqVal2
+        public DynelStat PetReqVal2
         {
             get
             {
@@ -9508,7 +8818,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PetReqVal3
+        public DynelStat PetReqVal3
         {
             get
             {
@@ -9518,7 +8828,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PetState
+        public DynelStat PetState
         {
             get
             {
@@ -9528,7 +8838,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PetType
+        public DynelStat PetType
         {
             get
             {
@@ -9578,7 +8888,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Placement
+        public DynelStat Placement
         {
             get
             {
@@ -9588,7 +8898,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PlayerId
+        public DynelStat PlayerId
         {
             get
             {
@@ -9598,7 +8908,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PlayerKilling
+        public DynelStat PlayerKilling
         {
             get
             {
@@ -9608,7 +8918,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PlayerOptions
+        public DynelStat PlayerOptions
         {
             get
             {
@@ -9618,7 +8928,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PlayfieldType
+        public DynelStat PlayfieldType
         {
             get
             {
@@ -9628,7 +8938,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PoisonAC
+        public DynelStat PoisonAC
         {
             get
             {
@@ -9638,7 +8948,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PoisonDamageModifier
+        public DynelStat PoisonDamageModifier
         {
             get
             {
@@ -9648,7 +8958,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PrevMovementMode
+        public DynelStat PrevMovementMode
         {
             get
             {
@@ -9658,7 +8968,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PreviousHealth
+        public DynelStat PreviousHealth
         {
             get
             {
@@ -9668,7 +8978,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Price
+        public DynelStat Price
         {
             get
             {
@@ -9678,7 +8988,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PrimaryItemInstance
+        public DynelStat PrimaryItemInstance
         {
             get
             {
@@ -9688,7 +8998,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PrimaryItemType
+        public DynelStat PrimaryItemType
         {
             get
             {
@@ -9698,7 +9008,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PrimaryTemplateId
+        public DynelStat PrimaryTemplateId
         {
             get
             {
@@ -9708,7 +9018,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProcChance1
+        public DynelStat ProcChance1
         {
             get
             {
@@ -9718,7 +9028,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProcChance2
+        public DynelStat ProcChance2
         {
             get
             {
@@ -9728,7 +9038,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProcChance3
+        public DynelStat ProcChance3
         {
             get
             {
@@ -9738,7 +9048,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProcChance4
+        public DynelStat ProcChance4
         {
             get
             {
@@ -9748,7 +9058,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProcInitiative1
+        public DynelStat ProcInitiative1
         {
             get
             {
@@ -9758,7 +9068,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProcInitiative2
+        public DynelStat ProcInitiative2
         {
             get
             {
@@ -9768,7 +9078,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProcInitiative3
+        public DynelStat ProcInitiative3
         {
             get
             {
@@ -9778,7 +9088,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProcInitiative4
+        public DynelStat ProcInitiative4
         {
             get
             {
@@ -9788,7 +9098,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProcNano1
+        public DynelStat ProcNano1
         {
             get
             {
@@ -9798,7 +9108,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProcNano2
+        public DynelStat ProcNano2
         {
             get
             {
@@ -9808,7 +9118,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProcNano3
+        public DynelStat ProcNano3
         {
             get
             {
@@ -9818,7 +9128,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProcNano4
+        public DynelStat ProcNano4
         {
             get
             {
@@ -9828,7 +9138,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Profession
+        public DynelStat Profession
         {
             get
             {
@@ -9838,7 +9148,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProfessionLevel
+        public DynelStat ProfessionLevel
         {
             get
             {
@@ -9848,7 +9158,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProjectileAC
+        public DynelStat ProjectileAC
         {
             get
             {
@@ -9858,7 +9168,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProjectileDamageModifier
+        public DynelStat ProjectileDamageModifier
         {
             get
             {
@@ -9868,7 +9178,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProximityRangeIndoors
+        public DynelStat ProximityRangeIndoors
         {
             get
             {
@@ -9878,7 +9188,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ProximityRangeOutdoors
+        public DynelStat ProximityRangeOutdoors
         {
             get
             {
@@ -9888,7 +9198,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Psychic
+        public DynelStat Psychic
         {
             get
             {
@@ -9918,7 +9228,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PvPLevelsKilled
+        public DynelStat PvPLevelsKilled
         {
             get
             {
@@ -9928,7 +9238,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PvpDuelDeaths
+        public DynelStat PvpDuelDeaths
         {
             get
             {
@@ -9938,7 +9248,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PvpDuelKills
+        public DynelStat PvpDuelKills
         {
             get
             {
@@ -9948,7 +9258,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PvpDuelScore
+        public DynelStat PvpDuelScore
         {
             get
             {
@@ -9958,7 +9268,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PvpProfessionDuelDeaths
+        public DynelStat PvpProfessionDuelDeaths
         {
             get
             {
@@ -9968,7 +9278,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PvpProfessionDuelKills
+        public DynelStat PvpProfessionDuelKills
         {
             get
             {
@@ -9978,7 +9288,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PvpRankedSoloDeaths
+        public DynelStat PvpRankedSoloDeaths
         {
             get
             {
@@ -9988,7 +9298,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PvpRankedSoloKills
+        public DynelStat PvpRankedSoloKills
         {
             get
             {
@@ -9998,7 +9308,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PvpRankedTeamDeaths
+        public DynelStat PvpRankedTeamDeaths
         {
             get
             {
@@ -10008,7 +9318,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PvpRankedTeamKills
+        public DynelStat PvpRankedTeamKills
         {
             get
             {
@@ -10018,7 +9328,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PvpRating
+        public DynelStat PvpRating
         {
             get
             {
@@ -10028,7 +9338,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PvpSoloScore
+        public DynelStat PvpSoloScore
         {
             get
             {
@@ -10038,7 +9348,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat PvpTeamScore
+        public DynelStat PvpTeamScore
         {
             get
             {
@@ -10048,7 +9358,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QTDungeonInstance
+        public DynelStat QTDungeonInstance
         {
             get
             {
@@ -10058,7 +9368,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QTKillNumMonsterCount1
+        public DynelStat QTKillNumMonsterCount1
         {
             get
             {
@@ -10068,7 +9378,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QTKillNumMonsterCount2
+        public DynelStat QTKillNumMonsterCount2
         {
             get
             {
@@ -10078,7 +9388,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QTKillNumMonsterCount3
+        public DynelStat QTKillNumMonsterCount3
         {
             get
             {
@@ -10088,7 +9398,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QTKillNumMonsterId1
+        public DynelStat QTKillNumMonsterId1
         {
             get
             {
@@ -10098,7 +9408,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QTKillNumMonsterId2
+        public DynelStat QTKillNumMonsterId2
         {
             get
             {
@@ -10108,7 +9418,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QTKillNumMonsterId3
+        public DynelStat QTKillNumMonsterId3
         {
             get
             {
@@ -10118,7 +9428,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QTKilledMonsters
+        public DynelStat QTKilledMonsters
         {
             get
             {
@@ -10128,7 +9438,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QTNumMonsters
+        public DynelStat QTNumMonsters
         {
             get
             {
@@ -10138,7 +9448,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QuestAsMaximumRange
+        public DynelStat QuestAsMaximumRange
         {
             get
             {
@@ -10148,7 +9458,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QuestAsMinimumRange
+        public DynelStat QuestAsMinimumRange
         {
             get
             {
@@ -10158,7 +9468,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QuestBoothDifficulty
+        public DynelStat QuestBoothDifficulty
         {
             get
             {
@@ -10168,7 +9478,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QuestIndex0
+        public DynelStat QuestIndex0
         {
             get
             {
@@ -10178,7 +9488,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QuestIndex1
+        public DynelStat QuestIndex1
         {
             get
             {
@@ -10188,7 +9498,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QuestIndex2
+        public DynelStat QuestIndex2
         {
             get
             {
@@ -10198,7 +9508,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QuestIndex3
+        public DynelStat QuestIndex3
         {
             get
             {
@@ -10208,7 +9518,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QuestIndex4
+        public DynelStat QuestIndex4
         {
             get
             {
@@ -10218,7 +9528,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QuestIndex5
+        public DynelStat QuestIndex5
         {
             get
             {
@@ -10228,7 +9538,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QuestInstance
+        public DynelStat QuestInstance
         {
             get
             {
@@ -10238,7 +9548,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QuestLevelsSolved
+        public DynelStat QuestLevelsSolved
         {
             get
             {
@@ -10248,7 +9558,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QuestStat
+        public DynelStat QuestStat
         {
             get
             {
@@ -10258,7 +9568,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat QuestTimeout
+        public DynelStat QuestTimeout
         {
             get
             {
@@ -10268,7 +9578,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat RP
+        public DynelStat RP
         {
             get
             {
@@ -10278,7 +9588,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Race
+        public DynelStat Race
         {
             get
             {
@@ -10288,7 +9598,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat RadiationAC
+        public DynelStat RadiationAC
         {
             get
             {
@@ -10298,7 +9608,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat RadiationDamageModifier
+        public DynelStat RadiationDamageModifier
         {
             get
             {
@@ -10308,7 +9618,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat RangeIncreaserNF
+        public DynelStat RangeIncreaserNF
         {
             get
             {
@@ -10318,7 +9628,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat RangeIncreaserWeapon
+        public DynelStat RangeIncreaserWeapon
         {
             get
             {
@@ -10328,7 +9638,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReadOnly
+        public DynelStat ReadOnly
         {
             get
             {
@@ -10338,7 +9648,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat RechargeDelay
+        public DynelStat RechargeDelay
         {
             get
             {
@@ -10348,7 +9658,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat RechargeDelayCap
+        public DynelStat RechargeDelayCap
         {
             get
             {
@@ -10358,7 +9668,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReclaimItem
+        public DynelStat ReclaimItem
         {
             get
             {
@@ -10368,7 +9678,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectChemicalAC
+        public DynelStat ReflectChemicalAC
         {
             get
             {
@@ -10378,7 +9688,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectColdAC
+        public DynelStat ReflectColdAC
         {
             get
             {
@@ -10388,7 +9698,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectEnergyAC
+        public DynelStat ReflectEnergyAC
         {
             get
             {
@@ -10398,7 +9708,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectFireAC
+        public DynelStat ReflectFireAC
         {
             get
             {
@@ -10408,7 +9718,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectMeleeAC
+        public DynelStat ReflectMeleeAC
         {
             get
             {
@@ -10418,7 +9728,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectNanoAC
+        public DynelStat ReflectNanoAC
         {
             get
             {
@@ -10428,7 +9738,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectPoisonAC
+        public DynelStat ReflectPoisonAC
         {
             get
             {
@@ -10438,7 +9748,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectProjectileAC
+        public DynelStat ReflectProjectileAC
         {
             get
             {
@@ -10448,7 +9758,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectRadiationAC
+        public DynelStat ReflectRadiationAC
         {
             get
             {
@@ -10458,7 +9768,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectReturnedChemicalAC
+        public DynelStat ReflectReturnedChemicalAC
         {
             get
             {
@@ -10468,7 +9778,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectReturnedColdAC
+        public DynelStat ReflectReturnedColdAC
         {
             get
             {
@@ -10478,7 +9788,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectReturnedEnergyAC
+        public DynelStat ReflectReturnedEnergyAC
         {
             get
             {
@@ -10488,7 +9798,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectReturnedFireAC
+        public DynelStat ReflectReturnedFireAC
         {
             get
             {
@@ -10498,7 +9808,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectReturnedMeleeAC
+        public DynelStat ReflectReturnedMeleeAC
         {
             get
             {
@@ -10508,7 +9818,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectReturnedNanoAC
+        public DynelStat ReflectReturnedNanoAC
         {
             get
             {
@@ -10518,7 +9828,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectReturnedPoisonAC
+        public DynelStat ReflectReturnedPoisonAC
         {
             get
             {
@@ -10528,7 +9838,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectReturnedProjectileAC
+        public DynelStat ReflectReturnedProjectileAC
         {
             get
             {
@@ -10538,7 +9848,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ReflectReturnedRadiationAC
+        public DynelStat ReflectReturnedRadiationAC
         {
             get
             {
@@ -10548,7 +9858,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat RegainXPPercentage
+        public DynelStat RegainXPPercentage
         {
             get
             {
@@ -10558,7 +9868,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat RepairDifficulty
+        public DynelStat RepairDifficulty
         {
             get
             {
@@ -10568,7 +9878,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat RepairSkill
+        public DynelStat RepairSkill
         {
             get
             {
@@ -10578,7 +9888,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ResistModifier
+        public DynelStat ResistModifier
         {
             get
             {
@@ -10588,7 +9898,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat RestModifier
+        public DynelStat RestModifier
         {
             get
             {
@@ -10598,7 +9908,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ResurrectDest
+        public DynelStat ResurrectDest
         {
             get
             {
@@ -10628,7 +9938,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat RitualTargetInst
+        public DynelStat RitualTargetInst
         {
             get
             {
@@ -10638,7 +9948,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Rnd
+        public DynelStat Rnd
         {
             get
             {
@@ -10648,7 +9958,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Rotation
+        public DynelStat Rotation
         {
             get
             {
@@ -10668,7 +9978,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SK
+        public DynelStat SK
         {
             get
             {
@@ -10678,7 +9988,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SavedXP
+        public DynelStat SavedXP
         {
             get
             {
@@ -10688,7 +9998,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat School
+        public DynelStat School
         {
             get
             {
@@ -10698,7 +10008,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SecondaryItemInstance
+        public DynelStat SecondaryItemInstance
         {
             get
             {
@@ -10708,7 +10018,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SecondaryItemTemplate
+        public DynelStat SecondaryItemTemplate
         {
             get
             {
@@ -10718,7 +10028,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SecondaryItemType
+        public DynelStat SecondaryItemType
         {
             get
             {
@@ -10728,7 +10038,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SelectedTarget
+        public DynelStat SelectedTarget
         {
             get
             {
@@ -10738,7 +10048,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SelectedTargetType
+        public DynelStat SelectedTargetType
         {
             get
             {
@@ -10748,7 +10058,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SellModifier
+        public DynelStat SellModifier
         {
             get
             {
@@ -10758,7 +10068,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Sense
+        public DynelStat Sense
         {
             get
             {
@@ -10778,7 +10088,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SessionTime
+        public DynelStat SessionTime
         {
             get
             {
@@ -10788,7 +10098,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Sex
+        public DynelStat Sex
         {
             get
             {
@@ -10798,7 +10108,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShadowBreed
+        public DynelStat ShadowBreed
         {
             get
             {
@@ -10808,7 +10118,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShadowBreedTemplate
+        public DynelStat ShadowBreedTemplate
         {
             get
             {
@@ -10818,7 +10128,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShieldChemicalAC
+        public DynelStat ShieldChemicalAC
         {
             get
             {
@@ -10828,7 +10138,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShieldColdAC
+        public DynelStat ShieldColdAC
         {
             get
             {
@@ -10838,7 +10148,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShieldEnergyAC
+        public DynelStat ShieldEnergyAC
         {
             get
             {
@@ -10848,7 +10158,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShieldFireAC
+        public DynelStat ShieldFireAC
         {
             get
             {
@@ -10858,7 +10168,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShieldMeleeAC
+        public DynelStat ShieldMeleeAC
         {
             get
             {
@@ -10868,7 +10178,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShieldNanoAC
+        public DynelStat ShieldNanoAC
         {
             get
             {
@@ -10878,7 +10188,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShieldPoisonAC
+        public DynelStat ShieldPoisonAC
         {
             get
             {
@@ -10888,7 +10198,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShieldProjectileAC
+        public DynelStat ShieldProjectileAC
         {
             get
             {
@@ -10898,7 +10208,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShieldRadiationAC
+        public DynelStat ShieldRadiationAC
         {
             get
             {
@@ -10908,7 +10218,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShopFlags
+        public DynelStat ShopFlags
         {
             get
             {
@@ -10918,7 +10228,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShopId
+        public DynelStat ShopId
         {
             get
             {
@@ -10928,7 +10238,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShopIndex
+        public DynelStat ShopIndex
         {
             get
             {
@@ -10938,7 +10248,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShopLastUsed
+        public DynelStat ShopLastUsed
         {
             get
             {
@@ -10948,7 +10258,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShopPrice
+        public DynelStat ShopPrice
         {
             get
             {
@@ -10958,7 +10268,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShopRent
+        public DynelStat ShopRent
         {
             get
             {
@@ -10968,7 +10278,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShopType
+        public DynelStat ShopType
         {
             get
             {
@@ -10988,7 +10298,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShoulderMeshHolder
+        public DynelStat ShoulderMeshHolder
         {
             get
             {
@@ -10998,7 +10308,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShoulderMeshLeft
+        public DynelStat ShoulderMeshLeft
         {
             get
             {
@@ -11008,7 +10318,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat ShoulderMeshRight
+        public DynelStat ShoulderMeshRight
         {
             get
             {
@@ -11018,7 +10328,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Side
+        public DynelStat Side
         {
             get
             {
@@ -11028,7 +10338,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SisCap
+        public DynelStat SisCap
         {
             get
             {
@@ -11038,7 +10348,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SkillDisabled
+        public DynelStat SkillDisabled
         {
             get
             {
@@ -11048,7 +10358,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SkillLockModifier
+        public DynelStat SkillLockModifier
         {
             get
             {
@@ -11058,7 +10368,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SkillTimeOnSelectedTarget
+        public DynelStat SkillTimeOnSelectedTarget
         {
             get
             {
@@ -11078,7 +10388,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SocialStatus
+        public DynelStat SocialStatus
         {
             get
             {
@@ -11088,7 +10398,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SoundVolume
+        public DynelStat SoundVolume
         {
             get
             {
@@ -11098,7 +10408,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SpecialAttackShield
+        public DynelStat SpecialAttackShield
         {
             get
             {
@@ -11108,7 +10418,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SpecialCondition
+        public DynelStat SpecialCondition
         {
             get
             {
@@ -11118,7 +10428,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Specialization
+        public DynelStat Specialization
         {
             get
             {
@@ -11128,7 +10438,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SpeedPenalty
+        public DynelStat SpeedPenalty
         {
             get
             {
@@ -11138,7 +10448,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Stability
+        public DynelStat Stability
         {
             get
             {
@@ -11148,7 +10458,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat StackingLine2
+        public DynelStat StackingLine2
         {
             get
             {
@@ -11158,7 +10468,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat StackingLine3
+        public DynelStat StackingLine3
         {
             get
             {
@@ -11168,7 +10478,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat StackingLine4
+        public DynelStat StackingLine4
         {
             get
             {
@@ -11178,7 +10488,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat StackingLine5
+        public DynelStat StackingLine5
         {
             get
             {
@@ -11188,7 +10498,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat StackingLine6
+        public DynelStat StackingLine6
         {
             get
             {
@@ -11198,7 +10508,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat StackingOrder
+        public DynelStat StackingOrder
         {
             get
             {
@@ -11208,7 +10518,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Stamina
+        public DynelStat Stamina
         {
             get
             {
@@ -11218,7 +10528,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat StatOne
+        public DynelStat StatOne
         {
             get
             {
@@ -11228,7 +10538,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat State
+        public DynelStat State
         {
             get
             {
@@ -11238,7 +10548,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat StateAction
+        public DynelStat StateAction
         {
             get
             {
@@ -11248,7 +10558,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat StateMachine
+        public DynelStat StateMachine
         {
             get
             {
@@ -11258,7 +10568,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat StaticInstance
+        public DynelStat StaticInstance
         {
             get
             {
@@ -11268,7 +10578,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat StaticType
+        public DynelStat StaticType
         {
             get
             {
@@ -11278,7 +10588,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat StreamCheckMagic
+        public DynelStat StreamCheckMagic
         {
             get
             {
@@ -11288,7 +10598,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Strength
+        public DynelStat Strength
         {
             get
             {
@@ -11318,7 +10628,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat SynergyHash
+        public DynelStat SynergyHash
         {
             get
             {
@@ -11328,7 +10638,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Taboo
+        public DynelStat Taboo
         {
             get
             {
@@ -11338,7 +10648,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TargetDistance
+        public DynelStat TargetDistance
         {
             get
             {
@@ -11348,7 +10658,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TargetDistanceChange
+        public DynelStat TargetDistanceChange
         {
             get
             {
@@ -11358,7 +10668,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TargetFacing
+        public DynelStat TargetFacing
         {
             get
             {
@@ -11368,7 +10678,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat Team
+        public DynelStat Team
         {
             get
             {
@@ -11378,7 +10688,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TeamAllowed
+        public DynelStat TeamAllowed
         {
             get
             {
@@ -11388,7 +10698,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TeamCloseness
+        public DynelStat TeamCloseness
         {
             get
             {
@@ -11398,7 +10708,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TeamSide
+        public DynelStat TeamSide
         {
             get
             {
@@ -11408,7 +10718,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TeleportPauseMilliSeconds
+        public DynelStat TeleportPauseMilliSeconds
         {
             get
             {
@@ -11418,7 +10728,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TempSavePlayfield
+        public DynelStat TempSavePlayfield
         {
             get
             {
@@ -11428,7 +10738,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TempSaveTeamId
+        public DynelStat TempSaveTeamId
         {
             get
             {
@@ -11438,7 +10748,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TempSaveX
+        public DynelStat TempSaveX
         {
             get
             {
@@ -11448,7 +10758,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TempSaveY
+        public DynelStat TempSaveY
         {
             get
             {
@@ -11458,7 +10768,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TemporarySkillReduction
+        public DynelStat TemporarySkillReduction
         {
             get
             {
@@ -11488,7 +10798,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TideRequiredDynelId
+        public DynelStat TideRequiredDynelId
         {
             get
             {
@@ -11498,7 +10808,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TimeExist
+        public DynelStat TimeExist
         {
             get
             {
@@ -11508,7 +10818,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TimeSinceCreation
+        public DynelStat TimeSinceCreation
         {
             get
             {
@@ -11518,7 +10828,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TimeSinceUpkeep
+        public DynelStat TimeSinceUpkeep
         {
             get
             {
@@ -11538,7 +10848,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TotalDamage
+        public DynelStat TotalDamage
         {
             get
             {
@@ -11548,7 +10858,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TotalMass
+        public DynelStat TotalMass
         {
             get
             {
@@ -11558,7 +10868,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TowerInstance
+        public DynelStat TowerInstance
         {
             get
             {
@@ -11568,7 +10878,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TowerNpcHash
+        public DynelStat TowerNpcHash
         {
             get
             {
@@ -11578,7 +10888,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TowerType
+        public DynelStat TowerType
         {
             get
             {
@@ -11588,7 +10898,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TracerEffectType
+        public DynelStat TracerEffectType
         {
             get
             {
@@ -11598,7 +10908,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TrackChemicalDamage
+        public DynelStat TrackChemicalDamage
         {
             get
             {
@@ -11608,7 +10918,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TrackColdDamage
+        public DynelStat TrackColdDamage
         {
             get
             {
@@ -11618,7 +10928,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TrackEnergyDamage
+        public DynelStat TrackEnergyDamage
         {
             get
             {
@@ -11628,7 +10938,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TrackFireDamage
+        public DynelStat TrackFireDamage
         {
             get
             {
@@ -11638,7 +10948,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TrackMeleeDamage
+        public DynelStat TrackMeleeDamage
         {
             get
             {
@@ -11648,7 +10958,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TrackPoisonDamage
+        public DynelStat TrackPoisonDamage
         {
             get
             {
@@ -11658,7 +10968,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TrackProjectileDamage
+        public DynelStat TrackProjectileDamage
         {
             get
             {
@@ -11668,7 +10978,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TrackRadiationDamage
+        public DynelStat TrackRadiationDamage
         {
             get
             {
@@ -11678,7 +10988,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TradeLimit
+        public DynelStat TradeLimit
         {
             get
             {
@@ -11688,7 +10998,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TrainSkill
+        public DynelStat TrainSkill
         {
             get
             {
@@ -11698,7 +11008,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TrainSkillCost
+        public DynelStat TrainSkillCost
         {
             get
             {
@@ -11708,7 +11018,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TrapDifficulty
+        public DynelStat TrapDifficulty
         {
             get
             {
@@ -11718,7 +11028,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TravelSound
+        public DynelStat TravelSound
         {
             get
             {
@@ -11738,7 +11048,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat TurnSpeed
+        public DynelStat TurnSpeed
         {
             get
             {
@@ -11778,7 +11088,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat UnarmedTemplateInstance
+        public DynelStat UnarmedTemplateInstance
         {
             get
             {
@@ -11788,7 +11098,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat UnreadMailCount
+        public DynelStat UnreadMailCount
         {
             get
             {
@@ -11798,7 +11108,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat UnsavedXP
+        public DynelStat UnsavedXP
         {
             get
             {
@@ -11808,7 +11118,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat UserInstance
+        public DynelStat UserInstance
         {
             get
             {
@@ -11818,7 +11128,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat UserType
+        public DynelStat UserType
         {
             get
             {
@@ -11828,7 +11138,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat VehicleAC
+        public DynelStat VehicleAC
         {
             get
             {
@@ -11838,7 +11148,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat VehicleDamage
+        public DynelStat VehicleDamage
         {
             get
             {
@@ -11848,7 +11158,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat VehicleHealth
+        public DynelStat VehicleHealth
         {
             get
             {
@@ -11858,7 +11168,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat VehicleSpeed
+        public DynelStat VehicleSpeed
         {
             get
             {
@@ -11868,7 +11178,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat VeteranPoints
+        public DynelStat VeteranPoints
         {
             get
             {
@@ -11878,7 +11188,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat VicinityRange
+        public DynelStat VicinityRange
         {
             get
             {
@@ -11888,7 +11198,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat VictoryPoints
+        public DynelStat VictoryPoints
         {
             get
             {
@@ -11898,7 +11208,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat VisualBreed
+        public DynelStat VisualBreed
         {
             get
             {
@@ -11908,7 +11218,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat VisualFlags
+        public DynelStat VisualFlags
         {
             get
             {
@@ -11918,7 +11228,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat VisualLodLevel
+        public DynelStat VisualLodLevel
         {
             get
             {
@@ -11928,7 +11238,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat VisualProfession
+        public DynelStat VisualProfession
         {
             get
             {
@@ -11938,7 +11248,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat VisualSex
+        public DynelStat VisualSex
         {
             get
             {
@@ -11948,7 +11258,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat VolumeMass
+        public DynelStat VolumeMass
         {
             get
             {
@@ -11958,7 +11268,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat VoteCount
+        public DynelStat VoteCount
         {
             get
             {
@@ -11968,7 +11278,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat WaitState
+        public DynelStat WaitState
         {
             get
             {
@@ -11978,7 +11288,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat WeaponDisallowedInstance
+        public DynelStat WeaponDisallowedInstance
         {
             get
             {
@@ -11988,7 +11298,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat WeaponDisallowedType
+        public DynelStat WeaponDisallowedType
         {
             get
             {
@@ -11998,7 +11308,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat WeaponMeshHolder
+        public DynelStat WeaponMeshHolder
         {
             get
             {
@@ -12008,7 +11318,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat WeaponMeshLeft
+        public DynelStat WeaponMeshLeft
         {
             get
             {
@@ -12018,7 +11328,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat WeaponMeshRight
+        public DynelStat WeaponMeshRight
         {
             get
             {
@@ -12038,7 +11348,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat WeaponStyleLeft
+        public DynelStat WeaponStyleLeft
         {
             get
             {
@@ -12048,7 +11358,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat WeaponStyleRight
+        public DynelStat WeaponStyleRight
         {
             get
             {
@@ -12058,7 +11368,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat WeaponsStyle
+        public DynelStat WeaponsStyle
         {
             get
             {
@@ -12068,7 +11378,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat XP
+        public DynelStat XP
         {
             get
             {
@@ -12078,7 +11388,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat XPBonus
+        public DynelStat XPBonus
         {
             get
             {
@@ -12088,7 +11398,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat XPKillRange
+        public DynelStat XPKillRange
         {
             get
             {
@@ -12098,7 +11408,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        public ClassStat XPModifier
+        public DynelStat XPModifier
         {
             get
             {
@@ -12114,7 +11424,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </summary>
         public void ClearChangedFlags()
         {
-            foreach (ClassStat cs in this.all)
+            foreach (DynelStat cs in this.all)
             {
                 cs.Changed = false;
             }
@@ -12124,10 +11434,10 @@ namespace ZoneEngine.GameObject.Stats
         /// </summary>
         public void ClearModifiers()
         {
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
-                c.StatModifier = 0;
-                c.StatPercentageModifier = 100;
+                c.Modifier = 0;
+                c.PercentageModifier = 100;
                 c.Trickle = 0;
             }
         }
@@ -12142,14 +11452,14 @@ namespace ZoneEngine.GameObject.Stats
         /// </exception>
         public uint GetBaseValue(int stat)
         {
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 if (c.StatNumber != stat)
                 {
                     continue;
                 }
 
-                return c.StatBaseValue;
+                return c.BaseValue;
             }
 
             throw new StatDoesNotExistException("Stat " + stat + " does not exist.\r\nMethod: GetBaseValue");
@@ -12165,14 +11475,14 @@ namespace ZoneEngine.GameObject.Stats
         /// </exception>
         public int GetModifier(int stat)
         {
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 if (c.StatNumber != stat)
                 {
                     continue;
                 }
 
-                return c.StatModifier;
+                return c.Modifier;
             }
 
             throw new StatDoesNotExistException("Stat " + stat + " does not exist.\r\nMethod: GetModifier");
@@ -12188,14 +11498,14 @@ namespace ZoneEngine.GameObject.Stats
         /// </exception>
         public int GetPercentageModifier(int stat)
         {
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 if (c.StatNumber != stat)
                 {
                     continue;
                 }
 
-                return c.StatPercentageModifier;
+                return c.PercentageModifier;
             }
 
             throw new StatDoesNotExistException("Stat " + stat + " does not exist.\r\nMethod: GetPercentageModifier");
@@ -12207,9 +11517,9 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         /// <returns>
         /// </returns>
-        public ClassStat GetStatbyNumber(int number)
+        public DynelStat GetStatbyNumber(int number)
         {
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 if (c.StatNumber != number)
                 {
@@ -12227,7 +11537,9 @@ namespace ZoneEngine.GameObject.Stats
         /// </summary>
         public void ReadStatsfromSql()
         {
-            foreach (DBStats dbStats in StatDao.GetById((int)this.flags.Parent.Identity.Type,this.flags.Parent.Identity.Instance))
+            foreach (
+                DBStats dbStats in
+                    StatDao.GetById((int)this.flags.Parent.Identity.Type, this.flags.Parent.Identity.Instance))
             {
                 this.SetBaseValue(dbStats.statid, (uint)dbStats.statvalue);
             }
@@ -12241,10 +11553,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         public void Send(object sender, StatChangedEventArgs e)
         {
-            Contract.Requires(sender != null);
-            Contract.Requires(((ClassStat)sender).Parent != null);
-
-            if (!((ClassStat)sender).Parent.DoNotDoTimers)
+            if (!((DynelStat)sender).Parent.DoNotDoTimers)
             {
                 Stat.Send(e.Stat.Parent, e.Stat.StatNumber, e.NewValue, e.Stat.AnnounceToPlayfield);
 
@@ -12301,15 +11610,15 @@ namespace ZoneEngine.GameObject.Stats
         /// </exception>
         public void SetBaseValue(int stat, uint value)
         {
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 if (c.StatNumber != stat)
                 {
                     continue;
                 }
 
-                c.Changed = c.StatBaseValue != value;
-                c.StatBaseValue = value;
+                c.Changed = c.BaseValue != value;
+                c.BaseValue = value;
                 return;
             }
 
@@ -12327,14 +11636,14 @@ namespace ZoneEngine.GameObject.Stats
         /// </exception>
         public void SetModifier(int stat, int value)
         {
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 if (c.StatNumber != stat)
                 {
                     continue;
                 }
 
-                c.StatModifier = value;
+                c.Modifier = value;
                 return;
             }
 
@@ -12352,14 +11661,14 @@ namespace ZoneEngine.GameObject.Stats
         /// </exception>
         public void SetPercentageModifier(int stat, int value)
         {
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 if (c.StatNumber != stat)
                 {
                     continue;
                 }
 
-                c.StatPercentageModifier = value;
+                c.PercentageModifier = value;
                 return;
             }
 
@@ -12378,7 +11687,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         public void SetStatValueByName(int number, uint newValue)
         {
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 if (c.StatNumber != number)
                 {
@@ -12406,7 +11715,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             Contract.Requires(statName != null);
             int statid = StatsList.GetStatId(statName.ToLower());
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 if (c.StatNumber != statid)
                 {
@@ -12431,7 +11740,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </exception>
         public void SetTrickle(int statId, int value)
         {
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 if (c.StatNumber != statId)
                 {
@@ -12457,7 +11766,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             Contract.Requires(statName != null);
             int statid = StatsList.GetStatId(statName.ToLower());
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 if (c.StatNumber != statid)
                 {
@@ -12481,7 +11790,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </returns>
         public int StatValueByName(int number)
         {
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 if (c.StatNumber != number)
                 {
@@ -12507,7 +11816,7 @@ namespace ZoneEngine.GameObject.Stats
         {
             Contract.Requires(name != null);
             int statid = StatsList.GetStatId(name.ToLower());
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 if (c.StatNumber != statid)
                 {
@@ -12525,7 +11834,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </summary>
         public void WriteStatstoSql()
         {
-            foreach (ClassStat c in this.all)
+            foreach (DynelStat c in this.all)
             {
                 if (c.DoNotDontWriteToSql)
                 {

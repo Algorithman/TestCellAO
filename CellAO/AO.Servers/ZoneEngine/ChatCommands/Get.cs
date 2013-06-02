@@ -91,8 +91,8 @@ namespace ZoneEngine.ChatCommands
                     statValue = targetCharacter.Stats.GetBaseValue(statId);
                     effectiveValue = targetCharacter.Stats.StatValueByName(statId);
                     trickle = targetCharacter.Stats.GetStatbyNumber(statId).Trickle;
-                    mod = targetCharacter.Stats.GetStatbyNumber(statId).StatModifier;
-                    perc = targetCharacter.Stats.GetStatbyNumber(statId).StatPercentageModifier;
+                    mod = targetCharacter.Stats.GetStatbyNumber(statId).Modifier;
+                    perc = targetCharacter.Stats.GetStatbyNumber(statId).PercentageModifier;
                 }
                 catch (StatDoesNotExistException)
                 {

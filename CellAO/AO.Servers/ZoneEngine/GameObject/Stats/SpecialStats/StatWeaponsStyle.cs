@@ -27,7 +27,7 @@ namespace ZoneEngine.GameObject.Stats
 {
     /// <summary>
     /// </summary>
-    public class StatWeaponsStyle : ClassStat
+    public class StatWeaponsStyle : DynelStat
     {
         #region Constructors and Destructors
 
@@ -37,21 +37,18 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         /// <param name="defaultValue">
         /// </param>
-        /// <param name="name">
-        /// </param>
         /// <param name="sendBaseValue">
         /// </param>
         /// <param name="doNotWrite">
         /// </param>
         /// <param name="announceToPlayfield">
         /// </param>
-        public StatWeaponsStyle(
-            int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
+        public StatWeaponsStyle(int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
             this.StatNumber = number;
-            this.StatDefaultValue = (uint)defaultValue;
+            this.DefaultValue = defaultValue;
 
-            this.StatBaseValue = this.StatDefaultValue;
+            this.BaseValue = this.DefaultValue;
             this.SendBaseValue = true;
             this.DoNotDontWriteToSql = false;
             this.AnnounceToPlayfield = false;

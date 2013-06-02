@@ -39,7 +39,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        int BaseValue { get; set; }
+        uint BaseValue { get; set; }
 
         /// <summary>
         /// </summary>
@@ -48,5 +48,9 @@ namespace ZoneEngine.GameObject.Stats
         /// <summary>
         /// </summary>
         int Modifier { get; set; }
+
+        /// <summary>
+        /// </summary>
+        int PercentageModifier { get; set; }
     }
 }

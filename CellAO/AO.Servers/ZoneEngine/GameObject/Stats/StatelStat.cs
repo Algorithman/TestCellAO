@@ -58,16 +58,16 @@ namespace ZoneEngine.GameObject.Stats
         /// <summary>
         /// Always 'value' for Statels
         /// </summary>
-        public int BaseValue
+        public uint BaseValue
         {
             get
             {
-                return this.value;
+                return (uint)this.value;
             }
 
             set
             {
-                this.value = value;
+                this.value = (int)value;
             }
         }
 
@@ -94,6 +94,21 @@ namespace ZoneEngine.GameObject.Stats
             get
             {
                 return 0;
+            }
+
+            set
+            {
+            }
+        }
+
+        /// <summary>
+        /// Always 100%
+        /// </summary>
+        public int PercentageModifier
+        {
+            get
+            {
+                return 100;
             }
 
             set

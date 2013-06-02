@@ -251,7 +251,7 @@ namespace ZoneEngine.GameObject.Misc
                     {
                         // Helmet there?
                         // This probably needs to be looked at (glasses/visors)
-                        if (meshs.ElementAt(0).Mesh != character.Stats.HeadMesh.StatBaseValue)
+                        if (meshs.ElementAt(0).Mesh != character.Stats.HeadMesh.BaseValue)
                         {
                             // Dont remove the head :)
                             meshs.RemoveAt(0);
@@ -262,7 +262,7 @@ namespace ZoneEngine.GameObject.Misc
                     {
                         // Helmet there?
                         // This probably needs to be looked at (glasses/visors)
-                        if (socials.ElementAt(0).Mesh != character.Stats.HeadMesh.StatBaseValue)
+                        if (socials.ElementAt(0).Mesh != character.Stats.HeadMesh.BaseValue)
                         {
                             // Dont remove the head :)
                             socials.RemoveAt(0);
@@ -353,7 +353,7 @@ namespace ZoneEngine.GameObject.Misc
                         // Compare layer only when both slots are set
                         if (cloth.Position == 0)
                         {
-                            if (social.Mesh != character.Stats.HeadMesh.StatBaseValue)
+                            if (social.Mesh != character.Stats.HeadMesh.BaseValue)
                             {
                                 cloth = social;
                             }

@@ -33,7 +33,7 @@ namespace ZoneEngine.GameObject.Stats
 
     /// <summary>
     /// </summary>
-    public class StatHealDelta : ClassStat
+    public class StatHealDelta : DynelStat
     {
         #region Constructors and Destructors
 
@@ -52,15 +52,15 @@ namespace ZoneEngine.GameObject.Stats
         /// <param name="announceToPlayfield">
         /// </param>
         public StatHealDelta(
-            int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
+            int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
             this.StatNumber = number;
-            this.StatDefaultValue = (uint)defaultValue;
+            this.DefaultValue = defaultValue;
 
-            this.StatBaseValue = this.StatDefaultValue;
-            this.SendBaseValue = true;
-            this.DoNotDontWriteToSql = false;
-            this.AnnounceToPlayfield = false;
+            this.BaseValue = this.DefaultValue;
+            this.SendBaseValue = sendBaseValue;
+            this.DoNotDontWriteToSql = doNotWrite;
+            this.AnnounceToPlayfield = announceToPlayfield;
         }
 
         #endregion
@@ -77,7 +77,7 @@ namespace ZoneEngine.GameObject.Stats
                 Character ch = (Character)this.Parent;
                 uint[] healDelta = { 3, 3, 2, 4, 12, 15, 20 };
 
-                this.StatBaseValue = healDelta[ch.Stats.Breed.Value - 1]
+                this.BaseValue = healDelta[ch.Stats.Breed.Value - 1]
                                      + (uint)Math.Floor((double)(ch.Stats.BodyDevelopment.Value / 100));
 
                 if (!this.Parent.Starting)

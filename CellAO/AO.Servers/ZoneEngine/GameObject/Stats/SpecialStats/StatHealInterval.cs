@@ -35,7 +35,7 @@ namespace ZoneEngine.GameObject.Stats
 
     /// <summary>
     /// </summary>
-    public class StatHealInterval : ClassStat
+    public class StatHealInterval : DynelStat
     {
         #region Constructors and Destructors
 
@@ -54,15 +54,15 @@ namespace ZoneEngine.GameObject.Stats
         /// <param name="announceToPlayfield">
         /// </param>
         public StatHealInterval(
-            int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
+            int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
             this.StatNumber = number;
-            this.StatDefaultValue = (uint)defaultValue;
+            this.DefaultValue = defaultValue;
 
-            this.StatBaseValue = this.StatDefaultValue;
-            this.SendBaseValue = true;
-            this.DoNotDontWriteToSql = false;
-            this.AnnounceToPlayfield = false;
+            this.BaseValue = this.DefaultValue;
+            this.SendBaseValue = sendBaseValue;
+            this.DoNotDontWriteToSql = doNotWrite;
+            this.AnnounceToPlayfield = announceToPlayfield;
         }
 
         #endregion
@@ -80,7 +80,7 @@ namespace ZoneEngine.GameObject.Stats
                 // calculating Nano and Heal Delta and interval
                 int healinterval = 29 - Math.Min(character.Stats.Stamina.Value / 30, 27);
 
-                character.Stats.HealInterval.StatBaseValue = (uint)healinterval; // Healinterval
+                character.Stats.HealInterval.BaseValue = (uint)healinterval; // Healinterval
 
                 /* TODO: Create Timed Queue for this stuff
                  * TODO: Create AOFunctions properly

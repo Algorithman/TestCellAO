@@ -128,11 +128,11 @@ namespace ZoneEngine.Network.Packets
                 charId = character.Identity;
                 charHeading = character.Heading;
 
-                sideValue = character.Stats.Side.StatBaseValue;
-                fatValue = character.Stats.Fatness.StatBaseValue;
-                breedValue = character.Stats.Breed.StatBaseValue;
-                sexValue = character.Stats.Sex.StatBaseValue;
-                raceValue = character.Stats.Race.StatBaseValue;
+                sideValue = character.Stats.Side.BaseValue;
+                fatValue = character.Stats.Fatness.BaseValue;
+                breedValue = character.Stats.Breed.BaseValue;
+                sexValue = character.Stats.Sex.BaseValue;
+                raceValue = character.Stats.Race.BaseValue;
 
                 charName = character.Name;
                 charFlagsValue = character.Stats.Flags.Value;
@@ -141,12 +141,12 @@ namespace ZoneEngine.Network.Packets
                 expansionValue = character.Stats.Expansion.Value;
                 currentNano = character.Stats.CurrentNano.Value;
 
-                strengthBaseValue = character.Stats.Strength.StatBaseValue;
-                staminaBaseValue = character.Stats.Strength.StatBaseValue;
-                agilityBaseValue = character.Stats.Strength.StatBaseValue;
-                senseBaseValue = character.Stats.Strength.StatBaseValue;
-                intelligenceBaseValue = character.Stats.Strength.StatBaseValue;
-                psychicBaseValue = character.Stats.Strength.StatBaseValue;
+                strengthBaseValue = character.Stats.Strength.BaseValue;
+                staminaBaseValue = character.Stats.Strength.BaseValue;
+                agilityBaseValue = character.Stats.Strength.BaseValue;
+                senseBaseValue = character.Stats.Strength.BaseValue;
+                intelligenceBaseValue = character.Stats.Strength.BaseValue;
+                psychicBaseValue = character.Stats.Strength.BaseValue;
 
                 firstName = character.FirstName;
                 lastName = character.LastName;
@@ -160,7 +160,7 @@ namespace ZoneEngine.Network.Packets
                 visualFlags = character.Stats.VisualFlags.Value;
 
                 currentMovementMode = character.Stats.CurrentMovementMode.Value;
-                runSpeedBaseValue = character.Stats.RunSpeed.StatBaseValue;
+                runSpeedBaseValue = character.Stats.RunSpeed.BaseValue;
 
                 texturesCount = character.Textures.Count;
 

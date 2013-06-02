@@ -33,7 +33,7 @@ namespace ZoneEngine.GameObject.Stats
 
     /// <summary>
     /// </summary>
-    public class StatNanoPoints : ClassStat
+    public class StatCurrentNano : DynelStat
     {
         #region Constructors and Destructors
 
@@ -51,16 +51,16 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         /// <param name="announce">
         /// </param>
-        public StatNanoPoints(
-            int number, int defaultValue, string name, bool sendBaseValue, bool dontWrite, bool announce)
+        public StatCurrentNano(
+            int number, uint defaultValue, bool sendBaseValue, bool dontWrite, bool announce)
         {
             this.StatNumber = number;
-            this.StatDefaultValue = (uint)defaultValue;
+            this.DefaultValue = defaultValue;
 
-            this.StatBaseValue = this.StatDefaultValue;
-            this.SendBaseValue = true;
-            this.DoNotDontWriteToSql = false;
-            this.AnnounceToPlayfield = false;
+            this.BaseValue = this.DefaultValue;
+            this.SendBaseValue = sendBaseValue;
+            this.DoNotDontWriteToSql = dontWrite;
+            this.AnnounceToPlayfield = announce;
         }
 
         #endregion

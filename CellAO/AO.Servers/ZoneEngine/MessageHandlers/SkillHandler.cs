@@ -63,7 +63,7 @@ namespace ZoneEngine.MessageHandlers
 
             uint baseIp = 0;
 
-            uint characterLevel = client.Character.Stats.Level.StatBaseValue;
+            uint characterLevel = (uint)client.Character.Stats.Level.BaseValue;
 
             // Calculate base IP value for character level
             if (characterLevel > 204)
@@ -116,7 +116,7 @@ namespace ZoneEngine.MessageHandlers
 
             statlist.Add(53); // IP
             uint usedIp = baseIp - (uint)Math.Floor(SkillUpdate.CalculateIP(client.Character));
-            client.Character.Stats.IP.StatBaseValue = usedIp;
+            client.Character.Stats.IP.BaseValue = usedIp;
 
             // Send the changed stats back to the client
             count = 0;

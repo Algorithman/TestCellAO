@@ -35,7 +35,7 @@ namespace ZoneEngine.GameObject.Stats
 
     /// <summary>
     /// </summary>
-    public class StatIP : ClassStat
+    public class StatIP : DynelStat
     {
         #region Constructors and Destructors
 
@@ -54,15 +54,15 @@ namespace ZoneEngine.GameObject.Stats
         /// <param name="announceToPlayfield">
         /// </param>
         public StatIP(
-            int number, int defaultValue, string name, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
+            int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
             this.StatNumber = number;
-            this.StatDefaultValue = (uint)defaultValue;
+            this.DefaultValue = defaultValue;
 
-            this.StatBaseValue = this.StatDefaultValue;
-            this.SendBaseValue = true;
-            this.DoNotDontWriteToSql = false;
-            this.AnnounceToPlayfield = false;
+            this.BaseValue = this.DefaultValue;
+            this.SendBaseValue = sendBaseValue;
+            this.DoNotDontWriteToSql = doNotWrite;
+            this.AnnounceToPlayfield = announceToPlayfield;
         }
 
         #endregion
@@ -80,7 +80,7 @@ namespace ZoneEngine.GameObject.Stats
                 int baseIP = 0;
                 int characterLevel;
 
-                characterLevel = (Int32)ch.Stats.Level.StatBaseValue;
+                characterLevel = (Int32)ch.Stats.Level.BaseValue;
 
                 // Calculate base IP value for character level
                 if (characterLevel > 204)
