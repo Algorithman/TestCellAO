@@ -29,7 +29,10 @@ namespace ZoneEngine.GameObject.Stats
     /// </summary>
     public interface IStat
     {
+        /// <summary>
+        /// </summary>
         int StatId { get; }
+
         /// <summary>
         /// </summary>
         int Value { get; set; }

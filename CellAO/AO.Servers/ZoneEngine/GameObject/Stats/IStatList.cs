@@ -30,18 +30,24 @@ namespace ZoneEngine.GameObject.Stats
     public interface IStatList
     {
         /// <summary>
+        /// Number-indexed access to Stats List
         /// </summary>
         /// <param name="index">
+        /// Id of Stat
         /// </param>
         /// <returns>
+        /// IStat object
         /// </returns>
         IStat this[int index] { get; }
 
         /// <summary>
+        /// Name-indexed access to Stats List
         /// </summary>
         /// <param name="name">
+        /// Name of the Stat
         /// </param>
         /// <returns>
+        /// IStat object
         /// </returns>
         IStat this[string name] { get; }
     }

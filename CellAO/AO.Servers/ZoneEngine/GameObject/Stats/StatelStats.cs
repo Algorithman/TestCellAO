@@ -27,16 +27,17 @@ namespace ZoneEngine.GameObject.Stats
 {
     #region Usings ...
 
-    using System;
     using System.Collections.Generic;
 
     #endregion
 
     /// <summary>
+    /// List of StatelStats
     /// </summary>
     public class StatelStats : IStatList
     {
         /// <summary>
+        /// List of Stats (StatelStat) for non-modifiable Stats
         /// </summary>
         private readonly Dictionary<int, StatelStat> statList = new Dictionary<int, StatelStat>();
 
@@ -52,7 +53,7 @@ namespace ZoneEngine.GameObject.Stats
             {
                 if (!this.statList.ContainsKey(index))
                 {
-                    this.statList.Add(index, new StatelStat(index, StatNamesDefaults.GetDefault(index)));
+                    this.statList.Add(index, new StatelStat(index));
                 }
 
                 return this.statList[index];
@@ -63,15 +64,19 @@ namespace ZoneEngine.GameObject.Stats
         /// </summary>
         /// <param name="name">
         /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
         /// <returns>
         /// </returns>
         IStat IStatList.this[string name]
         {
             get
             {
-                throw new NotImplementedException();
+                int index = StatNamesDefaults.GetStatNumber(name);
+                if (!this.statList.ContainsKey(index))
+                {
+                    this.statList.Add(index, new StatelStat(index));
+                }
+
+                return this.statList[index];
             }
         }
     }

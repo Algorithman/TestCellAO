@@ -29,6 +29,8 @@ namespace ZoneEngine.GameObject.Stats
 
     using System.Collections.Generic;
 
+    using AO.Core;
+
     #endregion
 
     /// <summary>
@@ -760,7 +762,13 @@ namespace ZoneEngine.GameObject.Stats
             NameList.Add(1010, "OverrideTextureWeaponLeft");
             NameList.Add(1009, "OverrideTextureWeaponRight");
 
-            // Create crossreferencing List
+            // We dont want to be too specific here, so lets turn them all lower case (for user input)
+            foreach (int number in NameList.Keys)
+            {
+                NameList[number] = NameList[number].ToLower();
+            }
+
+            // and create a crossreferencing List
             foreach (KeyValuePair<int, string> keyValuePair in NameList)
             {
                 NumberList.Add(keyValuePair.Value, keyValuePair.Key);
@@ -1057,14 +1065,41 @@ namespace ZoneEngine.GameObject.Stats
         }
 
         /// <summary>
+        /// Return Stat's default value
         /// </summary>
         /// <param name="statId">
+        /// Stat Id to look for
         /// </param>
         /// <returns>
+        /// Stat Default value
         /// </returns>
         public static int GetDefault(int statId)
         {
-            return 123456890;
+            // Return 1234567890 if nothing else is specified
+            return !Defaults.ContainsKey(statId) ? 123456890 : Defaults[statId];
+        }
+
+        /// <summary>
+        /// Returns number of named Stat
+        /// </summary>
+        /// <param name="name">
+        /// The name of the stat to look for
+        /// </param>
+        /// <returns>
+        /// Stat Id
+        /// </returns>
+        /// <exception cref="StatDoesNotExistException">
+        /// If specified Stat does not exist
+        /// </exception>
+        public static int GetStatNumber(string name)
+        {
+            // Check lowercase
+            if (!NumberList.ContainsKey(name.ToLower()))
+            {
+                throw new StatDoesNotExistException("Stat with name '" + name + "' does not exist");
+            }
+
+            return NumberList[name.ToLower()];
         }
     }
 }
