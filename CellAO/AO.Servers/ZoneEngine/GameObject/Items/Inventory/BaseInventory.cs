@@ -223,7 +223,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public InventoryError TryAdd(Item Item)
+        public virtual InventoryError TryAdd(Item Item)
         {
             int nextFreeSlot = this.FindFreeSlot();
             if (nextFreeSlot == -1)
@@ -274,133 +274,17 @@ namespace ZoneEngine.GameObject.Items.Inventory
             return false;
         }
 
-        /// <summary>
-        /// </summary>
-        /// <returns>
-        /// </returns>
-        public IEnumerator<Item> GetEnumerator()
+        public List<Item> List()
         {
-            for (int i = 0; i < this.Content.Length; i++)
+            List<Item> temp = new List<Item>();
+            foreach (Item it in this.Content)
             {
-                Item item = this.Content[i];
-                if (item != null)
+                if (it != null)
                 {
-                    yield return item;
+                    temp.Add(it);
                 }
             }
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <returns>
-        /// </returns>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="item">
-        /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public void Add(Item item)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public void Clear()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="item">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public bool Contains(Item item)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="array">
-        /// </param>
-        /// <param name="arrayIndex">
-        /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public void CopyTo(Item[] array, int arrayIndex)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="item">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public bool Remove(Item item)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        public int Count { get; private set; }
-
-        /// <summary>
-        /// </summary>
-        public bool IsReadOnly { get; private set; }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="item">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public int IndexOf(Item item)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="index">
-        /// </param>
-        /// <param name="item">
-        /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public void Insert(int index, Item item)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="index">
-        /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public void RemoveAt(int index)
-        {
-            throw new NotImplementedException();
+            return temp;
         }
 
         /// <summary>

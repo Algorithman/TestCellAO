@@ -36,6 +36,9 @@ namespace ZoneEngine.GameObject.Items.Inventory
     #endregion
 
     /// <summary>
+    /// ALL SLOT NUMBERS ARE OUTSIDE SLOT NUMBERS
+    /// means for standard inventory slotnumber would be 0x40 - 0x5e
+    /// All Calculation is made INSIDE, dont bother
     /// </summary>
     public abstract class PartialInventory : IInventory
     {
@@ -64,168 +67,64 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
         /// <summary>
         /// </summary>
-        /// <returns>
-        /// </returns>
-        public IEnumerator<Item> GetEnumerator()
+        public Item[] Content { get; private set; }
+
+        /// <summary>
+        /// ONLY SET IT WHEN INVENTORY IS EMPTY
+        /// </summary>
+        public int MaxCount
         {
-            foreach (Item item in this.Content)
+            get
             {
-                if (item != null)
+                return this.Content.Length;
+            }
+            set
+            {
+                this.Content = new Item[value];
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public bool IsEmpty
+        {
+            get
+            {
+                foreach (Item it in this.Content)
                 {
-                    yield return item;
+                    if (it != null)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            private set
+            {
+                for (int i = 0; i < this.Content.Length; i++)
+                {
+                    this.Content[i] = null;
                 }
             }
         }
 
         /// <summary>
         /// </summary>
-        /// <returns>
-        /// </returns>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="item">
-        /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public void Add(Item item)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public void Clear()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="item">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public bool Contains(Item item)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="array">
-        /// </param>
-        /// <param name="arrayIndex">
-        /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public void CopyTo(Item[] array, int arrayIndex)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="item">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public bool Remove(Item item)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        public int Count { get; private set; }
-
-        /// <summary>
-        /// </summary>
-        public bool IsReadOnly { get; private set; }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="item">
-        /// </param>
-        /// <returns>
-        /// </returns>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public int IndexOf(Item item)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="index">
-        /// </param>
-        /// <param name="item">
-        /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public void Insert(int index, Item item)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="index">
-        /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public void RemoveAt(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="index">
-        /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        /// <returns>
-        /// </returns>
-        public Item this[int index]
+        public bool IsFull
         {
             get
             {
-                throw new NotImplementedException();
+                foreach (Item it in this.Content)
+                {
+                    if (it == null)
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
+            private set { }
         }
-
-        /// <summary>
-        /// </summary>
-        public Item[] Content { get; private set; }
-
-        /// <summary>
-        /// </summary>
-        public int MaxCount { get; private set; }
-
-        /// <summary>
-        /// </summary>
-        public bool IsEmpty { get; private set; }
-
-        /// <summary>
-        /// </summary>
-        public bool IsFull { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -235,7 +134,16 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </exception>
         public int FindFreeSlot()
         {
-            throw new NotImplementedException();
+            int slot = 0;
+            foreach (Item it in Content)
+            {
+                if (it == null)
+                {
+                    return slot + FirstSlotNumber;
+                }
+                slot++;
+            }
+            return -1;
         }
 
         /// <summary>
@@ -250,9 +158,11 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public bool IsValidSlot(int Slot)
+        public virtual bool IsValidSlot(int slot)
         {
-            throw new NotImplementedException();
+            // Subtract offset (firstslotnumber) then check
+            // Apply other checks for subclasses
+            return slot - FirstSlotNumber < Content.Length;
         }
 
         /// <summary>
@@ -269,9 +179,13 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public InventoryError TryAdd(int slot, Item item, bool isNew, ItemReceptionType reception)
+        public virtual InventoryError TryAdd(int slot, Item item, bool isNew, ItemReceptionType reception)
         {
-            throw new NotImplementedException();
+            if (slot - FirstSlotNumber >= Content.Length) return InventoryError.Invalid;
+            if (Content[slot - FirstSlotNumber] != null) return InventoryError.Invalid;
+
+            Content[slot - FirstSlotNumber] = item;
+            return InventoryError.OK;
         }
 
         /// <summary>
@@ -288,7 +202,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </exception>
         public InventoryError TryAdd(Item item, bool isNew, ItemReceptionType reception)
         {
-            throw new NotImplementedException();
+            return TryAdd(this.FindFreeSlot(), item, isNew, reception);
         }
 
         /// <summary>
@@ -303,7 +217,13 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </exception>
         public Item Remove(int slot, bool ownerChange)
         {
-            throw new NotImplementedException();
+            Item temp = null;
+            if (ownerChange)
+            {
+                temp = this.Content[slot];
+            }
+            this.Content[slot - FirstSlotNumber] = null;
+            return temp;
         }
 
         /// <summary>
@@ -316,7 +236,22 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </exception>
         public bool Destroy(int slot)
         {
-            throw new NotImplementedException();
+            this.Content[slot - FirstSlotNumber] = null;
+            // TODO: Need to check if AO has non-destroyable Items
+            return true;
+        }
+
+        public List<Item> List()
+        {
+            List<Item> temp = new List<Item>();
+            foreach (Item it in this.Content)
+            {
+                if (it != null)
+                {
+                    temp.Add(it);
+                }
+            }
+            return temp;
         }
 
         public void InitializeInventory(int slots, int firstSlot)

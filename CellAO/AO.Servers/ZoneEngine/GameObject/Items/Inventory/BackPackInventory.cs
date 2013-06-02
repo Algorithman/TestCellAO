@@ -36,6 +36,8 @@ namespace ZoneEngine.GameObject.Items.Inventory
         public BackPackInventory(EntityInventory baseInventory)
             : base(baseInventory)
         {
+            MaxCount = 30;
+            FirstSlotNumber = 0x40;
         }
     }
 }

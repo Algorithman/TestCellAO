@@ -43,7 +43,7 @@ namespace ZoneEngine.Gameobject.Items
     /// <summary>
     /// Item template Loader/Cache class
     /// </summary>
-    public class ItemLoader
+    public static class ItemLoader
     {
         /// <summary>
         /// Cache of all item templates

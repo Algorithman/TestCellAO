@@ -77,6 +77,11 @@ namespace ZoneEngine.GameObject.Items
             int lowAttribute = this.templateLow.getItemAttribute(attributeId);
             int highAttribute = this.templateHigh.getItemAttribute(attributeId);
 
+            if (this.templateHigh.Quality - this.templateLow.Quality == 0)
+            {
+                return lowAttribute;
+            }
+
             return
                 Convert.ToInt32(
                     (double)lowAttribute
@@ -156,11 +161,11 @@ namespace ZoneEngine.GameObject.Items
             {
                 throw new ArgumentOutOfRangeException("No Item found with ID " + lowID);
             }
-            templateLow = ItemLoader.ItemList[lowID];
-            templateHigh = ItemLoader.ItemList[highID];
-            Quality = QL < templateLow.Quality
-                          ? templateLow.Quality
-                          : (QL > templateHigh.Quality ? templateHigh.Quality : QL);
+            this.templateLow = ItemLoader.ItemList[lowID];
+            this.templateHigh = ItemLoader.ItemList[highID];
+            this.Quality = QL < this.templateLow.Quality
+                          ? this.templateLow.Quality
+                          : (QL > this.templateHigh.Quality ? this.templateHigh.Quality : QL);
         }
     }
 }

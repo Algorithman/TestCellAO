@@ -29,6 +29,8 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
     using System;
 
+    using ZoneEngine.GameObject.Enums;
+
     #endregion
 
     /// <summary>
@@ -299,5 +301,11 @@ namespace ZoneEngine.GameObject.Items.Inventory
          *  0790 Playershop Inventory
          *  DEAD Trade Window (incoming)
          */
+
+        public override InventoryError TryAdd(Item it)
+        {
+            // If no special page is given, lets assume normal Backpack inventory
+            return BackPackPage.TryAdd(it, true, ItemReceptionType.Receive);
+        }
     }
 }

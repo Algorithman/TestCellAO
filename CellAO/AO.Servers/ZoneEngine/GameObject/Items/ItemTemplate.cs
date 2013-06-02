@@ -31,6 +31,8 @@ namespace ZoneEngine.GameObject.Items
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
 
+    using ZoneEngine.GameObject.Stats;
+
     #endregion
 
     /// <summary>
@@ -82,7 +84,8 @@ namespace ZoneEngine.GameObject.Items
                 return this.Stats[number];
             }
 
-            return 1234567890;
+            // TODO: Might need adjustments for Items
+            return StatNamesDefaults.GetDefault(number);
         }
 
         /// <summary>

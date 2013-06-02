@@ -913,6 +913,7 @@ namespace ZoneEngine.GameObject.Stats
             Defaults.Add(206, 0);
             Defaults.Add(207, 0);
             Defaults.Add(208, 0);
+            Defaults.Add(212, 1);
             Defaults.Add(213, 0);
             Defaults.Add(214, 1);
             Defaults.Add(215, 0);
@@ -982,6 +983,7 @@ namespace ZoneEngine.GameObject.Stats
             Defaults.Add(382, 0);
             Defaults.Add(389, 0);
             Defaults.Add(410, 0);
+            Defaults.Add(412, 1);
             Defaults.Add(418, 0);
             Defaults.Add(423, 0);
             Defaults.Add(430, 2);

@@ -109,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChatCommands\Get.cs" />
+    <Compile Include="ChatCommands\GiveItem.cs" />
     <Compile Include="ChatCommands\Set.cs" />
     <Compile Include="Functions\Constants.cs" />
     <Compile Include="Functions\FunctionPrototype.cs" />
@@ -230,6 +231,7 @@
     <Compile Include="Network\PacketHandlers\ChatCommandHandler.cs" />
     <Compile Include="Network\PacketHandlers\ClientConnected.cs" />
     <Compile Include="Network\PacketHandlers\SkillUpdate.cs" />
+    <Compile Include="Network\Packets\AddTemplate.cs" />
     <Compile Include="Network\Packets\AppearanceUpdate.cs" />
     <Compile Include="Network\Packets\ChatServerInfo.cs" />
     <Compile Include="Network\Packets\FullCharacter.cs" />

@@ -35,7 +35,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
     /// <summary>
     /// </summary>
-    public interface IInventory : IList<Item>
+    public interface IInventory
     {
         /// <summary>
         /// </summary>
@@ -118,5 +118,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// <returns>
         /// </returns>
         bool Destroy(int slot);
+
+        List<Item> List();
     }
 }
