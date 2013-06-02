@@ -32,6 +32,7 @@ namespace ZoneEngine.GameObject
     using AO.Core;
 
     using ZoneEngine.GameObject.Items;
+    using ZoneEngine.GameObject.Items.Inventory;
     using ZoneEngine.GameObject.Playfields;
     using ZoneEngine.GameObject.Stats;
 
