@@ -67,7 +67,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
         /// <summary>
         /// </summary>
-        public Item[] Content { get; private set; }
+        public IItem[] Content { get; private set; }
 
         /// <summary>
         /// ONLY SET IT WHEN INVENTORY IS EMPTY
@@ -215,9 +215,9 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </returns>
         /// <exception cref="NotImplementedException">
         /// </exception>
-        public Item Remove(int slot, bool ownerChange)
+        public IItem Remove(int slot, bool ownerChange)
         {
-            Item temp = null;
+            IItem temp = null;
             if (ownerChange)
             {
                 temp = this.Content[slot];
@@ -241,10 +241,10 @@ namespace ZoneEngine.GameObject.Items.Inventory
             return true;
         }
 
-        public List<Item> List()
+        public List<IItem> List()
         {
-            List<Item> temp = new List<Item>();
-            foreach (Item it in this.Content)
+            List<IItem> temp = new List<IItem>();
+            foreach (IItem it in this.Content)
             {
                 if (it != null)
                 {

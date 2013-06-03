@@ -43,7 +43,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
         /// <summary>
         /// </summary>
-        Item[] Content { get; }
+        IItem[] Content { get; }
 
         /// <summary>
         /// </summary>
@@ -109,7 +109,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <returns>
         /// </returns>
-        Item Remove(int slot, bool ownerChange);
+        IItem Remove(int slot, bool ownerChange);
 
         /// <summary>
         /// </summary>
@@ -119,6 +119,6 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </returns>
         bool Destroy(int slot);
 
-        List<Item> List();
+        List<IItem> List();
     }
 }

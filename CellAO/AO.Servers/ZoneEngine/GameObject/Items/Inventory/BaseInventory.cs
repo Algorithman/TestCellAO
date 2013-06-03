@@ -55,7 +55,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
         /// <summary>
         /// </summary>
-        public Item[] Content { get; private set; }
+        public IItem[] Content { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -243,12 +243,12 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <returns>
         /// </returns>
-        public Item Remove(int Slot, bool ownerChange)
+        public IItem Remove(int Slot, bool ownerChange)
         {
             if (this.IsValidSlot(Slot))
             {
                 // TODO: Add more checks (eg. is equipped)
-                Item item = this.Content[Slot];
+                IItem item = this.Content[Slot];
                 this.Content[Slot] = null;
                 return item;
             }
@@ -274,10 +274,10 @@ namespace ZoneEngine.GameObject.Items.Inventory
             return false;
         }
 
-        public List<Item> List()
+        public List<IItem> List()
         {
-            List<Item> temp = new List<Item>();
-            foreach (Item it in this.Content)
+            List<IItem> temp = new List<IItem>();
+            foreach (IItem it in this.Content)
             {
                 if (it != null)
                 {
