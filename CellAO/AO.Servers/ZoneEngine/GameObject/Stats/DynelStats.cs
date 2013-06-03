@@ -981,7 +981,7 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
-        private readonly DynelStat gmLevel = new DynelStat(215, 0, false, false, false);
+        private readonly DynelStat gmLevel = new DynelStat(215, 0, false, true, false);
 
         /// <summary>
         /// </summary>
@@ -4330,6 +4330,7 @@ namespace ZoneEngine.GameObject.Stats
             this.professionLevel.DoNotDontWriteToSql = true;
             this.objectType.DoNotDontWriteToSql = true;
             this.instance.DoNotDontWriteToSql = true;
+            this.gmLevel.DoNotDontWriteToSql = true;
         }
 
         #endregion
