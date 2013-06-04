@@ -9,7 +9,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
     public interface IInventoryPages
     {
-        IList<IInventoryPage> Pages { get; }
+        IDictionary<int, IInventoryPage> Pages { get; }
 
         InventoryError AddToPage(int pageNum, int slotNum, IItem item);
 

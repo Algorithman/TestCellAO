@@ -118,6 +118,7 @@
     <Compile Include="GameObject\Enums\Expansions.cs" />
     <Compile Include="GameObject\IDatabaseObject.cs" />
     <Compile Include="GameObject\Items\Inventory\BaseInventoryPage.cs" />
+    <Compile Include="GameObject\Items\Inventory\BaseInventoryPages.cs" />
     <Compile Include="GameObject\Items\Inventory\IInventoryPage.cs" />
     <Compile Include="GameObject\Items\Inventory\IInventoryPages.cs" />
     <Compile Include="GameObject\Stats\DynelStats.cs" />
