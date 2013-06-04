@@ -39,7 +39,7 @@
       <HintPath>..\..\..\..\..\CellAO\CellAO\Libraries\Binaries\Mysql\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="Npgsql">
-      <HintPath>..\..\..\..\..\CellAO\CellAO\Libraries\Binaries\Npgsql2.0.10-bin-ms.net3.5sp1\Npgsql.dll</HintPath>
+      <HintPath>..\..\Binaries\Npgsql2.0.10-bin-ms.net3.5sp1\Npgsql.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -54,11 +54,13 @@
     <Compile Include="Dao\CharacterDao.cs" />
     <Compile Include="Connector.cs" />
     <Compile Include="Dao\InstancedItemDao.cs" />
+    <Compile Include="Dao\ItemDao.cs" />
     <Compile Include="Dao\OnlineDao.cs" />
     <Compile Include="Dao\LoginDataDao.cs" />
     <Compile Include="Dao\StatDao.cs" />
     <Compile Include="Entities\DBCharacter.cs" />
     <Compile Include="Entities\DBInstancedItem.cs" />
+    <Compile Include="Entities\DBItem.cs" />
     <Compile Include="Entities\DBOnline.cs" />
     <Compile Include="Entities\DBLoginData.cs" />
     <Compile Include="Entities\DBStats.cs" />
@@ -73,6 +75,9 @@
       <Project>{1ec261bb-153d-487d-8a0a-dd85e850775f}</Project>
       <Name>AO.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

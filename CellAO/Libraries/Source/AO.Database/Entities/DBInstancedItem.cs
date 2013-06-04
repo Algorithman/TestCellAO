@@ -10,7 +10,6 @@ namespace Database.Entities
 
     public class DBInstancedItem
     {
-        public int id { get; set; }
         public int containertype { get; set; }
         public int containerinstance { get; set; }
         public int containerplacement { get; set; }
