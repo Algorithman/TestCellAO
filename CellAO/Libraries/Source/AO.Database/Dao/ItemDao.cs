@@ -149,5 +149,23 @@ namespace AO.Database.Dao
                 }
             }
         }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="containertype">
+        /// </param>
+        /// <param name="containerinstance">
+        /// </param>
+        /// <param name="containerplacement">
+        /// </param>
+        public static void RemoveItem(int containertype, int containerinstance, int containerplacement)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                conn.Execute(
+                    "DELETE FROM items WHERE containertype=@containertype AND containerinstance=@containerinstance AND containerplacement=@containerplacement", 
+                    new { containertype, containerinstance, containerplacement });
+            }
+        }
     }
 }

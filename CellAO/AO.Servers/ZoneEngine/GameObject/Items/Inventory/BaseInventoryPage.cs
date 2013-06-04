@@ -95,11 +95,20 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </exception>
         public IItem Remove(int slotNum)
         {
+            // TODO: Item placement switches could cause items to disappear when zoneengine crashes at that moment
             if (!this.Content.ContainsKey(slotNum))
             {
-                throw new ArgumentOutOfRangeException("No item in slot "+slotNum+" of container "+this.Identity.Type+":"+this.Identity.Instance);
+                throw new ArgumentOutOfRangeException("No item in slot " + slotNum + " of container " + this.Identity.Type + ":" + this.Identity.Instance);
             }
             IItem temp = this.Content[slotNum];
+            if (temp.Identity.Type == IdentityType.None)
+            {
+                ItemDao.RemoveItem((int)this.Identity.Type, this.Identity.Instance, slotNum);
+            }
+            else
+            {
+                InstancedItemDao.RemoveItem((int)this.Identity.Type, this.Identity.Instance, slotNum);
+            }
             return temp;
         }
 
@@ -152,15 +161,15 @@ namespace ZoneEngine.GameObject.Items.Inventory
                 {
                     DBInstancedItem dbi = new DBInstancedItem
                                               {
-                                                  containerinstance = this.Identity.Instance, 
-                                                  containertype = (int)this.Identity.Type, 
-                                                  containerplacement = kv.Key, 
-                                                  itemtype = (int)kv.Value.Identity.Type, 
-                                                  iteminstance = kv.Value.Identity.Instance, 
-                                                  lowid = kv.Value.LowID, 
-                                                  highid = kv.Value.HighID, 
-                                                  quality = kv.Value.Quality, 
-                                                  multiplecount = kv.Value.MultipleCount, 
+                                                  containerinstance = this.Identity.Instance,
+                                                  containertype = (int)this.Identity.Type,
+                                                  containerplacement = kv.Key,
+                                                  itemtype = (int)kv.Value.Identity.Type,
+                                                  iteminstance = kv.Value.Identity.Instance,
+                                                  lowid = kv.Value.LowID,
+                                                  highid = kv.Value.HighID,
+                                                  quality = kv.Value.Quality,
+                                                  multiplecount = kv.Value.MultipleCount,
                                                   stats = new Binary(kv.Value.GetItemAttributes())
                                               };
 
@@ -170,12 +179,12 @@ namespace ZoneEngine.GameObject.Items.Inventory
                 {
                     DBItem dbi = new DBItem
                                      {
-                                         containerinstance = this.Identity.Instance, 
-                                         containertype = (int)this.Identity.Type, 
-                                         containerplacement = kv.Key, 
-                                         lowid = kv.Value.LowID, 
-                                         highid = kv.Value.HighID, 
-                                         quality = kv.Value.Quality, 
+                                         containerinstance = this.Identity.Instance,
+                                         containertype = (int)this.Identity.Type,
+                                         containerplacement = kv.Key,
+                                         lowid = kv.Value.LowID,
+                                         highid = kv.Value.HighID,
+                                         quality = kv.Value.Quality,
                                          multiplecount = kv.Value.MultipleCount
                                      };
 

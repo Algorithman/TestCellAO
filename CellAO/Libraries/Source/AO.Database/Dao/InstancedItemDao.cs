@@ -77,82 +77,117 @@ namespace AO.Database
                 conn.Execute(
                     "INSERT INTO instanceditems (containertype,containerinstance,containerplacement,itemtype,iteminstance"
                     + ",lowid,highid,quality,multiplecount,x,y,z,headingx,headingy,headingz,headingw,stats) VALUES (@conttype,"
-                    + " @continstance, @contplacement, @itype, @iinstance, @low, @high, @ql, @mc, @ix, @iy, @iz, @hx, @hy, @hz, @hw, @st)",
+                    + " @continstance, @contplacement, @itype, @iinstance, @low, @high, @ql, @mc, @ix, @iy, @iz, @hx, @hy, @hz, @hw, @st)", 
                     new
                         {
-                            conttype = item.containertype,
-                            continstance = item.containerinstance,
-                            contplacement = item.containerplacement,
-                            itype = item.itemtype,
-                            iinstance = item.iteminstance,
-                            low = item.lowid,
-                            high = item.highid,
-                            ql = item.quality,
-                            mc = item.multiplecount,
-                            ix = item.x,
-                            iy = item.y,
-                            iz = item.z,
-                            hx = item.headingx,
-                            hy = item.headingy,
-                            hz = item.headingz,
-                            hw = item.headingw,
+                            conttype = item.containertype, 
+                            continstance = item.containerinstance, 
+                            contplacement = item.containerplacement, 
+                            itype = item.itemtype, 
+                            iinstance = item.iteminstance, 
+                            low = item.lowid, 
+                            high = item.highid, 
+                            ql = item.quality, 
+                            mc = item.multiplecount, 
+                            ix = item.x, 
+                            iy = item.y, 
+                            iz = item.z, 
+                            hx = item.headingx, 
+                            hy = item.headingy, 
+                            hz = item.headingz, 
+                            hw = item.headingw, 
                             st = item.stats
                         });
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="items">
+        /// </param>
         public static void Save(List<DBInstancedItem> items)
         {
             if (items.Count == 0)
             {
                 return;
             }
+
             using (IDbConnection conn = Connector.GetConnection())
             {
-                using (var trans = conn.BeginTransaction())
+                using (IDbTransaction trans = conn.BeginTransaction())
                 {
                     conn.Execute(
-                        "DELETE FROM instanceditems WHERE containertype=@containertype AND containerinstance=@containerinstance",
-                        new { items[0].containertype, items[0].containerinstance },
+                        "DELETE FROM instanceditems WHERE containertype=@containertype AND containerinstance=@containerinstance", 
+                        new { items[0].containertype, items[0].containerinstance }, 
                         transaction: trans);
                     foreach (DBInstancedItem item in items)
                     {
                         conn.Execute(
                             "INSERT INTO instanceditems (containertype,containerinstance,containerplacement,itemtype,iteminstance"
                             + ",lowid,highid,quality,multiplecount,x,y,z,headingx,headingy,headingz,headingw,stats) VALUES (@conttype,"
-                            + " @continstance, @contplacement, @itype, @iinstance, @low, @high, @ql, @mc, @ix, @iy, @iz, @hx, @hy, @hz, @hw, @st)",
+                            + " @continstance, @contplacement, @itype, @iinstance, @low, @high, @ql, @mc, @ix, @iy, @iz, @hx, @hy, @hz, @hw, @st)", 
                             new
                                 {
-                                    conttype = item.containertype,
-                                    continstance = item.containerinstance,
-                                    contplacement = item.containerplacement,
-                                    itype = item.itemtype,
-                                    iinstance = item.iteminstance,
-                                    low = item.lowid,
-                                    high = item.highid,
-                                    ql = item.quality,
-                                    mc = item.multiplecount,
-                                    ix = item.x,
-                                    iy = item.y,
-                                    iz = item.z,
-                                    hx = item.headingx,
-                                    hy = item.headingy,
-                                    hz = item.headingz,
-                                    hw = item.headingw,
+                                    conttype = item.containertype, 
+                                    continstance = item.containerinstance, 
+                                    contplacement = item.containerplacement, 
+                                    itype = item.itemtype, 
+                                    iinstance = item.iteminstance, 
+                                    low = item.lowid, 
+                                    high = item.highid, 
+                                    ql = item.quality, 
+                                    mc = item.multiplecount, 
+                                    ix = item.x, 
+                                    iy = item.y, 
+                                    iz = item.z, 
+                                    hx = item.headingx, 
+                                    hy = item.headingy, 
+                                    hz = item.headingz, 
+                                    hw = item.headingw, 
                                     st = item.stats
-                                },
+                                }, 
                             transaction: trans);
                     }
+
                     trans.Commit();
                 }
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="containertype">
+        /// </param>
+        /// <param name="containerinstance">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public static IEnumerable<DBInstancedItem> GetAllInContainer(int containertype, int containerinstance)
         {
             using (IDbConnection conn = Connector.GetConnection())
             {
-                return conn.Query<DBInstancedItem>("SELECT * FROM instanceditems WHERE containertype=@containertype AND containerinstance=@containerinstance", new { containertype, containerinstance });
+                return
+                    conn.Query<DBInstancedItem>(
+                        "SELECT * FROM instanceditems WHERE containertype=@containertype AND containerinstance=@containerinstance", 
+                        new { containertype, containerinstance });
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="containertype">
+        /// </param>
+        /// <param name="containerinstance">
+        /// </param>
+        /// <param name="containerplacement">
+        /// </param>
+        public static void RemoveItem(int containertype, int containerinstance, int containerplacement)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                conn.Execute(
+                    "DELETE FROM instanceditems WHERE containertype=@containertype AND containerinstance=@containerinstance AND containerplacement=@containerplacement", 
+                    new { containertype, containerinstance, containerplacement });
             }
         }
     }
