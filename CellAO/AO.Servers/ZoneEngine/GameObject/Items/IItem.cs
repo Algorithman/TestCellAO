@@ -98,6 +98,10 @@ namespace ZoneEngine.GameObject.Items
         /// </summary>
         void WriteToDatabase();
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         byte[] GetItemAttributes();
     }
 }

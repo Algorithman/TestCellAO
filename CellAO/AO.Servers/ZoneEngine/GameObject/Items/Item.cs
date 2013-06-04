@@ -33,6 +33,7 @@ namespace ZoneEngine.GameObject.Items
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine.GameObject.Stats;
     using ZoneEngine.Gameobject.Items;
 
     #endregion
@@ -43,11 +44,11 @@ namespace ZoneEngine.GameObject.Items
     {
         /// <summary>
         /// </summary>
-        private ItemTemplate templateLow;
+        private readonly ItemTemplate templateLow;
 
         /// <summary>
         /// </summary>
-        private ItemTemplate templateHigh;
+        private readonly ItemTemplate templateHigh;
 
         /// <summary>
         /// </summary>
@@ -105,34 +106,43 @@ namespace ZoneEngine.GameObject.Items
                     // TODO: Instantiate Item
                 }
             }
+
             // Do always set it for caching purposes
             this.Attributes.Add(attributeId, newValue);
         }
 
+        /// <summary>
+        /// </summary>
         public int LowID
         {
             get
             {
-                return templateLow.ID;
+                return this.templateLow.ID;
             }
         }
 
+        /// <summary>
+        /// </summary>
         public int HighID
         {
             get
             {
-                return templateHigh.ID;
+                return this.templateHigh.ID;
             }
         }
 
+        /// <summary>
+        /// </summary>
         public int Nothing
         {
             get
             {
-                return templateLow.Nothing;
+                return this.templateLow.Nothing;
             }
         }
 
+        /// <summary>
+        /// </summary>
         public int MultipleCount
         {
             get
@@ -142,19 +152,32 @@ namespace ZoneEngine.GameObject.Items
             }
         }
 
+        /// <summary>
+        /// </summary>
         public int Flags
         {
             get
             {
-                return templateLow.Flags;
+                return this.templateLow.Flags;
             }
         }
 
+        /// <summary>
+        /// </summary>
         public void WriteToDatabase()
         {
-
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="QL">
+        /// </param>
+        /// <param name="lowID">
+        /// </param>
+        /// <param name="highID">
+        /// </param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// </exception>
         public Item(int QL, int lowID, int highID)
         {
             // Checks:
@@ -162,17 +185,22 @@ namespace ZoneEngine.GameObject.Items
             {
                 throw new ArgumentOutOfRangeException("No Item found with ID " + lowID);
             }
+
             this.templateLow = ItemLoader.ItemList[lowID];
             this.templateHigh = ItemLoader.ItemList[highID];
             this.Quality = QL < this.templateLow.Quality
-                          ? this.templateLow.Quality
-                          : (QL > this.templateHigh.Quality ? this.templateHigh.Quality : QL);
+                               ? this.templateLow.Quality
+                               : (QL > this.templateHigh.Quality ? this.templateHigh.Quality : QL);
             this.Identity = new Identity();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public byte[] GetItemAttributes()
         {
-            byte[] temp = new byte[this.Attributes.Count*2*4];
+            byte[] temp = new byte[this.Attributes.Count * 2 * 4];
 
             int counter = 0;
             foreach (KeyValuePair<int, int> kv in this.Attributes)
@@ -189,6 +217,7 @@ namespace ZoneEngine.GameObject.Items
                 temp[counter++] = temp2[2];
                 temp[counter++] = temp2[3];
             }
+
             return temp;
         }
     }
