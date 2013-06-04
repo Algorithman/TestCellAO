@@ -111,6 +111,6 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        public BaseInventory BaseInventory { get; private set; }
+        public IInventoryPages BaseInventory { get; private set; }
     }
 }

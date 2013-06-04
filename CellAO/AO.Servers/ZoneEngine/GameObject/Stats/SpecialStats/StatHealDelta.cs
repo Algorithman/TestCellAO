@@ -43,8 +43,6 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         /// <param name="defaultValue">
         /// </param>
-        /// <param name="name">
-        /// </param>
         /// <param name="sendBaseValue">
         /// </param>
         /// <param name="doNotWrite">
@@ -78,7 +76,7 @@ namespace ZoneEngine.GameObject.Stats
                 uint[] healDelta = { 3, 3, 2, 4, 12, 15, 20 };
 
                 this.BaseValue = healDelta[ch.Stats["Breed"].Value - 1]
-                                     + (uint)Math.Floor((double)(ch.Stats["BodyDevelopment"].Value / 100));
+                                 + (uint)Math.Floor((double)(ch.Stats["BodyDevelopment"].Value / 100));
 
                 if (!this.Parent.Starting)
                 {

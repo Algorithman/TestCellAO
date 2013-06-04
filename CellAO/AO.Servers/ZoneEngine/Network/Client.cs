@@ -42,13 +42,13 @@ namespace ZoneEngine.Network
 
     using Cell.Core;
 
-    using zlib;
-
     using NiceHexOutput;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+
+    using zlib;
 
     using ZoneEngine.GameObject;
     using ZoneEngine.GameObject.Playfields;
@@ -438,6 +438,7 @@ namespace ZoneEngine.Network
             this.Playfield = this.character.Playfield;
             this.Playfield.Entities.Add(this.character);
             this.character.Stats.Read();
+            this.character.BaseInventory.Read();
         }
 
         /// <summary>

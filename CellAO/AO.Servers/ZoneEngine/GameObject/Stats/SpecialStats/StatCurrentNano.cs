@@ -43,16 +43,13 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         /// <param name="defaultValue">
         /// </param>
-        /// <param name="name">
-        /// </param>
         /// <param name="sendBaseValue">
         /// </param>
         /// <param name="dontWrite">
         /// </param>
         /// <param name="announce">
         /// </param>
-        public StatCurrentNano(
-            int number, uint defaultValue, bool sendBaseValue, bool dontWrite, bool announce)
+        public StatCurrentNano(int number, uint defaultValue, bool sendBaseValue, bool dontWrite, bool announce)
         {
             this.StatId = number;
             this.DefaultValue = defaultValue;

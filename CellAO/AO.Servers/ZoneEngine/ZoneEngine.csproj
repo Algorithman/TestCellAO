@@ -121,6 +121,7 @@
     <Compile Include="GameObject\Items\Inventory\BaseInventoryPages.cs" />
     <Compile Include="GameObject\Items\Inventory\IInventoryPage.cs" />
     <Compile Include="GameObject\Items\Inventory\IInventoryPages.cs" />
+    <Compile Include="GameObject\Items\Inventory\UnitInventory.cs" />
     <Compile Include="GameObject\Stats\DynelStats.cs" />
     <Compile Include="GameObject\Stats\IStatList.cs" />
     <Compile Include="GameObject\ITargetingEntity.cs" />
@@ -147,7 +148,6 @@
     <Compile Include="GameObject\Items\Inventory\OverflowInventoryPage.cs" />
     <Compile Include="GameObject\Items\Inventory\PlayerInventoryPage.cs" />
     <Compile Include="GameObject\Items\Inventory\PlayerShopInventoryPage.cs" />
-    <Compile Include="GameObject\Items\Inventory\ShopInventoryPages.cs" />
     <Compile Include="GameObject\Items\Inventory\SocialArmorInventoryPage.cs" />
     <Compile Include="GameObject\Items\Inventory\WeaponInventoryPage.cs" />
     <Compile Include="GameObject\Items\Item.cs" />
@@ -278,6 +278,7 @@
     <Content Include="SQLTables\charactersuploadednanos.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="SQLTables\items.sql" />
     <Content Include="SQLTables\stats.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

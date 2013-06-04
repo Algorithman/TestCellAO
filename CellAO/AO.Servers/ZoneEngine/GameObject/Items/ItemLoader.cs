@@ -32,9 +32,9 @@ namespace ZoneEngine.Gameobject.Items
     using System.Diagnostics.Contracts;
     using System.IO;
 
-    using zlib;
-
     using MsgPack.Serialization;
+
+    using zlib;
 
     using ZoneEngine.GameObject.Items;
 
@@ -86,12 +86,12 @@ namespace ZoneEngine.Gameobject.Items
             version = binaryReader.ReadChars(versionlength);
 
             // TODO: Check version and print a warning if not same as config.xml's
-
-            MessagePackSerializer<List<ItemTemplate>> messagePackSerializer = MessagePackSerializer.Create<List<ItemTemplate>>();
+            MessagePackSerializer<List<ItemTemplate>> messagePackSerializer =
+                MessagePackSerializer.Create<List<ItemTemplate>>();
 
             var buffer = new byte[4];
             memoryStream.Read(buffer, 0, 4);
-            var packaged = BitConverter.ToInt32(buffer, 0);
+            int packaged = BitConverter.ToInt32(buffer, 0);
             Console.WriteLine("Reading Items (" + new string(version) + "):");
             while (true)
             {
@@ -102,6 +102,7 @@ namespace ZoneEngine.Gameobject.Items
                     {
                         ItemList.Add(template.ID, template);
                     }
+
                     if (templates.Count != packaged)
                     {
                         break;
@@ -113,7 +114,7 @@ namespace ZoneEngine.Gameobject.Items
                 }
 
                 Console.Write(
-                    "Loaded {0} items in {1}\r",
+                    "Loaded {0} items in {1}\r", 
                     new object[] { ItemList.Count, new DateTime((DateTime.UtcNow - _now).Ticks).ToString("mm:ss.ff") });
             }
 
@@ -154,6 +155,5 @@ namespace ZoneEngine.Gameobject.Items
             output.Flush();
             Console.Write("\r                                             \r");
         }
-
     }
 }

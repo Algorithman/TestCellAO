@@ -27,6 +27,7 @@ namespace ZoneEngine.GameObject.Stats
 {
     #region Usings ...
 
+    using System;
     using System.Collections.Generic;
 
     #endregion
@@ -88,14 +89,26 @@ namespace ZoneEngine.GameObject.Stats
             return;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public bool Read()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
         public bool Write()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

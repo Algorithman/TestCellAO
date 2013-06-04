@@ -110,7 +110,7 @@ namespace ZoneEngine.MessageHandlers
             {
                 count--;
                 GameTuple<CharacterStat, uint> stat = skillMessage.Skills[count];
-                client.Character.Stats[(int)stat.Value1].Value= (int)stat.Value2;
+                client.Character.Stats[(int)stat.Value1].Value = (int)stat.Value2;
                 statlist.Add((int)stat.Value1);
             }
 

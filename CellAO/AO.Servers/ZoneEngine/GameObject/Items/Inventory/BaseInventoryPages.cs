@@ -140,9 +140,39 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
         /// <summary>
         /// </summary>
-        public BaseInventoryPages()
+        /// <param name="item">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        public InventoryError TryAdd(IItem item)
+        {
+            try
+            {
+                this.AddToPage(this.StandardPage, this.Pages[this.StandardPage].FindFreeSlot(), item);
+            }
+            catch
+            {
+                return InventoryError.InventoryIsFull;
+            }
+
+            return InventoryError.OK;
+        }
+
+        /// <summary>
+        /// </summary>
+        private BaseInventoryPages()
         {
             this.Pages = new Dictionary<int, IInventoryPage>();
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="standardpage">
+        /// </param>
+        public BaseInventoryPages(int standardpage)
+            : this()
+        {
+            this.StandardPage = standardpage;
         }
     }
 }

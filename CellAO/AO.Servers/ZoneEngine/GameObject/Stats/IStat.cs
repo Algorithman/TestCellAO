@@ -67,6 +67,10 @@ namespace ZoneEngine.GameObject.Stats
 
         /// <summary>
         /// </summary>
+        /// <param name="old">
+        /// </param>
+        /// <returns>
+        /// </returns>
         uint GetMaxValue(uint old);
     }
 }

@@ -11538,9 +11538,8 @@ namespace ZoneEngine.GameObject.Stats
         /// </summary>
         public void ReadStatsfromSql()
         {
-            foreach (
-                DBStats dbStats in
-                    StatDao.GetById((int)this.flags.Parent.Identity.Type, this.flags.Parent.Identity.Instance))
+            foreach (DBStats dbStats in
+                StatDao.GetById((int)this.flags.Parent.Identity.Type, this.flags.Parent.Identity.Instance))
             {
                 this.SetBaseValue(dbStats.statid, (uint)dbStats.statvalue);
             }
@@ -11840,37 +11839,60 @@ namespace ZoneEngine.GameObject.Stats
 
         #endregion
 
+        /// <summary>
+        /// </summary>
+        /// <param name="index">
+        /// </param>
+        /// <exception cref="StatDoesNotExistException">
+        /// </exception>
+        /// <returns>
+        /// </returns>
         IStat IStatList.this[int index]
         {
             get
             {
-                foreach (IStat stat in all)
+                foreach (IStat stat in this.all)
                 {
                     if (stat.StatId == index)
                     {
                         return stat;
                     }
                 }
+
                 throw new StatDoesNotExistException("Stat with Id " + index + " does not exist");
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="name">
+        /// </param>
+        /// <exception cref="StatDoesNotExistException">
+        /// </exception>
+        /// <returns>
+        /// </returns>
         IStat IStatList.this[string name]
         {
             get
             {
                 int index = StatNamesDefaults.GetStatNumber(name);
-                foreach (IStat stat in all)
+                foreach (IStat stat in this.all)
                 {
                     if (stat.StatId == index)
                     {
                         return stat;
                     }
                 }
-                throw new StatDoesNotExistException("huh? Stat with Id " + index + " does not exist, but the name " + name + " exists? CODER ALERT");
+
+                throw new StatDoesNotExistException(
+                    "huh? Stat with Id " + index + " does not exist, but the name " + name + " exists? CODER ALERT");
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public bool Read()
         {
             try
@@ -11885,19 +11907,33 @@ namespace ZoneEngine.GameObject.Stats
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public bool Write()
         {
-            int inst = Flags.Parent.Identity.Instance;
+            int inst = this.Flags.Parent.Identity.Instance;
             int typ = (int)this.Flags.Parent.Identity.Type;
             List<DBStats> temp = new List<DBStats>();
             foreach (IStat stat in this.all)
             {
                 // Flags are special cases, save always
-                if ((stat.StatId == 0) || ((stat.BaseValue != StatNamesDefaults.GetDefault(stat.StatId)) && (((DynelStat)stat).DoNotDontWriteToSql == false)))
+                if ((stat.StatId == 0)
+                    || ((stat.BaseValue != StatNamesDefaults.GetDefault(stat.StatId))
+                        && (((DynelStat)stat).DoNotDontWriteToSql == false)))
                 {
-                    temp.Add(new DBStats { statid = stat.StatId, statvalue = (int)stat.BaseValue, type = typ, instance = inst });
+                    temp.Add(
+                        new DBStats
+                            {
+                                statid = stat.StatId, 
+                                statvalue = (int)stat.BaseValue, 
+                                type = typ, 
+                                instance = inst
+                            });
                 }
             }
+
             if (temp.Count == 0)
             {
                 StatDao.DeleteStats(typ, inst);

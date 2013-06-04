@@ -158,6 +158,19 @@ namespace ZoneEngine.Network
 
         /// <summary>
         /// </summary>
+        /// <param name="client">
+        /// </param>
+        /// <param name="forced">
+        /// </param>
+        protected override void OnClientDisconnected(IClient client, bool forced)
+        {
+            IZoneClient cl = (IZoneClient)client;
+            cl.Character.BaseInventory.Write();
+            base.OnClientDisconnected(client, forced);
+        }
+
+        /// <summary>
+        /// </summary>
         /// <param name="playfieldIdentity">
         /// </param>
         /// <returns>

@@ -1,5 +1,4 @@
 ﻿CREATE TABLE `instanceditems` (
-	`id` INT(10) NOT NULL AUTO_INCREMENT,
 	`containertype` INT(32) NOT NULL,
 	`containerinstance` INT(32) NOT NULL,
 	`containerplacement` INT(32) NOT NULL,
@@ -17,7 +16,7 @@
 	`headingz` FLOAT NOT NULL,
 	`headingw` FLOAT NOT NULL,
 	`stats` BLOB NULL,
-	PRIMARY KEY (`id`)
+	UNIQUE INDEX `Key1` (`containertype`, `containerinstance`, `containerplacement`)
 )
 COLLATE='latin1_general_ci'
 ENGINE=InnoDB;

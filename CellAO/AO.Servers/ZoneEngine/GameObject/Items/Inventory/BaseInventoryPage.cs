@@ -49,7 +49,10 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </summary>
         private readonly IDictionary<int, IItem> Content;
 
+        /// <summary>
+        /// </summary>
         private Identity identity;
+
         /// <summary>
         /// </summary>
         public Identity Identity
@@ -58,6 +61,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
             {
                 return this.identity;
             }
+
             set
             {
                 this.identity = value;
@@ -72,6 +76,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
             {
                 return (int)this.identity.Type;
             }
+
             set
             {
                 this.identity.Type = (IdentityType)value;
@@ -100,8 +105,18 @@ namespace ZoneEngine.GameObject.Items.Inventory
         {
             if (this.Content.ContainsKey(slot))
             {
-                throw new ArgumentException("Already item in slot " + slot + " of container " + this.Identity.Type + ":" + this.Identity.Instance);
+                throw new ArgumentException(
+                    "Already item in slot " + slot + " of container " + this.Identity.Type + ":"
+                    + this.Identity.Instance);
             }
+
+            if ((slot < this.FirstSlotNumber) || (slot > this.FirstSlotNumber + this.MaxSlots))
+            {
+                throw new ArgumentOutOfRangeException(
+                    "Slot out of range: " + slot + " not in " + this.FirstSlotNumber + " to "
+                    + (this.FirstSlotNumber + this.MaxSlots));
+            }
+
             this.Content.Add(slot, item);
             return InventoryError.OK;
         }
@@ -119,8 +134,10 @@ namespace ZoneEngine.GameObject.Items.Inventory
             // TODO: Item placement switches could cause items to disappear when zoneengine crashes at that moment
             if (!this.Content.ContainsKey(slotNum))
             {
-                throw new ArgumentOutOfRangeException("No item in slot " + slotNum + " of container " + this.Identity.Type + ":" + this.Identity.Instance);
+                throw new ArgumentOutOfRangeException(
+                    "No item in slot " + slotNum + " of container " + this.Identity.Type + ":" + this.Identity.Instance);
             }
+
             IItem temp = this.Content[slotNum];
             if (temp.Identity.Type == IdentityType.None)
             {
@@ -130,6 +147,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
             {
                 InstancedItemDao.RemoveItem((int)this.Identity.Type, this.Identity.Instance, slotNum);
             }
+
             return temp;
         }
 
@@ -144,6 +162,10 @@ namespace ZoneEngine.GameObject.Items.Inventory
                 Item newItem = new Item(item.quality, item.lowid, item.highid);
                 newItem.SetAttribute(212, item.multiplecount);
                 this.Content.Add(item.containerplacement, newItem);
+
+                // Make item visible
+                // TODO: Other flags must be set too
+                newItem.Flags |= 0x81;
             }
 
             foreach (DBInstancedItem item in
@@ -163,6 +185,10 @@ namespace ZoneEngine.GameObject.Items.Inventory
                     int statvalue = BitConverter.ToInt32(binaryStats, i * 8 + 4);
                     newItem.SetAttribute(statid, statvalue);
                 }
+
+                // Make item visible
+                // TODO: Other flags must be set too
+                newItem.Flags |= 0x81;
             }
 
             return true;
@@ -182,15 +208,15 @@ namespace ZoneEngine.GameObject.Items.Inventory
                 {
                     DBInstancedItem dbi = new DBInstancedItem
                                               {
-                                                  containerinstance = this.Identity.Instance,
-                                                  containertype = (int)this.Identity.Type,
-                                                  containerplacement = kv.Key,
-                                                  itemtype = (int)kv.Value.Identity.Type,
-                                                  iteminstance = kv.Value.Identity.Instance,
-                                                  lowid = kv.Value.LowID,
-                                                  highid = kv.Value.HighID,
-                                                  quality = kv.Value.Quality,
-                                                  multiplecount = kv.Value.MultipleCount,
+                                                  containerinstance = this.Identity.Instance, 
+                                                  containertype = (int)this.Identity.Type, 
+                                                  containerplacement = kv.Key, 
+                                                  itemtype = (int)kv.Value.Identity.Type, 
+                                                  iteminstance = kv.Value.Identity.Instance, 
+                                                  lowid = kv.Value.LowID, 
+                                                  highid = kv.Value.HighID, 
+                                                  quality = kv.Value.Quality, 
+                                                  multiplecount = kv.Value.MultipleCount, 
                                                   stats = new Binary(kv.Value.GetItemAttributes())
                                               };
 
@@ -200,12 +226,12 @@ namespace ZoneEngine.GameObject.Items.Inventory
                 {
                     DBItem dbi = new DBItem
                                      {
-                                         containerinstance = this.Identity.Instance,
-                                         containertype = (int)this.Identity.Type,
-                                         containerplacement = kv.Key,
-                                         lowid = kv.Value.LowID,
-                                         highid = kv.Value.HighID,
-                                         quality = kv.Value.Quality,
+                                         containerinstance = this.Identity.Instance, 
+                                         containertype = (int)this.Identity.Type, 
+                                         containerplacement = kv.Key, 
+                                         lowid = kv.Value.LowID, 
+                                         highid = kv.Value.HighID, 
+                                         quality = kv.Value.Quality, 
                                          multiplecount = kv.Value.MultipleCount
                                      };
 
@@ -237,6 +263,35 @@ namespace ZoneEngine.GameObject.Items.Inventory
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
+        public IDictionary<int, IItem> List()
+        {
+            return this.Content;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
+        public int FindFreeSlot()
+        {
+            int slot = this.FirstSlotNumber;
+            while (slot < this.FirstSlotNumber + this.MaxSlots)
+            {
+                if (!this.Content.ContainsKey(slot))
+                {
+                    return slot;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// </summary>
         private BaseInventoryPage()
         {
             this.Identity = new Identity();
@@ -250,6 +305,8 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// <param name="maxslots">
         /// </param>
         /// <param name="firstslotnumber">
+        /// </param>
+        /// <param name="ownerInstance">
         /// </param>
         public BaseInventoryPage(int pagenum, int maxslots, int firstslotnumber, int ownerInstance)
             : this()

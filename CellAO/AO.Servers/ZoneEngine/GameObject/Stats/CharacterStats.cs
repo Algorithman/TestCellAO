@@ -30,8 +30,6 @@ namespace ZoneEngine.GameObject.Stats
     using System;
     using System.Collections.Generic;
     using System.Data;
-    using System.IO;
-    using System.Xml.Serialization;
 
     using AO.Core;
 

@@ -53,6 +53,8 @@ namespace ZoneEngine.GameObject.Nanos
         /// <summary>
         /// NCUCost
         /// </summary>
+        /// <returns>
+        /// </returns>
         public int NCUCost()
         {
             return this.getItemAttribute(54);
@@ -208,10 +210,11 @@ namespace ZoneEngine.GameObject.Nanos
         /// </returns>
         public int getItemAttribute(int number)
         {
-            if (Stats.ContainsKey(number))
+            if (this.Stats.ContainsKey(number))
             {
-                return Stats[number];
+                return this.Stats[number];
             }
+
             return 0;
         }
 

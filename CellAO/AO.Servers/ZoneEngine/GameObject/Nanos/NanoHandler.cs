@@ -32,9 +32,9 @@ namespace ZoneEngine.GameObject.Nanos
     using System.Diagnostics.Contracts;
     using System.IO;
 
-    using zlib;
-
     using MsgPack.Serialization;
+
+    using zlib;
 
     #endregion
 
@@ -101,6 +101,7 @@ namespace ZoneEngine.GameObject.Nanos
                     {
                         NanoList.Add(nf.ID, nf);
                     }
+
                     if (templist.Count != packaged)
                     {
                         break;

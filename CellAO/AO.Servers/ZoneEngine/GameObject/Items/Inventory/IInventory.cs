@@ -119,6 +119,10 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </returns>
         bool Destroy(int slot);
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         List<IItem> List();
     }
 }

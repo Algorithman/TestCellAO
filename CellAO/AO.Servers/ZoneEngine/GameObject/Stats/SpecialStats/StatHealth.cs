@@ -104,7 +104,8 @@ namespace ZoneEngine.GameObject.Stats
                 {
                     // TODO: correct calculation of mob HP
                     Set(
-                        breedBaseHitPoints[breed - 1] + (character.Stats["Level"].Value * tableProfessionHitPoints[6, 8])
+                        breedBaseHitPoints[breed - 1]
+                        + (character.Stats["Level"].Value * tableProfessionHitPoints[6, 8])
                         + (character.Stats["BodyDevelopment"].Value + breedMultiplicatorHitPoints[breed - 1]));
                 }
                 else

@@ -116,6 +116,8 @@ namespace ZoneEngine.GameObject.Stats
             }
         }
 
+        /// <summary>
+        /// </summary>
         public bool AnnounceToPlayfield { get; set; }
 
         /// <summary>
@@ -136,9 +138,11 @@ namespace ZoneEngine.GameObject.Stats
         /// <summary>
         /// Never called on Statels
         /// </summary>
-        /// <param name="old"></param>
+        /// <param name="old">
+        /// </param>
         /// old (actual) value
-        /// <returns></returns>
+        /// <returns>
+        /// </returns>
         public uint GetMaxValue(uint old)
         {
             return 0;

@@ -1,5 +1,6 @@
 ﻿#region License
-// Copyright (c) 2005-2012, CellAO Team
+
+// Copyright (c) 2005-2013, CellAO Team
 // 
 // All rights reserved.
 // 
@@ -22,28 +23,36 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-#region Usings...
-#endregion
-
 namespace ZoneEngine.ChatCommands
 {
+    #region Usings ...
+
     using System;
     using System.Collections.Generic;
-
-    using AO.Core;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.GameObject;
     using ZoneEngine.GameObject.Enums;
     using ZoneEngine.GameObject.Items;
-    using ZoneEngine.Gameobject.Items;
     using ZoneEngine.Network;
     using ZoneEngine.Network.Packets;
     using ZoneEngine.Script;
 
+    #endregion
+
+    /// <summary>
+    /// </summary>
     public class ChatCommandGiveItem : AOChatCommand
     {
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
+        /// <param name="target">
+        /// </param>
+        /// <param name="args">
+        /// </param>
         public override void ExecuteCommand(Client client, Identity target, string[] args)
         {
             IInstancedEntity targetEntity = null;
@@ -68,17 +77,20 @@ namespace ZoneEngine.ChatCommands
                         client.SendChatText("HighId is no number");
                         return;
                     }
+
                     if (!int.TryParse(args[3], out ql))
                     {
                         client.SendChatText("QualityLevel is no number");
                         return;
                     }
+
                     Item item = new Item(ql, lowId, highId);
                     InventoryError err = container.BaseInventory.TryAdd(item);
                     if (err != InventoryError.OK)
                     {
                         client.SendChatText("Could not add to inventory." + (int)err);
                     }
+
                     if (targetEntity as Character != null)
                     {
                         AddTemplate.Send((targetEntity as Character).Client, item);
@@ -92,12 +104,22 @@ namespace ZoneEngine.ChatCommands
             }
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="client">
+        /// </param>
         public override void CommandHelp(Client client)
         {
             client.SendChatText("Usage: Select target and /command giveitem lowid highid ql");
             return;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <param name="args">
+        /// </param>
+        /// <returns>
+        /// </returns>
         public override bool CheckCommandArguments(string[] args)
         {
             List<Type> check = new List<Type>();
@@ -108,11 +130,19 @@ namespace ZoneEngine.ChatCommands
             return CheckArgumentHelper(check, args);
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public override int GMLevelNeeded()
         {
             return 1;
         }
 
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
         public override List<string> ListCommands()
         {
             List<string> temp = new List<string>();

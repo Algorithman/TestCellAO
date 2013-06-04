@@ -43,16 +43,13 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         /// <param name="defaultValue">
         /// </param>
-        /// <param name="name">
-        /// </param>
         /// <param name="sendBaseValue">
         /// </param>
         /// <param name="doNotWrite">
         /// </param>
         /// <param name="announceToPlayfield">
         /// </param>
-        public StatNextSK(
-            int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
+        public StatNextSK(int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
             this.StatId = number;
             this.DefaultValue = defaultValue;

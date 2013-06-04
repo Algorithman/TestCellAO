@@ -61,7 +61,7 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        private DynelStats stats;
+        private readonly DynelStats stats;
 
         /// <summary>
         /// </summary>

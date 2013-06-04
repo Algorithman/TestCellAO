@@ -63,6 +63,7 @@ namespace ZoneEngine.ChatCommands
                 target = client.Character.Identity;
                 fallback = true;
             }
+
             int statId = 0;
             try
             {
@@ -73,7 +74,7 @@ namespace ZoneEngine.ChatCommands
                 client.SendChatText("Unknown Stat name " + args[1]);
                 return;
             }
-            
+
             uint statNewValue = 1234567890;
             try
             {
@@ -115,11 +116,7 @@ namespace ZoneEngine.ChatCommands
                                     new FunctionArguments
                                         {
                                             Values =
-                                                new List<object>
-                                                    {
-                                                        statId, 
-                                                        (int)statNewValue
-                                                    }
+                                                new List<object> { statId, (int)statNewValue }
                                         }, 
                                 TickCount = 1, 
                                 TickInterval = 1, 

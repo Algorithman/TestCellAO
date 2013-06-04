@@ -33,7 +33,6 @@ namespace ZoneEngine.GameObject.Items
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
-    using ZoneEngine.GameObject.Stats;
     using ZoneEngine.Gameobject.Items;
 
     #endregion
@@ -154,13 +153,7 @@ namespace ZoneEngine.GameObject.Items
 
         /// <summary>
         /// </summary>
-        public int Flags
-        {
-            get
-            {
-                return this.templateLow.Flags;
-            }
-        }
+        public int Flags { get; set; }
 
         /// <summary>
         /// </summary>

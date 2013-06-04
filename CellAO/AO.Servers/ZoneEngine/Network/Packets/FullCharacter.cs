@@ -35,6 +35,7 @@ namespace ZoneEngine.Network.Packets
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.GameObject.Items;
+    using ZoneEngine.GameObject.Items.Inventory;
 
     #endregion
 
@@ -54,26 +55,23 @@ namespace ZoneEngine.Network.Packets
 
             /* part 1 of data */
             List<InventorySlot> inventory = new List<InventorySlot>();
-            int slot = client.Character.MainInventory.InventoryPage.FirstSlotNumber;
-            foreach (Item item in client.Character.MainInventory.InventoryPage.List())
+            foreach (IInventoryPage ivp in client.Character.BaseInventory.Pages.Values)
             {
-                if (item != null)
+                foreach (KeyValuePair<int, IItem> kv in ivp.List())
                 {
                     var temp = new InventorySlot
                                    {
-                                       Placement = slot, 
-                                       Flags = (short)item.Flags, 
-                                       Count = (short)item.MultipleCount, 
-                                       Identity = item.Identity, 
-                                       ItemLowId = item.LowID, 
-                                       ItemHighId = item.HighID, 
-                                       Quality = item.Quality, 
-                                       Unknown = item.Nothing
+                                       Placement = kv.Key, 
+                                       Flags = (short)kv.Value.Flags, 
+                                       Count = (short)kv.Value.MultipleCount, 
+                                       Identity = kv.Value.Identity, 
+                                       ItemLowId = kv.Value.LowID, 
+                                       ItemHighId = kv.Value.HighID, 
+                                       Quality = kv.Value.Quality, 
+                                       Unknown = kv.Value.Nothing
                                    };
                     inventory.Add(temp);
                 }
-
-                slot++;
             }
 
             fc.InventorySlots = inventory.ToArray();
@@ -768,8 +766,6 @@ namespace ZoneEngine.Network.Packets
 
             fc.Stats3 = stats3.ToArray();
 
-            
-
             /* Byte stat number
                Int16 (short) stat value */
             var stats4 = new List<GameTuple<byte, short>>();
@@ -824,19 +820,17 @@ namespace ZoneEngine.Network.Packets
 
             fc.Stats4 = stats4.ToArray();
 
-            
-
             /* ? */
             fc.Unknown9 = 0;
 
             /* ? */
             fc.Unknown10 = 0;
 
-            #region Data10 (Empty)
+            
 
             fc.Unknown11 = new object[0];
 
-            #endregion
+            
 
             #region Data11 (Empty)
 
@@ -867,11 +861,7 @@ namespace ZoneEngine.Network.Packets
         /// </param>
         private static void AddStat3232(Client client, IList<GameTuple<int, uint>> list, int statId)
         {
-            var tuple = new GameTuple<int, uint>
-                            {
-                                Value1 = statId, 
-                                Value2 = client.Character.Stats[statId].BaseValue
-                            };
+            var tuple = new GameTuple<int, uint> { Value1 = statId, Value2 = client.Character.Stats[statId].BaseValue };
 
             list.Add(tuple);
         }

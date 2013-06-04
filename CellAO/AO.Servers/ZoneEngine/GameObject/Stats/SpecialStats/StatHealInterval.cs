@@ -45,8 +45,6 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         /// <param name="defaultValue">
         /// </param>
-        /// <param name="name">
-        /// </param>
         /// <param name="sendBaseValue">
         /// </param>
         /// <param name="doNotWrite">

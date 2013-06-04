@@ -50,8 +50,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         /// <param name="announceToPlayfield">
         /// </param>
-        public StatSkill(
-            int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
+        public StatSkill(int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
             this.StatId = number;
             this.DefaultValue = defaultValue;

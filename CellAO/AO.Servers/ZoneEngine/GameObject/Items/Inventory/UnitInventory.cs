@@ -25,9 +25,30 @@
 
 namespace ZoneEngine.GameObject.Items.Inventory
 {
+    #region Usings ...
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
+    #endregion
+
     /// <summary>
     /// </summary>
-    public class ShopInventoryPages : BaseInventoryPages
+    public class UnitInventory : BaseInventoryPages
     {
+        /// <summary>
+        /// </summary>
+        /// <param name="ownerInstance">
+        /// </param>
+        public UnitInventory(int ownerInstance)
+            : base((int)IdentityType.Inventory)
+        {
+            // These are the standard pages
+            // Bank, overflow etc will be added when needed
+            this.Pages.Add((int)IdentityType.WeaponPage, new WeaponInventoryPage(ownerInstance));
+            this.Pages.Add((int)IdentityType.ArmorPage, new ArmorInventoryPage(ownerInstance));
+            this.Pages.Add((int)IdentityType.ImplantPage, new ImplantInventoryPage(ownerInstance));
+            this.Pages.Add((int)IdentityType.SocialPage, new SocialArmorInventoryPage(ownerInstance));
+            this.Pages.Add((int)IdentityType.Inventory, new PlayerInventoryPage(ownerInstance));
+        }
     }
 }

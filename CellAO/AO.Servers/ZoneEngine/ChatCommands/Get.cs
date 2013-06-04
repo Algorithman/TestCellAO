@@ -78,7 +78,6 @@ namespace ZoneEngine.ChatCommands
                 try
                 {
                     statId = StatNamesDefaults.GetStatNumber(args[1]);
-
                 }
                 catch (Exception)
                 {
@@ -114,8 +113,8 @@ namespace ZoneEngine.ChatCommands
                 }
                 else
                 {
-                    response = "Dynel " + targetCharacter.Identity.Instance + "Stat " + StatNamesDefaults.GetStatName(statId)
-                               + " (" + statId + ") = " + statValue;
+                    response = "Dynel " + targetCharacter.Identity.Instance + "Stat "
+                               + StatNamesDefaults.GetStatName(statId) + " (" + statId + ") = " + statValue;
                 }
 
                 client.SendChatText(response);

@@ -129,9 +129,9 @@ namespace AO.Database.Dao
                     foreach (DBItem item in items)
                     {
                         conn.Execute(
-                            "INSERT INTO items (containertype,containerinstance,containerplacement,itemtype,iteminstance"
-                            + ",lowid,highid,quality,multiplecount,x,y,z,headingx,headingy,headingz,headingw,stats) VALUES (@conttype,"
-                            + " @continstance, @contplacement, @itype, @iinstance, @low, @high, @ql, @mc, @ix, @iy, @iz, @hx, @hy, @hz, @hw, @st)", 
+                            "INSERT INTO items (containertype,containerinstance,containerplacement"
+                            + ",lowid,highid,quality,multiplecount) VALUES (@conttype,"
+                            + " @continstance, @contplacement, @low, @high, @ql, @mc)", 
                             new
                                 {
                                     conttype = item.containertype, 

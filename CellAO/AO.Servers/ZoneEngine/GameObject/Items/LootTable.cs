@@ -31,8 +31,6 @@ namespace ZoneEngine.GameObject.Items
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
 
-    using ZoneEngine.Gameobject.Items;
-
     #endregion
 
     /// <summary>

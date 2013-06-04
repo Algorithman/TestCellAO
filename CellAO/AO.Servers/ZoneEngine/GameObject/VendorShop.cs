@@ -88,21 +88,9 @@ namespace ZoneEngine.GameObject
         /// </summary>
         public Quaternion RawHeading { get; set; }
 
-        private IStatList stats;
-
         /// <summary>
         /// </summary>
-        public IStatList Stats
-        {
-            get
-            {
-                return this.stats;
-            }
-            private set
-            {
-                this.stats = value;
-            }
-        }
+        public IStatList Stats { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -123,10 +111,13 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        public BaseInventory BaseInventory { get; private set; }
+        public IInventoryPages BaseInventory { get; private set; }
+
+        /// <summary>
+        /// </summary>
         public VendorShop()
         {
-            this.stats=new StatelStats();
+            this.Stats = new StatelStats();
         }
     }
 }

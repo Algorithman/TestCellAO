@@ -52,12 +52,13 @@ namespace ZoneEngine.Network.PacketHandlers
                     { 6, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6 }, 
                     { 7, 7, 6, 7, 7, 7, 6, 7, 8, 6, 6, 6, 7, 7 }, 
                     { 8, 7, 6, 7, 7, 8, 7, 7, 9, 6, 6, 6, 8, 8 }, 
+                    { 9, 8, 6, 8, 8, 8, 7, 7, 10, 6, 6, 6, 9, 9 }, 
                     
-                    // TitleLevel 3
-                    { 9, 8, 6, 8, 8, 8, 7, 7, 10, 6, 6, 6, 9, 9 }, // TitleLevel 4
+                    // TitleLevel 4
                     { 10, 9, 6, 9, 8, 9, 8, 8, 11, 6, 6, 6, 10, 9 }, // TitleLevel 5
                     { 11, 12, 6, 10, 9, 9, 9, 9, 12, 6, 6, 6, 11, 10 }, // TitleLevel 6
                     { 12, 13, 7, 11, 10, 10, 9, 9, 13, 6, 6, 6, 11, 10 }, // TitleLevel 7
+                    // TitleLevel 3
                     // TitleLevel 2
                     // TitleLevel 1
                     // Sol| MA|ENG|FIX|AGE|ADV|TRA|CRA|ENF|DOC| NT| MP| KEP|SHA   // geprüfte Prof & TL = Soldier, Martial Artist, Engineer, Fixer
@@ -219,12 +220,13 @@ namespace ZoneEngine.Network.PacketHandlers
                     { 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4 }, 
                     { 4, 4, 5, 4, 5, 5, 5, 5, 4, 5, 5, 5, 4, 4 }, 
                     { 4, 4, 6, 4, 6, 5, 5, 5, 4, 6, 6, 6, 4, 4 }, 
+                    { 4, 4, 7, 4, 6, 6, 5, 5, 4, 7, 7, 7, 4, 4 }, 
                     
-                    // TitleLevel 3
-                    { 4, 4, 7, 4, 6, 6, 5, 5, 4, 7, 7, 7, 4, 4 }, // TitleLevel 4
+                    // TitleLevel 4
                     { 4, 4, 8, 4, 7, 6, 6, 6, 4, 8, 8, 8, 4, 4 }, // TitleLevel 5
                     { 4, 4, 9, 4, 7, 7, 7, 7, 4, 10, 10, 10, 4, 4 }, // TitleLevel 6
                     { 5, 5, 10, 5, 8, 8, 7, 7, 5, 10, 10, 10, 4, 4 }, // TitleLevel 7
+                    // TitleLevel 3
                     // TitleLevel 2
                     // TitleLevel 1
                     // Sol|MA|ENG|FIX|AGE|ADV|TRA|CRA|ENF|DOC| NT| MP|KEP|SHA  // geprüfte Prof & TL = Soldier, Martial Artist, Engineer, Fixer

@@ -83,13 +83,19 @@ namespace ZoneEngine.GameObject
         /// </summary>
         public Quaternion RawHeading { get; set; }
 
-        private readonly IStatList stats;
         /// <summary>
         /// </summary>
-        public IStatList Stats { get
+        private readonly IStatList stats;
+
+        /// <summary>
+        /// </summary>
+        public IStatList Stats
         {
-            return stats;
-        }
+            get
+            {
+                return this.stats;
+            }
+
             private set
             {
             }
@@ -110,9 +116,11 @@ namespace ZoneEngine.GameObject
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// </summary>
         public Statel()
         {
-            stats=new StatelStats();
+            this.stats = new StatelStats();
         }
     }
 }

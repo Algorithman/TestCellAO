@@ -29,10 +29,6 @@ namespace ZoneEngine.GameObject.Stats
 
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
-    using System.Linq;
-
-    using AO.Core;
 
     using AO.Database;
 
@@ -139,16 +135,13 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         /// <param name="defaultValue">
         /// </param>
-        /// <param name="name">
-        /// </param>
         /// <param name="sendBaseValue">
         /// </param>
         /// <param name="dontWrite">
         /// </param>
         /// <param name="announceToPlayfield">
         /// </param>
-        public DynelStat(
-            int number, uint defaultValue, bool sendBaseValue, bool dontWrite, bool announceToPlayfield)
+        public DynelStat(int number, uint defaultValue, bool sendBaseValue, bool dontWrite, bool announceToPlayfield)
         {
             this.StatId = number;
             this.DefaultValue = defaultValue;
@@ -232,7 +225,10 @@ namespace ZoneEngine.GameObject.Stats
             }
         }
 
+        /// <summary>
+        /// </summary>
         private uint baseValue;
+
         /// <summary>
         /// </summary>
         public uint BaseValue
@@ -276,8 +272,12 @@ namespace ZoneEngine.GameObject.Stats
         /// </summary>
         public int Trickle { get; set; }
 
+        /// <summary>
+        /// </summary>
         public int Modifier { get; set; }
 
+        /// <summary>
+        /// </summary>
         public int StatId { get; set; }
 
         /// <summary>
@@ -448,5 +448,4 @@ namespace ZoneEngine.GameObject.Stats
     }
 
     #endregion
-
 }

@@ -79,7 +79,7 @@ namespace ZoneEngine.GameObject.Items
         public int getItemAttribute(int number)
         {
             Contract.Assume(this.Stats != null);
-            if (Stats.ContainsKey(number))
+            if (this.Stats.ContainsKey(number))
             {
                 return this.Stats[number];
             }

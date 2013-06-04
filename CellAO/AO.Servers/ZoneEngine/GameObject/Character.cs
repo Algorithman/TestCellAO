@@ -251,7 +251,7 @@ namespace ZoneEngine.GameObject
         /// </summary>
         public Character()
         {
-            this.BaseInventory = new EntityInventory(this);
+            this.BaseInventory = new UnitInventory(this.identity.Instance);
             this.pets = new List<Pet>();
         }
 
@@ -264,7 +264,7 @@ namespace ZoneEngine.GameObject
         public Character(Identity identity, IZoneClient client)
         {
             this.identity = identity;
-            this.BaseInventory = new EntityInventory(this);
+            this.BaseInventory = new UnitInventory(this.identity.Instance);
             this.pets = new List<Pet>();
             this.client = client;
             this.Textures = new List<AOTextures>();
@@ -424,15 +424,15 @@ namespace ZoneEngine.GameObject
 
         /// <summary>
         /// </summary>
-        public BaseInventory BaseInventory { get; private set; }
+        public IInventoryPages BaseInventory { get; private set; }
 
         /// <summary>
         /// </summary>
-        public EntityInventory MainInventory
+        public IInventoryPage MainInventory
         {
             get
             {
-                return (EntityInventory)this.BaseInventory;
+                return this.BaseInventory.Pages[this.BaseInventory.StandardPage];
             }
         }
     }

@@ -49,8 +49,7 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         /// <param name="announceToPlayfield">
         /// </param>
-        public StatNextXP(
-            int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
+        public StatNextXP(int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
             this.StatId = number;
             this.DefaultValue = defaultValue;

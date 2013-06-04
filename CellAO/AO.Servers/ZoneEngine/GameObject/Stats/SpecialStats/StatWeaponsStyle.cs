@@ -43,7 +43,8 @@ namespace ZoneEngine.GameObject.Stats
         /// </param>
         /// <param name="announceToPlayfield">
         /// </param>
-        public StatWeaponsStyle(int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
+        public StatWeaponsStyle(
+            int number, uint defaultValue, bool sendBaseValue, bool doNotWrite, bool announceToPlayfield)
         {
             this.StatId = number;
             this.DefaultValue = defaultValue;

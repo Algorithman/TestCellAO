@@ -36,7 +36,6 @@ namespace ZoneEngine
     using AO.Core;
     using AO.Core.Components;
     using AO.Core.Logger;
-
     using AO.Database;
 
     using MySql.Data.MySqlClient;
@@ -48,7 +47,6 @@ namespace ZoneEngine
 
     using ZoneEngine.Collision;
     using ZoneEngine.Functions;
-    using ZoneEngine.GameObject.Stats;
     using ZoneEngine.Gameobject.Items;
     using ZoneEngine.GameObject.Nanos;
     using ZoneEngine.Network;
@@ -181,11 +179,7 @@ namespace ZoneEngine
             AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
             TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
 
-            
-
             csc = new ScriptCompiler();
-
-            
 
             // TODO: ADD More Handlers.
             Console.Title = "CellAO " + AssemblyInfoclass.Title + " Console. Version: " + AssemblyInfoclass.Description
