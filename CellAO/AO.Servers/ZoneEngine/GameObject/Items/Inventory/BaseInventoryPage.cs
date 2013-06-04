@@ -77,7 +77,12 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </exception>
         public virtual InventoryError Add(int slot, IItem item)
         {
-            throw new NotImplementedException();
+            if (this.Content.ContainsKey(slot))
+            {
+                throw new ArgumentException("Already item in slot " + slot + " of container " + this.Identity.Type + ":" + this.Identity.Instance);
+            }
+            this.Content.Add(slot, item);
+            return InventoryError.OK;
         }
 
         /// <summary>
@@ -90,7 +95,12 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </exception>
         public IItem Remove(int slotNum)
         {
-            throw new NotImplementedException();
+            if (!this.Content.ContainsKey(slotNum))
+            {
+                throw new ArgumentOutOfRangeException("No item in slot "+slotNum+" of container "+this.Identity.Type+":"+this.Identity.Instance);
+            }
+            IItem temp = this.Content[slotNum];
+            return temp;
         }
 
         /// <summary>
