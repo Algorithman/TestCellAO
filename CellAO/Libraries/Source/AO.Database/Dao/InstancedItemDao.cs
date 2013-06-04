@@ -30,9 +30,9 @@ namespace AO.Database
     using System.Collections.Generic;
     using System.Data;
 
-    using Dapper;
+    using AO.Database.Entities;
 
-    using global::Database.Entities;
+    using Dapper;
 
     #endregion
 

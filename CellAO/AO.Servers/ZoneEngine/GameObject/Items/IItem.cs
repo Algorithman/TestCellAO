@@ -97,5 +97,7 @@ namespace ZoneEngine.GameObject.Items
         /// Write item to database
         /// </summary>
         void WriteToDatabase();
+
+        byte[] GetItemAttributes();
     }
 }

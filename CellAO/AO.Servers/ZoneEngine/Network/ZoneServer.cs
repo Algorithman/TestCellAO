@@ -38,8 +38,6 @@ namespace ZoneEngine.Network
 
     using Cell.Core;
 
-    using Database;
-
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine.Component;

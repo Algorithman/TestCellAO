@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 
-namespace Database.Entities
+namespace AO.Database.Entities
 {
     using System.Data.Linq;
 

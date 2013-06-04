@@ -29,6 +29,13 @@ namespace AO.Database.Dao
             }
         }
 
+        public static IEnumerable<DBItem> GetAllInContainer(int containerType, int containerInstance)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                return conn.Query<DBItem>("SELECT * FROM items WHERE containertype=@containerType AND containerinstance=@containerInstance", new { containerType, containerInstance });
+            }
+        }
 
         public static void Save(DBItem item)
         {

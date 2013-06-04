@@ -44,8 +44,6 @@ namespace ZoneEngine.Network
 
     using zlib;
 
-    using Database;
-
     using NiceHexOutput;
 
     using SmokeLounge.AOtomation.Messaging.GameData;

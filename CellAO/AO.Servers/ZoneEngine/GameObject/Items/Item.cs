@@ -58,8 +58,9 @@ namespace ZoneEngine.GameObject.Items
         public int Quality { get; set; }
 
         /// <summary>
+        /// Gets or sets Item Instance Identity
         /// </summary>
-        public Identity Identity { get; private set; }
+        public Identity Identity { get; set; }
 
         /// <summary>
         /// </summary>
@@ -166,6 +167,29 @@ namespace ZoneEngine.GameObject.Items
             this.Quality = QL < this.templateLow.Quality
                           ? this.templateLow.Quality
                           : (QL > this.templateHigh.Quality ? this.templateHigh.Quality : QL);
+            this.Identity = new Identity();
+        }
+
+        public byte[] GetItemAttributes()
+        {
+            byte[] temp = new byte[this.Attributes.Count*2*4];
+
+            int counter = 0;
+            foreach (KeyValuePair<int, int> kv in this.Attributes)
+            {
+                byte[] temp2 = BitConverter.GetBytes(kv.Key);
+                temp[counter++] = temp2[0];
+                temp[counter++] = temp2[1];
+                temp[counter++] = temp2[2];
+                temp[counter++] = temp2[3];
+
+                temp2 = BitConverter.GetBytes(kv.Value);
+                temp[counter++] = temp2[0];
+                temp[counter++] = temp2[1];
+                temp[counter++] = temp2[2];
+                temp[counter++] = temp2[3];
+            }
+            return temp;
         }
     }
 }
