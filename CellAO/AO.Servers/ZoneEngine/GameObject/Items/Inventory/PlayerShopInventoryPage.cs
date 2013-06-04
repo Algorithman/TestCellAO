@@ -25,16 +25,22 @@
 
 namespace ZoneEngine.GameObject.Items.Inventory
 {
+    #region Usings ...
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
+    #endregion
+
     /// <summary>
     /// </summary>
-    public class PlayerShopInventory : PartialInventory
+    public class PlayerShopInventoryPage : BaseInventoryPage
     {
         /// <summary>
         /// </summary>
-        /// <param name="baseInventory">
+        /// <param name="ownerInstance">
         /// </param>
-        public PlayerShopInventory(EntityInventory baseInventory)
-            : base(baseInventory)
+        public PlayerShopInventoryPage(int ownerInstance)
+            : base((int)IdentityType.PlayerShopInventory, 0x40, 0, ownerInstance)
         {
         }
     }

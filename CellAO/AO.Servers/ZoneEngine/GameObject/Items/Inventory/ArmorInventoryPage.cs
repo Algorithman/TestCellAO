@@ -29,22 +29,23 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
     using System;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine.GameObject.Enums;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    public class ArmorPageInventory : PartialInventory, IItemSlotHandler, IItemHotSwapHandler
+    public class ArmorInventoryPage : BaseInventoryPage, IItemSlotHandler, IItemHotSwapHandler
     {
         /// <summary>
         /// </summary>
-        /// <param name="baseInventory">
+        /// <param name="ownerInstance">
         /// </param>
-        public ArmorPageInventory(EntityInventory baseInventory)
-            : base(baseInventory)
+        public ArmorInventoryPage(int ownerInstance)
+            : base((int)IdentityType.ArmorPage, 15, 0x11, ownerInstance)
         {
-            this.InitializeInventory(15, 0x11);
         }
 
         /// <summary>

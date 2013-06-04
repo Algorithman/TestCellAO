@@ -27,16 +27,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
 {
     /// <summary>
     /// </summary>
-    public class OutgoingTradeInventory : PartialInventory
+    public class ShopInventoryPages : BaseInventoryPages
     {
-        /// <summary>
-        /// </summary>
-        /// <param name="baseInventory">
-        /// </param>
-        public OutgoingTradeInventory(EntityInventory baseInventory)
-            : base(baseInventory)
-        {
-            this.InitializeInventory(64, 0); // sell max 64 items
-        }
     }
 }

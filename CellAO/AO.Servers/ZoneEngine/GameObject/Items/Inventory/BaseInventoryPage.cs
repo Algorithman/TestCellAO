@@ -49,13 +49,34 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </summary>
         private readonly IDictionary<int, IItem> Content;
 
+        private Identity identity;
         /// <summary>
         /// </summary>
-        public Identity Identity { get; set; }
+        public Identity Identity
+        {
+            get
+            {
+                return this.identity;
+            }
+            set
+            {
+                this.identity = value;
+            }
+        }
 
         /// <summary>
         /// </summary>
-        public int Page { get; set; }
+        public virtual int Page
+        {
+            get
+            {
+                return (int)this.identity.Type;
+            }
+            set
+            {
+                this.identity.Type = (IdentityType)value;
+            }
+        }
 
         /// <summary>
         /// </summary>
@@ -216,6 +237,12 @@ namespace ZoneEngine.GameObject.Items.Inventory
             }
         }
 
+        private BaseInventoryPage()
+        {
+            this.Identity = new Identity();
+            this.Content = new Dictionary<int, IItem>();
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="pagenum">
@@ -224,12 +251,13 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </param>
         /// <param name="firstslotnumber">
         /// </param>
-        public BaseInventoryPage(int pagenum, int maxslots, int firstslotnumber)
+        public BaseInventoryPage(int pagenum, int maxslots, int firstslotnumber, int ownerInstance)
+            : this()
         {
-            this.Page = pagenum;
+            this.identity.Type = (IdentityType)pagenum;
+            this.identity.Instance = ownerInstance;
             this.MaxSlots = maxslots;
             this.FirstSlotNumber = firstslotnumber;
-            this.Content = new Dictionary<int, IItem>();
         }
     }
 }

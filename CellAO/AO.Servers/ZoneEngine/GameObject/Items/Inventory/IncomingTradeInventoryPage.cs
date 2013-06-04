@@ -25,19 +25,23 @@
 
 namespace ZoneEngine.GameObject.Items.Inventory
 {
+    #region Usings ...
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
+    #endregion
+
     /// <summary>
     /// </summary>
-    public class BackPackInventory : PartialInventory
+    public class IncomingTradeInventoryPage : BaseInventoryPage
     {
         /// <summary>
         /// </summary>
-        /// <param name="baseInventory">
+        /// <param name="ownerInstance">
         /// </param>
-        public BackPackInventory(EntityInventory baseInventory)
-            : base(baseInventory)
+        public IncomingTradeInventoryPage(int ownerInstance)
+            : base((int)IdentityType.IncomingTradeWindow, 0x40, 0, ownerInstance)
         {
-            MaxCount = 30;
-            FirstSlotNumber = 0x40;
         }
     }
 }

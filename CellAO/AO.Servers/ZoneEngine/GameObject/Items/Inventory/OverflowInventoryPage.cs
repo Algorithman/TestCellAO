@@ -25,28 +25,23 @@
 
 namespace ZoneEngine.GameObject.Items.Inventory
 {
+    #region Usings ...
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
+    #endregion
+
     /// <summary>
     /// </summary>
-    public class BankInventory : PartialInventory
+    public class OverflowInventoryPage : BaseInventoryPage
     {
         /// <summary>
         /// </summary>
-        /// <param name="baseInventory">
+        /// <param name="ownerInstance">
         /// </param>
-        public BankInventory(EntityInventory baseInventory)
-            : base(baseInventory)
+        public OverflowInventoryPage(int ownerInstance)
+            : base((int)IdentityType.OverflowWindow, 0x40, 0, ownerInstance)
         {
-            this.InitializeInventory(102, 0);
-        }
-
-        /// <summary>
-        /// </summary>
-        public override int FirstSlotNumber
-        {
-            get
-            {
-                return 64;
-            }
         }
     }
 }

@@ -29,22 +29,23 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
     using System;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine.GameObject.Enums;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    public class ImplantPageInventory : PartialInventory, IItemSlotHandler, IItemHotSwapHandler
+    public class SocialArmorInventoryPage : BaseInventoryPage, IItemSlotHandler
     {
         /// <summary>
         /// </summary>
-        /// <param name="baseInventory">
+        /// <param name="ownerInstance">
         /// </param>
-        public ImplantPageInventory(EntityInventory baseInventory)
-            : base(baseInventory)
+        public SocialArmorInventoryPage(int ownerInstance)
+            : base((int)IdentityType.SocialPage, 15, 0x31, ownerInstance)
         {
-            this.InitializeInventory(15, 0x21);
         }
 
         /// <summary>
@@ -97,21 +98,6 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// <exception cref="NotImplementedException">
         /// </exception>
         public void Removed(int slot, ItemTemplate item)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="slotFrom">
-        /// </param>
-        /// <param name="slotTo">
-        /// </param>
-        /// <param name="err">
-        /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        public void TryHotSwap(int slotFrom, int slotTo, ref InventoryError err)
         {
             throw new NotImplementedException();
         }

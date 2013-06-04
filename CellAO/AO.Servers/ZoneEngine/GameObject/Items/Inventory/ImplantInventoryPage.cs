@@ -29,22 +29,23 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
     using System;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine.GameObject.Enums;
 
     #endregion
 
     /// <summary>
     /// </summary>
-    public class WeaponPageInventory : PartialInventory, IItemSlotHandler, IItemHotSwapHandler
+    public class ImplantInventoryPage : BaseInventoryPage, IItemSlotHandler, IItemHotSwapHandler
     {
         /// <summary>
         /// </summary>
-        /// <param name="baseInventory">
+        /// <param name="ownerInstance">
         /// </param>
-        public WeaponPageInventory(EntityInventory baseInventory)
-            : base(baseInventory)
+        public ImplantInventoryPage(int ownerInstance)
+            : base((int)IdentityType.ImplantPage, 15, 0x21, ownerInstance)
         {
-            this.InitializeInventory(15,1);
         }
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// </exception>
         public void CheckAdd(int slot, ItemTemplate item, ref InventoryError err)
         {
-            
+            throw new NotImplementedException();
         }
 
         /// <summary>

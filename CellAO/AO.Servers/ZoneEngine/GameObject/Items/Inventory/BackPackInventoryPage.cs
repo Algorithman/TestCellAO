@@ -25,18 +25,23 @@
 
 namespace ZoneEngine.GameObject.Items.Inventory
 {
+    #region Usings ...
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
+    #endregion
+
     /// <summary>
     /// </summary>
-    public class OverflowInventory : PartialInventory
+    public class BackPackInventoryPage : BaseInventoryPage
     {
         /// <summary>
         /// </summary>
-        /// <param name="baseInventory">
+        /// <param name="ownerInstance">
         /// </param>
-        public OverflowInventory(EntityInventory baseInventory)
-            : base(baseInventory)
+        public BackPackInventoryPage(int ownerInstance)
+            : base((int)IdentityType.Backpack, 30, 0, ownerInstance)
         {
-            this.InitializeInventory(64, 0); // size 64 atm
         }
     }
 }

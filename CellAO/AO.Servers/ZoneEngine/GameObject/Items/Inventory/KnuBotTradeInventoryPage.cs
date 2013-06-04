@@ -25,18 +25,23 @@
 
 namespace ZoneEngine.GameObject.Items.Inventory
 {
+    #region Usings ...
+
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
+    #endregion
+
     /// <summary>
     /// </summary>
-    public class KnuBotTradeInventory : PartialInventory
+    public class KnuBotTradeInventoryPage : BaseInventoryPage
     {
         /// <summary>
         /// </summary>
-        /// <param name="baseInventory">
+        /// <param name="ownerInstance">
         /// </param>
-        public KnuBotTradeInventory(EntityInventory baseInventory)
-            : base(baseInventory)
+        public KnuBotTradeInventoryPage(int ownerInstance)
+            : base((int)IdentityType.KnuBotTradeWindow, 0x20, 0, ownerInstance)
         {
-            this.InitializeInventory(64,0); // Setting it to size 64 atm, dunno which size is proper
         }
     }
 }
