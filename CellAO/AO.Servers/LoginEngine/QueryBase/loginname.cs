@@ -27,6 +27,7 @@ namespace LoginEngine.QueryBase
 {
     #region Usings ...
 
+    using System;
     using System.Data;
 
     using AO.Core;
@@ -69,7 +70,12 @@ namespace LoginEngine.QueryBase
         /// </param>
         public void GetLoginName(string recvLogin)
         {
-            this.loginN = LoginDataDao.GetByUsername(recvLogin).Username;
+            this.loginN = null;
+            DBLoginData temp = LoginDataDao.GetByUsername(recvLogin);
+            if (temp != null)
+            {
+                this.loginN = LoginDataDao.GetByUsername(recvLogin).Username;
+            }
         }
 
         #endregion

@@ -73,7 +73,10 @@ namespace LoginEngine.QueryBase
         public void GetLoginFlags(string recvLogin)
         {
             DBLoginData login = LoginDataDao.GetByUsername(recvLogin);
-            this.flagsL = login.Flags;
+            if (login != null)
+            {
+                this.flagsL = login.Flags;
+            }
         }
 
         #endregion

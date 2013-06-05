@@ -27,9 +27,16 @@ namespace AO.Database.Dao
         {
             using (IDbConnection conn = Connector.GetConnection())
             {
-                return
-                    conn.Query<DBLoginData>(
-                        "SELECT * FROM login where Username=@user", new { user = username }).First();
+                try
+                {
+                    return
+                        conn.Query<DBLoginData>(
+                            "SELECT * FROM login where Username=@user", new { user = username }).First();
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
             }
         }
 
