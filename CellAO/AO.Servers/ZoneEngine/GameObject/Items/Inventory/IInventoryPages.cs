@@ -94,5 +94,9 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// <returns>
         /// </returns>
         InventoryError TryAdd(IItem item);
+
+        IInventoryPage PageFromSlot(int slotNum);
+
+
     }
 }

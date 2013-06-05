@@ -98,5 +98,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// <returns>
         /// </returns>
         int FindFreeSlot();
+
+        bool ValidSlot(int slotNum);
     }
 }

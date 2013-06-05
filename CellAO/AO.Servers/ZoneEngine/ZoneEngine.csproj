@@ -123,6 +123,8 @@
     <Compile Include="GameObject\Items\Inventory\IInventoryPage.cs" />
     <Compile Include="GameObject\Items\Inventory\IInventoryPages.cs" />
     <Compile Include="GameObject\Items\Inventory\UnitInventory.cs" />
+    <Compile Include="MessageHandlers\ContainerAddItemHandler.cs" />
+    <Compile Include="Network\PacketHandlers\ContainerAddItem.cs" />
     <Compile Include="Network\PacketHandlers\OrgClient.cs" />
     <Compile Include="GameObject\Stats\DynelStats.cs" />
     <Compile Include="GameObject\Stats\IStatList.cs" />
