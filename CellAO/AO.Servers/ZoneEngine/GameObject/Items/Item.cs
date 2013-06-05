@@ -107,7 +107,14 @@ namespace ZoneEngine.GameObject.Items
             }
 
             // Do always set it for caching purposes
-            this.Attributes.Add(attributeId, newValue);
+            if (!this.Attributes.ContainsKey(attributeId))
+            {
+                this.Attributes.Add(attributeId, newValue);
+            }
+            else
+            {
+                this.Attributes[attributeId] = newValue;
+            }
         }
 
         /// <summary>
@@ -147,7 +154,11 @@ namespace ZoneEngine.GameObject.Items
             get
             {
                 // Return MaxEnergy = MultipleCount
-                return this.GetAttribute(212);
+                return this.GetAttribute(412);
+            }
+            set
+            {
+                this.SetAttribute(412, value);
             }
         }
 

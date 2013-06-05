@@ -147,7 +147,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
             {
                 InstancedItemDao.RemoveItem((int)this.Identity.Type, this.Identity.Instance, slotNum);
             }
-
+            this.Content.Remove(slotNum);
             return temp;
         }
 
@@ -160,19 +160,19 @@ namespace ZoneEngine.GameObject.Items.Inventory
             foreach (DBItem item in ItemDao.GetAllInContainer((int)this.Identity.Type, this.Identity.Instance))
             {
                 Item newItem = new Item(item.quality, item.lowid, item.highid);
-                newItem.SetAttribute(212, item.multiplecount);
+                newItem.SetAttribute(412, item.multiplecount);
                 this.Content.Add(item.containerplacement, newItem);
 
                 // Make item visible
                 // TODO: Other flags must be set too
-                newItem.Flags |= 0x81;
+                newItem.Flags |= 0x1;
             }
 
             foreach (DBInstancedItem item in
                 InstancedItemDao.GetAllInContainer((int)this.Identity.Type, this.Identity.Instance))
             {
                 Item newItem = new Item(item.quality, item.lowid, item.highid);
-                newItem.SetAttribute(212, item.multiplecount);
+                newItem.SetAttribute(412, item.multiplecount);
                 Identity temp = new Identity();
                 temp.Type = (IdentityType)item.itemtype;
                 temp.Instance = item.iteminstance;
@@ -188,7 +188,15 @@ namespace ZoneEngine.GameObject.Items.Inventory
 
                 // Make item visible
                 // TODO: Other flags must be set too
-                newItem.Flags |= 0x81;
+                // Anything ->    =0x01
+                // Containers ->  =0x02
+                // ????? ->       |0x20
+                // ????? ->       |0x80 (maybe unique)
+
+                // Found online: 0xa1 for nano instruction disc
+                //               0x02 for any bag
+                //               0x81 for unique totw rings
+                newItem.Flags |= 0x1;
             }
 
             return true;
@@ -285,6 +293,7 @@ namespace ZoneEngine.GameObject.Items.Inventory
                 {
                     return slot;
                 }
+                slot++;
             }
 
             return -1;

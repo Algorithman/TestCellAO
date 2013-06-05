@@ -109,6 +109,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChatCommands\DebugItem.cs" />
     <Compile Include="ChatCommands\Get.cs" />
     <Compile Include="ChatCommands\GiveItem.cs" />
     <Compile Include="ChatCommands\Set.cs" />
@@ -122,6 +123,7 @@
     <Compile Include="GameObject\Items\Inventory\IInventoryPage.cs" />
     <Compile Include="GameObject\Items\Inventory\IInventoryPages.cs" />
     <Compile Include="GameObject\Items\Inventory\UnitInventory.cs" />
+    <Compile Include="Network\PacketHandlers\OrgClient.cs" />
     <Compile Include="GameObject\Stats\DynelStats.cs" />
     <Compile Include="GameObject\Stats\IStatList.cs" />
     <Compile Include="GameObject\ITargetingEntity.cs" />
@@ -172,6 +174,7 @@
     <Compile Include="GameObject\Stats\StatelStat.cs" />
     <Compile Include="GameObject\Stats\StatelStats.cs" />
     <Compile Include="GameObject\Stats\StatNamesDefaults.cs" />
+    <Compile Include="MessageHandlers\CharacterActionHandler.cs" />
     <Compile Include="MessageHandlers\CharDCMoveHandler.cs" />
     <Compile Include="MessageHandlers\CharInPlayHandler.cs" />
     <Compile Include="MessageHandlers\ChatCmdHandler.cs" />
@@ -228,6 +231,7 @@
     <Compile Include="Network\InternalBus\PlayfieldTimedList.cs" />
     <Compile Include="Network\InternalBus\PlayfieldTimedListEntry.cs" />
     <Compile Include="Network\IZoneClient.cs" />
+    <Compile Include="Network\PacketHandlers\CharacterAction.cs" />
     <Compile Include="Network\PacketHandlers\CharacterInPlay.cs" />
     <Compile Include="Network\PacketHandlers\CharDCMove.cs" />
     <Compile Include="Network\PacketHandlers\ChatCommandHandler.cs" />
@@ -238,6 +242,7 @@
     <Compile Include="Network\Packets\ChatServerInfo.cs" />
     <Compile Include="Network\Packets\FullCharacter.cs" />
     <Compile Include="Network\Packets\PlayfieldAnarchyF.cs" />
+    <Compile Include="Network\Packets\SendFeedback.cs" />
     <Compile Include="Network\Packets\SimpleCharFullUpdate.cs" />
     <Compile Include="Network\Packets\Stat.cs" />
     <Compile Include="Network\PlayfieldWorker.cs" />

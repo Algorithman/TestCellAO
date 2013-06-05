@@ -99,9 +99,11 @@ namespace ZoneEngine.GameObject
 
             set
             {
-                throw new NotImplementedException();
+                this.moveMode = value;
             }
         }
+
+        public MoveModes PreviousMoveMode { get; set; }
 
         /// <summary>
         /// Active Nanos list

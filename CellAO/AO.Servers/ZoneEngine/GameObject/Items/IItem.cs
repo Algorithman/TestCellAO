@@ -86,7 +86,7 @@ namespace ZoneEngine.GameObject.Items
         /// <summary>
         /// Stacked count of the item
         /// </summary>
-        int MultipleCount { get; }
+        int MultipleCount { get; set; }
 
         /// <summary>
         /// Item's Flags
