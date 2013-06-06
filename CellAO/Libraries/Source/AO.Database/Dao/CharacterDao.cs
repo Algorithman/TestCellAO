@@ -144,9 +144,16 @@ namespace AO.Database
 
         public static DBCharacter GetByCharName(string name)
         {
-            using (IDbConnection conn = Connector.GetConnection())
+            try
             {
-                return conn.Query<DBCharacter>("SELECT * FROM characters WHERE Name=@name", new { name }).First();
+                using (IDbConnection conn = Connector.GetConnection())
+                {
+                    return conn.Query<DBCharacter>("SELECT * FROM characters WHERE Name=@name", new { name }).First();
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
 
@@ -156,6 +163,23 @@ namespace AO.Database
             {
                 conn.Execute(
                     "UPDATE characters SET playfield = @Playfield, X = @X, Y = @Y, Z = @Z WHERE id=@Id", new { db.Playfield, db.X, db.Y, db.Z, db.Id });
+            }
+        }
+
+        public static string GetCharacterNameById(int characterId)
+        {
+            try
+            {
+                using (IDbConnection conn = Connector.GetConnection())
+                {
+                    return
+                        conn.Query<string>("SELECT Name FROM characters WHERE ID=@characterId", new { characterId })
+                            .Single();
+                }
+            }
+            catch
+            {
+                return string.Empty;
             }
         }
     }

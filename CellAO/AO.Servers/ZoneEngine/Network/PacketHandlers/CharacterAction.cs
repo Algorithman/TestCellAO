@@ -121,6 +121,7 @@ namespace ZoneEngine.PacketHandlers
                     {
                         // If action == search
                         /* Msg 110:136744723 = "No hidden objects found." */
+                        // TODO: SEARCH!!
                         SendFeedback.Send(client, 110, 136744723);
                     }
 
@@ -271,6 +272,7 @@ namespace ZoneEngine.PacketHandlers
                             client.SendCompressed(infoPacketMessage);
                         }
                         else
+                            // TODO: NPC's
                         {/*
                             var npc =
                                 (NonPlayerCharacterClass)

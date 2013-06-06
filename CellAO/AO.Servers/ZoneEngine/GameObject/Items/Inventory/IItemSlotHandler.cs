@@ -73,5 +73,11 @@ namespace ZoneEngine.GameObject.Items.Inventory
         /// <param name="item">
         /// </param>
         void Removed(int slot, ItemTemplate item);
+
+        void HotSwap(IInventoryPage sendingPage, int fromPlacement, int toPlacement);
+
+        void Equip(IInventoryPage sendingPage, int fromPlacement, int toPlacement);
+
+        void Unequip(int fromPlacement, IInventoryPage receivingPage, int toPlacement);
     }
 }

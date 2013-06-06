@@ -57,12 +57,14 @@
     <Compile Include="Dao\ItemDao.cs" />
     <Compile Include="Dao\OnlineDao.cs" />
     <Compile Include="Dao\LoginDataDao.cs" />
+    <Compile Include="Dao\OrganizationDao.cs" />
     <Compile Include="Dao\StatDao.cs" />
     <Compile Include="Entities\DBCharacter.cs" />
     <Compile Include="Entities\DBInstancedItem.cs" />
     <Compile Include="Entities\DBItem.cs" />
     <Compile Include="Entities\DBOnline.cs" />
     <Compile Include="Entities\DBLoginData.cs" />
+    <Compile Include="Entities\DBOrganization.cs" />
     <Compile Include="Entities\DBStats.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -71,6 +73,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\SmokeLounge.AOtomation.Messaging.csproj">
+      <Project>{3ceac898-bfca-45ea-bf34-c4bbb85d2da4}</Project>
+      <Name>SmokeLounge.AOtomation.Messaging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AO.Core\AO.Core.csproj">
       <Project>{1ec261bb-153d-487d-8a0a-dd85e850775f}</Project>
       <Name>AO.Core</Name>

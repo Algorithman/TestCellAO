@@ -158,6 +158,11 @@ namespace ZoneEngine.GameObject.Items.Inventory
             return InventoryError.OK;
         }
 
+        public IInventoryPage PageFromSlot(int slotNum)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// </summary>
         private BaseInventoryPages()

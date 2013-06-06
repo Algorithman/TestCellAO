@@ -89,6 +89,11 @@ namespace ZoneEngine.GameObject.Stats
             return;
         }
 
+        public void ClearChangedFlags()
+        {
+            // Empty, statels dont have changing stats
+        }
+
         /// <summary>
         /// </summary>
         /// <returns>

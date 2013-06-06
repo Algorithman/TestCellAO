@@ -101,5 +101,20 @@ namespace ZoneEngine.GameObject.Items.Inventory
         {
             throw new NotImplementedException();
         }
+
+        public void HotSwap(IInventoryPage sendingPage, int fromPlacement, int toPlacement)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Equip(IInventoryPage sendingPage, int fromPlacement, int toPlacement)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Unequip(int fromPlacement, IInventoryPage receivingPage, int toPlacement)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

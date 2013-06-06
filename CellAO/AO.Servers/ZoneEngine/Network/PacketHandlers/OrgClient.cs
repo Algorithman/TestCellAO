@@ -33,6 +33,9 @@ namespace ZoneEngine.Network.PacketHandlers
     using System.Data;
 
     using AO.Core;
+    using AO.Database;
+    using AO.Database.Dao;
+    using AO.Database.Entities;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -49,47 +52,24 @@ namespace ZoneEngine.Network.PacketHandlers
 
         public static void Read(OrgClientMessage message, Client client)
         {
-            var ms = new SqlWrapper();
-            DataTable dt;
-
             switch ((byte)message.Command)
             {
-
-
                 case 1:
                     {
                         // org create
                         /* client wants to create organization
-                         * name of org is CmdStr
+                         * name of org is message.CommandArgs
                          */
-                        var sqlQuery = "SELECT * FROM organizations WHERE Name='" + message.CommandArgs + "'";
-                        string guildName = null;
-                        uint orgID = 0;
-                        dt = ms.ReadDatatable(sqlQuery);
-                        if (dt.Rows.Count > 0)
-                        {
-                            guildName = (string)dt.Rows[0]["Name"];
-                        }
 
-                        if (guildName == null)
+                        if (OrganizationDao.CreateOrganization(message.CommandArgs, DateTime.UtcNow, client.Character.Identity.Instance))
                         {
+
                             client.SendChatText("You have created the guild: " + message.CommandArgs);
 
-                            var currentDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                            var sqlQuery2 =
-                                "INSERT INTO organizations (Name, creation, LeaderID, GovernmentForm) VALUES ('"
-                                + message.CommandArgs + "', '" + currentDate + "', '" + client.Character.Identity.Instance + "', '0')";
-                            ms.SqlInsert(sqlQuery2);
-                            var sqlQuery3 = "SELECT * FROM organizations WHERE Name='" + message.CommandArgs + "'";
-                            dt = ms.ReadDatatable(sqlQuery3);
-                            if (dt.Rows.Count > 0)
-                            {
-                                orgID = (UInt32)dt.Rows[0]["ID"];
-                            }
-
+                            int orgID = OrganizationDao.GetOrganizationId(message.CommandArgs);
                             // Make sure the order of these next two lines is not swapped -NV
                             client.Character.Stats["ClanLevel"].Value = 0;
-                            client.Character.Stats["Clan"].BaseValue = orgID;
+                            client.Character.Stats["Clan"].Value = orgID;
                             break;
                         }
                         else
@@ -114,13 +94,7 @@ namespace ZoneEngine.Network.PacketHandlers
                         break;
                     }
 
-                    var ranksSql = "SELECT GovernmentForm FROM organizations WHERE ID = " + client.Character.Stats["Clan"].BaseValue;
-                    var governingForm = -1;
-                    dt = ms.ReadDatatable(ranksSql);
-                    if (dt.Rows.Count > 0)
-                    {
-                        governingForm = (Int32)dt.Rows[0]["GovernmentForm"];
-                    }
+                    var governingForm = OrganizationDao.GetGovernmentForm((int)client.Character.Stats["Clan"].BaseValue);
 
                     client.SendChatText("Current Rank Structure: " + GetRankList(governingForm));
                     break;
@@ -156,22 +130,20 @@ namespace ZoneEngine.Network.PacketHandlers
                                    orgHistory = string.Empty,
                                    orgLeaderName = string.Empty;
                             int orgGoverningForm = 0, orgLeaderID = 0;
-                            dt = ms.ReadDatatable("SELECT * FROM organizations WHERE ID=" + tPlayer.Stats["Clan"].BaseValue);
 
-                            if (dt.Rows.Count > 0)
+                            DBOrganization orgData =
+                                OrganizationDao.GetOrganizationData((int)tPlayer.Stats["Clan"].BaseValue);
+
+                            if (orgData != null)
                             {
-                                orgDescription = (string)dt.Rows[0]["Description"];
-                                orgObjective = (string)dt.Rows[0]["Objective"];
-                                orgHistory = (string)dt.Rows[0]["History"];
-                                orgGoverningForm = (Int32)dt.Rows[0]["GovernmentForm"];
-                                orgLeaderID = (Int32)dt.Rows[0]["LeaderID"];
+                                orgDescription = orgData.Description;
+                                orgObjective = orgData.Objective;
+                                orgHistory = orgData.History;
+                                orgGoverningForm = orgData.GovernmentForm;
+                                orgLeaderID = orgData.LeaderID;
                             }
 
-                            dt = ms.ReadDatatable("SELECT Name FROM characters WHERE ID=" + orgLeaderID);
-                            if (dt.Rows.Count > 0)
-                            {
-                                orgLeaderName = (string)dt.Rows[0][0];
-                            }
+                            orgLeaderName = CharacterDao.GetCharacterNameById(orgLeaderID);
 
                             string textGovForm = null;
                             if (orgGoverningForm == 0)
@@ -219,7 +191,7 @@ namespace ZoneEngine.Network.PacketHandlers
                                         Instance =
                                             (int)tPlayer.Stats["Clan"].BaseValue
                                     },
-                                    // TODO: Possible NULL here
+                                // TODO: Possible NULL here
                                 OrganizationName = (tPlayer as Character).OrganizationName,
                                 Description = orgDescription,
                                 Objective = orgObjective,
@@ -240,6 +212,12 @@ namespace ZoneEngine.Network.PacketHandlers
                 #region /org disband
 
                 case 6:
+                    // Add Org Bank to prez
+                    DBOrganization orgDisband =
+                        OrganizationDao.GetOrganizationData((int)client.Character.Stats["Clan"].BaseValue);
+                    client.Character.Stats["Cash"].BaseValue += (uint)orgDisband.Bank;
+                    // Clear stat 5 (Clan) from all chars where value=orgId
+                    StatDao.DisbandOrganization((int)client.Character.Stats["Clan"].BaseValue);
                     break;
 
                 #endregion
@@ -304,63 +282,52 @@ namespace ZoneEngine.Network.PacketHandlers
                                 // Promoter is eligible. Start the process
 
                                 // First we get the details about the org itself
-                                promoteSql = "SELECT * FROM organizations WHERE ID = " + client.Character.Stats["Clan"].BaseValue;
-                                dt = ms.ReadDatatable(promoteSql);
+                                DBOrganization orgPromote =
+                                    OrganizationDao.GetOrganizationData((int)client.Character.Stats["Clan"].BaseValue);
 
                                 var promoteGovForm = -1;
                                 var promotedToRank = string.Empty;
                                 var demotedFromRank = string.Empty;
 
-                                if (dt.Rows.Count > 0)
+                                if (orgPromote != null)
                                 {
-                                    promoteGovForm = (Int32)dt.Rows[0]["GovernmentForm"];
-                                }
+                                    // Check if new rank == 0, if so, demote promoter
+                                    if ((targetOldRank - 1) == 0)
+                                    {
+                                        /* This is a bit more complex.  Here we need to promote new president first
+                                             * then we go about demoting old president
+                                             * finally we set the new leader in Sql
+                                             * Reset OrgName to set changes
+                                             */
 
-                                // Check if new rank == 0, if so, demote promoter
-                                if ((targetOldRank - 1) == 0)
-                                {
-                                    /* This is a bit more complex.  Here we need to promote new president first
-                                         * then we go about demoting old president
-                                         * finally we set the new leader in Sql
-                                         * Reset OrgName to set changes
-                                         */
+                                        OrganizationDao.SetNewPrez(orgPromote.ID, toPromote.Identity.Instance);
+                                        toPromote.Stats["ClanLevel"].Value = 0;
+                                        client.Character.Stats["ClanLevel"].Value = 1;
 
-                                    // Set new President's Rank
-                                    targetOldRank = toPromote.Stats["ClanLevel"].Value;
-                                    targetNewRank = targetOldRank - 1;
-                                    promotedToRank = GetRank(promoteGovForm, (uint)targetNewRank);
-                                    toPromote.Stats["ClanLevel"].Value=targetNewRank;
-
-                                    // Demote the old president
-                                    oldPresRank = client.Character.Stats["ClanLevel"].Value;
-                                    newPresRank = oldPresRank + 1;
-                                    demotedFromRank = GetRank(promoteGovForm, (uint)newPresRank);
-                                    client.Character.Stats["ClanLevel"].Value=newPresRank;
-
-                                    // Change the leader id in Sql
-                                    var newLeadSql = "UPDATE organizations SET LeaderID = " + toPromote.Identity.Instance
-                                                     + " WHERE ID = " + toPromote.Stats["Clan"].BaseValue;
-                                    ms.SqlUpdate(newLeadSql);
-                                    client.SendChatText(
-                                        "You've passed leadership of the organization to: " + (toPromote as Character).Name);
-                                    ((toPromote as Character).Client as Client).SendChatText(
-                                        "You've been promoted to the rank of " + promotedToRank + " by "
-                                        + client.Character.Name);
-                                    break;
+                                        client.SendChatText(
+                                            "You've passed leadership of the organization to: "
+                                            + (toPromote as Character).Name);
+                                        ((toPromote as Character).Client as Client).SendChatText(
+                                            "You've been promoted to the rank of " + promotedToRank + " by "
+                                            + client.Character.Name);
+                                    }
+                                    else
+                                    {
+                                        // Just Promote
+                                        targetOldRank = toPromote.Stats["ClanLevel"].Value;
+                                        targetNewRank = targetOldRank - 1;
+                                        promotedToRank = GetRank(promoteGovForm, (uint)targetNewRank);
+                                        toPromote.Stats["ClanLevel"].Value = targetNewRank;
+                                        client.SendChatText(
+                                            "You've promoted " + (toPromote as Character).Name + " to " + promotedToRank);
+                                        ((toPromote as Character).Client as Client).SendChatText(
+                                            "You've been promoted to the rank of " + promotedToRank + " by "
+                                            + client.Character.Name);
+                                    }
                                 }
                                 else
                                 {
-                                    // Just Promote
-                                    targetOldRank = toPromote.Stats["ClanLevel"].Value;
-                                    targetNewRank = targetOldRank - 1;
-                                    promotedToRank = GetRank(promoteGovForm, (uint)targetNewRank);
-                                    toPromote.Stats
-                                        ["ClanLevel"].Value=targetNewRank;
-                                    client.SendChatText(
-                                        "You've promoted " + (toPromote as Character).Name + " to " + promotedToRank);
-                                    ((toPromote as Character).Client as Client).SendChatText(
-                                        "You've been promoted to the rank of " + promotedToRank + " by "
-                                        + client.Character.Name);
+                                    client.SendChatText("Organization does not exist?");
                                 }
                             }
                             else
@@ -380,17 +347,17 @@ namespace ZoneEngine.Network.PacketHandlers
                 #region /org demote
 
                 case 11:
-                    /*
                     // demote target player
                     // create the target namespace t_demote
-                    Client toDemote = null;
+                    IInstancedEntity toDemote = null;
                     var demoteSql = string.Empty;
                     var targetCurRank = -1;
                     var targetNewerRank = -1;
-                    if ((toDemote = FindClient.FindClientById(message.Target.Instance)) != null)
+                    toDemote = client.Character.Playfield.FindByIdentity(message.Target);
+                    if (toDemote != null)
                     {
                         // First we check if target is in the same org as you
-                        if (toDemote.Character.OrgId != client.Character.OrgId)
+                        if (toDemote.Stats["Clan"].BaseValue != client.Character.Stats["Clan"].BaseValue)
                         {
                             // not in same org
                             client.SendChatText("Target is not in your organization!");
@@ -398,47 +365,48 @@ namespace ZoneEngine.Network.PacketHandlers
                         }
 
                         // Target is in same org, are you eligible to demote?  Promoter Rank has to be TargetRank-2 or == 0
-                        if ((client.Character.Stats.GMLevel.Value == (toDemote.Character.Stats.ClanLevel.Value - 2))
-                            || (client.Character.Stats.ClanLevel.Value == 0))
+                        if ((client.Character.Stats["ClanLevel"].Value <= (toDemote.Stats["ClanLevel"].Value - 2))
+                            || (client.Character.Stats["ClanLevel"].Value == 0))
                         {
                             // Promoter is eligible. Start the process
 
                             // First we get the details about the org itself
-                            demoteSql = "SELECT GovernmentForm FROM organizations WHERE ID = " + client.Character.OrgId;
-                            dt = ms.ReadDatatable(demoteSql);
+                            DBOrganization orgDemote =
+                                OrganizationDao.GetOrganizationData((int)client.Character.Stats["Clan"].BaseValue);
                             var demoteGovForm = -1;
                             var demotedToRank = string.Empty;
-                            if (dt.Rows.Count > 0)
+                            if (orgDemote == null)
                             {
-                                demoteGovForm = (Int32)dt.Rows[0]["GovernmentForm"];
+                                client.SendChatText("Organization does not exist?");
+                                break;
                             }
 
                             // Check whether new rank would be lower than lowest for current govform
-                            if ((targetCurRank + 1) > GetLowestRank(demoteGovForm))
+                            if ((targetCurRank + 1) > GetLowestRank(orgDemote.GovernmentForm))
                             {
                                 client.SendChatText("You can't demote character any lower!");
                                 break;
                             }
 
-                            targetCurRank = toDemote.Character.Stats.GMLevel.Value;
+                            targetCurRank = toDemote.Stats["ClanLevel"].Value;
                             targetNewerRank = targetCurRank + 1;
                             demotedToRank = GetRank(demoteGovForm, (uint)targetNewerRank);
-                            toDemote.Character.Stats.ClanLevel.Set(targetNewerRank);
-                            client.SendChatText("You've demoted " + toDemote.Character.Name + " to " + demotedToRank);
-                            toDemote.SendChatText(
+                            toDemote.Stats["ClanLevel"].Value = targetNewerRank;
+                            client.SendChatText("You've demoted " + (toDemote as Character).Name + " to " + demotedToRank);
+                            ((toDemote as Character).Client as Client).SendChatText(
                                 "You've been demoted to the rank of " + demotedToRank + " by " + client.Character.Name);
                             break;
                         }
                         else
                         {
                             // Promoter not eligible to promote
-                            client.SendChatText("Your Rank is not high enough to demote " + toDemote.Character.Name);
+                            client.SendChatText("Your Rank is not high enough to demote " + (toDemote as Character).Name);
                             break;
                         }
                     }
-                    */
-                    break;
                     
+                    break;
+
                 #endregion
 
                 #region unknown org command 12
@@ -458,20 +426,24 @@ namespace ZoneEngine.Network.PacketHandlers
 
                     // create the t_player Client namespace, using CmdStr to find character id, in replacement of target.Instance
                     var kickedFrom = client.Character.Stats["Clan"].BaseValue;
-                    var kickeeSql = "SELECT * FROM characters WHERE Name = '" + message.CommandArgs + "'";
-                    var kickeeId = 0;
-                    dt = ms.ReadDatatable(kickeeSql);
-                    if (dt.Rows.Count > 0)
+                    DBCharacter kickChar = CharacterDao.GetByCharName(message.CommandArgs);
+                    if (kickChar == null)
                     {
-                        kickeeId = (Int32)dt.Rows[0]["ID"];
+                        client.SendChatText("No character with name "+message.CommandArgs+" exists.");
+                        break;
                     }
+                    var kickeeId = kickChar.Id;
 
-                    Client targetPlayer = null;
-                    if ((targetPlayer = FindClient.FindClientById(kickeeId)) != null)
+                    IInstancedEntity targetPlayer =
+                        client.Playfield.FindByIdentity(
+                            new Identity() { Type = IdentityType.CanbeAffected, Instance = kickeeId });
+                    
+                    if (targetPlayer != null)
                     {
                         // Check if CmdStr is actually part of the org
-                        var kickeeOrgId = targetPlayer.Character.OrgId;
-                        if (kickeeOrgId != client.Character.OrgId)
+
+                        var kickeeOrgId = targetPlayer.Stats["Clan"].BaseValue;
+                        if (kickeeOrgId != client.Character.Stats["Clan"].BaseValue)
                         {
                             // Not part of Org. break out.
                             client.SendChatText(message.CommandArgs + "is not a member of your organization!");
@@ -544,7 +516,7 @@ namespace ZoneEngine.Network.PacketHandlers
                             tPlayer.SendCompressed(inviteMessage);
                         }*/
                     }
-                        
+
                     break;
 
                 #endregion
@@ -568,7 +540,7 @@ namespace ZoneEngine.Network.PacketHandlers
                         client.Character.OrgId = (uint)orgIdtoJoin;
                       */
                     }
-                        
+
                     break;
 
                 #endregion
@@ -609,7 +581,7 @@ namespace ZoneEngine.Network.PacketHandlers
                 #region /org tax | /org tax <tax>
 
                 case 17:
-                    
+
                     // gets or sets org tax
                     // <tax> is CmdStr
                     // if no <tax>, then just send chat text with current tax info

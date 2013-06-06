@@ -282,17 +282,19 @@ namespace ZoneEngine.Network.PacketHandlers
             {
                 Thread.Sleep(200); // social has to wait for 0.2 secs too (for helmet update)
             }
-
+            /*
             SwitchItem.Send(
                 cli,
                 fromContainerID,
                 fromPlacement,
                 new Identity { Type = toIdentity.Type, Instance = toIdentity.Instance },
                 toPlacement);
+             */
             cli.Character.Stats.ClearChangedFlags();
             if (!noAppearanceUpdate)
             {
-                cli.Character.AppearanceUpdate();
+                throw new NotImplementedException("TODO");
+                //cli.Character.AppearanceUpdate();
             }
 
             itemFrom = null;

@@ -299,6 +299,11 @@ namespace ZoneEngine.GameObject.Items.Inventory
             return -1;
         }
 
+        public bool ValidSlot(int slotNum)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// </summary>
         private BaseInventoryPage()

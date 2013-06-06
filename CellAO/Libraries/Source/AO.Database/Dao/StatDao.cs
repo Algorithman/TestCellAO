@@ -142,5 +142,13 @@ namespace AO.Database
                 }
             }
         }
+
+        public static void DisbandOrganization(int orgId)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                conn.Execute("UPDATE stats SET statvalue=0 WHERE statid=5 AND statvalue=@orgId", new { orgId });
+            }
+        }
     }
 }

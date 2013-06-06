@@ -54,5 +54,7 @@ namespace ZoneEngine.GameObject.Stats
         /// <summary>
         /// </summary>
         void ClearModifiers();
+
+        void ClearChangedFlags();
     }
 }
