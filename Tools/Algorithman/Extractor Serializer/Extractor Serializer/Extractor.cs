@@ -100,7 +100,7 @@ namespace Extractor_Serializer
             {
                 bStream.ReadInt32();
                 short num2 = bStream.ReadInt16();
-                bStream.Position += 8u;
+                bStream.Position += 22u;
                 this.totalRecords += (uint)num2;
                 while (true)
                 {
@@ -114,6 +114,7 @@ namespace Extractor_Serializer
                     uint value = bStream.ReadUInt32();
                     int key = bStream.ReadInt32_MSB();
                     int key2 = bStream.ReadInt32_MSB();
+                    bStream.ReadInt32();
                     if (!this.Records.ContainsKey(key))
                     {
                         this.Records.Add(key, new Dictionary<int, uint>());

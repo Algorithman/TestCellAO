@@ -75,12 +75,13 @@ namespace Extractor_Serializer
     using System.IO;
     using System.Text;
 
-    using ComponentAce.Compression.Libs.zlib;
+    using ZoneEngine.GameObject.Items;
+    using ZoneEngine.Gameobject.Items;
+
+    using zlib;
 
     using MsgPack.Serialization;
 
-    using ZoneEngine.GameObject.Items;
-    using ZoneEngine.Gameobject.Items;
     using ZoneEngine.GameObject.Nanos;
 
     #endregion
@@ -273,7 +274,7 @@ namespace Extractor_Serializer
             // GetData(@"D:\c#\extractor serializer\data\nanostrains\",0xf4266);
             // GetData(@"D:\c#\extractor serializer\data\perks\",0xf4264);
             var np = new NewParser();
-            var rawItemList = new List<AOItemTemplate>();
+            var rawItemList = new List<ItemTemplate>();
             var rawNanoList = new List<NanoFormula>();
             int counter = 0;
             foreach (int recnum in extractor.GetRecordInstances(0xFDE85))
@@ -303,6 +304,7 @@ namespace Extractor_Serializer
             counter = 0;
             foreach (int recnum in extractor.GetRecordInstances(0xF4254))
             {
+                Console.Write("\rItem ID: " + recnum.ToString().PadLeft(9)); 
                 rawItemList.Add(np.ParseItem(0xF4254, recnum, extractor.GetRecordData(0xF4254, recnum), ItemNamesSql));
                 if ((counter % 1000) == 0)
                 {
@@ -403,9 +405,9 @@ namespace Extractor_Serializer
 
             ds = new ZOutputStream(sf, zlibConst.Z_BEST_COMPRESSION);
             sm = new MemoryStream();
-            MessagePackSerializer<List<AOItemTemplate>> bf2 = MessagePackSerializer.Create<List<AOItemTemplate>>();
+            MessagePackSerializer<List<ItemTemplate>> bf2 = MessagePackSerializer.Create<List<ItemTemplate>>();
 
-            List<AOItemTemplate> items = new List<AOItemTemplate>();
+            List<ItemTemplate> items = new List<ItemTemplate>();
 
             maxnum = 5000;
             sm.WriteByte((byte)(versionbuffer.Length));
@@ -414,7 +416,7 @@ namespace Extractor_Serializer
             buffer = BitConverter.GetBytes(maxnum);
             sm.Write(buffer, 0, buffer.Length);
 
-            foreach (AOItemTemplate it in rawItemList)
+            foreach (ItemTemplate it in rawItemList)
             {
                 items.Add(it);
                 if (items.Count == maxnum)
@@ -435,10 +437,10 @@ namespace Extractor_Serializer
             Console.WriteLine("Checking Items...");
             Console.WriteLine();
 
-            ItemHandler.CacheAllItems("items.dat");
+            ItemLoader.CacheAllItems("items.dat");
 
             Console.WriteLine();
-            Console.WriteLine("Items: " + ItemHandler.ItemList.Count + " successfully converted");
+            Console.WriteLine("Items: " + ItemLoader.ItemList.Count + " successfully converted");
 
             Console.WriteLine();
             Console.WriteLine("Further Instructions:");

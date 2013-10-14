@@ -63,7 +63,7 @@ namespace Extractor_Serializer
         /// <param name="ITEM">
         /// The item.
         /// </param>
-        public void ParseAnimSoundSet(int typeN, AOItemTemplate ITEM)
+        public void ParseAnimSoundSet(int typeN, ItemTemplate ITEM)
         {
             int num = this.br.ReadInt32();
             int num2 = this.br.Read3F1();
@@ -125,10 +125,10 @@ namespace Extractor_Serializer
         /// <returns>
         /// The <see cref="AOItem"/>.
         /// </returns>
-        public AOItemTemplate ParseItem(int rectype, int recnum, byte[] data, List<string> itemnamessql)
+        public ItemTemplate ParseItem(int rectype, int recnum, byte[] data, List<string> itemnamessql)
         {
             this.br = new BufferedReader(rectype, recnum, data);
-            AOItemTemplate aoi = new AOItemTemplate();
+            ItemTemplate aoi = new ItemTemplate();
             aoi.ID = recnum;
             this.br.Skip(16);
 
@@ -378,16 +378,16 @@ namespace Extractor_Serializer
         /// <returns>
         /// The <see cref="List"/>.
         /// </returns>
-        public List<AORequirements> ParseReqs(List<rawreqs> rreqs)
+        public List<Requirements> ParseReqs(List<rawreqs> rreqs)
         {
             int numreqs = rreqs.Count;
 
-            List<AORequirements> output = new List<AORequirements>();
+            List<Requirements> output = new List<Requirements>();
 
             for (int i = 0; i < numreqs; i++)
             {
                 rawreqs rr = rreqs[i];
-                AORequirements aor = new AORequirements();
+                Requirements aor = new Requirements();
 
                 aor.Target = 0x13;
                 aor.Statnumber = rr.stat;
@@ -442,7 +442,7 @@ namespace Extractor_Serializer
         /// <returns>
         /// The <see cref="List"/>.
         /// </returns>
-        public List<AORequirements> ReadReqs(int numreqs)
+        public List<Requirements> ReadReqs(int numreqs)
         {
             int num4 = numreqs;
             bool flag = num4 > 0;
@@ -475,7 +475,7 @@ namespace Extractor_Serializer
                 return this.ParseReqs(list);
             }
 
-            return new List<AORequirements>();
+            return new List<Requirements>();
         }
 
         #endregion
@@ -510,7 +510,7 @@ namespace Extractor_Serializer
         /// </param>
         /// <exception cref="Exception">
         /// </exception>
-        private void ParseActionSet(List<AOActions> actions)
+        private void ParseActionSet(List<Actions> actions)
         {
             bool flag = this.br.ReadInt32() != 36;
             if (flag)
@@ -533,18 +533,18 @@ namespace Extractor_Serializer
                     }
 
                     int actionNum = this.br.ReadInt32();
-                    AOActions aoa = new AOActions();
+                    Actions aoa = new Actions();
                     aoa.ActionType = actionNum;
                     int numreqs = this.br.Read3F1();
-                    List<AORequirements> cookedreqs = this.ReadReqs(numreqs);
-                    foreach (AORequirements REQ in cookedreqs)
+                    List<Requirements> cookedreqs = this.ReadReqs(numreqs);
+                    foreach (Requirements REQ in cookedreqs)
                     {
                         aoa.Requirements.Add(REQ);
                     }
 
                     if (actions == null)
                     {
-                        actions = new List<AOActions>();
+                        actions = new List<Actions>();
                     }
                     actions.Add(aoa);
                     cookedreqs.Clear();
@@ -572,7 +572,10 @@ namespace Extractor_Serializer
             bool flag = !this.FunctionSets.ContainsKey(funcNum.ToString());
             if (flag)
             {
-                throw new IndexOutOfRangeException("Not handled function" + funcNum.ToString());
+                TextWriter lastitem = new StreamWriter("J:\\lastitem.txt");
+                lastitem.WriteLine(NiceHexOutput.NiceHexOutput.Output(this.br.Buffer));
+                lastitem.Close();
+                throw new IndexOutOfRangeException("Not handled function " + funcNum.ToString());
             }
 
             string[] array = this.FunctionSets[funcNum.ToString()].Split(',');
@@ -724,13 +727,13 @@ namespace Extractor_Serializer
 
                             if (value == 12)
                             {
-                                list.Add(attrkey,attrval);
+                                list.Add(attrkey, attrval);
                                 num7++;
                             }
 
                             if (value == 13)
                             {
-                                list2.Add(attrkey,attrval);
+                                list2.Add(attrkey, attrval);
                                 num7++;
                             }
                         }
@@ -743,9 +746,9 @@ namespace Extractor_Serializer
                     num3++;
                 }
 
-                foreach (KeyValuePair<int,int> ua in list)
+                foreach (KeyValuePair<int, int> ua in list)
                 {
-                    attackstat.Add(ua.Key,ua.Value);
+                    attackstat.Add(ua.Key, ua.Value);
                 }
 
                 foreach (KeyValuePair<int, int> ua in list2)
@@ -761,11 +764,11 @@ namespace Extractor_Serializer
         /// <param name="retlist">
         /// The retlist.
         /// </param>
-        private void ParseFunctionSet(List<AOEvents> retlist)
+        private void ParseFunctionSet(List<Events> retlist)
         {
             int eventNum = this.br.ReadInt32();
             int num = this.br.Read3F1();
-            List<AOFunctions> list = new List<AOFunctions>();
+            List<Functions> list = new List<Functions>();
             int arg_2F_0 = 0;
             bool R;
             int num2 = num - 1;
@@ -779,7 +782,7 @@ namespace Extractor_Serializer
                     break;
                 }
 
-                AOFunctions func = new AOFunctions();
+                Functions func = new Functions();
 
                 func.FunctionType = this.br.ReadInt32();
                 this.br.Skip(8);
@@ -787,7 +790,7 @@ namespace Extractor_Serializer
                 bool flag = num5 > 0;
                 if (flag)
                 {
-                    foreach (AORequirements ur in this.ReadReqs(num5))
+                    foreach (Requirements ur in this.ReadReqs(num5))
                     {
                         func.Requirements.Add(ur);
                     }
@@ -808,15 +811,15 @@ namespace Extractor_Serializer
                 num3++;
             }
 
-            AOEvents aoe = new AOEvents();
+            Events aoe = new Events();
             aoe.EventType = eventNum;
-            foreach (AOFunctions ff in list)
+            foreach (Functions ff in list)
             {
                 aoe.Functions.Add(ff);
             }
             if (retlist == null)
             {
-                retlist = new List<AOEvents>();
+                retlist = new List<Events>();
             }
             retlist.Add(aoe);
         }
@@ -827,14 +830,14 @@ namespace Extractor_Serializer
         /// <param name="events">
         /// The events.
         /// </param>
-        private void ParseShopHash(List<AOEvents> events)
+        private void ParseShopHash(List<Events> events)
         {
             int eventNum = this.br.ReadInt32();
             int num = this.br.Read3F1();
             int arg_2D_0 = 1;
             int num2 = num;
             int num3 = arg_2D_0;
-            AOEvents aoe = new AOEvents();
+            Events aoe = new Events();
             aoe.EventType = eventNum;
             checked
             {
@@ -860,7 +863,7 @@ namespace Extractor_Serializer
                     int count = Math.Min(11, this.br.Buffer.Length - this.br.Ptr);
                     this.br.Skip(count);
 
-                    AOFunctions aof = new AOFunctions();
+                    Functions aof = new Functions();
                     aof.Arguments.Values.Add(text);
                     aof.Arguments.Values.Add(num5);
                     aof.Arguments.Values.Add(num6);
@@ -876,7 +879,7 @@ namespace Extractor_Serializer
 
             if (events == null)
             {
-                events = new List<AOEvents>();
+                events = new List<Events>();
             }
             events.Add(aoe);
         }
