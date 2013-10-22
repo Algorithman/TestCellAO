@@ -82,7 +82,7 @@ namespace AO.Database
                 conn = new SqlConnection(ConnectionString_MSSQL);
             }
 
-            if (Sqltype == "PostgreSQL")
+            if (Sqltype == "PostgreSQL" )
             {
                 conn = new NpgsqlConnection(ConnectionString_PostGreSQL);
             }
